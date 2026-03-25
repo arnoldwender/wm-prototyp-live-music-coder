@@ -21,7 +21,7 @@ import { getOrchestrator } from '../../lib/orchestrator'
 import { getRecorder } from '../../lib/audio/recorder'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Tooltip } from '../atoms'
-import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog } from '../molecules'
+import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog, HelpPanel } from '../molecules'
 import { GistDialog } from './GistDialog'
 
 /** Main transport and toolbar header */
@@ -39,9 +39,10 @@ function TransportBar() {
   const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
 
-  /* Dialog visibility state */
+  /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
 
   /* Orchestrator-wired handlers — bridge UI state with audio engine */
   const handlePlay = async () => {
@@ -208,10 +209,15 @@ function TransportBar() {
           </Tooltip>
         </ToolbarGroup>
 
-        {/* Settings */}
+        {/* Settings / Help toggle */}
         <ToolbarGroup>
           <Tooltip content={t('toolbar.settings')}>
-            <Button variant="icon" aria-label={t('toolbar.settings')}>
+            <Button
+              variant="icon"
+              active={showHelp}
+              onClick={() => setShowHelp(!showHelp)}
+              aria-label={t('toolbar.settings')}
+            >
               <Icon icon={Settings} size={16} />
             </Button>
           </Tooltip>
@@ -222,9 +228,10 @@ function TransportBar() {
       </div>
     </header>
 
-    {/* --- Modal dialogs (rendered outside header flow) --- */}
+    {/* --- Modal dialogs and panels (rendered outside header flow) --- */}
     {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
     {showGist && <GistDialog onClose={() => setShowGist(false)} />}
+    {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
     </>
   )
 }
