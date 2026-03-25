@@ -1,0 +1,255 @@
+/* ──────────────────────────────────────────────────────────
+   GistDialog organism — modal for GitHub Gist integration.
+   Sections: PAT token management, save project to Gist,
+   load project from Gist URL/ID.
+   ────────────────────────────────────────────────────────── */
+
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { X, Upload, Download, Trash2 } from 'lucide-react'
+import { useAppStore } from '../../lib/store'
+import {
+  getStoredToken,
+  setStoredToken,
+  clearStoredToken,
+  saveToGist,
+  loadFromGist,
+  parseGistId,
+} from '../../lib/persistence/gist'
+import { Button } from '../atoms'
+import type { Project } from '../../types/project'
+
+interface GistDialogProps {
+  onClose: () => void
+}
+
+/** Dialog for GitHub Gist save/load with PAT management */
+export function GistDialog({ onClose }: GistDialogProps) {
+  const { t } = useTranslation()
+  const [token, setToken] = useState(getStoredToken() ?? '')
+  const [remember, setRemember] = useState(false)
+  const [gistInput, setGistInput] = useState('')
+  const [status, setStatus] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const hasToken = !!getStoredToken()
+
+  /* --- Token management handlers --- */
+
+  const handleSaveToken = () => {
+    setStoredToken(token, remember)
+    setStatus('Token saved')
+  }
+
+  const handleClearToken = () => {
+    clearStoredToken()
+    setToken('')
+    setStatus('Token cleared')
+  }
+
+  /* --- Gist save handler — builds Project from current store state --- */
+
+  const handleSave = async () => {
+    setSaving(true)
+    setStatus('Saving...')
+    try {
+      const store = useAppStore.getState()
+      const now = new Date().toISOString()
+      const project: Project = {
+        id: `project_${Date.now()}`,
+        name: 'Live Music Coder Project',
+        version: 1,
+        created: now,
+        updated: now,
+        bpm: store.bpm,
+        defaultEngine: store.defaultEngine,
+        files: store.files,
+        graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
+        layout: store.layout,
+        ecosystem: {
+          creatures: [],
+          golGrid: { width: 64, height: 64, liveCells: [] },
+          collection: [],
+        },
+      }
+      const result = await saveToGist(project)
+      setStatus(`Saved! Gist ID: ${result.id}`)
+    } catch (err) {
+      setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)
+    }
+    setSaving(false)
+  }
+
+  /* --- Gist load handler — applies loaded project to store --- */
+
+  const handleLoad = async () => {
+    const gistId = parseGistId(gistInput)
+    if (!gistId) {
+      setStatus('Invalid Gist ID or URL')
+      return
+    }
+    setStatus('Loading...')
+    try {
+      const project = await loadFromGist(gistId)
+      useAppStore.setState({
+        bpm: project.bpm,
+        defaultEngine: project.defaultEngine,
+        files: project.files,
+        layout: project.layout,
+      })
+      setStatus('Loaded successfully!')
+    } catch (err) {
+      setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)
+    }
+  }
+
+  /* Shared input styles — reusable across both inputs */
+  const inputStyle: React.CSSProperties = {
+    backgroundColor: 'var(--color-bg)',
+    color: 'var(--color-text)',
+    border: '1px solid var(--color-border)',
+    fontSize: 'var(--font-size-sm)',
+    padding: 'var(--space-3)',
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+    >
+      <div
+        className="rounded-lg max-w-lg w-full mx-4"
+        style={{
+          backgroundColor: 'var(--color-bg-elevated)',
+          border: '1px solid var(--color-border)',
+          padding: 'var(--space-6)',
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+          <h2
+            style={{
+              fontSize: 'var(--font-size-lg)',
+              fontWeight: 'var(--font-weight-semibold)',
+              color: 'var(--color-text)',
+            }}
+          >
+            {t('toolbar.gist')}
+          </h2>
+          <Button variant="ghost" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </Button>
+        </div>
+
+        {/* --- Token management section --- */}
+        <section style={{ marginBottom: 'var(--space-4)' }}>
+          <label
+            className="block"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              marginBottom: 'var(--space-2)',
+            }}
+          >
+            GitHub Personal Access Token
+          </label>
+          <input
+            type="password"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            placeholder="ghp_..."
+            className="w-full rounded"
+            style={{ ...inputStyle, marginBottom: 'var(--space-3)' }}
+          />
+          <div className="flex items-center" style={{ marginBottom: 'var(--space-3)', gap: 'var(--space-2)' }}>
+            <label
+              className="flex items-center cursor-pointer"
+              style={{
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--color-text-muted)',
+                gap: 'var(--space-2)',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              Remember token (localStorage)
+            </label>
+          </div>
+          <div className="flex" style={{ gap: 'var(--space-3)' }}>
+            <Button variant="secondary" onClick={handleSaveToken}>
+              Save Token
+            </Button>
+            {hasToken && (
+              <Button variant="ghost" onClick={handleClearToken} className="flex items-center gap-1">
+                <Trash2 size={14} /> Clear
+              </Button>
+            )}
+          </div>
+        </section>
+
+        {/* --- Save to Gist section --- */}
+        <section style={{ marginBottom: 'var(--space-4)' }}>
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            disabled={!hasToken || saving}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Upload size={16} />
+            <span>Save to Gist</span>
+          </Button>
+        </section>
+
+        {/* --- Load from Gist section --- */}
+        <section style={{ marginBottom: 'var(--space-4)' }}>
+          <label
+            className="block"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              marginBottom: 'var(--space-2)',
+            }}
+          >
+            Load from Gist (URL or ID)
+          </label>
+          <input
+            value={gistInput}
+            onChange={(e) => setGistInput(e.target.value)}
+            placeholder="https://gist.github.com/user/abc123"
+            className="w-full rounded"
+            style={{
+              ...inputStyle,
+              fontFamily: 'var(--font-family-mono)',
+              marginBottom: 'var(--space-3)',
+            }}
+          />
+          <Button
+            variant="secondary"
+            onClick={handleLoad}
+            disabled={!hasToken || !gistInput}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Download size={16} />
+            <span>Load from Gist</span>
+          </Button>
+        </section>
+
+        {/* --- Status feedback --- */}
+        {status && (
+          <p
+            className="text-center"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            {status}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -4,6 +4,7 @@
    Right: Undo/Redo/Share/Gist, Settings, LanguageSwitcher
    ────────────────────────────────────────────────────────── */
 
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Play,
@@ -17,9 +18,11 @@ import {
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
+import { getRecorder } from '../../lib/audio/recorder'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Tooltip } from '../atoms'
-import { ToolbarGroup, EngineSelector, LanguageSwitcher } from '../molecules'
+import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog } from '../molecules'
+import { GistDialog } from './GistDialog'
 
 /** Main transport and toolbar header */
 function TransportBar() {
@@ -35,6 +38,10 @@ function TransportBar() {
   const stop = useAppStore((s) => s.stop)
   const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
+
+  /* Dialog visibility state */
+  const [showShare, setShowShare] = useState(false)
+  const [showGist, setShowGist] = useState(false)
 
   /* Orchestrator-wired handlers — bridge UI state with audio engine */
   const handlePlay = async () => {
@@ -59,7 +66,20 @@ function TransportBar() {
     getOrchestrator().setBpm(newBpm)
   }
 
+  /* Record handler — toggles audio recording via MediaRecorder */
+  const handleRecord = async () => {
+    const recorder = getRecorder()
+    if (recorder.isRecording()) {
+      await recorder.stopAndDownload('live-music-coder')
+      toggleRecord()
+    } else {
+      recorder.start()
+      toggleRecord()
+    }
+  }
+
   return (
+    <>
     <header
       className="flex items-center justify-between shrink-0"
       style={{
@@ -98,7 +118,7 @@ function TransportBar() {
             <Button
               variant="icon"
               active={isRecording}
-              onClick={toggleRecord}
+              onClick={handleRecord}
               aria-label={t('transport.record')}
             >
               {/* Record circle — filled red when recording */}
@@ -176,13 +196,13 @@ function TransportBar() {
         {/* Share / Gist */}
         <ToolbarGroup>
           <Tooltip content={t('toolbar.share')}>
-            <Button variant="icon" aria-label={t('toolbar.share')}>
+            <Button variant="icon" onClick={() => setShowShare(true)} aria-label={t('toolbar.share')}>
               <Icon icon={Share2} size={16} />
             </Button>
           </Tooltip>
 
           <Tooltip content={t('toolbar.gist')}>
-            <Button variant="icon" aria-label={t('toolbar.gist')}>
+            <Button variant="icon" onClick={() => setShowGist(true)} aria-label={t('toolbar.gist')}>
               <Icon icon={FileCode2} size={16} />
             </Button>
           </Tooltip>
@@ -201,6 +221,11 @@ function TransportBar() {
         <LanguageSwitcher />
       </div>
     </header>
+
+    {/* --- Modal dialogs (rendered outside header flow) --- */}
+    {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
+    {showGist && <GistDialog onClose={() => setShowGist(false)} />}
+    </>
   )
 }
 
