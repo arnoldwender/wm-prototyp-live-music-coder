@@ -10,6 +10,7 @@ import { VisualizerToggle } from '../molecules/VisualizerToggle';
 import { WaveformVisualizer } from './WaveformVisualizer';
 import { SpectrumVisualizer } from './SpectrumVisualizer';
 import { PatternTimeline } from './PatternTimeline';
+import { BeatlingPanel } from './BeatlingPanel';
 
 /** Composes all visualizer panels with toggle controls */
 export function VisualizerDashboard() {
@@ -22,11 +23,7 @@ export function VisualizerDashboard() {
     visiblePanels.timeline && { key: 'timeline', component: <PatternTimeline /> },
     visiblePanels.beatlings && {
       key: 'beatlings',
-      component: (
-        <div className="flex items-center justify-center h-full" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}>
-          Beatling World — Phase 6
-        </div>
-      ),
+      component: <BeatlingPanel />,
     },
   ].filter(Boolean) as { key: string; component: ReactNode }[];
 

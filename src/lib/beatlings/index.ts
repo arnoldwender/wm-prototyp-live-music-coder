@@ -6,7 +6,7 @@
 
 import { GolBrain } from './gol-brain';
 import { AudioBridge } from './audio-bridge';
-import { SPECIES, shouldSpawn, type AudioFeatures } from './species';
+import { shouldSpawn, type AudioFeatures } from './species';
 import { addXp, getStage, type BeatlingXp } from './evolution';
 import { ACHIEVEMENTS, checkAchievement, isUnlocked } from './collection';
 import { drawBeatlingWorld } from './renderer';
