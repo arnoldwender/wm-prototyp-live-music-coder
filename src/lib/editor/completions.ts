@@ -30,7 +30,6 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'delay', type: 'function', detail: 'completions.strudel.delay', apply: '.delay(0.5)' },
   { label: 'room', type: 'function', detail: 'completions.strudel.room', apply: '.room(0.5)' },
   { label: 'pan', type: 'function', detail: 'completions.strudel.pan', apply: '.pan(0.5)' },
-  { label: 'bank', type: 'function', detail: 'completions.strudel.bank', apply: '.bank("")' },
   { label: 'rev', type: 'function', detail: 'completions.strudel.rev', apply: '.rev()' },
   { label: 'jux', type: 'function', detail: 'completions.strudel.jux', apply: '.jux(rev)' },
   { label: 'every', type: 'function', detail: 'completions.strudel.every', apply: '.every(4, x => x.rev())' },
@@ -50,9 +49,9 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'sine', type: 'keyword', detail: 'completions.strudel.sine' },
   { label: 'square', type: 'keyword', detail: 'completions.strudel.square' },
   { label: 'triangle', type: 'keyword', detail: 'completions.strudel.triangle' },
-  /* Banks */
-  { label: 'RolandTR808', type: 'keyword', detail: 'completions.strudel.tr808' },
-  { label: 'RolandTR909', type: 'keyword', detail: 'completions.strudel.tr909' },
+  /* Numeric sample packs */
+  { label: '808', type: 'keyword', detail: 'completions.strudel.s808' },
+  { label: '909', type: 'keyword', detail: 'completions.strudel.s909' },
 ];
 
 /* Tone.js completions */

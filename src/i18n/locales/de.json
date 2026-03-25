@@ -91,7 +91,7 @@
     "exampleDrums": "Drum-Pattern",
     "exampleEffects": "Mit Effekten",
     "exampleEuclidean": "Euklidischer Rhythmus",
-    "exampleBank": "Mit Sample-Bank",
+    "exampleStack": "Geschichtete Drums",
     "samples": "Verfügbare Samples",
     "sampleBd": "Bassdrum",
     "sampleSd": "Snare",
@@ -104,7 +104,7 @@
     "sampleHt": "High Tom",
     "sampleCr": "Crash",
     "sampleRd": "Ride",
-    "banks": "Sample-Bänke",
+    "banks": "Sample-Packs",
     "miniNotation": "Strudel Mini-Notation",
     "mnSequence": "Events sequenzieren",
     "mnSubdivide": "Unterteilen / Gruppieren",
@@ -181,7 +181,7 @@
       "delay": "Delay-Effekt (0-1)",
       "room": "Hallanteil (0-1)",
       "pan": "Stereoposition (0-1)",
-      "bank": "Sample-Bank Name",
+      "bank": "Sample-Bank Name (veraltet)",
       "rev": "Pattern umkehren",
       "jux": "Modifizierte Kopie im anderen Stereokanal",
       "every": "Funktion alle N Zyklen anwenden",
@@ -199,8 +199,8 @@
       "sine": "Sinus-Oszillator",
       "square": "Rechteck-Oszillator",
       "triangle": "Dreieck-Oszillator",
-      "tr808": "Roland TR-808 Drum-Bank",
-      "tr909": "Roland TR-909 Drum-Bank"
+      "s808": "808-Drum-Sounds — nutze als s(\"808\")",
+      "s909": "909-Drum-Sounds — nutze als s(\"909\")"
     },
     "tonejs": {
       "synth": "Basis-Synth (Oszillator + Hüllkurve)",
@@ -256,7 +256,7 @@
       "whatIsHeading": "Was ist Strudel?",
       "whatIsText": "Mit Strudel beschreibst du musikalische Patterns in kompakten Ausdrücken. Jedes Pattern dauert einen Zyklus und wiederholt sich unendlich. Du kettest Funktionen für Sounds, Noten, Effekte und Transformationen aneinander.",
       "firstPatternsHeading": "Erste Patterns",
-      "firstPatternsText": "Verwende note() für Melodien und sound() für Samples. Die .s()-Methode wählt die Klangquelle — Oszillatoren wie sawtooth oder Sample-Bänke wie RolandTR808.",
+      "firstPatternsText": "Verwende note() für Melodien und sound() für Samples. Die .s()-Methode wählt die Klangquelle — Oszillatoren wie sawtooth oder Drum-Samples wie bd, sd, hh.",
       "chainingHeading": "Effekte verketten",
       "chainingText": "Kette Methoden an, um deinen Klang zu formen. Jede Funktion transformiert das Pattern und gibt es weiter. Die Reihenfolge zählt — Filter vor Hall klingt anders als Hall vor Filter."
     },
@@ -288,7 +288,7 @@
       "mt": "mt — Mid Tom",
       "ht": "ht — High Tom",
       "banksHeading": "Sample-Bänke",
-      "banksText": "Verwende .bank() zum Wechseln zwischen Drum-Machine-Modellen. RolandTR808 und RolandTR909 sind klassische Bänke mit vollständigen Sample-Sets für jeden Drum-Typ.",
+      "banksText": "Verwende direkte Sample-Namen wie bd, sd, hh, oh, cp für Drums. Für 808/909-Sounds nutze s(\"808\") oder s(\"909\") direkt.",
       "oscillatorsHeading": "Oszillatoren",
       "oscillatorsText": "Für Synthese nutze .s() mit Oszillator-Typen: sawtooth (hell, brummig), sine (rein, klar), square (hohl, retro) und triangle (weich, sanft)."
     },

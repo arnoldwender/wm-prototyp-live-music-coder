@@ -91,7 +91,7 @@
     "exampleDrums": "Drum pattern",
     "exampleEffects": "With effects",
     "exampleEuclidean": "Euclidean rhythm",
-    "exampleBank": "With sample bank",
+    "exampleStack": "Layered drums",
     "samples": "Available Samples",
     "sampleBd": "Bass drum",
     "sampleSd": "Snare",
@@ -104,7 +104,7 @@
     "sampleHt": "High tom",
     "sampleCr": "Crash",
     "sampleRd": "Ride",
-    "banks": "Sample Banks",
+    "banks": "Sample Packs",
     "miniNotation": "Strudel Mini-Notation",
     "mnSequence": "Sequence events",
     "mnSubdivide": "Subdivide / group",
@@ -181,7 +181,7 @@
       "delay": "Delay effect (0-1)",
       "room": "Reverb amount (0-1)",
       "pan": "Stereo position (0-1)",
-      "bank": "Sample bank name",
+      "bank": "Sample bank name (deprecated)",
       "rev": "Reverse pattern",
       "jux": "Play modified copy in other stereo channel",
       "every": "Apply function every N cycles",
@@ -199,8 +199,8 @@
       "sine": "Sine oscillator",
       "square": "Square oscillator",
       "triangle": "Triangle oscillator",
-      "tr808": "Roland TR-808 drum bank",
-      "tr909": "Roland TR-909 drum bank"
+      "s808": "808 drum sounds — use as s(\"808\")",
+      "s909": "909 drum sounds — use as s(\"909\")"
     },
     "tonejs": {
       "synth": "Basic synth (osc + envelope)",
@@ -256,7 +256,7 @@
       "whatIsHeading": "What Is Strudel?",
       "whatIsText": "Strudel lets you describe musical patterns with concise expressions. Each pattern has a duration of one cycle and repeats infinitely. You chain functions to add sounds, notes, effects, and transformations.",
       "firstPatternsHeading": "Your First Patterns",
-      "firstPatternsText": "Use note() for melodies and sound() for samples. The .s() method selects the sound source — oscillators like sawtooth or sample banks like RolandTR808.",
+      "firstPatternsText": "Use note() for melodies and sound() for samples. The .s() method selects the sound source — oscillators like sawtooth or drum samples like bd, sd, hh.",
       "chainingHeading": "Chaining Effects",
       "chainingText": "Chain methods to shape your sound. Each function transforms the pattern and passes it to the next. Order matters — filters before reverb sounds different than reverb before filters."
     },
@@ -288,7 +288,7 @@
       "mt": "mt — Mid tom",
       "ht": "ht — High tom",
       "banksHeading": "Sample Banks",
-      "banksText": "Use .bank() to switch between drum machine models. RolandTR808 and RolandTR909 are classic banks with full sample sets for each drum type.",
+      "banksText": "Use direct sample names like bd, sd, hh, oh, cp for drums. For 808/909 sounds, use s(\"808\") or s(\"909\") directly.",
       "oscillatorsHeading": "Oscillators",
       "oscillatorsText": "For synthesis, use .s() with oscillator types: sawtooth (bright, buzzy), sine (pure, clean), square (hollow, retro), and triangle (soft, mellow)."
     },

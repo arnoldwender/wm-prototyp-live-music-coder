@@ -33,8 +33,8 @@ const EXAMPLE_PATTERNS = [
     code: 's("bd(3,8) hh(5,8) sd(2,8)")',
   },
   {
-    labelKey: 'help.exampleBank',
-    code: 's("bd sd hh oh").bank("RolandTR808")',
+    labelKey: 'help.exampleStack',
+    code: 'stack(s("bd sd"), s("hh*8").gain(.4))',
   },
 ] as const
 
@@ -51,15 +51,6 @@ const DRUM_SAMPLES = [
   { name: 'ht', labelKey: 'help.sampleHt' },
   { name: 'cr', labelKey: 'help.sampleCr' },
   { name: 'rd', labelKey: 'help.sampleRd' },
-] as const
-
-/* Common sample banks */
-const SAMPLE_BANKS = [
-  'RolandTR808',
-  'RolandTR909',
-  'RolandCR8000',
-  'AkaiLinn',
-  'ViscoSpaceDrum',
 ] as const
 
 /** Copyable code block with copy-to-clipboard button */
@@ -253,23 +244,6 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
                 <span style={{ color: 'var(--color-primary)' }}>{s.name}</span>
                 {' — '}
                 {t(s.labelKey)}
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* --- Sample banks --- */}
-        <Section titleKey="help.banks">
-          <div
-            className="space-y-1 text-xs"
-            style={{
-              fontFamily: 'var(--font-family-mono)',
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            {SAMPLE_BANKS.map((bank) => (
-              <div key={bank}>
-                <span style={{ color: 'var(--color-primary)' }}>{bank}</span>
               </div>
             ))}
           </div>

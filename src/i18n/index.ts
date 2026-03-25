@@ -48,6 +48,8 @@ i18n
       /* React already escapes output */
       escapeValue: false,
     },
+    /* Suppress promotional messages in console */
+    debug: false,
   })
 
 /* Persist language choice on change */

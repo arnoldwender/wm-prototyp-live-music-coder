@@ -21,7 +21,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
     description: 'Classic 808 drum machine pattern',
     engine: 'strudel',
     code: `s("bd sd [~ bd] sd")
-.bank("RolandTR808")
 .speed("<1 1.5 1 0.5>")
 .sometimes(x => x.delay(.5))`,
   },
@@ -33,7 +32,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
     engine: 'strudel',
     code: `stack(
   s("bd ~ [bd ~] ~").gain(1.2),
-  s("~ sd ~ sd").bank("RolandTR909"),
+  s("~ sd ~ sd"),
   s("hh*8").gain(.4).pan(sine.range(.3,.7))
 )`,
   },
@@ -45,7 +44,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
     engine: 'strudel',
     code: `stack(
   s("bd(3,8)").gain(1.2),
-  s("sd(2,8)").bank("RolandTR808"),
+  s("sd(2,8)"),
   s("hh(5,8)").gain(.5),
   s("oh(1,8)").gain(.3)
 )`,
@@ -222,7 +221,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
     .lpf(2000).gain(.25)
     .delay(.3).delaytime(.166).fast(2),
   s("bd ~ bd ~, ~ cp ~ cp, hh*8")
-    .bank("RolandTR808").gain(.5)
+    .gain(.5)
 ).slow(2)`,
   },
   {

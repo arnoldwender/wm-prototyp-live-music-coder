@@ -91,7 +91,7 @@
     "exampleDrums": "Patrón de batería",
     "exampleEffects": "Con efectos",
     "exampleEuclidean": "Ritmo euclidiano",
-    "exampleBank": "Con banco de muestras",
+    "exampleStack": "Batería en capas",
     "samples": "Muestras Disponibles",
     "sampleBd": "Bombo",
     "sampleSd": "Caja",
@@ -104,7 +104,7 @@
     "sampleHt": "Tom agudo",
     "sampleCr": "Crash",
     "sampleRd": "Ride",
-    "banks": "Bancos de Muestras",
+    "banks": "Packs de Muestras",
     "miniNotation": "Strudel Mini-Notación",
     "mnSequence": "Secuenciar eventos",
     "mnSubdivide": "Subdividir / agrupar",
@@ -181,7 +181,7 @@
       "delay": "Efecto de eco (0-1)",
       "room": "Cantidad de reverberación (0-1)",
       "pan": "Posición estéreo (0-1)",
-      "bank": "Nombre del banco de muestras",
+      "bank": "Nombre del banco de muestras (obsoleto)",
       "rev": "Invertir patrón",
       "jux": "Copia modificada en otro canal estéreo",
       "every": "Aplicar función cada N ciclos",
@@ -199,8 +199,8 @@
       "sine": "Oscilador sinusoidal",
       "square": "Oscilador cuadrado",
       "triangle": "Oscilador triangular",
-      "tr808": "Banco de batería Roland TR-808",
-      "tr909": "Banco de batería Roland TR-909"
+      "s808": "Sonidos de batería 808 — usa como s(\"808\")",
+      "s909": "Sonidos de batería 909 — usa como s(\"909\")"
     },
     "tonejs": {
       "synth": "Sintetizador básico (oscilador + envolvente)",
@@ -256,7 +256,7 @@
       "whatIsHeading": "¿Qué es Strudel?",
       "whatIsText": "Strudel te permite describir patrones musicales con expresiones concisas. Cada patrón dura un ciclo y se repite infinitamente. Encadenas funciones para añadir sonidos, notas, efectos y transformaciones.",
       "firstPatternsHeading": "Primeros patrones",
-      "firstPatternsText": "Usa note() para melodías y sound() para muestras. El método .s() selecciona la fuente de sonido — osciladores como sawtooth o bancos de muestras como RolandTR808.",
+      "firstPatternsText": "Usa note() para melodías y sound() para muestras. El método .s() selecciona la fuente de sonido — osciladores como sawtooth o muestras de batería como bd, sd, hh.",
       "chainingHeading": "Encadenar efectos",
       "chainingText": "Encadena métodos para dar forma a tu sonido. Cada función transforma el patrón y lo pasa al siguiente. El orden importa — filtros antes de reverb suena diferente que reverb antes de filtros."
     },
@@ -288,7 +288,7 @@
       "mt": "mt — Tom medio",
       "ht": "ht — Tom agudo",
       "banksHeading": "Bancos de muestras",
-      "banksText": "Usa .bank() para cambiar entre modelos de caja de ritmos. RolandTR808 y RolandTR909 son bancos clásicos con conjuntos completos de muestras para cada tipo de tambor.",
+      "banksText": "Usa nombres de muestras directos como bd, sd, hh, oh, cp para batería. Para sonidos 808/909, usa s(\"808\") o s(\"909\") directamente.",
       "oscillatorsHeading": "Osciladores",
       "oscillatorsText": "Para síntesis, usa .s() con tipos de oscilador: sawtooth (brillante, zumbante), sine (puro, limpio), square (hueco, retro) y triangle (suave, melódico)."
     },
