@@ -14,7 +14,6 @@ import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engi
 export class StrudelEngine extends BaseEngine {
   name: EngineType = 'strudel'
   private scheduler: any = null
-  private repl: any = null
 
   async init(): Promise<void> {
     /* Dynamic import to enable code splitting */
@@ -41,7 +40,7 @@ export class StrudelEngine extends BaseEngine {
     })
 
     this.scheduler = replInstance.scheduler
-    this.repl = replInstance
+
   }
 
   /** Evaluate Strudel code and set as active pattern */
@@ -90,6 +89,5 @@ export class StrudelEngine extends BaseEngine {
     this.stop()
     super.dispose()
     this.scheduler = null
-    this.repl = null
   }
 }

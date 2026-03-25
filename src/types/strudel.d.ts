@@ -1,0 +1,31 @@
+/* ──────────────────────────────────────────────────────────
+   Type declarations for @strudel/* packages.
+   These packages ship JS-only — no .d.ts included.
+   ────────────────────────────────────────────────────────── */
+
+declare module '@strudel/core' {
+  export function repl(options: Record<string, unknown>): {
+    scheduler: { start(): void; stop(): void; setPattern(p: unknown): void }
+    [key: string]: unknown
+  }
+}
+
+declare module '@strudel/webaudio' {
+  export function initAudioOnFirstClick(): void
+  export function webaudioOutput(...args: unknown[]): unknown
+  export function getAudioContext(): AudioContext
+}
+
+declare module '@strudel/mini' {
+  const mini: unknown
+  export default mini
+}
+
+declare module '@strudel/tonal' {
+  const tonal: unknown
+  export default tonal
+}
+
+declare module '@strudel/transpiler' {
+  export function transpiler(code: string): string
+}

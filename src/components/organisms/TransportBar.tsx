@@ -16,6 +16,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
+import { getOrchestrator } from '../../lib/orchestrator'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Tooltip } from '../atoms'
 import { ToolbarGroup, EngineSelector, LanguageSwitcher } from '../molecules'
@@ -35,6 +36,29 @@ function TransportBar() {
   const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
 
+  /* Orchestrator-wired handlers — bridge UI state with audio engine */
+  const handlePlay = async () => {
+    const orch = getOrchestrator()
+    if (isPlaying) {
+      orch.stop()
+      togglePlay()
+    } else {
+      await orch.start()
+      togglePlay()
+    }
+  }
+
+  const handleStop = () => {
+    getOrchestrator().stop()
+    stop()
+  }
+
+  const handleBpmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newBpm = Number(e.target.value)
+    setBpm(newBpm)
+    getOrchestrator().setBpm(newBpm)
+  }
+
   return (
     <header
       className="flex items-center justify-between shrink-0"
@@ -53,7 +77,7 @@ function TransportBar() {
             <Button
               variant="icon"
               active={isPlaying}
-              onClick={togglePlay}
+              onClick={handlePlay}
               aria-label={t('transport.play')}
             >
               <Icon icon={Play} size={16} />
@@ -63,7 +87,7 @@ function TransportBar() {
           <Tooltip content={t('transport.stop')}>
             <Button
               variant="icon"
-              onClick={stop}
+              onClick={handleStop}
               aria-label={t('transport.stop')}
             >
               <Icon icon={Square} size={16} />
@@ -108,7 +132,7 @@ function TransportBar() {
               min={MIN_BPM}
               max={MAX_BPM}
               value={bpm}
-              onChange={(e) => setBpm(Number(e.target.value))}
+              onChange={handleBpmChange}
               aria-label={t('transport.bpm')}
               className="focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{
