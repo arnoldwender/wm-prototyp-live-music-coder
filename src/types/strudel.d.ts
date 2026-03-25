@@ -95,4 +95,10 @@ declare module 'superdough' {
   export function getAudioContext(): AudioContext
   export function getCompressor(): DynamicsCompressorNode | null
   export function gainNode(): GainNode | null
+  export function getSuperdoughAudioController(): {
+    destinationGain: GainNode | null;
+    channelMerger: ChannelMergerNode | null;
+    connectToDestination: (node: AudioNode, channels?: number[]) => void;
+  } | null
+  export function getAnalyserById(id: string | number, fftSize?: number, smoothing?: number): AnalyserNode
 }

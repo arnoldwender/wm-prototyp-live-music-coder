@@ -1,60 +1,56 @@
-/* Tap into superdough's audio chain for visualization.
- * Reconnects every call to handle superdough's dynamic node creation. */
+/* Tap into superdough's master output via getSuperdoughAudioController().
+ * The controller's destinationGain is the LAST node before ctx.destination —
+ * connecting an analyser here captures ALL audio output from Strudel. */
 
-let analyserNode: AnalyserNode | null = null;
-let lastConnectAttempt = 0;
+let analyser: AnalyserNode | null = null;
+let connected = false;
 
-/** Get an AnalyserNode that receives superdough's audio output.
- * Retries connection every 500ms if not connected. */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
-  const now = Date.now();
-
-  /* Don't spam connection attempts — wait 500ms between tries */
-  if (analyserNode && now - lastConnectAttempt < 500) return analyserNode;
-  lastConnectAttempt = now;
+  /* Already connected and working */
+  if (analyser && connected) return analyser;
 
   try {
-    const superdough = await import('superdough');
-    const ctx = superdough.getAudioContext();
+    const sd = await import('superdough');
+    const ctx = sd.getAudioContext();
     if (!ctx || ctx.state === 'closed' || ctx.state === 'suspended') return null;
 
-    /* Create analyser if we don't have one yet */
-    if (!analyserNode) {
-      analyserNode = ctx.createAnalyser();
-      analyserNode.fftSize = 2048;
-      analyserNode.smoothingTimeConstant = 0.85;
+    /* Create analyser once */
+    if (!analyser) {
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.85;
     }
 
-    /* Try to connect to the audio chain every time — superdough
-     * creates nodes lazily, so they may not exist on first call.
-     * Reconnecting is safe (Web Audio ignores duplicate connections). */
-    let connected = false;
-
+    /* Connect to the master destinationGain — the node right before ctx.destination.
+     * getSuperdoughAudioController() returns the audio controller instance. */
     try {
-      const comp = superdough.getCompressor();
-      if (comp) {
-        comp.connect(analyserNode);
+      const controller = sd.getSuperdoughAudioController();
+      if (controller?.destinationGain) {
+        controller.destinationGain.connect(analyser);
         connected = true;
+        console.log('[strudel-tap] Connected to destinationGain');
+        return analyser;
       }
-    } catch { /* compressor not available */ }
+    } catch { /* controller not available yet */ }
 
-    if (!connected) {
-      try {
-        const gain = superdough.gainNode();
-        if (gain) {
-          gain.connect(analyserNode);
-          connected = true;
-        }
-      } catch { /* gain not available */ }
-    }
+    /* Fallback: try compressor */
+    try {
+      const comp = sd.getCompressor();
+      if (comp) { comp.connect(analyser); connected = true; return analyser; }
+    } catch {}
 
-    return analyserNode;
+    /* Fallback: try gainNode */
+    try {
+      const gain = sd.gainNode();
+      if (gain) { gain.connect(analyser); connected = true; return analyser; }
+    } catch {}
+
+    return analyser;
   } catch {
     return null;
   }
 }
 
-/** Get superdough's AudioContext sample rate */
 export async function getStrudelSampleRate(): Promise<number> {
   try {
     const { getAudioContext } = await import('superdough');
@@ -64,7 +60,6 @@ export async function getStrudelSampleRate(): Promise<number> {
   }
 }
 
-/** Force reconnection on next call */
 export function resetStrudelTap(): void {
-  lastConnectAttempt = 0;
+  connected = false;
 }
