@@ -38,12 +38,32 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'slow', type: 'function', detail: 'completions.strudel.slow', apply: '.slow(2)' },
   { label: 'dec', type: 'function', detail: 'completions.strudel.dec', apply: '.dec(0.2)' },
   { label: 'sustain', type: 'function', detail: 'completions.strudel.sustain', apply: '.sustain(0.5)' },
-  /* Common samples */
+  /* Common drum samples */
   { label: 'bd', type: 'keyword', detail: 'completions.strudel.bd' },
   { label: 'sd', type: 'keyword', detail: 'completions.strudel.sd' },
   { label: 'hh', type: 'keyword', detail: 'completions.strudel.hh' },
   { label: 'oh', type: 'keyword', detail: 'completions.strudel.oh' },
   { label: 'cp', type: 'keyword', detail: 'completions.strudel.cp' },
+  /* Melodic & bass samples */
+  { label: 'arpy', type: 'keyword', detail: 'Arpeggio samples (11)' },
+  { label: 'bass', type: 'keyword', detail: 'Bass samples (4)' },
+  { label: 'bass1', type: 'keyword', detail: 'Bass variant 1' },
+  { label: 'casio', type: 'keyword', detail: 'Casio tones (3)' },
+  { label: 'piano', type: 'keyword', detail: 'Piano sample' },
+  { label: 'pluck', type: 'keyword', detail: 'Pluck synth sample' },
+  /* Percussion & misc samples */
+  { label: 'metal', type: 'keyword', detail: 'Metal hits (10)' },
+  { label: 'tabla', type: 'keyword', detail: 'Tabla percussion (26)' },
+  { label: 'can', type: 'keyword', detail: 'Can hits (14)' },
+  { label: 'drum', type: 'keyword', detail: 'Drum misc (6)' },
+  { label: 'noise', type: 'keyword', detail: 'Noise sample' },
+  { label: 'clubkick', type: 'keyword', detail: 'Club kick (5)' },
+  /* 808 kit */
+  { label: '808bd', type: 'keyword', detail: '808 bass drum' },
+  { label: '808sd', type: 'keyword', detail: '808 snare' },
+  /* Breaks */
+  { label: 'breaks125', type: 'keyword', detail: 'Breakbeat 125 BPM' },
+  { label: 'amencutup', type: 'keyword', detail: 'Amen break slices (32)' },
   /* Synth types */
   { label: 'sawtooth', type: 'keyword', detail: 'completions.strudel.sawtooth' },
   { label: 'sine', type: 'keyword', detail: 'completions.strudel.sine' },
@@ -104,7 +124,9 @@ function getDescription(key: string): string {
 function engineCompletionSource(engine: EngineType) {
   const items = COMPLETION_MAP[engine];
   return (context: CompletionContext): CompletionResult | null => {
-    const word = context.matchBefore(/[\w.]+/);
+    /* Match simple word tokens — [\w]+ instead of [\w.]+ to avoid
+     * swallowing method chains and to trigger more reliably on typing */
+    const word = context.matchBefore(/[\w]+/);
     if (!word && !context.explicit) return null;
 
     return {

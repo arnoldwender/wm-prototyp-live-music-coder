@@ -210,6 +210,21 @@ export function StrudelEditor() {
         </span>
       </div>
 
+      {/* Playing indicator bar — pulses green when a pattern is active */}
+      {playing && (
+        <div
+          className="shrink-0"
+          style={{
+            height: '3px',
+            background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))',
+            backgroundSize: '200% 100%',
+            animation: 'playing-indicator 1.5s ease-in-out infinite',
+          }}
+          role="status"
+          aria-label="Pattern playing"
+        />
+      )}
+
       {/* CodeMirror editor container */}
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 

@@ -38,19 +38,98 @@ const EXAMPLE_PATTERNS = [
   },
 ] as const
 
-/* Available drum sample abbreviations */
-const DRUM_SAMPLES = [
-  { name: 'bd', labelKey: 'help.sampleBd' },
-  { name: 'sd', labelKey: 'help.sampleSd' },
-  { name: 'hh', labelKey: 'help.sampleHh' },
-  { name: 'oh', labelKey: 'help.sampleOh' },
-  { name: 'cp', labelKey: 'help.sampleCp' },
-  { name: 'cb', labelKey: 'help.sampleCb' },
-  { name: 'lt', labelKey: 'help.sampleLt' },
-  { name: 'mt', labelKey: 'help.sampleMt' },
-  { name: 'ht', labelKey: 'help.sampleHt' },
-  { name: 'cr', labelKey: 'help.sampleCr' },
-  { name: 'rd', labelKey: 'help.sampleRd' },
+/* Categorized sample library from Dirt-Samples (~50 most useful) */
+const SAMPLE_CATEGORIES = [
+  {
+    category: 'Drums',
+    samples: [
+      { name: 'bd', desc: 'Bass drum (24)' },
+      { name: 'sd', desc: 'Snare drum (24)' },
+      { name: 'hh', desc: 'Hi-hat closed (6)' },
+      { name: 'oh', desc: 'Open hi-hat (4)' },
+      { name: 'cp', desc: 'Clap (2)' },
+      { name: 'cr', desc: 'Crash cymbal (6)' },
+      { name: 'cb', desc: 'Cowbell (1)' },
+      { name: 'lt', desc: 'Low tom (16)' },
+      { name: 'mt', desc: 'Mid tom (8)' },
+      { name: 'ht', desc: 'High tom (5)' },
+    ],
+  },
+  {
+    category: '808 Kit',
+    samples: [
+      { name: '808bd', desc: 'Bass drum' },
+      { name: '808sd', desc: 'Snare' },
+      { name: '808hc', desc: 'Hi-hat closed' },
+      { name: '808ht', desc: 'High tom' },
+      { name: '808lt', desc: 'Low tom' },
+      { name: '808mt', desc: 'Mid tom' },
+      { name: '808oh', desc: 'Open hi-hat' },
+      { name: '808cy', desc: 'Cymbal' },
+    ],
+  },
+  {
+    category: 'Bass',
+    samples: [
+      { name: 'bass', desc: 'Bass (4)' },
+      { name: 'bass0', desc: 'Bass variant 0' },
+      { name: 'bass1', desc: 'Bass variant 1' },
+      { name: 'bass2', desc: 'Bass variant 2' },
+      { name: 'bass3', desc: 'Bass variant 3' },
+      { name: 'bassdm', desc: 'Bass DM' },
+      { name: 'bassfoo', desc: 'Bass Foo' },
+    ],
+  },
+  {
+    category: 'Melodic',
+    samples: [
+      { name: 'arpy', desc: 'Arpeggio (11)' },
+      { name: 'casio', desc: 'Casio tones (3)' },
+      { name: 'piano', desc: 'Piano (1)' },
+      { name: 'pluck', desc: 'Pluck synth (1)' },
+    ],
+  },
+  {
+    category: 'Percussion',
+    samples: [
+      { name: 'can', desc: 'Can hits (14)' },
+      { name: 'bottle', desc: 'Bottle (13)' },
+      { name: 'click', desc: 'Click (4)' },
+      { name: 'drum', desc: 'Drum misc (6)' },
+      { name: 'metal', desc: 'Metal hits (10)' },
+      { name: 'tabla', desc: 'Tabla (26)' },
+    ],
+  },
+  {
+    category: 'Vocal / FX',
+    samples: [
+      { name: 'mouth', desc: 'Mouth (1)' },
+      { name: 'breath', desc: 'Breath (1)' },
+      { name: 'crow', desc: 'Crow (4)' },
+      { name: 'birds', desc: 'Birds (10)' },
+      { name: 'bubble', desc: 'Bubble (8)' },
+    ],
+  },
+  {
+    category: 'Breaks',
+    samples: [
+      { name: 'breaks125', desc: '125 BPM' },
+      { name: 'breaks152', desc: '152 BPM' },
+      { name: 'breaks157', desc: '157 BPM' },
+      { name: 'breaks165', desc: '165 BPM' },
+      { name: 'amencutup', desc: 'Amen slices (32)' },
+    ],
+  },
+  {
+    category: 'Misc',
+    samples: [
+      { name: 'noise', desc: 'Noise (1)' },
+      { name: 'coins', desc: 'Coins (1)' },
+      { name: 'bleep', desc: 'Bleep (13)' },
+      { name: 'blip', desc: 'Blip (2)' },
+      { name: 'clubkick', desc: 'Club kick (5)' },
+    ],
+  },
 ] as const
 
 /** Copyable code block with copy-to-clipboard button */
@@ -230,20 +309,32 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
           ))}
         </Section>
 
-        {/* --- Available drum samples --- */}
+        {/* --- Categorized sample library --- */}
         <Section titleKey="help.samples">
-          <div
-            className="grid grid-cols-2 gap-1 text-xs"
-            style={{
-              fontFamily: 'var(--font-family-mono)',
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            {DRUM_SAMPLES.map((s) => (
-              <div key={s.name}>
-                <span style={{ color: 'var(--color-primary)' }}>{s.name}</span>
-                {' — '}
-                {t(s.labelKey)}
+          <div className="space-y-3">
+            {SAMPLE_CATEGORIES.map((cat) => (
+              <div key={cat.category}>
+                <div
+                  className="text-xs font-medium mb-1"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  {cat.category}
+                </div>
+                <div
+                  className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs"
+                  style={{
+                    fontFamily: 'var(--font-family-mono)',
+                    color: 'var(--color-text-secondary)',
+                  }}
+                >
+                  {cat.samples.map((s) => (
+                    <div key={s.name} className="truncate">
+                      <span style={{ color: 'var(--color-primary)' }}>{s.name}</span>
+                      {' — '}
+                      <span className="opacity-70">{s.desc}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
