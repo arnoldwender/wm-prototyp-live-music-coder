@@ -6,7 +6,7 @@
    the orchestrator when playback is active.
    ────────────────────────────────────────────────────────── */
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, lazy, Suspense } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
@@ -18,7 +18,12 @@ import { FileTabs } from '../molecules/FileTabs';
 import { Play } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
 
-/** Main code editor — CodeMirror 6 with multi-tab support and live evaluation */
+/* Lazy-load StrudelEditor for code splitting */
+const StrudelEditor = lazy(() =>
+  import('./StrudelEditor').then((m) => ({ default: m.StrudelEditor }))
+);
+
+/** Main code editor — uses StrudelEditor for Strudel tabs, generic CM6 for others */
 export function CodeEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -123,6 +128,22 @@ export function CodeEditor() {
   useEffect(() => {
     setupEvaluator();
   }, [setupEvaluator]);
+
+  /* For Strudel engine, use the dedicated StrudelEditor with live highlighting */
+  if (activeFile?.engine === 'strudel') {
+    return (
+      <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <FileTabs />
+        <Suspense fallback={
+          <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--color-text-muted)' }}>
+            Loading Strudel editor...
+          </div>
+        }>
+          <StrudelEditor />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>

@@ -30,6 +30,36 @@ declare module '@strudel/transpiler' {
   export function transpiler(code: string): string
 }
 
+declare module '@strudel/codemirror' {
+  import type { EditorView } from '@codemirror/view';
+  export class StrudelMirror {
+    constructor(options: {
+      root: HTMLElement;
+      initialCode?: string;
+      prebake?: () => Promise<void>;
+      drawTime?: [number, number];
+      bgFill?: boolean;
+      onDraw?: (...args: unknown[]) => void;
+      [key: string]: unknown;
+    });
+    editor: EditorView;
+    repl: {
+      evaluate: (code: string, autostart?: boolean) => Promise<unknown>;
+      start: () => void;
+      stop: () => void;
+      scheduler: unknown;
+    };
+    code: string;
+    setCode(code: string): void;
+    evaluate(): Promise<void>;
+    start(): void;
+    stop(): void;
+  }
+  export function highlightExtension(): unknown[];
+  export function updateMiniLocations(editor: EditorView, locations: unknown[]): void;
+  export const theme: unknown;
+}
+
 declare module '@strudel/web' {
   export function initStrudel(options?: Record<string, unknown>): Promise<{
     scheduler: { start(): void; stop(): void; setPattern(p: unknown): void }
