@@ -38,96 +38,225 @@ const EXAMPLE_PATTERNS = [
   },
 ] as const
 
-/* Categorized sample library from Dirt-Samples (~50 most useful) */
+/* Categorized sample library from Dirt-Samples (218 total, ~120 shown in help) */
 const SAMPLE_CATEGORIES = [
   {
-    category: 'Drums',
+    categoryKey: 'help.catKicks',
     samples: [
-      { name: 'bd', desc: 'Bass drum (24)' },
-      { name: 'sd', desc: 'Snare drum (24)' },
-      { name: 'hh', desc: 'Hi-hat closed (6)' },
-      { name: 'oh', desc: 'Open hi-hat (4)' },
-      { name: 'cp', desc: 'Clap (2)' },
-      { name: 'cr', desc: 'Crash cymbal (6)' },
-      { name: 'cb', desc: 'Cowbell (1)' },
-      { name: 'lt', desc: 'Low tom (16)' },
-      { name: 'mt', desc: 'Mid tom (8)' },
-      { name: 'ht', desc: 'High tom (5)' },
+      { name: 'bd', desc: '(24)' },
+      { name: 'clubkick', desc: '(5)' },
+      { name: 'hardkick', desc: '(6)' },
+      { name: 'popkick', desc: '(10)' },
+      { name: 'reverbkick', desc: '(1)' },
+      { name: 'kicklinn', desc: '(1)' },
     ],
   },
   {
-    category: '808 Kit',
+    categoryKey: 'help.catSnare',
     samples: [
-      { name: '808bd', desc: 'Bass drum' },
-      { name: '808sd', desc: 'Snare' },
-      { name: '808hc', desc: 'Hi-hat closed' },
-      { name: '808ht', desc: 'High tom' },
-      { name: '808lt', desc: 'Low tom' },
-      { name: '808mt', desc: 'Mid tom' },
-      { name: '808oh', desc: 'Open hi-hat' },
-      { name: '808cy', desc: 'Cymbal' },
+      { name: 'sd', desc: '(2)' },
+      { name: 'sn', desc: '(52)' },
+      { name: 'realclaps', desc: '(4)' },
     ],
   },
   {
-    category: 'Bass',
+    categoryKey: 'help.catHihat',
     samples: [
-      { name: 'bass', desc: 'Bass (4)' },
-      { name: 'bass0', desc: 'Bass variant 0' },
-      { name: 'bass1', desc: 'Bass variant 1' },
-      { name: 'bass2', desc: 'Bass variant 2' },
-      { name: 'bass3', desc: 'Bass variant 3' },
-      { name: 'bassdm', desc: 'Bass DM' },
-      { name: 'bassfoo', desc: 'Bass Foo' },
+      { name: 'hh', desc: '(13)' },
+      { name: 'hh27', desc: '(13)' },
+      { name: 'linnhats', desc: '(6)' },
     ],
   },
   {
-    category: 'Melodic',
+    categoryKey: 'help.catCymbal',
     samples: [
-      { name: 'arpy', desc: 'Arpeggio (11)' },
-      { name: 'casio', desc: 'Casio tones (3)' },
-      { name: 'piano', desc: 'Piano (1)' },
-      { name: 'pluck', desc: 'Pluck synth (1)' },
+      { name: 'oh', desc: '(1)' },
+      { name: 'cr', desc: '(6)' },
+      { name: 'cb', desc: '(1)' },
     ],
   },
   {
-    category: 'Percussion',
+    categoryKey: 'help.catPerc',
     samples: [
-      { name: 'can', desc: 'Can hits (14)' },
-      { name: 'bottle', desc: 'Bottle (13)' },
-      { name: 'click', desc: 'Click (4)' },
-      { name: 'drum', desc: 'Drum misc (6)' },
-      { name: 'metal', desc: 'Metal hits (10)' },
-      { name: 'tabla', desc: 'Tabla (26)' },
+      { name: 'cp', desc: '(2)' },
+      { name: 'clak', desc: '(2)' },
+      { name: 'perc', desc: '(6)' },
+      { name: 'click', desc: '(4)' },
+      { name: 'stomp', desc: '(10)' },
+      { name: 'hand', desc: '(17)' },
     ],
   },
   {
-    category: 'Vocal / FX',
+    categoryKey: 'help.catToms',
     samples: [
-      { name: 'mouth', desc: 'Mouth (1)' },
-      { name: 'breath', desc: 'Breath (1)' },
-      { name: 'crow', desc: 'Crow (4)' },
-      { name: 'birds', desc: 'Birds (10)' },
-      { name: 'bubble', desc: 'Bubble (8)' },
+      { name: 'lt', desc: '(16)' },
+      { name: 'mt', desc: '(16)' },
+      { name: 'ht', desc: '(16)' },
     ],
   },
   {
-    category: 'Breaks',
+    categoryKey: 'help.cat808',
     samples: [
-      { name: 'breaks125', desc: '125 BPM' },
-      { name: 'breaks152', desc: '152 BPM' },
-      { name: 'breaks157', desc: '157 BPM' },
-      { name: 'breaks165', desc: '165 BPM' },
-      { name: 'amencutup', desc: 'Amen slices (32)' },
+      { name: '808', desc: '' },
+      { name: '808bd', desc: '' },
+      { name: '808sd', desc: '' },
+      { name: '808hc', desc: '' },
+      { name: '808ht', desc: '' },
+      { name: '808lt', desc: '' },
+      { name: '808mt', desc: '' },
+      { name: '808oh', desc: '' },
+      { name: '808cy', desc: '' },
     ],
   },
   {
-    category: 'Misc',
+    categoryKey: 'help.cat909',
     samples: [
-      { name: 'noise', desc: 'Noise (1)' },
-      { name: 'coins', desc: 'Coins (1)' },
-      { name: 'bleep', desc: 'Bleep (13)' },
-      { name: 'blip', desc: 'Blip (2)' },
-      { name: 'clubkick', desc: 'Club kick (5)' },
+      { name: '909', desc: '' },
+    ],
+  },
+  {
+    categoryKey: 'help.catDrumMachines',
+    samples: [
+      { name: 'dr', desc: '(42)' },
+      { name: 'dr2', desc: '' },
+      { name: 'dr55', desc: '' },
+      { name: 'dr_few', desc: '' },
+      { name: 'drum', desc: '' },
+      { name: 'drumtraks', desc: '' },
+      { name: 'gretsch', desc: '(24)' },
+      { name: 'electro1', desc: '' },
+    ],
+  },
+  {
+    categoryKey: 'help.catBass',
+    samples: [
+      { name: 'bass', desc: '(4)' },
+      { name: 'bass0', desc: '' },
+      { name: 'bass1', desc: '(30)' },
+      { name: 'bass2', desc: '' },
+      { name: 'bass3', desc: '' },
+      { name: 'bassdm', desc: '(24)' },
+      { name: 'bassfoo', desc: '' },
+      { name: 'jvbass', desc: '(13)' },
+      { name: 'jungbass', desc: '(20)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catSynth',
+    samples: [
+      { name: 'arpy', desc: '(11)' },
+      { name: 'casio', desc: '(3)' },
+      { name: 'juno', desc: '(12)' },
+      { name: 'moog', desc: '(7)' },
+      { name: 'fm', desc: '(17)' },
+      { name: 'pad', desc: '(3)' },
+      { name: 'pluck', desc: '(17)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catGuitar',
+    samples: [
+      { name: 'gtr', desc: '(3)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catSax',
+    samples: [
+      { name: 'sax', desc: '(22)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catStrings',
+    samples: [
+      { name: 'sitar', desc: '(8)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catVocals',
+    samples: [
+      { name: 'mouth', desc: '(15)' },
+      { name: 'speech', desc: '(7)' },
+      { name: 'speechless', desc: '(10)' },
+      { name: 'speakspell', desc: '(12)' },
+      { name: 'diphone', desc: '(38)' },
+      { name: 'diphone2', desc: '' },
+    ],
+  },
+  {
+    categoryKey: 'help.catNoiseFx',
+    samples: [
+      { name: 'noise', desc: '(1)' },
+      { name: 'noise2', desc: '' },
+      { name: 'glitch', desc: '(8)' },
+      { name: 'glitch2', desc: '' },
+      { name: 'dist', desc: '(16)' },
+      { name: 'industrial', desc: '(32)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catNature',
+    samples: [
+      { name: 'birds', desc: '(10)' },
+      { name: 'birds3', desc: '' },
+      { name: 'insect', desc: '(3)' },
+      { name: 'wind', desc: '(10)' },
+      { name: 'crow', desc: '(4)' },
+      { name: 'bubble', desc: '(8)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catBreaks',
+    samples: [
+      { name: 'breaks125', desc: '' },
+      { name: 'breaks152', desc: '' },
+      { name: 'breaks157', desc: '' },
+      { name: 'breaks165', desc: '' },
+      { name: 'amencutup', desc: '(32)' },
+      { name: 'jungle', desc: '(13)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catRave',
+    samples: [
+      { name: 'rave', desc: '(8)' },
+      { name: 'rave2', desc: '' },
+      { name: 'ravemono', desc: '' },
+      { name: 'gabba', desc: '(4)' },
+      { name: 'gabbaloud', desc: '' },
+      { name: 'gabbalouder', desc: '' },
+      { name: 'hardcore', desc: '(12)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catWorld',
+    samples: [
+      { name: 'tabla', desc: '(26)' },
+      { name: 'tabla2', desc: '(46)' },
+      { name: 'world', desc: '(3)' },
+      { name: 'east', desc: '(9)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catRetro',
+    samples: [
+      { name: 'invaders', desc: '(18)' },
+      { name: 'sid', desc: '(12)' },
+      { name: 'subroc3d', desc: '(11)' },
+      { name: 'tacscan', desc: '(22)' },
+      { name: 'space', desc: '(18)' },
+    ],
+  },
+  {
+    categoryKey: 'help.catMisc',
+    samples: [
+      { name: 'stab', desc: '(23)' },
+      { name: 'hit', desc: '(6)' },
+      { name: 'hoover', desc: '(6)' },
+      { name: 'future', desc: '(17)' },
+      { name: 'techno', desc: '(7)' },
+      { name: 'tech', desc: '(13)' },
+      { name: 'house', desc: '(8)' },
+      { name: 'jazz', desc: '(8)' },
     ],
   },
 ] as const
@@ -313,12 +442,12 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
         <Section titleKey="help.samples">
           <div className="space-y-3">
             {SAMPLE_CATEGORIES.map((cat) => (
-              <div key={cat.category}>
+              <div key={cat.categoryKey}>
                 <div
                   className="text-xs font-medium mb-1"
                   style={{ color: 'var(--color-text)' }}
                 >
-                  {cat.category}
+                  {t(cat.categoryKey)}
                 </div>
                 <div
                   className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs"
@@ -330,8 +459,12 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
                   {cat.samples.map((s) => (
                     <div key={s.name} className="truncate">
                       <span style={{ color: 'var(--color-primary)' }}>{s.name}</span>
-                      {' — '}
-                      <span className="opacity-70">{s.desc}</span>
+                      {s.desc && (
+                        <>
+                          {' '}
+                          <span className="opacity-70">{s.desc}</span>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>

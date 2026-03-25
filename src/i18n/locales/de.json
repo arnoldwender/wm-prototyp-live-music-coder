@@ -134,7 +134,29 @@
     "engineStrudel": "Pattern-basiertes Live-Coding (strudel.cc)",
     "engineTonejs": "High-Level-Synths und Effekte",
     "engineWebaudio": "Low-Level natives API",
-    "engineMidi": "Externes Gerät (nur Ausgang)"
+    "engineMidi": "Externes Gerät (nur Ausgang)",
+    "catKicks": "Kick Drums",
+    "catSnare": "Snare / Clap",
+    "catHihat": "Hi-Hat",
+    "catCymbal": "Open Hat / Becken",
+    "catPerc": "Perkussion",
+    "catToms": "Toms",
+    "cat808": "808 Kit",
+    "cat909": "909 Kit",
+    "catDrumMachines": "Drum Machines",
+    "catBass": "Bass",
+    "catSynth": "Synth / Keys",
+    "catGuitar": "Gitarre",
+    "catSax": "Sax / Bläser",
+    "catStrings": "Saiten",
+    "catVocals": "Vocals / Sprache",
+    "catNoiseFx": "Noise / FX",
+    "catNature": "Natur",
+    "catBreaks": "Breaks / Jungle",
+    "catRave": "Rave / Gabba",
+    "catWorld": "World / Ethnisch",
+    "catRetro": "Retro / Game",
+    "catMisc": "Sonstiges"
   },
   "collection": {
     "title": "Erfolge",
@@ -200,7 +222,8 @@
       "square": "Rechteck-Oszillator",
       "triangle": "Dreieck-Oszillator",
       "s808": "808-Drum-Sounds — nutze als s(\"808\")",
-      "s909": "909-Drum-Sounds — nutze als s(\"909\")"
+      "s909": "909-Drum-Sounds — nutze als s(\"909\")",
+      "sample": "Dirt-Sample"
     },
     "tonejs": {
       "synth": "Basis-Synth (Oszillator + Hüllkurve)",

@@ -134,7 +134,29 @@
     "engineStrudel": "Pattern-based live coding (strudel.cc)",
     "engineTonejs": "High-level synths and effects",
     "engineWebaudio": "Low-level native API",
-    "engineMidi": "External device output (output only)"
+    "engineMidi": "External device output (output only)",
+    "catKicks": "Kick Drums",
+    "catSnare": "Snare / Clap",
+    "catHihat": "Hi-Hat",
+    "catCymbal": "Open Hat / Cymbal",
+    "catPerc": "Percussion",
+    "catToms": "Toms",
+    "cat808": "808 Kit",
+    "cat909": "909 Kit",
+    "catDrumMachines": "Drum Machines",
+    "catBass": "Bass",
+    "catSynth": "Synth / Keys",
+    "catGuitar": "Guitar",
+    "catSax": "Sax / Wind",
+    "catStrings": "Strings",
+    "catVocals": "Vocals / Speech",
+    "catNoiseFx": "Noise / FX",
+    "catNature": "Nature",
+    "catBreaks": "Breaks / Jungle",
+    "catRave": "Rave / Gabba",
+    "catWorld": "World / Ethnic",
+    "catRetro": "Retro / Game",
+    "catMisc": "Misc"
   },
   "collection": {
     "title": "Achievements",
@@ -200,7 +222,8 @@
       "square": "Square oscillator",
       "triangle": "Triangle oscillator",
       "s808": "808 drum sounds — use as s(\"808\")",
-      "s909": "909 drum sounds — use as s(\"909\")"
+      "s909": "909 drum sounds — use as s(\"909\")",
+      "sample": "Dirt-Sample"
     },
     "tonejs": {
       "synth": "Basic synth (osc + envelope)",

@@ -134,7 +134,29 @@
     "engineStrudel": "Live coding basado en patrones (strudel.cc)",
     "engineTonejs": "Sintetizadores y efectos de alto nivel",
     "engineWebaudio": "API nativa de bajo nivel",
-    "engineMidi": "Dispositivo externo (solo salida)"
+    "engineMidi": "Dispositivo externo (solo salida)",
+    "catKicks": "Bombos",
+    "catSnare": "Caja / Palmas",
+    "catHihat": "Hi-Hat",
+    "catCymbal": "Hat abierto / Platillo",
+    "catPerc": "Percusión",
+    "catToms": "Toms",
+    "cat808": "Kit 808",
+    "cat909": "Kit 909",
+    "catDrumMachines": "Cajas de ritmos",
+    "catBass": "Bajo",
+    "catSynth": "Sintetizador / Teclas",
+    "catGuitar": "Guitarra",
+    "catSax": "Saxo / Viento",
+    "catStrings": "Cuerdas",
+    "catVocals": "Voces / Habla",
+    "catNoiseFx": "Ruido / FX",
+    "catNature": "Naturaleza",
+    "catBreaks": "Breaks / Jungle",
+    "catRave": "Rave / Gabba",
+    "catWorld": "World / Étnico",
+    "catRetro": "Retro / Juego",
+    "catMisc": "Varios"
   },
   "collection": {
     "title": "Logros",
@@ -200,7 +222,8 @@
       "square": "Oscilador cuadrado",
       "triangle": "Oscilador triangular",
       "s808": "Sonidos de batería 808 — usa como s(\"808\")",
-      "s909": "Sonidos de batería 909 — usa como s(\"909\")"
+      "s909": "Sonidos de batería 909 — usa como s(\"909\")",
+      "sample": "Muestra Dirt"
     },
     "tonejs": {
       "synth": "Sintetizador básico (oscilador + envolvente)",
