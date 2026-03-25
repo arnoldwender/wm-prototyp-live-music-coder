@@ -338,6 +338,8 @@ Create `src/styles/tokens/index.css`:
 @import './spacing.css';
 ```
 
+**Note on Tailwind + CSS tokens:** Components use `style={{ ... }}` with `var(--token)` for dynamic values (colors, spacing) rather than Tailwind arbitrary values like `px-[var(--space-3)]`. Tailwind classes are used for layout (`flex`, `items-center`, `gap-2`) and responsive behavior. This avoids Tailwind's build-time resolution issues with runtime CSS variables. For font-weight ambiguity, always use `style` prop.
+
 - [ ] **Step 5: Create global.css**
 
 Replace `src/styles/global.css` (or `src/index.css` from scaffold):
@@ -793,21 +795,30 @@ import en from './locales/en.json';
 import de from './locales/de.json';
 import es from './locales/es.json';
 
+/* Detect language: saved preference > browser language > English */
+const savedLang = localStorage.getItem('lmc-lang');
+const browserLang = navigator.language.startsWith('de')
+  ? 'de'
+  : navigator.language.startsWith('es')
+    ? 'es'
+    : 'en';
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     de: { translation: de },
     es: { translation: es },
   },
-  lng: navigator.language.startsWith('de')
-    ? 'de'
-    : navigator.language.startsWith('es')
-      ? 'es'
-      : 'en',
+  lng: savedLang || browserLang,
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },
+});
+
+/* Persist language choice on change */
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('lmc-lang', lng);
 });
 
 export default i18n;
@@ -1038,6 +1049,8 @@ git commit -m "[Core] Add Zustand store with transport, engine, layout state + t
 **Files:**
 - Create: `src/components/atoms/Button.tsx`, `Icon.tsx`, `Toggle.tsx`, `Badge.tsx`, `Tooltip.tsx`, `index.ts`
 
+**Note:** `Slider` and `Knob` atoms from the spec are deferred to Phase 2 (Orchestrator & Engines) where they're needed for audio parameter control.
+
 - [ ] **Step 1: Create Button atom**
 
 Create `src/components/atoms/Button.tsx`:
@@ -1175,7 +1188,7 @@ export function Badge({ children, color = 'var(--color-primary)', className = ''
         font-[var(--font-weight-medium)]
         ${className}
       `}
-      style={{ backgroundColor: color, color: 'white' }}
+      style={{ backgroundColor: color, color: 'var(--color-text)' }}
     >
       {children}
     </span>
@@ -1204,6 +1217,8 @@ export function Tooltip({ content, children }: TooltipProps) {
       className="relative inline-flex"
       onMouseEnter={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
+      onFocus={() => setShow(true)}
+      onBlur={() => setShow(false)}
     >
       {children}
       {show && (
@@ -1428,7 +1443,7 @@ export function TransportBar() {
           </Tooltip>
           <Tooltip content={t('transport.record')}>
             <Button variant="icon" onClick={toggleRecord} active={isRecording} aria-label={t('transport.record')}>
-              <Circle size={18} fill={isRecording ? '#ef4444' : 'none'} />
+              <Circle size={18} style={{ fill: isRecording ? 'var(--color-error)' : 'none' }} />
             </Button>
           </Tooltip>
         </ToolbarGroup>
@@ -1876,7 +1891,7 @@ Expected: All store tests pass. No other tests yet (UI tests added in later phas
 - [ ] **Step 9: Commit**
 
 ```bash
-git add -A
+git add src/pages/ src/layouts/ src/App.tsx src/main.tsx index.html
 git commit -m "[App] Assemble pages, router, EditorLayout — working IDE shell"
 ```
 
@@ -1933,6 +1948,7 @@ describe('History', () => {
   it('respects max size', () => {
     for (let i = 0; i < 10; i++) history.push(String(i));
     let count = 0;
+    // maxSize=5 means 5 entries in stack; canUndo needs >1 (base state), so 4 undos
     while (history.canUndo()) { history.undo(); count++; }
     expect(count).toBe(4);
   });
