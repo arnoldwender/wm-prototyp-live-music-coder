@@ -6,7 +6,9 @@
   "nav": {
     "openEditor": "Editor öffnen",
     "backToHome": "Zurück zur Startseite",
-    "docs": "Dokumentation"
+    "docs": "Dokumentation",
+    "samples": "Samples",
+    "examples": "Beispiele"
   },
   "transport": {
     "play": "Abspielen",
@@ -254,6 +256,32 @@
       "connect": "Knoten verbinden",
       "mastergain": "Master-Ausgangs-Lautstärke"
     }
+  },
+  "samples": {
+    "title": "Sample-Bibliothek",
+    "search": "Samples nach Name, Kategorie oder Tag suchen...",
+    "tryInEditor": "Im Editor testen",
+    "variations": "Variationen",
+    "allCategories": "Alle",
+    "showVariations": "Einzelne Variationen anzeigen",
+    "results": "Ergebnisse",
+    "noResults": "Keine Samples gefunden — versuche einen anderen Suchbegriff.",
+    "baseSamples": "Basis-Samples",
+    "totalEntries": "Einträge gesamt"
+  },
+  "examples": {
+    "title": "Pattern-Bibliothek",
+    "search": "Patterns nach Name, Kategorie oder Tag suchen...",
+    "tryInEditor": "Im Editor testen",
+    "difficulty": "Schwierigkeit",
+    "allCategories": "Alle",
+    "allLevels": "Alle Level",
+    "beginner": "Einsteiger",
+    "intermediate": "Fortgeschritten",
+    "advanced": "Experte",
+    "results": "Ergebnisse",
+    "noResults": "Keine Patterns gefunden — versuche einen anderen Suchbegriff.",
+    "patterns": "kuratierte Patterns"
   },
   "docs": {
     "skipToContent": "Zum Inhalt springen",

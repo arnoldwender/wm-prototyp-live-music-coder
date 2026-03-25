@@ -106,6 +106,30 @@ function Landing() {
           <LanguageSwitcher />
 
           <Link
+            to="/samples"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.samples')}
+          </Link>
+
+          <Link
+            to="/examples"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.examples')}
+          </Link>
+
+          <Link
             to="/docs"
             style={{
               fontSize: 'var(--font-size-sm)',

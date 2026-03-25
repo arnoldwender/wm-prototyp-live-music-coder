@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Landing from './pages/Landing'
 import Editor from './pages/Editor'
 import Docs from './pages/Docs'
+import Samples from './pages/Samples'
+import Examples from './pages/Examples'
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/editor" element={<Editor />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/docs/:sectionId" element={<Docs />} />
+        <Route path="/samples" element={<Samples />} />
+        <Route path="/examples" element={<Examples />} />
       </Routes>
     </BrowserRouter>
   )

@@ -6,7 +6,9 @@
   "nav": {
     "openEditor": "Open Editor",
     "backToHome": "Back to home",
-    "docs": "Documentation"
+    "docs": "Documentation",
+    "samples": "Samples",
+    "examples": "Examples"
   },
   "transport": {
     "play": "Play",
@@ -254,6 +256,32 @@
       "connect": "Connect nodes together",
       "mastergain": "Master output gain node"
     }
+  },
+  "samples": {
+    "title": "Sample Library",
+    "search": "Search samples by name, category, or tag...",
+    "tryInEditor": "Try in Editor",
+    "variations": "variations",
+    "allCategories": "All",
+    "showVariations": "Show individual variations",
+    "results": "results",
+    "noResults": "No samples found — try a different search term.",
+    "baseSamples": "base samples",
+    "totalEntries": "total entries"
+  },
+  "examples": {
+    "title": "Pattern Library",
+    "search": "Search patterns by name, category, or tag...",
+    "tryInEditor": "Try in Editor",
+    "difficulty": "Difficulty",
+    "allCategories": "All",
+    "allLevels": "All levels",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "results": "results",
+    "noResults": "No patterns found — try a different search term.",
+    "patterns": "curated patterns"
   },
   "docs": {
     "skipToContent": "Skip to content",

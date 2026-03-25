@@ -6,7 +6,9 @@
   "nav": {
     "openEditor": "Abrir editor",
     "backToHome": "Volver al inicio",
-    "docs": "Documentación"
+    "docs": "Documentación",
+    "samples": "Samples",
+    "examples": "Ejemplos"
   },
   "transport": {
     "play": "Reproducir",
@@ -254,6 +256,32 @@
       "connect": "Conectar nodos entre sí",
       "mastergain": "Nodo de volumen de salida principal"
     }
+  },
+  "samples": {
+    "title": "Biblioteca de Samples",
+    "search": "Buscar samples por nombre, categoría o etiqueta...",
+    "tryInEditor": "Probar en Editor",
+    "variations": "variaciones",
+    "allCategories": "Todos",
+    "showVariations": "Mostrar variaciones individuales",
+    "results": "resultados",
+    "noResults": "No se encontraron samples — prueba con otro término de búsqueda.",
+    "baseSamples": "samples base",
+    "totalEntries": "entradas en total"
+  },
+  "examples": {
+    "title": "Biblioteca de Patrones",
+    "search": "Buscar patrones por nombre, categoría o etiqueta...",
+    "tryInEditor": "Probar en Editor",
+    "difficulty": "Dificultad",
+    "allCategories": "Todos",
+    "allLevels": "Todos los niveles",
+    "beginner": "Principiante",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+    "results": "resultados",
+    "noResults": "No se encontraron patrones — prueba con otro término de búsqueda.",
+    "patterns": "patrones curados"
   },
   "docs": {
     "skipToContent": "Saltar al contenido",
