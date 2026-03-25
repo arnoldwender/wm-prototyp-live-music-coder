@@ -139,9 +139,10 @@ Code Editor  ──user types──>  Orchestrator  ──push changes──>  N
 Code Editor  <──push code───  Orchestrator  <──user drags───   Node Graph
 ```
 
-- **Code -> Graph:** Lightweight parser extracts block declarations, connections, and parameters from code. Pattern matching on known structures (Strudel patterns, Tone.js constructors, Web Audio node creation). Not a full AST.
-- **Graph -> Code:** Code generator produces readable, formatted code from graph model. Each engine adapter has its own codegen template.
-- **Conflict resolution:** Last-write-wins with focus-based locking. The panel that has focus is the "active" panel — the other panel is read-only (visually dimmed, no input accepted). Sync triggers after a 500ms debounce from the last edit in the active panel. When focus switches, any in-progress edit is finalized and synced before the new panel accepts input.
+- **Source of truth: Code Editor.** The code is always authoritative. The node graph is a derived *view* that is regenerated from the code after every edit (debounced 500ms). This is conceptually cleaner than focus-based locking and avoids "who has the write lock?" confusion.
+- **Code -> Graph:** A lightweight parser extracts block declarations, connections, and parameters from code. Pattern matching on known structures (Strudel patterns, Tone.js constructors, Web Audio node creation). Not a full AST. The graph is regenerated from the parsed result after every code change.
+- **Graph -> Code:** When the user drags nodes, rewires connections, or tweaks parameters in the graph, the graph emits a *code mutation* (insert, replace, delete) that is applied to the source code. The code updates, which then triggers the standard Code -> Graph sync. This ensures the code always reflects the current state and the graph is always a projection of the code.
+- **No locking needed:** Both panels are always interactive. The code editor accepts keystrokes; the node graph accepts drag/drop. Both mutate the same source (code), just through different interaction models.
 
 ### Audio Routing
 
@@ -158,7 +159,7 @@ All engines write to the same Web Audio graph, but their paradigms differ. The o
 - **Strudel -> Tone.js/WebAudio:** Strudel's `superdough` engine creates Web Audio nodes internally. The orchestrator intercepts Strudel's output AudioNode and connects it to Tone.js effects or raw Web Audio nodes via standard `AudioNode.connect()`.
 - **Tone.js -> WebAudio:** Tone.js nodes expose their underlying `AudioNode` via `.toDestination()` bypass — the orchestrator connects to raw Web Audio nodes directly.
 - **WebAudio -> any:** Raw Web Audio nodes connect natively to anything since all engines use the same `AudioContext`.
-- **MIDI:** MIDI is output-only (no audio routing). MIDI blocks send note/CC data to external devices via WebMIDI. They cannot receive audio input from other engines.
+- **MIDI:** MIDI is output-only in v1 (no MIDI input). MIDI blocks send note/CC data to external devices via WebMIDI. They cannot receive audio input from other engines. **Important UX note:** When a user selects the MIDI engine, the UI must display a prominent badge: "Output only — MIDI input (keyboards, controllers) is planned for a future version." This prevents confusion for users expecting to play a MIDI keyboard into the IDE.
 
 **v1 supported connections:** Any source/effect chain within the same engine, plus cross-engine connections where the output is a standard AudioNode. Strudel pattern-level connections to Tone.js instruments (triggering Tone synths from Strudel patterns) are a future enhancement.
 
@@ -250,7 +251,7 @@ Copied and adapted from:
 
 #### Conway's Game of Life Grid
 
-New code. A GoL grid that receives audio-reactive cell injections:
+New code. A GoL grid (fixed 128x128 max dimension, enforced by the worker to prevent unbounded growth) that receives audio-reactive cell injections:
 
 | Audio Feature | GoL Effect |
 |---|---|
@@ -315,7 +316,7 @@ Visual mutations at each stage (color, size, glow, appendages). Ascended creatur
 | Bundler | Vite 8 | Fast HMR, same stack |
 | Styling | Tailwind CSS 4 | Consistent with workspace |
 | State | Zustand 5 | Proven in icon generator |
-| Code Editor | CodeMirror 6 | Lighter than Monaco, mobile-friendly |
+| Code Editor | CodeMirror 6 + `@strudel/codemirror` | Lighter than Monaco, mobile-friendly. Use Strudel's official CM6 language mode for pattern syntax highlighting instead of building custom |
 | Node Graph | React Flow | Most mature React node-based UI lib |
 | Audio: Patterns | @strudel/core + @strudel/webaudio | Real Strudel engine |
 | Audio: Synths | Tone.js | Best high-level Web Audio wrapper |
@@ -371,7 +372,7 @@ interface Project {
   layout: PanelLayout
   ecosystem: {
     creatures: BeatlingState[]
-    golGrid: { width: number; height: number; liveCells: [number, number][] }  // sparse storage for efficiency
+    golGrid: { width: number; height: number; liveCells: [number, number][] }  // sparse storage; max 128x128 cap enforced by worker
     collection: Achievement[]
   }
 }
@@ -418,7 +419,8 @@ Encodes code files + BPM + engine selection only. No ecosystem or graph state.
 
 ### Gist Integration
 
-- No OAuth app — user provides GitHub Personal Access Token (stored in sessionStorage for current tab only; cleared on tab close). Acceptable for prototype scope — production hardening would use an encrypted store.
+- No OAuth app — user provides GitHub Personal Access Token.
+- **Storage strategy:** Default is `sessionStorage` (cleared on tab close). A "Remember token" checkbox opts the user into `localStorage` (persists across sessions). Both options are clearly labeled in the Gist dialog with a warning: "localStorage keeps your token between sessions but is accessible to any script on this page."
 - Save: creates Gist with `project.json` + individual code files as separate Gist files
 - Load: fetch Gist by URL or ID, parse project JSON
 - Update: overwrite existing Gist
@@ -469,10 +471,11 @@ Scope:
 - Achievement names and descriptions
 - Error messages
 
-NOT translated:
-- Code syntax (English only — `note()`, `s()`, etc.)
-- Engine-specific terminology (common across all languages)
-- Sample names
+Translated but code stays English:
+- Code syntax remains English (`note()`, `s()`, etc.)
+- **Autocomplete tooltip descriptions** for functions ARE translated (e.g., `note()` shows "Nota musical" in ES, "Musikalische Note" in DE). This is a real UX difference for DE/ES beginners learning the API.
+- Engine-specific terminology stays English (common across all languages)
+- Sample names stay English
 
 ---
 
