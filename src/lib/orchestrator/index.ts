@@ -93,6 +93,19 @@ export class Orchestrator {
     return this.bpm
   }
 
+  /** Get or create a per-block analyser node, delegating to the engine adapter.
+   * Returns null if the engine is not yet initialized or doesn't support it. */
+  getAnalyserForBlock(blockId: string, engineType: EngineType): AnalyserNode | null {
+    const engine = this.engines.get(engineType)
+    if (!engine || !this.initializedEngines.has(engineType)) return null
+
+    /* Delegate to the engine's per-block analyser cache */
+    if ('getAnalyserForBlock' in engine && typeof (engine as any).getAnalyserForBlock === 'function') {
+      return (engine as any).getAnalyserForBlock(blockId)
+    }
+    return null
+  }
+
   /** Dispose all engines and clean up */
   dispose(): void {
     this.stop()

@@ -4,7 +4,7 @@
    preview with color-coded borders matching the engine.
    ────────────────────────────────────────────────────────── */
 
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { Handle, Position } from '@xyflow/react'
 import type { NodeProps } from '@xyflow/react'
 import type { EngineType } from '../../types/engine'
@@ -16,6 +16,8 @@ export interface EngineNodeData {
   engine: EngineType
   blockType: 'source' | 'effect' | 'output'
   code: string
+  blockId?: string
+  params?: Record<string, import('../../types/engine').ParamValue>
   [key: string]: unknown
 }
 
@@ -33,6 +35,9 @@ function EngineNode({ data }: NodeProps) {
   const nodeData = data as unknown as EngineNodeData
   const color = ENGINE_COLORS[nodeData.engine]
 
+  /* Track whether the parameter editor panel is expanded */
+  const [paramsExpanded, setParamsExpanded] = useState(false)
+
   /* Truncate code preview to 40 characters max */
   const preview =
     nodeData.code.length > 40
@@ -45,6 +50,10 @@ function EngineNode({ data }: NodeProps) {
       new CustomEvent('node-focus', { detail: { code: nodeData.code } }),
     )
   }
+
+  const params = nodeData.params ?? {}
+  const paramEntries = Object.entries(params)
+  const hasParams = paramEntries.length > 0
 
   return (
     <div
@@ -113,6 +122,71 @@ function EngineNode({ data }: NodeProps) {
       >
         {preview}
       </div>
+
+      {/* Parameter editor — collapsible sliders for block params */}
+      {hasParams && (
+        <div style={{ borderTop: '1px solid var(--color-border)', padding: 'var(--space-xs)' }}>
+          <button
+            type="button"
+            onClick={() => setParamsExpanded(!paramsExpanded)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-muted)',
+              cursor: 'pointer',
+              fontSize: 'var(--font-size-xs)',
+              padding: 0,
+              width: '100%',
+              textAlign: 'left',
+            }}
+          >
+            {paramsExpanded ? '\u25BC' : '\u25B6'} Params
+          </button>
+          {paramsExpanded && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)', marginTop: 'var(--space-xs)' }}>
+              {paramEntries.map(([key, param]) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+                  <label
+                    style={{
+                      fontSize: 'var(--font-size-xs)',
+                      color: 'var(--color-text-muted)',
+                      minWidth: 40,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {param.label || key}
+                  </label>
+                  <input
+                    type="range"
+                    aria-label={param.label || key}
+                    min={param.min}
+                    max={param.max}
+                    step={param.step}
+                    value={param.value}
+                    onChange={(e) => {
+                      /* Dispatch param change event for the orchestrator to pick up */
+                      window.dispatchEvent(new CustomEvent('node-param-change', {
+                        detail: { blockId: nodeData.blockId, param: key, value: Number(e.target.value) },
+                      }));
+                    }}
+                    style={{ flex: 1, minWidth: 0 }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 'var(--font-size-xs)',
+                      color: 'var(--color-text-muted)',
+                      minWidth: 28,
+                      textAlign: 'right',
+                    }}
+                  >
+                    {param.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Source handle — right side, hidden for output blocks */}
       {nodeData.blockType !== 'output' && (

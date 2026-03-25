@@ -93,6 +93,34 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
     [setVisualizerHeight]
   )
 
+  /* ── Keyboard resize: vertical handle (Left/Right arrows, 2% per press) ── */
+  const handleVerticalKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setEditorWidth(Math.max(20, layout.editorWidth - 2))
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setEditorWidth(Math.min(80, layout.editorWidth + 2))
+      }
+    },
+    [layout.editorWidth, setEditorWidth]
+  )
+
+  /* ── Keyboard resize: horizontal handle (Up/Down arrows, 2% per press) ── */
+  const handleHorizontalKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setVisualizerHeight(Math.min(60, layout.visualizerHeight + 2))
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setVisualizerHeight(Math.max(15, layout.visualizerHeight - 2))
+      }
+    },
+    [layout.visualizerHeight, setVisualizerHeight]
+  )
+
   /* Derived size values — desktop uses percentage, mobile uses fixed height */
   const topHeight = isMobile ? undefined : `${100 - layout.visualizerHeight}%`
   const bottomHeight = isMobile ? '200px' : `${layout.visualizerHeight}%`
@@ -130,8 +158,10 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
               <div
                 role="separator"
                 aria-orientation="vertical"
+                aria-label="Resize editor and graph panels"
                 tabIndex={0}
                 onMouseDown={handleVerticalResize}
+                onKeyDown={handleVerticalKeyDown}
                 className="shrink-0 cursor-col-resize transition-colors"
                 style={{
                   width: '1px',
@@ -161,8 +191,10 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
           <div
             role="separator"
             aria-orientation="horizontal"
+            aria-label="Resize editor and visualizer panels"
             tabIndex={0}
             onMouseDown={handleHorizontalResize}
+            onKeyDown={handleHorizontalKeyDown}
             className="shrink-0 cursor-row-resize transition-colors"
             style={{
               height: '1px',

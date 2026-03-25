@@ -3,7 +3,7 @@
  * editor paired with the @strudel/web REPL for evaluation. */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { EditorState } from '@codemirror/state';
+import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
@@ -16,6 +16,8 @@ export function StrudelEditor() {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const replRef = useRef<any>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const highlightExtRef = useRef<Extension[]>([]);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
@@ -56,6 +58,15 @@ export function StrudelEditor() {
           }
         }
 
+        /* Load highlight extension for per-character pattern highlighting */
+        try {
+          const strudelCM = await import('@strudel/codemirror');
+          highlightExtRef.current = strudelCM.highlightExtension;
+          console.log('[StrudelEditor] Highlight extension loaded');
+        } catch (err) {
+          console.warn('[StrudelEditor] Highlight extension unavailable:', err);
+        }
+
         setReady(true);
         console.log('[StrudelEditor] Ready — REPL + samples loaded');
       } catch (err) {
@@ -87,6 +98,8 @@ export function StrudelEditor() {
       extensions: [
         ...getBaseExtensions(),
         ...getEngineExtensions(activeFile.engine),
+        /* Per-character highlight decorations for active pattern haps */
+        ...highlightExtRef.current,
         updateListener,
       ],
     });
@@ -152,6 +165,69 @@ export function StrudelEditor() {
         useAppStore.getState().togglePlay();
       }
     }
+  }, [playing]);
+
+  /* Per-character highlight loop — polls scheduler for active haps and
+   * dispatches mini-locations to the CM6 editor so currently-sounding
+   * code fragments light up, like strudel.cc does. */
+  useEffect(() => {
+    if (!playing) {
+      /* Clear highlights when playback stops */
+      if (viewRef.current && highlightExtRef.current.length > 0) {
+        import('@strudel/codemirror').then(({ updateMiniLocations }) => {
+          if (viewRef.current) updateMiniLocations(viewRef.current, []);
+        }).catch(() => { /* ignore */ });
+      }
+      return;
+    }
+
+    let running = true;
+
+    const highlightLoop = async () => {
+      const { updateMiniLocations } = await import('@strudel/codemirror');
+
+      const tick = () => {
+        if (!running) return;
+
+        const view = viewRef.current;
+        const repl = replRef.current;
+        if (!view || !repl) {
+          animFrameRef.current = requestAnimationFrame(tick);
+          return;
+        }
+
+        try {
+          const scheduler = repl.scheduler;
+          const state = repl.state;
+          if (scheduler && state?.pattern) {
+            /* Query active haps in a small window around current time */
+            const now = scheduler.now();
+            const haps = state.pattern.queryArc(now, now + 0.1);
+            /* Extract mini-locations from haps that have source positions */
+            const locations = haps
+              .filter((h: any) => h.hasOnset?.() && h.context?.locations)
+              .flatMap((h: any) => h.context.locations || []);
+            updateMiniLocations(view, locations);
+          }
+        } catch {
+          /* Ignore errors during highlight — pattern may be mid-update */
+        }
+
+        animFrameRef.current = requestAnimationFrame(tick);
+      };
+
+      animFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    highlightLoop();
+
+    return () => {
+      running = false;
+      if (animFrameRef.current != null) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
+      }
+    };
   }, [playing]);
 
   return (

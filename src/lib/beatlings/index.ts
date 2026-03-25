@@ -42,8 +42,39 @@ export class BeatlingWorld {
   private golTickCounter = 0;
   private spawnCooldowns: Map<Species, number> = new Map();
 
+  /* Web Worker for offloading GoL computation from the main thread */
+  private worker: Worker | null = null;
+  private workerBusy = false;
+
   constructor(golWidth = 64, golHeight = 64) {
     this.gol = new GolBrain(golWidth, golHeight);
+
+    /* Try to initialize Web Worker for GoL steps — falls back to
+     * synchronous computation if Workers are not available */
+    try {
+      this.worker = new Worker(
+        new URL('../../workers/beatling-worker.ts', import.meta.url),
+        { type: 'module' },
+      );
+      this.worker.onmessage = (e) => {
+        if (e.data.type === 'gol-result') {
+          /* Copy worker result back into the GoL brain grid */
+          const newGrid = new Uint8Array(e.data.data.grid);
+          const grid = this.gol.getGrid();
+          for (let i = 0; i < newGrid.length; i++) {
+            grid[i] = newGrid[i];
+          }
+          this.workerBusy = false;
+        }
+      };
+      this.worker.onerror = () => {
+        /* Worker failed — disable and fall back to sync */
+        this.worker = null;
+        this.workerBusy = false;
+      };
+    } catch {
+      /* Worker not available in this environment, use sync fallback */
+    }
   }
 
   /** Connect the audio analyser to drive brain stimulation and spawn logic */
@@ -61,7 +92,20 @@ export class BeatlingWorld {
     this.golTickCounter++;
     if (this.golTickCounter % 3 === 0) {
       this.injectAudioIntoGol(features);
-      this.gol.step();
+
+      /* Offload GoL step to Web Worker when available, otherwise sync */
+      if (this.worker && !this.workerBusy) {
+        const grid = this.gol.getGrid();
+        const copy = new Uint8Array(grid);
+        this.workerBusy = true;
+        this.worker.postMessage(
+          { type: 'gol-step', data: { grid: copy, width: this.gol.width, height: this.gol.height } },
+          [copy.buffer],
+        );
+      } else if (!this.worker) {
+        /* Sync fallback — no worker available */
+        this.gol.step();
+      }
     }
 
     /* Try spawn new creatures based on audio features */

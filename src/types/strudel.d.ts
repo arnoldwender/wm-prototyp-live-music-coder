@@ -55,17 +55,33 @@ declare module '@strudel/codemirror' {
     start(): void;
     stop(): void;
   }
-  export function highlightExtension(): unknown[];
+  /** Array of CM6 extensions that enable per-character pattern highlighting */
+  export const highlightExtension: import('@codemirror/state').Extension[];
+  /** Dispatch mini-locations to the editor to update highlight decorations */
   export function updateMiniLocations(editor: EditorView, locations: unknown[]): void;
+  /** Highlight haps at a specific time — alternative to updateMiniLocations */
+  export function highlightMiniLocations(editor: EditorView, atTime: number, haps: unknown[]): void;
   export const theme: unknown;
 }
 
 declare module '@strudel/web' {
   export function initStrudel(options?: Record<string, unknown>): Promise<{
-    scheduler: { start(): void; stop(): void; setPattern(p: unknown): void }
+    scheduler: {
+      start(): void
+      stop(): void
+      setPattern(p: unknown): void
+      now(): number
+    }
     evaluate: (code: string, autostart?: boolean) => Promise<unknown>
     start: () => void
     stop: () => void
+    /** Live REPL state — updated after each evaluation */
+    state: {
+      miniLocations: unknown[]
+      pattern: { queryArc(begin: number, end: number): unknown[] } | null
+      activeCode: string
+      [key: string]: unknown
+    }
     [key: string]: unknown
   }>
 }
