@@ -128,12 +128,13 @@ function parseWebAudio(code: string): ParseResult {
     if (varMatch) {
       const [, varName, creator] = varMatch;
       const isSource = WA_SOURCES.test(creator);
+      const isEffect = WA_EFFECTS.test(creator);
       const blockId = `webaudio_${varName}`;
 
       blocks.push({
         id: blockId,
         engine: 'webaudio',
-        type: isSource ? 'source' : 'effect',
+        type: isSource ? 'source' : isEffect ? 'effect' : 'effect',
         code: trimmed,
         params: {},
         inputs: isSource ? [] : [{ id: 'in', label: 'Input', type: 'audio' }],

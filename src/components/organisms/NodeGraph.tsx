@@ -65,8 +65,8 @@ export default function NodeGraph() {
     [files],
   )
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   /* Re-parse and rebuild graph when the active file code or engine changes */
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function NodeGraph() {
   /* Handle manual edge creation via drag in the canvas */
   const onConnect = useCallback(
     (params: RFConnection) => {
-      setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: 'var(--color-primary)' } }, eds))
+      setEdges((eds) => addEdge(params, eds))
     },
     [setEdges],
   )

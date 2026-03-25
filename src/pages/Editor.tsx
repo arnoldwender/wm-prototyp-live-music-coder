@@ -5,7 +5,7 @@
 
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
-import { TransportBar, StatusBar, CodeEditor } from '../components/organisms'
+import { TransportBar, StatusBar, CodeEditor, NodeGraph } from '../components/organisms'
 
 /** Placeholder panel — shows a centered label with muted styling */
 function PlaceholderPanel({ label }: { label: string }) {
@@ -31,7 +31,7 @@ function Editor() {
     <EditorLayout
       toolbar={<TransportBar />}
       editor={<CodeEditor />}
-      graph={<PlaceholderPanel label={t('panels.graph')} />}
+      graph={<NodeGraph />}
       visualizers={<PlaceholderPanel label={t('panels.waveform')} />}
       statusBar={<StatusBar />}
     />
