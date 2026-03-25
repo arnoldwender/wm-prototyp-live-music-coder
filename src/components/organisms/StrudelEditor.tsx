@@ -39,13 +39,21 @@ export function StrudelEditor() {
 
         replRef.current = repl;
 
-        /* Also load Dirt-Samples for drum sounds */
+        /* Load Dirt-Samples by evaluating a samples() call through the REPL.
+         * This ensures samples are registered in the correct context. */
         try {
-          const { samples } = await import('superdough');
-          await samples('github:tidalcycles/Dirt-Samples/master');
-          console.log('[StrudelEditor] Dirt-Samples loaded');
+          await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
+          console.log('[StrudelEditor] Dirt-Samples registered via REPL');
         } catch (err) {
-          console.warn('[StrudelEditor] Dirt-Samples failed:', err);
+          console.warn('[StrudelEditor] Dirt-Samples via REPL failed, trying direct:', err);
+          /* Fallback: try direct superdough call */
+          try {
+            const { samples } = await import('superdough');
+            await samples('github:tidalcycles/Dirt-Samples/master');
+            console.log('[StrudelEditor] Dirt-Samples loaded via superdough');
+          } catch (err2) {
+            console.warn('[StrudelEditor] Dirt-Samples failed entirely:', err2);
+          }
         }
 
         setReady(true);
