@@ -1,8 +1,8 @@
 # Live Music Coder — Social Media Campaign Kit
 
 ## Project Links
-- **Live App:** https://wm-prototyp-live-music-coder.netlify.app
-- **Editor Direct:** https://wm-prototyp-live-music-coder.netlify.app/editor
+- **Live App:** https://live-music-coder.pro
+- **Editor Direct:** https://live-music-coder.pro/editor
 - **GitHub:** https://github.com/arnoldwender/wm-prototyp-live-music-coder
 
 ---
@@ -56,7 +56,7 @@ Write code → hear music → watch creatures dance
 ✅ 21 patterns ready to play
 ✅ Zero install — runs in the browser
 
-Try it → wm-prototyp-live-music-coder.netlify.app
+Try it → live-music-coder.pro
 
 #LiveCoding #CreativeCoding #WebAudio
 ```
@@ -81,7 +81,7 @@ Waveform, spectrum analyzer, pattern timeline — plus a Game of Life grid that 
 Every pattern is shareable via URL. Save to GitHub Gist. Record audio. All in the browser.
 
 Try the "Synth Wave" or "Horror Drone" pattern 🎧
-→ wm-prototyp-live-music-coder.netlify.app
+→ live-music-coder.pro
 
 Built with React 19, TypeScript, Vite, 104 tests. Open source (AGPL-3.0).
 
@@ -96,7 +96,7 @@ note("c3 e3 g3 b3").s("sawtooth").lpf(800).delay(.25).room(.5)
 
 That's it. That's the whole song. No DAW needed.
 
-→ wm-prototyp-live-music-coder.netlify.app/editor
+→ live-music-coder.pro/editor
 
 #LiveCoding #CodeMusic
 ```
@@ -169,7 +169,7 @@ The creative twist: 6 species of "Beatling" creatures with neural network + Game
 Built in a single session with Claude Code — from brainstorming to deployment.
 8 implementation phases, 107 source files, zero npm vulnerabilities.
 
-Try it: wm-prototyp-live-music-coder.netlify.app
+Try it: live-music-coder.pro
 
 Open source (AGPL-3.0): github.com/arnoldwender/wm-prototyp-live-music-coder
 
@@ -227,7 +227,7 @@ Features:
 10:00 - Sharing & Export
 11:00 - Tech Stack Deep Dive
 
-Try it: https://wm-prototyp-live-music-coder.netlify.app
+Try it: https://live-music-coder.pro
 
 Tech: React 19, TypeScript, Vite, CodeMirror 6, Strudel, Tone.js, Web Audio API, React Flow, Canvas 2D
 
@@ -261,7 +261,7 @@ Quick facts:
 • Works in English, German, and Spanish
 • Zero install — just open and play
 
-Try it: wm-prototyp-live-music-coder.netlify.app
+Try it: live-music-coder.pro
 
 Let me know what you think!
 
