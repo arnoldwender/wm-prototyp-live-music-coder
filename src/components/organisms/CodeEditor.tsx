@@ -8,13 +8,15 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
 import { getOrchestrator } from '../../lib/orchestrator';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { createEvaluator } from '../../lib/editor/evaluate';
 import { FileTabs } from '../molecules/FileTabs';
+import { Play, RefreshCw } from 'lucide-react';
+import { Button, Tooltip } from '../atoms';
 
 /** Main code editor — CodeMirror 6 with multi-tab support and live evaluation */
 export function CodeEditor() {
@@ -24,11 +26,27 @@ export function CodeEditor() {
 
   /* Error state — shows the last evaluation error below the editor */
   const [evalError, setEvalError] = useState<string | null>(null);
+  /* Auto-update: when on, code evaluates on every change while playing */
+  const [autoUpdate, setAutoUpdate] = useState(true);
 
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const isPlaying = useAppStore((s) => s.isPlaying);
   const activeFile = files.find((f) => f.active);
+
+  /** Manually evaluate the current code — works regardless of play state */
+  const handleManualEvaluate = useCallback(async () => {
+    if (!activeFile) return;
+    const orch = getOrchestrator();
+    try {
+      setEvalError(null);
+      await orch.evaluate(activeFile.code, activeFile.engine);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[CodeEditor] Manual eval error:', msg);
+      setEvalError(msg);
+    }
+  }, [activeFile?.id, activeFile?.code, activeFile?.engine]);
 
   /** Set up evaluator for live code changes */
   const setupEvaluator = useCallback(() => {
@@ -53,17 +71,27 @@ export function CodeEditor() {
     /* Destroy previous editor */
     viewRef.current?.destroy();
 
-    /* Create update listener — syncs code to store and triggers evaluation */
+    /* Create update listener — syncs code to store and triggers auto-evaluation */
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         const code = update.state.doc.toString();
         updateFileCode(activeFile.id, code);
-        /* Auto-evaluate when playing */
-        if (isPlaying) {
+        /* Auto-evaluate when playing AND autoUpdate is on */
+        if (isPlaying && autoUpdate) {
           evaluatorRef.current?.evaluate(code);
         }
       }
     });
+
+    /* Ctrl+Enter keybinding to manually evaluate code */
+    const evalKeymap = keymap.of([{
+      key: 'Ctrl-Enter',
+      mac: 'Cmd-Enter',
+      run: () => {
+        handleManualEvaluate();
+        return true;
+      },
+    }]);
 
     /* Create new editor state with base + engine-specific extensions */
     const state = EditorState.create({
@@ -72,6 +100,7 @@ export function CodeEditor() {
         ...getBaseExtensions(),
         ...getEngineExtensions(activeFile.engine),
         updateListener,
+        evalKeymap,
       ],
     });
 
@@ -98,6 +127,48 @@ export function CodeEditor() {
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
       <FileTabs />
+
+      {/* Editor toolbar: Evaluate button + Auto-update toggle */}
+      <div
+        className="flex items-center gap-2 shrink-0"
+        style={{
+          padding: 'var(--space-1) var(--space-3)',
+          backgroundColor: 'var(--color-bg-alt)',
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <Tooltip content="Evaluate code (Ctrl+Enter)">
+          <Button
+            variant="ghost"
+            onClick={handleManualEvaluate}
+            className="!py-0.5 !px-2 text-xs"
+          >
+            <Play size={12} />
+            Run
+          </Button>
+        </Tooltip>
+
+        <label
+          className="flex items-center gap-1.5 cursor-pointer select-none"
+          style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}
+        >
+          <input
+            type="checkbox"
+            checked={autoUpdate}
+            onChange={(e) => setAutoUpdate(e.target.checked)}
+            className="cursor-pointer"
+          />
+          Auto-update
+        </label>
+
+        <span
+          className="ml-auto"
+          style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}
+        >
+          Ctrl+Enter to evaluate
+        </span>
+      </div>
+
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 
       {/* Evaluation error bar — visible feedback when code fails to parse/run */}
