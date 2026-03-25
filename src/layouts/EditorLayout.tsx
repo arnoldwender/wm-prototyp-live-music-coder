@@ -100,44 +100,47 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
 
       {/* ── Main content area ── */}
       <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
-        {/* Top zone: editor + graph */}
+        {/* Top zone: editor + graph (graph hidden by default) */}
         <div className="flex min-h-0" style={{ height: topHeight }}>
-          {/* Editor panel */}
+          {/* Editor panel — full width when graph is hidden */}
           <section
             aria-label="Editor"
             className="min-w-0 overflow-auto"
-            style={{ width: `${layout.editorWidth}%` }}
+            style={{ width: layout.showGraph ? `${layout.editorWidth}%` : '100%' }}
           >
             {editor}
           </section>
 
-          {/* Vertical resize handle */}
-          <div
-            role="separator"
-            aria-orientation="vertical"
-            tabIndex={0}
-            onMouseDown={handleVerticalResize}
-            className="shrink-0 cursor-col-resize transition-colors"
-            style={{
-              width: '1px',
-              backgroundColor: 'var(--color-border)',
-            }}
-            onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
-            }}
-            onMouseLeave={(e) => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
-            }}
-          />
+          {/* Vertical resize handle + Graph panel — only when graph is visible */}
+          {layout.showGraph && (
+            <>
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                tabIndex={0}
+                onMouseDown={handleVerticalResize}
+                className="shrink-0 cursor-col-resize transition-colors"
+                style={{
+                  width: '1px',
+                  backgroundColor: 'var(--color-border)',
+                }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
+                }}
+              />
 
-          {/* Graph panel */}
-          <section
-            aria-label="Graph"
-            className="min-w-0 overflow-auto"
-            style={{ width: `${layout.graphWidth}%` }}
-          >
-            {graph}
-          </section>
+              <section
+                aria-label="Graph"
+                className="min-w-0 overflow-auto"
+                style={{ width: `${layout.graphWidth}%` }}
+              >
+                {graph}
+              </section>
+            </>
+          )}
         </div>
 
         {/* Horizontal resize handle */}

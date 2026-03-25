@@ -15,6 +15,7 @@ import {
   Share2,
   FileCode2,
   Settings,
+  GitBranch,
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
@@ -184,8 +185,22 @@ function TransportBar() {
         </ToolbarGroup>
 
         {/* Engine selector */}
-        <ToolbarGroup separator={false}>
+        <ToolbarGroup>
           <EngineSelector />
+        </ToolbarGroup>
+
+        {/* Node Graph toggle */}
+        <ToolbarGroup separator={false}>
+          <Tooltip content={t('panels.graph')}>
+            <Button
+              variant="icon"
+              active={useAppStore.getState().layout.showGraph}
+              onClick={() => useAppStore.getState().toggleGraph()}
+              aria-label={t('panels.graph')}
+            >
+              <Icon icon={GitBranch} size={16} />
+            </Button>
+          </Tooltip>
         </ToolbarGroup>
       </div>
 

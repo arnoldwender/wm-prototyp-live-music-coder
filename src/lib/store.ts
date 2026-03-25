@@ -38,6 +38,7 @@ interface AppState {
 
   /* Layout actions */
   togglePanel: (panel: PanelName) => void
+  toggleGraph: () => void
   setEditorWidth: (width: number) => void
   setVisualizerHeight: (height: number) => void
 
@@ -97,6 +98,20 @@ export const useAppStore = create<AppState>()((set, get) => ({
         },
       },
     })),
+
+  /** Toggle the node graph panel — adjusts editor width accordingly */
+  toggleGraph: () =>
+    set((s) => {
+      const show = !s.layout.showGraph;
+      return {
+        layout: {
+          ...s.layout,
+          showGraph: show,
+          editorWidth: show ? 60 : 100,
+          graphWidth: show ? 40 : 0,
+        },
+      };
+    }),
 
   /** Set editor width — graph auto-fills the remainder */
   setEditorWidth: (width: number) =>

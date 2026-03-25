@@ -11,6 +11,7 @@ export interface PanelLayout {
   editorWidth: number
   graphWidth: number
   visualizerHeight: number
+  showGraph: boolean
   visiblePanels: {
     waveform: boolean
     spectrum: boolean

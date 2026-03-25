@@ -22,11 +22,12 @@ export const ENGINE_COLORS: Record<EngineType, string> = {
   midi: 'var(--color-engine-midi)',
 }
 
-/* Default panel layout — 50/50 split, all visualizers visible */
+/* Default panel layout — full-width editor, graph hidden by default */
 export const DEFAULT_LAYOUT: PanelLayout = {
-  editorWidth: 50,
-  graphWidth: 50,
+  editorWidth: 100,
+  graphWidth: 0,
   visualizerHeight: 30,
+  showGraph: false,
   visiblePanels: {
     waveform: true,
     spectrum: true,
