@@ -1,30 +1,28 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawWaveform } from '../../lib/visualizers/waveform';
 import { AudioAnalyzer } from '../../lib/audio/analyzer';
-import { getMasterAnalyser } from '../../lib/audio/context';
+import { getStrudelAnalyser } from '../../lib/audio/strudel-tap';
 
-/** Real-time waveform display — reads from master analyser */
+/** Real-time waveform display — taps into superdough's audio chain */
 export function WaveformVisualizer() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
-
-  useEffect(() => {
-    try {
-      const analyserNode = getMasterAnalyser();
-      analyzerRef.current = new AudioAnalyzer(analyserNode);
-    } catch {
-      /* AudioContext not yet created — will init on first play */
-    }
-  }, []);
+  const connectingRef = useRef(false);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    /* Lazy-connect to superdough's analyser on each frame until successful */
+    if (!analyzerRef.current && !connectingRef.current) {
+      connectingRef.current = true;
+      getStrudelAnalyser().then((node) => {
+        if (node) analyzerRef.current = new AudioAnalyzer(node);
+        connectingRef.current = false;
+      });
+      drawWaveform(ctx, width, height, new Float32Array(2048));
+      return;
+    }
     if (!analyzerRef.current) {
-      try {
-        const analyserNode = getMasterAnalyser();
-        analyzerRef.current = new AudioAnalyzer(analyserNode);
-      } catch {
-        return;
-      }
+      drawWaveform(ctx, width, height, new Float32Array(2048));
+      return;
     }
     const data = analyzerRef.current.getTimeDomainData();
     drawWaveform(ctx, width, height, data);
