@@ -1,0 +1,46 @@
+# Live Music Coder — LLM Context
+
+## What is this?
+A browser-based live coding music IDE. Users write code to make music in real time. Features a CodeMirror 6 editor, React Flow node graph, 4 audio engines, Canvas 2D visualizers, and audio-reactive creatures called Beatlings.
+
+## Live URL
+https://wm-prototyp-live-music-coder.netlify.app
+
+## Tech Stack
+React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React Flow, @strudel/core, Tone.js, Web Audio API, WebMidi.js, Canvas 2D, i18next (DE/EN/ES), idb, lz-string, @octokit/rest, Framer Motion 12, Vitest.
+
+## Architecture
+- Code editor is source of truth; node graph is derived view
+- Engine orchestrator with shared AudioContext routes to 4 engine adapters
+- Atomic Design: atoms → molecules → organisms → layouts → pages
+- Design tokens via CSS custom properties (Canvas uses VIZ_COLORS literals)
+- Beatling creatures have neural network + Conway's Game of Life dual-brain
+- Brain code adapted from wm-lifegame project (copied, not imported)
+
+## Audio Engines
+- Strudel: pattern-based live coding (@strudel/core + @strudel/webaudio)
+- Tone.js: high-level synths and effects
+- Web Audio: raw browser API (oscillators, filters, gain nodes)
+- MIDI: external device output only (WebMidi.js)
+
+## Beatling Species (6)
+Beatling (drums/bounce), Looplet (loops/orbit), Synthling (melody/flow), Glitchbit (noise/glitch), Wavelet (bass/wave), Codefly (typing/swarm). Each spawns based on audio features and evolves through 5 stages: Egg → Baby → Adult → Elder → Ascended.
+
+## Persistence
+- IndexedDB autosave (idb)
+- URL sharing via lz-string compression (#code=...)
+- GitHub Gist save/load (@octokit/rest) with PAT in sessionStorage/localStorage
+- Audio recording via MediaRecorder → WebM
+
+## Key Constraints
+- Dark mode only (music production aesthetic)
+- NEVER hardcode colors/spacing — use design tokens
+- This is Vite + React SPA, NOT Next.js
+- AGPL-3.0 license (Strudel dependency)
+- 104 tests, 19 test files
+- Colocated tests (foo.test.ts next to foo.ts)
+
+## Entry Points
+- / → Landing page (hero, features, examples)
+- /editor → Main IDE (code editor, node graph, visualizers, Beatlings)
+- /editor#code=... → Load shared project from URL hash
