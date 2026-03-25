@@ -41,7 +41,35 @@
   "landing": {
     "hero": "Programmiere deine Musik live",
     "subtitle": "Eine visuelle Entwicklungsumgebung für Live-Coding mit mehreren Audio-Engines und digitalen Kreaturen, die mit deinem Sound wachsen.",
-    "cta": "Jetzt loslegen"
+    "cta": "Jetzt loslegen",
+    "examples": "Beispiel ausprobieren",
+    "poweredBy": "Angetrieben von",
+    "features": {
+      "engines": {
+        "title": "4 Audio-Engines",
+        "desc": "Strudel-Patterns, Tone.js-Synths, natives Web Audio und MIDI-Ausgang — alles in einer IDE."
+      },
+      "graph": {
+        "title": "Visueller Node-Graph",
+        "desc": "Audio-Routing als verschiebbare Knoten sehen. Code und Graph bleiben synchron."
+      },
+      "visualizers": {
+        "title": "Live-Visualizer",
+        "desc": "Wellenform, Spektrum-Analysator und Pattern-Timeline reagieren in Echtzeit auf deine Musik."
+      },
+      "beatlings": {
+        "title": "Beatling-Kreaturen",
+        "desc": "6 audio-reaktive Spezies mit neuronalem Gehirn und Game-of-Life-Evolution."
+      },
+      "share": {
+        "title": "Teilen & Zusammenarbeiten",
+        "desc": "Per URL teilen, als GitHub Gist speichern oder deine Session als Audio aufnehmen."
+      },
+      "i18n": {
+        "title": "DE / EN / ES",
+        "desc": "Vollständige Oberfläche auf Deutsch, Englisch und Spanisch mit übersetzten Autocomplete-Tooltips."
+      }
+    }
   },
   "completions": {
     "strudel": {

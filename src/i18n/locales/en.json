@@ -41,7 +41,35 @@
   "landing": {
     "hero": "Live code your music",
     "subtitle": "A visual IDE for live coding music with multiple audio engines and digital creatures that evolve with your sound.",
-    "cta": "Start Coding"
+    "cta": "Start Coding",
+    "examples": "Try an Example",
+    "poweredBy": "Powered by",
+    "features": {
+      "engines": {
+        "title": "4 Audio Engines",
+        "desc": "Strudel patterns, Tone.js synths, raw Web Audio, and MIDI output — all in one IDE."
+      },
+      "graph": {
+        "title": "Visual Node Graph",
+        "desc": "See your audio routing as draggable nodes. Code and graph stay in sync."
+      },
+      "visualizers": {
+        "title": "Live Visualizers",
+        "desc": "Waveform, spectrum analyzer, and pattern timeline react to your music in real time."
+      },
+      "beatlings": {
+        "title": "Beatling Creatures",
+        "desc": "6 species of audio-reactive creatures with neural brains and Game of Life evolution."
+      },
+      "share": {
+        "title": "Share & Collaborate",
+        "desc": "Share via URL, save to GitHub Gist, or record your session as audio."
+      },
+      "i18n": {
+        "title": "DE / EN / ES",
+        "desc": "Full interface in German, English, and Spanish with translated autocomplete tooltips."
+      }
+    }
   },
   "completions": {
     "strudel": {

@@ -41,7 +41,35 @@
   "landing": {
     "hero": "Programa tu música en vivo",
     "subtitle": "Un IDE visual para programar música en vivo con múltiples motores de audio y criaturas digitales que evolucionan con tu sonido.",
-    "cta": "Empezar a programar"
+    "cta": "Empezar a programar",
+    "examples": "Probar un ejemplo",
+    "poweredBy": "Impulsado por",
+    "features": {
+      "engines": {
+        "title": "4 motores de audio",
+        "desc": "Patrones Strudel, sintetizadores Tone.js, Web Audio nativo y salida MIDI — todo en un IDE."
+      },
+      "graph": {
+        "title": "Grafo visual de nodos",
+        "desc": "Visualiza el enrutamiento de audio como nodos arrastrables. Código y grafo se sincronizan."
+      },
+      "visualizers": {
+        "title": "Visualizadores en vivo",
+        "desc": "Forma de onda, analizador de espectro y línea de tiempo reaccionan a tu música en tiempo real."
+      },
+      "beatlings": {
+        "title": "Criaturas Beatling",
+        "desc": "6 especies audio-reactivas con cerebros neuronales y evolución Game of Life."
+      },
+      "share": {
+        "title": "Compartir y colaborar",
+        "desc": "Comparte por URL, guarda en GitHub Gist o graba tu sesión como audio."
+      },
+      "i18n": {
+        "title": "DE / EN / ES",
+        "desc": "Interfaz completa en alemán, inglés y español con tooltips de autocompletado traducidos."
+      }
+    }
   },
   "completions": {
     "strudel": {
