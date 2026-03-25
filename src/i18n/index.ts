@@ -3,6 +3,13 @@
    Priority: localStorage → browser language → English
    ────────────────────────────────────────────────────────── */
 
+/* Suppress i18next promotional console.log about Locize */
+const _origLog = console.log
+console.log = (...args: unknown[]) => {
+  if (typeof args[0] === 'string' && args[0].includes('i18next')) return
+  _origLog(...args)
+}
+
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from './locales/en.json'
@@ -51,6 +58,9 @@ i18n
     /* Suppress promotional messages in console */
     debug: false,
   })
+
+/* Restore console.log after i18next init */
+console.log = _origLog
 
 /* Persist language choice on change */
 i18n.on('languageChanged', (lng) => {

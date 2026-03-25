@@ -10,16 +10,16 @@ export function SpectrumVisualizer() {
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     frameCount.current++;
-    if (frameCount.current % 60 === 0) {
+    if (frameCount.current % 30 === 0) {
       getStrudelAnalyser().then((node) => {
         if (node) analyzerRef.current = new AudioAnalyzer(node);
       });
     }
-    if (!analyzerRef.current) {
+    if (analyzerRef.current) {
+      drawSpectrum(ctx, width, height, analyzerRef.current.getFrequencyData());
+    } else {
       drawSpectrum(ctx, width, height, new Float32Array(1024));
-      return;
     }
-    drawSpectrum(ctx, width, height, analyzerRef.current.getFrequencyData());
   }, []);
 
   return (

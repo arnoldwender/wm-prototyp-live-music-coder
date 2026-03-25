@@ -11,14 +11,14 @@ export function BeatlingPanel() {
 
   useEffect(() => {
     worldRef.current = new BeatlingWorld(64, 64);
+    return () => { worldRef.current?.dispose?.(); };
   }, []);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
     if (!worldRef.current) return;
     frameCount.current++;
 
-    /* Retry connection every 60 frames until bridge is connected */
-    if (!bridgeConnected.current && frameCount.current % 60 === 0) {
+    if (!bridgeConnected.current && frameCount.current % 30 === 0) {
       getStrudelAnalyser().then(async (node) => {
         if (node && worldRef.current) {
           const sr = await getStrudelSampleRate();

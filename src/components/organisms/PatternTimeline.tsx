@@ -12,13 +12,13 @@ export function PatternTimeline() {
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
     frameCount.current++;
-    if (frameCount.current % 60 === 0) {
+    if (frameCount.current % 30 === 0) {
       getStrudelAnalyser().then((node) => {
         if (node) analyzerRef.current = new AudioAnalyzer(node);
       });
     }
-    const rmsLevel = analyzerRef.current?.getRmsLevel() ?? 0;
-    drawTimeline(ctx, width, height, bpm, time, rmsLevel);
+    const rms = analyzerRef.current?.getRmsLevel() ?? 0;
+    drawTimeline(ctx, width, height, bpm, time, rms);
   }, [bpm]);
 
   return (
