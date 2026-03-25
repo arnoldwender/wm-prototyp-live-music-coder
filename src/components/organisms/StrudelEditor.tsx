@@ -184,7 +184,7 @@ export function StrudelEditor() {
     let running = true;
 
     const highlightLoop = async () => {
-      const { updateMiniLocations } = await import('@strudel/codemirror');
+      const { updateMiniLocations, highlightMiniLocations } = await import('@strudel/codemirror');
 
       const tick = () => {
         if (!running) return;
@@ -197,17 +197,25 @@ export function StrudelEditor() {
         }
 
         try {
-          const scheduler = repl.scheduler;
           const state = repl.state;
+          const scheduler = repl.scheduler;
+
+          /* Step 1: Send mini-locations (code positions) to the editor.
+           * These are set after evaluate() and define WHERE highlights can appear. */
+          if (state?.miniLocations?.length > 0) {
+            updateMiniLocations(view, state.miniLocations);
+          }
+
+          /* Step 2: Send active haps to the editor.
+           * This tells the highlight system WHICH locations are sounding RIGHT NOW.
+           * Without this, locations are registered but never visually marked. */
           if (scheduler && state?.pattern) {
-            /* Query active haps in a small window around current time */
             const now = scheduler.now();
             const haps = state.pattern.queryArc(now, now + 0.1);
-            /* Extract mini-locations from haps that have source positions */
-            const locations = haps
-              .filter((h: any) => h.hasOnset?.() && h.context?.locations)
-              .flatMap((h: any) => h.context.locations || []);
-            updateMiniLocations(view, locations);
+            const activeHaps = haps.filter((h: any) => h.hasOnset?.() || h.whole);
+            if (activeHaps.length > 0) {
+              highlightMiniLocations(view, now, activeHaps);
+            }
           }
         } catch {
           /* Ignore errors during highlight — pattern may be mid-update */
