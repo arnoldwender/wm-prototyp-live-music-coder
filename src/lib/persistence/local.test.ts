@@ -23,9 +23,10 @@ function createMockProject(): Project {
     }],
     graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
     layout: {
-      editorWidth: 50,
-      graphWidth: 50,
+      editorWidth: 100,
+      graphWidth: 0,
       visualizerHeight: 30,
+      showGraph: false,
       visiblePanels: { waveform: true, spectrum: true, timeline: true, beatlings: true },
     },
     ecosystem: {
