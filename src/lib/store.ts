@@ -5,7 +5,7 @@
 
 import { create } from 'zustand'
 import type { EngineType } from '../types/engine'
-import type { PanelLayout } from '../types/project'
+import type { PanelLayout, ProjectFile } from '../types/project'
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
 
 /** Visible panel names that can be toggled */
@@ -24,6 +24,9 @@ interface AppState {
   /* Layout */
   layout: PanelLayout
 
+  /* Files */
+  files: ProjectFile[]
+
   /* Transport actions */
   togglePlay: () => void
   stop: () => void
@@ -37,15 +40,33 @@ interface AppState {
   togglePanel: (panel: PanelName) => void
   setEditorWidth: (width: number) => void
   setVisualizerHeight: (height: number) => void
+
+  /* File management actions */
+  addFile: (name: string, engine: EngineType) => void
+  removeFile: (fileId: string) => void
+  setActiveFile: (fileId: string) => void
+  updateFileCode: (fileId: string, code: string) => void
+  renameFile: (fileId: string, name: string) => void
+  getActiveFile: () => ProjectFile | undefined
 }
 
-export const useAppStore = create<AppState>()((set) => ({
+/** Default file loaded on startup — Strudel demo pattern */
+const DEFAULT_FILE: ProjectFile = {
+  id: 'file_1',
+  name: 'main.js',
+  engine: 'strudel' as EngineType,
+  code: 'note("c3 e3 g3 b3").s("sawtooth").lpf(800)',
+  active: true,
+}
+
+export const useAppStore = create<AppState>()((set, get) => ({
   /* --- Initial state --- */
   isPlaying: false,
   isRecording: false,
   bpm: DEFAULT_BPM,
   defaultEngine: DEFAULT_ENGINE,
   layout: { ...DEFAULT_LAYOUT, visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels } },
+  files: [{ ...DEFAULT_FILE }],
 
   /* --- Transport actions --- */
 
@@ -95,4 +116,63 @@ export const useAppStore = create<AppState>()((set) => ({
         visualizerHeight: height,
       },
     })),
+
+  /* --- File management actions --- */
+
+  /** Add a new file with the given name and engine */
+  addFile: (name: string, engine: EngineType) =>
+    set((s) => ({
+      files: [
+        ...s.files,
+        {
+          id: `file_${Date.now()}`,
+          name,
+          engine,
+          code: '',
+          active: false,
+        },
+      ],
+    })),
+
+  /** Remove a file by id — prevents removing the last file.
+   *  If removing the active file, activates the first remaining file. */
+  removeFile: (fileId: string) =>
+    set((s) => {
+      if (s.files.length <= 1) return s
+      const removed = s.files.find((f) => f.id === fileId)
+      const remaining = s.files.filter((f) => f.id !== fileId)
+      /* If the removed file was active, activate the first remaining */
+      if (removed?.active && remaining.length > 0) {
+        remaining[0] = { ...remaining[0], active: true }
+      }
+      return { files: remaining }
+    }),
+
+  /** Set the active file — deactivates all others */
+  setActiveFile: (fileId: string) =>
+    set((s) => ({
+      files: s.files.map((f) => ({
+        ...f,
+        active: f.id === fileId,
+      })),
+    })),
+
+  /** Update the code content of a file */
+  updateFileCode: (fileId: string, code: string) =>
+    set((s) => ({
+      files: s.files.map((f) =>
+        f.id === fileId ? { ...f, code } : f,
+      ),
+    })),
+
+  /** Rename a file */
+  renameFile: (fileId: string, name: string) =>
+    set((s) => ({
+      files: s.files.map((f) =>
+        f.id === fileId ? { ...f, name } : f,
+      ),
+    })),
+
+  /** Get the currently active file */
+  getActiveFile: () => get().files.find((f) => f.active),
 }))
