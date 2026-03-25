@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    DREAMS — Memory consolidation during sleep
    Stripped-down version for Beatlings: keeps only

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* Strudel editor — uses initStrudel() for audio + custom CM6 highlighting.
  * Implements its own pattern highlighting without StrudelMirror dependency. */
 

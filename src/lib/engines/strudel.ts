@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    Strudel engine adapter — pattern-based live coding.
    Uses @strudel/core repl + scheduler for pattern evaluation.

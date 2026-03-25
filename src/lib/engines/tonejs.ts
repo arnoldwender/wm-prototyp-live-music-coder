@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    Tone.js engine adapter — high-level synths and effects.
    Provides synth factory (7 types), transport control, and

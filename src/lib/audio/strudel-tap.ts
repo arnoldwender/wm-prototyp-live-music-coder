@@ -31,22 +31,22 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
         console.log('[strudel-tap] Connected to destinationGain');
         return analyser;
       }
-    } catch { /* controller not available yet */ }
+    } catch { /* expected */ /* controller not available yet */ }
 
     /* Fallback: try compressor */
     try {
       const comp = sd.getCompressor();
       if (comp) { comp.connect(analyser); connected = true; return analyser; }
-    } catch {}
+    } catch { /* expected */}
 
     /* Fallback: try gainNode */
     try {
       const gain = sd.gainNode();
       if (gain) { gain.connect(analyser); connected = true; return analyser; }
-    } catch {}
+    } catch { /* expected */}
 
     return analyser;
-  } catch {
+  } catch { /* expected */
     return null;
   }
 }
@@ -55,7 +55,7 @@ export async function getStrudelSampleRate(): Promise<number> {
   try {
     const { getAudioContext } = await import('superdough');
     return getAudioContext()?.sampleRate ?? 44100;
-  } catch {
+  } catch { /* expected */
     return 44100;
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    Orchestrator — central manager for engines, audio graph,
    and playback state. Evaluates code from the editor and

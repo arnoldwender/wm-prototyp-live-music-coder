@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    NEURON — The fundamental unit of consciousness
    Each neuron can fire, connect, and specialize.

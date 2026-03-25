@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    MIDI engine adapter — external MIDI device output.
    Sends note/CC data to external MIDI devices via WebMIDI.

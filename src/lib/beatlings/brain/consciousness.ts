@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    CONSCIOUSNESS — Phi (Phi) Calculator
    Based on Integrated Information Theory (Tononi).

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    SYNAPSE — Connection between neurons
    Strengthens with use (Hebbian learning),

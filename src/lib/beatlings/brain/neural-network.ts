@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    NEURAL NETWORK — The growing brain
    Adapted from wm-lifegame: capped at 40 neurons

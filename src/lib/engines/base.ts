@@ -4,7 +4,7 @@
    per-block analyser creation, and common connect/disconnect.
    ────────────────────────────────────────────────────────── */
 
-import type { EngineType, EngineAdapter, EngineBlock, AudioNodeWrapper, Connection } from '../../types/engine'
+import type { EngineType, EngineAdapter, EngineBlock, AudioNodeWrapper } from '../../types/engine'
 import { getSharedContext, getMasterGain } from '../audio/context'
 
 /** Abstract base for all engine adapters.
@@ -20,7 +20,7 @@ export abstract class BaseEngine implements EngineAdapter {
   abstract stop(block: EngineBlock): void
 
   /* Connect two AudioNode wrappers at the Web Audio level */
-  connect(source: AudioNodeWrapper, target: AudioNodeWrapper, _connection: Connection): void {
+  connect(source: AudioNodeWrapper, target: AudioNodeWrapper): void {
     source.node.connect(target.node)
   }
 
