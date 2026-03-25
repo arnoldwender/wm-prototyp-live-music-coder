@@ -44,13 +44,18 @@ export class StrudelEngine extends BaseEngine {
       console.warn('[Strudel] Failed to load default samples — oscillator sounds still work:', err)
     }
 
-    /* Create the Strudel REPL instance — it handles transpilation,
-     * evaluation, and pattern scheduling internally. We use its
-     * evaluate() method instead of manual transpiler + Function(). */
+    /* Import the transpiler so the REPL knows how to parse
+     * mini-notation and resolve functions like note(), s(), etc. */
+    const { transpiler } = await import('@strudel/transpiler')
+
+    /* Create the Strudel REPL instance — with transpiler it handles
+     * full Strudel syntax including mini-notation, function calls,
+     * and pattern scheduling. */
     const strudelCtx = getAudioContext()
     const replInstance = repl({
       defaultOutput: webaudioOutput,
       getTime: () => strudelCtx.currentTime,
+      transpiler,
     })
 
     this.scheduler = replInstance.scheduler
