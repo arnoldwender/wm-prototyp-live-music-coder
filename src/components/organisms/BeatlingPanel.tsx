@@ -1,7 +1,3 @@
-/* BeatlingPanel — renders the Beatling ecosystem.
- * Connects to superdough's audio chain via strudel-tap helper
- * to analyze audio and drive creature behavior. */
-
 import { useCallback, useRef, useEffect } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { BeatlingWorld } from '../../lib/beatlings';
@@ -11,7 +7,7 @@ import { getStrudelAnalyser, getStrudelSampleRate } from '../../lib/audio/strude
 export function BeatlingPanel() {
   const worldRef = useRef<BeatlingWorld | null>(null);
   const bridgeConnected = useRef(false);
-  const connectingRef = useRef(false);
+  const frameCount = useRef(0);
 
   useEffect(() => {
     worldRef.current = new BeatlingWorld(64, 64);
@@ -19,17 +15,16 @@ export function BeatlingPanel() {
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
     if (!worldRef.current) return;
+    frameCount.current++;
 
-    /* Lazy-connect to superdough's analyser via shared helper */
-    if (!bridgeConnected.current && !connectingRef.current) {
-      connectingRef.current = true;
+    /* Retry connection every 60 frames until bridge is connected */
+    if (!bridgeConnected.current && frameCount.current % 60 === 0) {
       getStrudelAnalyser().then(async (node) => {
         if (node && worldRef.current) {
           const sr = await getStrudelSampleRate();
           worldRef.current.setAudioBridge(new AudioAnalyzer(node), sr);
           bridgeConnected.current = true;
         }
-        connectingRef.current = false;
       });
     }
 

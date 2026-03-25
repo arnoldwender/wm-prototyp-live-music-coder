@@ -5,25 +5,19 @@ import { AudioAnalyzer } from '../../lib/audio/analyzer';
 import { getStrudelAnalyser } from '../../lib/audio/strudel-tap';
 import { useAppStore } from '../../lib/store';
 
-/** Pattern timeline — scrolling beat grid with playhead and level indicator */
 export function PatternTimeline() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
-  const connectingRef = useRef(false);
+  const frameCount = useRef(0);
   const bpm = useAppStore((s) => s.bpm);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
-    let rmsLevel = 0;
-    /* Lazy-connect to superdough's analyser on each frame until successful */
-    if (!analyzerRef.current && !connectingRef.current) {
-      connectingRef.current = true;
+    frameCount.current++;
+    if (frameCount.current % 60 === 0) {
       getStrudelAnalyser().then((node) => {
         if (node) analyzerRef.current = new AudioAnalyzer(node);
-        connectingRef.current = false;
       });
     }
-    if (analyzerRef.current) {
-      rmsLevel = analyzerRef.current.getRmsLevel();
-    }
+    const rmsLevel = analyzerRef.current?.getRmsLevel() ?? 0;
     drawTimeline(ctx, width, height, bpm, time, rmsLevel);
   }, [bpm]);
 

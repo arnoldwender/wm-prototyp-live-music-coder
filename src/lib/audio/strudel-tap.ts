@@ -1,39 +1,54 @@
-/* Tap into superdough's audio chain to get an AnalyserNode.
- * Strudel uses its own AudioContext via superdough — our shared context is separate.
- * This module bridges the gap by creating an analyser in superdough's context. */
+/* Tap into superdough's audio chain for visualization.
+ * Reconnects every call to handle superdough's dynamic node creation. */
 
-let cachedAnalyser: AnalyserNode | null = null;
-let cachedCtx: AudioContext | null = null;
+let analyserNode: AnalyserNode | null = null;
+let lastConnectAttempt = 0;
 
-/** Get an AnalyserNode connected to superdough's audio output.
- * Returns null if superdough isn't loaded yet. */
+/** Get an AnalyserNode that receives superdough's audio output.
+ * Retries connection every 500ms if not connected. */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
-  if (cachedAnalyser && cachedCtx?.state !== 'closed') return cachedAnalyser;
+  const now = Date.now();
+
+  /* Don't spam connection attempts — wait 500ms between tries */
+  if (analyserNode && now - lastConnectAttempt < 500) return analyserNode;
+  lastConnectAttempt = now;
 
   try {
-    const { getAudioContext, getCompressor, gainNode } = await import('superdough');
-    const ctx = getAudioContext();
-    if (!ctx || ctx.state === 'closed') return null;
+    const superdough = await import('superdough');
+    const ctx = superdough.getAudioContext();
+    if (!ctx || ctx.state === 'closed' || ctx.state === 'suspended') return null;
 
-    cachedCtx = ctx;
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048;
-    analyser.smoothingTimeConstant = 0.8;
+    /* Create analyser if we don't have one yet */
+    if (!analyserNode) {
+      analyserNode = ctx.createAnalyser();
+      analyserNode.fftSize = 2048;
+      analyserNode.smoothingTimeConstant = 0.85;
+    }
 
-    /* Connect to superdough's compressor or gain node */
+    /* Try to connect to the audio chain every time — superdough
+     * creates nodes lazily, so they may not exist on first call.
+     * Reconnecting is safe (Web Audio ignores duplicate connections). */
+    let connected = false;
+
     try {
-      const comp = getCompressor();
-      if (comp) { comp.connect(analyser); cachedAnalyser = analyser; return analyser; }
-    } catch { /* no compressor */ }
+      const comp = superdough.getCompressor();
+      if (comp) {
+        comp.connect(analyserNode);
+        connected = true;
+      }
+    } catch { /* compressor not available */ }
 
-    try {
-      const gain = gainNode();
-      if (gain) { gain.connect(analyser); cachedAnalyser = analyser; return analyser; }
-    } catch { /* no gain */ }
+    if (!connected) {
+      try {
+        const gain = superdough.gainNode();
+        if (gain) {
+          gain.connect(analyserNode);
+          connected = true;
+        }
+      } catch { /* gain not available */ }
+    }
 
-    /* Fallback: connect to destination (won't get audio but at least won't crash) */
-    cachedAnalyser = analyser;
-    return analyser;
+    return analyserNode;
   } catch {
     return null;
   }
@@ -47,4 +62,9 @@ export async function getStrudelSampleRate(): Promise<number> {
   } catch {
     return 44100;
   }
+}
+
+/** Force reconnection on next call */
+export function resetStrudelTap(): void {
+  lastConnectAttempt = 0;
 }

@@ -1,6 +1,7 @@
 /* ──────────────────────────────────────────────────────────
-   Example pattern library — 65+ curated Strudel patterns
-   organized by category and difficulty level.
+   Example pattern library — 165+ curated patterns across
+   Strudel, Tone.js, and Web Audio engines.
+   Organized by category and difficulty level.
    Used by the /examples browseable library page.
    ────────────────────────────────────────────────────────── */
 
@@ -10,7 +11,7 @@ export interface ExampleEntry {
   name: string;
   category: string;
   description: string;
-  engine: 'strudel';
+  engine: 'strudel' | 'tonejs' | 'webaudio';
   code: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   tags: string[];
