@@ -6,14 +6,14 @@
 
 export class AudioAnalyzer {
   private analyser: AnalyserNode
-  private freqBuffer: Float32Array
-  private timeBuffer: Float32Array
+  private freqBuffer: Float32Array<ArrayBuffer>
+  private timeBuffer: Float32Array<ArrayBuffer>
 
   constructor(analyser: AnalyserNode) {
     this.analyser = analyser
     /* Pre-allocate typed arrays matching the FFT bin count */
-    this.freqBuffer = new Float32Array(analyser.frequencyBinCount)
-    this.timeBuffer = new Float32Array(analyser.frequencyBinCount)
+    this.freqBuffer = new Float32Array(analyser.frequencyBinCount) as Float32Array<ArrayBuffer>
+    this.timeBuffer = new Float32Array(analyser.frequencyBinCount) as Float32Array<ArrayBuffer>
   }
 
   /** Returns frequency-domain data in decibels */
