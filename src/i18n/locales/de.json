@@ -8,7 +8,8 @@
     "backToHome": "Zurück zur Startseite",
     "docs": "Dokumentation",
     "samples": "Samples",
-    "examples": "Beispiele"
+    "examples": "Beispiele",
+    "legal": "Rechtliches"
   },
   "transport": {
     "play": "Abspielen",
@@ -387,5 +388,9 @@
       "tipsHeading": "Performance-Tipps",
       "tipsText": "Halte deine Patterns kurz und modular. Nutze separate Zeilen für Drums, Bass und Melodie, damit du schnell einzelne Layer auskommentieren oder ändern kannst. Strg+Enter wertet den gesamten Code auf einmal aus, sodass du Änderungen über mehrere Zeilen vorbereiten kannst."
     }
+  },
+  "legal": {
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz"
   }
 }

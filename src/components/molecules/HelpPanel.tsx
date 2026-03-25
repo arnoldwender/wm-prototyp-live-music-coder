@@ -549,10 +549,10 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
             className="space-y-2 text-xs"
             style={{ color: 'var(--color-text-secondary)' }}
           >
-            <div><span style={{ color: '#a855f7' }}>Strudel</span> — {t('help.engineStrudel')}</div>
-            <div><span style={{ color: '#3b82f6' }}>Tone.js</span> — {t('help.engineTonejs')}</div>
-            <div><span style={{ color: '#22c55e' }}>Web Audio</span> — {t('help.engineWebaudio')}</div>
-            <div><span style={{ color: '#f97316' }}>MIDI</span> — {t('help.engineMidi')}</div>
+            <div><span style={{ color: 'var(--color-strudel)' }}>Strudel</span> — {t('help.engineStrudel')}</div>
+            <div><span style={{ color: 'var(--color-tonejs)' }}>Tone.js</span> — {t('help.engineTonejs')}</div>
+            <div><span style={{ color: 'var(--color-webaudio)' }}>Web Audio</span> — {t('help.engineWebaudio')}</div>
+            <div><span style={{ color: 'var(--color-midi)' }}>MIDI</span> — {t('help.engineMidi')}</div>
           </div>
         </Section>
       </div>

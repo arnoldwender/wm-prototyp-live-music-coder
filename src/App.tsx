@@ -8,6 +8,7 @@ import Editor from './pages/Editor'
 import Docs from './pages/Docs'
 import Samples from './pages/Samples'
 import Examples from './pages/Examples'
+import Legal from './pages/Legal'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/docs/:sectionId" element={<Docs />} />
         <Route path="/samples" element={<Samples />} />
         <Route path="/examples" element={<Examples />} />
+        <Route path="/legal" element={<Legal />} />
       </Routes>
     </BrowserRouter>
   )

@@ -8,7 +8,8 @@
     "backToHome": "Back to home",
     "docs": "Documentation",
     "samples": "Samples",
-    "examples": "Examples"
+    "examples": "Examples",
+    "legal": "Legal"
   },
   "transport": {
     "play": "Play",
@@ -387,5 +388,9 @@
       "tipsHeading": "Performance Tips",
       "tipsText": "Keep your patterns short and modular. Use separate lines for drums, bass, and melody so you can quickly comment out or modify individual layers. The Ctrl+Enter shortcut evaluates all code at once, so you can prepare changes across multiple lines before committing them."
     }
+  },
+  "legal": {
+    "impressum": "Impressum",
+    "datenschutz": "Privacy Policy"
   }
 }

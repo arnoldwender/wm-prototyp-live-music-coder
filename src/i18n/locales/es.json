@@ -8,7 +8,8 @@
     "backToHome": "Volver al inicio",
     "docs": "Documentación",
     "samples": "Samples",
-    "examples": "Ejemplos"
+    "examples": "Ejemplos",
+    "legal": "Legal"
   },
   "transport": {
     "play": "Reproducir",
@@ -387,5 +388,9 @@
       "tipsHeading": "Consejos de performance",
       "tipsText": "Mantén tus patrones cortos y modulares. Usa líneas separadas para batería, bajo y melodía para poder comentar o modificar capas individuales rápidamente. Ctrl+Enter evalúa todo el código a la vez, para que puedas preparar cambios en múltiples líneas antes de aplicarlos."
     }
+  },
+  "legal": {
+    "impressum": "Aviso legal",
+    "datenschutz": "Política de privacidad"
   }
 }

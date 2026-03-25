@@ -198,7 +198,12 @@ function Landing() {
           Web Audio
         </p>
 
-        {/* License notice */}
+        {/* Legal links + License */}
+        <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
+          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
+          <span>|</span>
+          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
+        </p>
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
           Live Music Coder — Open Source (AGPL-3.0)
         </p>
