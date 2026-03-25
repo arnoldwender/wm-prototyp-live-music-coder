@@ -5,7 +5,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useAppStore } from '../../lib/store';
 import { Button, Tooltip } from '../atoms';
-import { Play } from 'lucide-react';
+import { Play, Square, Loader2 } from 'lucide-react';
 
 /** Strudel editor with live pattern highlighting via StrudelMirror */
 export function StrudelEditor() {
@@ -13,6 +13,7 @@ export function StrudelEditor() {
   const mirrorRef = useRef<any>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [evaluating, setEvaluating] = useState(false);
 
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
@@ -110,9 +111,10 @@ export function StrudelEditor() {
     }
   }, [activeFile?.id]);
 
-  /* Handle evaluate */
+  /* Handle evaluate — shows loading state during evaluation */
   const handleEvaluate = useCallback(async () => {
     if (!mirrorRef.current?.repl) return;
+    setEvaluating(true);
     try {
       setEvalError(null);
       /* Get current code from the editor */
@@ -130,6 +132,8 @@ export function StrudelEditor() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setEvalError(msg);
+    } finally {
+      setEvaluating(false);
     }
   }, [togglePlay]);
 
@@ -152,25 +156,28 @@ export function StrudelEditor() {
           borderBottom: '1px solid var(--color-border)',
         }}
       >
-        <Tooltip content="Evaluate & Play (Ctrl+Enter)">
+        <Tooltip content="Evaluate & play pattern">
           <Button
             variant="ghost"
             onClick={handleEvaluate}
-            disabled={!ready}
+            disabled={!ready || evaluating}
             className="!py-0.5 !px-2 text-xs"
           >
-            <Play size={12} />
-            Run
+            {evaluating ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />}
+            {evaluating ? 'Evaluating...' : 'Run'}
           </Button>
         </Tooltip>
 
-        <Button
-          variant="ghost"
-          onClick={handleStop}
-          className="!py-0.5 !px-2 text-xs"
-        >
-          Stop
-        </Button>
+        <Tooltip content="Stop playback">
+          <Button
+            variant="ghost"
+            onClick={handleStop}
+            className="!py-0.5 !px-2 text-xs"
+          >
+            <Square size={12} />
+            Stop
+          </Button>
+        </Tooltip>
 
         <span
           className="ml-auto flex items-center gap-1"
@@ -180,7 +187,7 @@ export function StrudelEditor() {
             className="w-1.5 h-1.5 rounded-full"
             style={{ backgroundColor: ready ? 'var(--color-success)' : 'var(--color-warning)' }}
           />
-          {ready ? 'Strudel ready (samples loaded)' : 'Loading samples...'}
+          {ready ? 'Ready' : 'Initializing...'}
         </span>
       </div>
 

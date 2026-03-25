@@ -207,6 +207,89 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
 .fast(2)`,
   },
 
+  /* ── Cinematic ── */
+  {
+    id: 'cinematic-synthwave',
+    name: 'Synth Wave',
+    category: 'Cinematic',
+    description: 'Retro 80s synthwave with pulsing bass and bright arps',
+    engine: 'strudel',
+    code: `stack(
+  note("c2 c2 f1 g1").s("sawtooth")
+    .lpf(sine.range(200, 800).slow(8))
+    .gain(.6).sustain(.4),
+  note("c4 e4 g4 c5 g4 e4").s("square")
+    .lpf(2000).gain(.25)
+    .delay(.3).delaytime(.166).fast(2),
+  s("bd ~ bd ~, ~ cp ~ cp, hh*8")
+    .bank("RolandTR808").gain(.5)
+).slow(2)`,
+  },
+  {
+    id: 'cinematic-spy',
+    name: 'Spy Theme',
+    category: 'Cinematic',
+    description: 'Suspenseful spy jazz with walking bass and muted stabs',
+    engine: 'strudel',
+    code: `stack(
+  note("c2 ~ eb2 ~ f2 ~ g2 ~").s("triangle")
+    .gain(.7).lpf(400).sustain(.2),
+  note("<[eb4,gb4] ~ [f4,ab4] ~>")
+    .s("square").lpf(1200).gain(.2)
+    .delay(.25).delaytime(.333),
+  s("hh*4").gain(.2).pan(sine.range(.3,.7)),
+  s("~ rim ~ rim").gain(.35)
+)`,
+  },
+  {
+    id: 'cinematic-horror',
+    name: 'Horror Drone',
+    category: 'Cinematic',
+    description: 'Dark ambient tension with low drones and dissonant intervals',
+    engine: 'strudel',
+    code: `stack(
+  note("<c1 [c1,db1]>").s("sine")
+    .gain(.3).lpf(150).room(.9).slow(8),
+  note("<gb3 f3 e3 eb3>").s("sawtooth")
+    .gain(.08).lpf(sine.range(100, 600).slow(16))
+    .room(.8).delay(.6).slow(4),
+  note("c5 ~ ~ db5 ~ ~ ~ ~").s("triangle")
+    .gain(.05).delay(.7).delaytime(.5)
+    .room(.9).slow(3)
+)`,
+  },
+  {
+    id: 'cinematic-epic',
+    name: 'Epic Strings',
+    category: 'Cinematic',
+    description: 'Cinematic orchestral feel with wide chords and slow movement',
+    engine: 'strudel',
+    code: `stack(
+  note("<[c3,e3,g3,c4] [f3,a3,c4,f4] [ab3,c4,eb4,ab4] [g3,b3,d4,g4]>")
+    .s("sawtooth").lpf(sine.range(600, 1800).slow(16))
+    .gain(.25).room(.8).slow(4),
+  note("<c2 f2 ab2 g2>").s("sawtooth")
+    .gain(.35).lpf(300).sustain(.8).slow(4),
+  note("g4 ~ c5 ~ e5 ~ g5 ~").s("sine")
+    .gain(.1).delay(.4).room(.7).slow(8)
+)`,
+  },
+  {
+    id: 'cinematic-retrogame',
+    name: 'Retro Game',
+    category: 'Cinematic',
+    description: '8-bit chiptune style with square wave and fast arpeggios',
+    engine: 'strudel',
+    code: `stack(
+  note("c5 e5 g5 c6 g5 e5 c5 g4").s("square")
+    .lpf(3000).gain(.3).fast(2),
+  note("c3 g3 c3 e3").s("square")
+    .lpf(800).gain(.4).sustain(.15),
+  s("bd ~ bd ~, ~ sd ~ sd, hh*8")
+    .gain(.4).speed(1.5)
+).delay(.1).delaytime(.08)`,
+  },
+
   /* ── Tone.js ── */
   {
     id: 'tonejs-synth',

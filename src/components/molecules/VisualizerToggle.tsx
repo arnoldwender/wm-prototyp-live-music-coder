@@ -4,16 +4,18 @@
    ────────────────────────────────────────────────────────── */
 
 import { useTranslation } from 'react-i18next';
+import { Activity, BarChart3, Clock, Bug } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { Button } from '../atoms';
 import type { PanelLayout } from '../../types/project';
 
-/** Panel definitions with Unicode text icons */
-const panels: { key: keyof PanelLayout['visiblePanels']; icon: string }[] = [
-  { key: 'waveform', icon: '〜' },
-  { key: 'spectrum', icon: '▊' },
-  { key: 'timeline', icon: '◆' },
-  { key: 'beatlings', icon: '♫' },
+/** Panel definitions with Lucide icons for visual clarity */
+const panels: { key: keyof PanelLayout['visiblePanels']; Icon: LucideIcon }[] = [
+  { key: 'waveform', Icon: Activity },
+  { key: 'spectrum', Icon: BarChart3 },
+  { key: 'timeline', Icon: Clock },
+  { key: 'beatlings', Icon: Bug },
 ];
 
 /** Toggle buttons for each visualizer panel */
@@ -28,7 +30,7 @@ export function VisualizerToggle() {
       style={{ backgroundColor: 'var(--color-bg-alt)', borderBottom: '1px solid var(--color-border)' }}
       aria-label="Visualizer panels"
     >
-      {panels.map(({ key, icon }) => (
+      {panels.map(({ key, Icon }) => (
         <Button
           key={key}
           variant="ghost"
@@ -37,7 +39,7 @@ export function VisualizerToggle() {
           aria-pressed={visiblePanels[key]}
           className="!px-2 !py-0.5 text-xs"
         >
-          <span className="mr-1">{icon}</span>
+          <Icon size={14} className="mr-1 inline-block" />
           {t(`panels.${key}`)}
         </Button>
       ))}

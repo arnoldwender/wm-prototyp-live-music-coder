@@ -184,7 +184,7 @@ export function CodeEditor() {
           borderBottom: '1px solid var(--color-border)',
         }}
       >
-        <Tooltip content="Evaluate code (Ctrl+Enter)">
+        <Tooltip content="Evaluate & play pattern">
           <Button
             variant="ghost"
             onClick={handleManualEvaluate}
@@ -205,14 +205,15 @@ export function CodeEditor() {
             onChange={(e) => setAutoUpdate(e.target.checked)}
             className="cursor-pointer"
           />
-          Auto-update
+          Live mode
         </label>
 
+        {/* Platform-aware keyboard shortcut hint */}
         <span
           className="ml-auto"
           style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}
         >
-          Ctrl+Enter to evaluate
+          {navigator.platform?.includes('Mac') ? '\u2318\u21B5 to run' : 'Ctrl+Enter to run'}
         </span>
       </div>
 
