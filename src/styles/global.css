@@ -1,14 +1,52 @@
-/* Global styles — Tailwind + design tokens */
+/* ──────────────────────────────────────────────────────────
+   Global styles — Tailwind CSS v4 + design token imports
+   Dark-mode-only music production aesthetic.
+   ────────────────────────────────────────────────────────── */
 @import "tailwindcss";
+@import './tokens/index.css';
 
-/* Minimal reset for initial scaffold */
+/* --- Base element styles --- */
 html {
   color-scheme: dark;
 }
 
 body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background: var(--color-bg);
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #fafafa;
-  background: #09090b;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100%;
+}
+
+/* --- Monospace elements — code editor and terminal --- */
+code,
+pre,
+.cm-editor {
+  font-family: var(--font-family-mono);
+}
+
+/* --- Scrollbar styling (webkit) --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }

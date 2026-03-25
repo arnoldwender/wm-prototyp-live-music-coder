@@ -1,0 +1,40 @@
+/* ──────────────────────────────────────────────────────────
+   Spacing, radius, shadow, and transition tokens
+   8px base unit for spacing scale.
+   ────────────────────────────────────────────────────────── */
+:root {
+  /* --- Spacing (8px base) --- */
+  --space-0: 0;
+  --space-1: 0.125rem;   /* 2px */
+  --space-2: 0.25rem;    /* 4px */
+  --space-3: 0.375rem;   /* 6px */
+  --space-4: 0.5rem;     /* 8px */
+  --space-5: 0.625rem;   /* 10px */
+  --space-6: 0.75rem;    /* 12px */
+  --space-7: 0.875rem;   /* 14px */
+  --space-8: 1rem;       /* 16px */
+  --space-9: 1.25rem;    /* 20px */
+  --space-10: 1.5rem;    /* 24px */
+  --space-11: 1.75rem;   /* 28px */
+  --space-12: 2rem;      /* 32px */
+  --space-13: 2.5rem;    /* 40px */
+  --space-14: 3rem;      /* 48px */
+  --space-15: 4rem;      /* 64px */
+  --space-16: 5rem;      /* 80px */
+
+  /* --- Border radius --- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* --- Shadows (darker for dark UI) --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+
+  /* --- Transitions --- */
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
+}
