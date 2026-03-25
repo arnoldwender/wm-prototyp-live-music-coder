@@ -15,7 +15,7 @@ import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { createEvaluator } from '../../lib/editor/evaluate';
 import { FileTabs } from '../molecules/FileTabs';
-import { Play, RefreshCw } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
 
 /** Main code editor — CodeMirror 6 with multi-tab support and live evaluation */

@@ -13,7 +13,6 @@ import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engi
  * Audio routed through superdough → shared AudioContext. */
 export class StrudelEngine extends BaseEngine {
   name: EngineType = 'strudel'
-  private scheduler: any = null
   private replInstance: any = null
 
   async init(): Promise<void> {
@@ -24,7 +23,6 @@ export class StrudelEngine extends BaseEngine {
     const { initStrudel } = await import('@strudel/web')
 
     this.replInstance = await initStrudel()
-    this.scheduler = this.replInstance.scheduler
 
     console.log('[Strudel] Engine initialized via initStrudel()')
   }
@@ -72,7 +70,6 @@ export class StrudelEngine extends BaseEngine {
   dispose(): void {
     this.stop()
     super.dispose()
-    this.scheduler = null
     this.replInstance = null
   }
 }
