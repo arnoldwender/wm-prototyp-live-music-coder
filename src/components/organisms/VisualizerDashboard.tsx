@@ -4,6 +4,7 @@
    only active panels in a flex row with equal widths.
    ────────────────────────────────────────────────────────── */
 
+import type { ReactNode } from 'react';
 import { useAppStore } from '../../lib/store';
 import { VisualizerToggle } from '../molecules/VisualizerToggle';
 import { WaveformVisualizer } from './WaveformVisualizer';
@@ -27,7 +28,7 @@ export function VisualizerDashboard() {
         </div>
       ),
     },
-  ].filter(Boolean) as { key: string; component: JSX.Element }[];
+  ].filter(Boolean) as { key: string; component: ReactNode }[];
 
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
