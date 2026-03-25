@@ -30,3 +30,6 @@ dist-ssr
 
 # OS files
 Thumbs.db
+
+# Local Netlify folder
+.netlify
