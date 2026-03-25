@@ -87,10 +87,12 @@ declare module '@strudel/web' {
 }
 
 declare module 'superdough' {
-  /** Load a sample map from a URL (e.g. 'github:tidalcycles/Dirt-Samples/master') */
   export function samples(
     sampleMap: string | Record<string, unknown>,
     baseUrl?: string,
     options?: Record<string, unknown>,
   ): Promise<void>
+  export function getAudioContext(): AudioContext
+  export function getCompressor(): DynamicsCompressorNode | null
+  export function gainNode(): GainNode | null
 }
