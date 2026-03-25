@@ -68,7 +68,9 @@ wm-prototyp-live-music-coder/
 │   │       ├── brain/          # Copied + adapted from wm-lifegame
 │   │       │   ├── neuron.ts
 │   │       │   ├── synapse.ts
-│   │       │   └── neural-network.ts
+│   │       │   ├── neural-network.ts
+│   │       │   ├── consciousness.ts
+│   │       │   └── dreams.ts
 │   │       ├── gol-brain.ts    # Conway's Game of Life grid with audio-reactive injection
 │   │       ├── audio-bridge.ts # Connects audio analyzer to both brains
 │   │       └── renderer.ts     # Canvas 2D: GoL grid + creatures + neural overlay
@@ -81,7 +83,7 @@ wm-prototyp-live-music-coder/
 │   ├── App.tsx
 │   └── main.tsx
 ├── public/
-│   └── samples/                # Default sample library (kicks, snares, hats, etc.)
+│   └── samples/                # Default sample library — custom-created or CC0-licensed samples only (no third-party copyrighted content). Source and license documented in samples/LICENSE.md
 ├── docs/
 │   └── superpowers/specs/      # This spec
 ├── package.json
@@ -125,7 +127,8 @@ interface EngineAdapter {
   start(): void
   stop(): void
   dispose(): void
-  getAnalyserNode(): AnalyserNode
+  getAnalyserNode(): AnalyserNode              // master output analyser
+  getAnalyserForBlock(blockId: string): AnalyserNode  // per-block analyser for granular visualization
 }
 ```
 
@@ -138,7 +141,7 @@ Code Editor  <──push code───  Orchestrator  <──user drags───
 
 - **Code -> Graph:** Lightweight parser extracts block declarations, connections, and parameters from code. Pattern matching on known structures (Strudel patterns, Tone.js constructors, Web Audio node creation). Not a full AST.
 - **Graph -> Code:** Code generator produces readable, formatted code from graph model. Each engine adapter has its own codegen template.
-- **Conflict resolution:** Last-write-wins. No simultaneous editing of both views.
+- **Conflict resolution:** Last-write-wins with focus-based locking. The panel that has focus is the "active" panel — the other panel is read-only (visually dimmed, no input accepted). Sync triggers after a 500ms debounce from the last edit in the active panel. When focus switches, any in-progress edit is finalized and synced before the new panel accepts input.
 
 ### Audio Routing
 
@@ -147,6 +150,17 @@ All engines ultimately output to Web Audio API (Strudel uses it under the hood).
 - One master output node (with gain/compressor)
 - Visualizers can tap into the audio graph at any point
 - Cross-engine connections (Strudel pattern -> Tone.js effect -> Web Audio output)
+
+### Cross-Engine Audio Bridge
+
+All engines write to the same Web Audio graph, but their paradigms differ. The orchestrator bridges them:
+
+- **Strudel -> Tone.js/WebAudio:** Strudel's `superdough` engine creates Web Audio nodes internally. The orchestrator intercepts Strudel's output AudioNode and connects it to Tone.js effects or raw Web Audio nodes via standard `AudioNode.connect()`.
+- **Tone.js -> WebAudio:** Tone.js nodes expose their underlying `AudioNode` via `.toDestination()` bypass — the orchestrator connects to raw Web Audio nodes directly.
+- **WebAudio -> any:** Raw Web Audio nodes connect natively to anything since all engines use the same `AudioContext`.
+- **MIDI:** MIDI is output-only (no audio routing). MIDI blocks send note/CC data to external devices via WebMIDI. They cannot receive audio input from other engines.
+
+**v1 supported connections:** Any source/effect chain within the same engine, plus cross-engine connections where the output is a standard AudioNode. Strudel pattern-level connections to Tone.js instruments (triggering Tone synths from Strudel patterns) are a future enhancement.
 
 ---
 
@@ -228,7 +242,9 @@ Copied and adapted from:
 - `src/brain/neuron.ts` — neuron model (activation, threshold, decay)
 - `src/brain/synapse.ts` — Hebbian learning + STDP
 - `src/brain/neural-network.ts` — network growth, pruning (capped at ~40 neurons for performance)
-- `src/creature/soul.ts` — stripped to: neural update, consciousness Phi, behavior modulation
+- `src/brain/consciousness.ts` — IIT Phi calculation (required for consciousness-driven behavior)
+- `src/brain/dreams.ts` — dream/sleep behavior (adapted for silence-triggered idle states)
+- `src/creature/soul.ts` — stripped to: neural update, consciousness Phi, dream processing, behavior modulation
 
 **Important:** Code is COPIED into this project, not imported. wm-lifegame is not modified.
 
@@ -345,7 +361,7 @@ interface Project {
   created: number
   updated: number
   bpm: number
-  activeEngine: 'strudel' | 'tonejs' | 'webaudio' | 'midi'
+  defaultEngine: 'strudel' | 'tonejs' | 'webaudio' | 'midi'  // default engine for new blocks/files, not a global constraint
   files: ProjectFile[]
   graph: {
     nodes: EngineBlock[]
@@ -355,7 +371,7 @@ interface Project {
   layout: PanelLayout
   ecosystem: {
     creatures: BeatlingState[]
-    golGrid: boolean[][]
+    golGrid: { width: number; height: number; liveCells: [number, number][] }  // sparse storage for efficiency
     collection: Achievement[]
   }
 }
@@ -402,14 +418,35 @@ Encodes code files + BPM + engine selection only. No ecosystem or graph state.
 
 ### Gist Integration
 
-- No OAuth app — user provides GitHub Personal Access Token (localStorage, only sent to GitHub API)
+- No OAuth app — user provides GitHub Personal Access Token (stored in sessionStorage for current tab only; cleared on tab close). Acceptable for prototype scope — production hardening would use an encrypted store.
 - Save: creates Gist with `project.json` + individual code files as separate Gist files
 - Load: fetch Gist by URL or ID, parse project JSON
 - Update: overwrite existing Gist
 
 ---
 
-## 8. Design Aesthetic
+## 8. Landing Page & Onboarding
+
+### Landing Page
+
+- Hero section: animated Beatling ecosystem reacting to a demo loop (auto-playing, muted by default)
+- Tagline + brief explanation of what live coding music is
+- "Start Coding" CTA → opens editor with a starter template
+- Feature highlights: 4 engines, node graph, Beatling ecosystem, share/export
+- Example gallery: 3-4 pre-built shareable demos (URL-encoded)
+- i18n: fully translated DE/EN/ES
+
+### Onboarding / Help
+
+- **First-run tutorial:** Optional guided overlay (3-5 steps) showing editor, node graph, play button, and visualizer
+- **Starter templates:** Pre-loaded example files per engine (Strudel drum pattern, Tone.js melody, etc.) — user picks one on first visit
+- **Inline tooltips:** Hover hints on toolbar buttons and panel headers
+- **Help panel:** Slide-out reference with mini-notation cheat sheet, engine API quick reference, keyboard shortcuts
+- No separate docs site in v1 — all help is inline
+
+---
+
+## 9. Design Aesthetic
 
 - **Dark mode** primary (dashboard/IDE aesthetic)
 - **Design tokens** via CSS custom properties (per CLAUDE.md rules)
@@ -421,7 +458,7 @@ Encodes code files + BPM + engine selection only. No ecosystem or graph state.
 
 ---
 
-## 9. i18n Strategy
+## 10. i18n Strategy
 
 Three languages from the start: DE/EN/ES (matching icon generator and workspace convention).
 
@@ -439,7 +476,7 @@ NOT translated:
 
 ---
 
-## 10. Scope Boundaries
+## 11. Scope Boundaries
 
 ### In scope (v1)
 
