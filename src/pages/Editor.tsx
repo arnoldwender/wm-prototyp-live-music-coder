@@ -6,12 +6,13 @@
 
 import { useState, useEffect } from 'react'
 import EditorLayout from '../layouts/EditorLayout'
-import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector } from '../components/organisms'
+import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 
 function Editor() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
 
   const files = useAppStore((s) => s.files)
   const updateFileCode = useAppStore((s) => s.updateFileCode)
@@ -32,6 +33,9 @@ function Editor() {
     } else if (!localStorage.getItem('lmc-onboarded')) {
       /* First visit — show the template selector */
       setShowTemplateSelector(true)
+    } else if (!localStorage.getItem('lmc-tutorial-done')) {
+      /* Onboarded but tutorial not completed — show tutorial overlay */
+      setShowTutorial(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -46,7 +50,16 @@ function Editor() {
         statusBar={<StatusBar />}
       />
       {showTemplateSelector && (
-        <TemplateSelector onSelect={() => setShowTemplateSelector(false)} />
+        <TemplateSelector onSelect={() => {
+          setShowTemplateSelector(false)
+          /* After template selection, show tutorial if not already done */
+          if (!localStorage.getItem('lmc-tutorial-done')) {
+            setShowTutorial(true)
+          }
+        }} />
+      )}
+      {showTutorial && (
+        <TutorialOverlay onComplete={() => setShowTutorial(false)} />
       )}
     </>
   )

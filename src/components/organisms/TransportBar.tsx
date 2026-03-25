@@ -16,6 +16,7 @@ import {
   FileCode2,
   Settings,
   GitBranch,
+  Trophy,
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
@@ -24,6 +25,7 @@ import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Tooltip } from '../atoms'
 import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog, HelpPanel } from '../molecules'
 import { GistDialog } from './GistDialog'
+import { CollectionPanel } from './CollectionPanel'
 
 /** Main transport and toolbar header */
 function TransportBar() {
@@ -44,6 +46,7 @@ function TransportBar() {
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [showCollection, setShowCollection] = useState(false)
 
   /* Orchestrator-wired handlers — bridge UI state with audio engine */
   const handlePlay = async () => {
@@ -236,6 +239,20 @@ function TransportBar() {
           </Tooltip>
         </ToolbarGroup>
 
+        {/* Collection / Achievements toggle */}
+        <ToolbarGroup>
+          <Tooltip content={t('collection.title')}>
+            <Button
+              variant="icon"
+              active={showCollection}
+              onClick={() => setShowCollection(!showCollection)}
+              aria-label={t('collection.title')}
+            >
+              <Icon icon={Trophy} size={16} />
+            </Button>
+          </Tooltip>
+        </ToolbarGroup>
+
         {/* Settings / Help toggle */}
         <ToolbarGroup>
           <Tooltip content={t('toolbar.settings')}>
@@ -259,6 +276,7 @@ function TransportBar() {
     {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
     {showGist && <GistDialog onClose={() => setShowGist(false)} />}
     {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
+    {showCollection && <CollectionPanel onClose={() => setShowCollection(false)} />}
     </>
   )
 }

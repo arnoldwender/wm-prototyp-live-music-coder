@@ -130,6 +130,32 @@
     "engineWebaudio": "Low-level native API",
     "engineMidi": "External device output (output only)"
   },
+  "collection": {
+    "title": "Achievements",
+    "locked": "Locked",
+    "unlocked": "Unlocked"
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Write Your Code",
+      "desc": "Use the editor to write music patterns. Try typing a Strudel pattern like note(\"c3 e3 g3\").s(\"sawtooth\")."
+    },
+    "step2": {
+      "title": "Run Your Code",
+      "desc": "Click the Play button or press Ctrl+Enter to hear your music come alive."
+    },
+    "step3": {
+      "title": "See Your Music",
+      "desc": "Watch your music visualized in real time with waveforms, spectrum analyzers, and pattern timelines."
+    },
+    "step4": {
+      "title": "Explore & Learn",
+      "desc": "Open the settings panel for examples, mini-notation reference, and keyboard shortcuts."
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "done": "Let's go!"
+  },
   "graph": {
     "singleNodeTitle": "Single Pattern Node",
     "singleNodeDesc": "Strudel patterns are typically one expression. Use Tone.js or Web Audio files for multi-node graphs with complex routing."

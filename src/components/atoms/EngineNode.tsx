@@ -39,8 +39,16 @@ function EngineNode({ data }: NodeProps) {
       ? `${nodeData.code.slice(0, 40)}...`
       : nodeData.code
 
+  /** Double-click dispatches a custom event to focus the code in the editor */
+  const handleDoubleClick = () => {
+    window.dispatchEvent(
+      new CustomEvent('node-focus', { detail: { code: nodeData.code } }),
+    )
+  }
+
   return (
     <div
+      onDoubleClick={handleDoubleClick}
       style={{
         border: `2px solid ${color}`,
         borderRadius: 'var(--radius-lg)',

@@ -7,7 +7,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useEffect, useRef, useCallback, useState, lazy, Suspense } from 'react';
-import { EditorState } from '@codemirror/state';
+import { EditorState, EditorSelection } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
 import { getOrchestrator } from '../../lib/orchestrator';
@@ -128,6 +128,32 @@ export function CodeEditor() {
   useEffect(() => {
     setupEvaluator();
   }, [setupEvaluator]);
+
+  /* Listen for 'node-focus' custom events from EngineNode double-click.
+   * Searches for the code string in the editor and selects it. */
+  useEffect(() => {
+    const handleNodeFocus = (e: Event) => {
+      const view = viewRef.current
+      if (!view) return
+
+      const { code } = (e as CustomEvent<{ code: string }>).detail
+      if (!code) return
+
+      const doc = view.state.doc.toString()
+      const index = doc.indexOf(code)
+      if (index === -1) return
+
+      /* Select the matching code range and scroll it into view */
+      view.dispatch({
+        selection: EditorSelection.single(index, index + code.length),
+        scrollIntoView: true,
+      })
+      view.focus()
+    }
+
+    window.addEventListener('node-focus', handleNodeFocus)
+    return () => window.removeEventListener('node-focus', handleNodeFocus)
+  }, []);
 
   /* For Strudel engine, use the dedicated StrudelEditor with live highlighting */
   if (activeFile?.engine === 'strudel') {

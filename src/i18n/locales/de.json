@@ -130,6 +130,32 @@
     "engineWebaudio": "Low-Level natives API",
     "engineMidi": "Externes Gerät (nur Ausgang)"
   },
+  "collection": {
+    "title": "Erfolge",
+    "locked": "Gesperrt",
+    "unlocked": "Freigeschaltet"
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Schreibe deinen Code",
+      "desc": "Nutze den Editor, um Musik-Patterns zu schreiben. Probiere ein Strudel-Pattern wie note(\"c3 e3 g3\").s(\"sawtooth\")."
+    },
+    "step2": {
+      "title": "Führe deinen Code aus",
+      "desc": "Klicke auf Abspielen oder drücke Strg+Enter, um deine Musik zum Leben zu erwecken."
+    },
+    "step3": {
+      "title": "Sieh deine Musik",
+      "desc": "Beobachte deine Musik in Echtzeit mit Wellenformen, Spektrum-Analysatoren und Pattern-Zeitleisten."
+    },
+    "step4": {
+      "title": "Entdecke & Lerne",
+      "desc": "Öffne das Einstellungs-Panel für Beispiele, Mini-Notation-Referenz und Tastenkürzel."
+    },
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "done": "Los geht's!"
+  },
   "graph": {
     "singleNodeTitle": "Einzelner Pattern-Knoten",
     "singleNodeDesc": "Strudel-Patterns sind typischerweise ein einziger Ausdruck. Nutze Tone.js oder Web Audio für Multi-Knoten-Graphen mit komplexem Routing."

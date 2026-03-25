@@ -130,6 +130,32 @@
     "engineWebaudio": "API nativa de bajo nivel",
     "engineMidi": "Dispositivo externo (solo salida)"
   },
+  "collection": {
+    "title": "Logros",
+    "locked": "Bloqueado",
+    "unlocked": "Desbloqueado"
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Escribe tu código",
+      "desc": "Usa el editor para escribir patrones musicales. Prueba un patrón Strudel como note(\"c3 e3 g3\").s(\"sawtooth\")."
+    },
+    "step2": {
+      "title": "Ejecuta tu código",
+      "desc": "Haz clic en Reproducir o presiona Ctrl+Enter para que tu música cobre vida."
+    },
+    "step3": {
+      "title": "Visualiza tu música",
+      "desc": "Observa tu música visualizada en tiempo real con formas de onda, analizadores de espectro y líneas de tiempo."
+    },
+    "step4": {
+      "title": "Explora y aprende",
+      "desc": "Abre el panel de ajustes para ver ejemplos, referencia de mini-notación y atajos de teclado."
+    },
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "done": "¡Vamos!"
+  },
   "graph": {
     "singleNodeTitle": "Nodo de Patrón Único",
     "singleNodeDesc": "Los patrones de Strudel son típicamente una sola expresión. Usa Tone.js o Web Audio para grafos multi-nodo con enrutamiento complejo."
