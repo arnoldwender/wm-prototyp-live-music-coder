@@ -15,16 +15,20 @@ const STORAGE_KEY = 'lmc-lang'
 /** Detect initial language from localStorage or browser setting */
 function detectLanguage(): string {
   /* Check saved preference first */
-  const saved = localStorage.getItem(STORAGE_KEY)
-  if (saved && ['en', 'de', 'es'].includes(saved)) {
-    return saved
-  }
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved && ['en', 'de', 'es'].includes(saved)) {
+      return saved
+    }
+  } catch { /* localStorage unavailable (test env, iframe, etc.) */ }
 
   /* Fall back to browser language (first two chars) */
-  const browserLang = navigator.language.slice(0, 2)
-  if (['en', 'de', 'es'].includes(browserLang)) {
-    return browserLang
-  }
+  try {
+    const browserLang = navigator.language.slice(0, 2)
+    if (['en', 'de', 'es'].includes(browserLang)) {
+      return browserLang
+    }
+  } catch { /* navigator unavailable */ }
 
   /* Default to English */
   return 'en'
@@ -48,7 +52,7 @@ i18n
 
 /* Persist language choice on change */
 i18n.on('languageChanged', (lng) => {
-  localStorage.setItem(STORAGE_KEY, lng)
+  try { localStorage.setItem(STORAGE_KEY, lng) } catch { /* unavailable */ }
 })
 
 export default i18n

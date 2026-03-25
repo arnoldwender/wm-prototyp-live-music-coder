@@ -8,23 +8,13 @@
 import { javascript } from '@codemirror/lang-javascript';
 import type { Extension } from '@codemirror/state';
 import type { EngineType } from '../../types/engine';
+import { getEngineCompletions } from './completions';
 
-/** Get language extensions based on engine type */
+/** Get language extensions based on engine type.
+ * Includes JavaScript syntax + engine-specific autocomplete. */
 export function getEngineExtensions(engine: EngineType): Extension[] {
-  switch (engine) {
-    case 'strudel':
-      /* Strudel uses JavaScript with Strudel-specific patterns.
-       * For now, use JS mode. @strudel/codemirror extensions
-       * can be added later for pattern visualization. */
-      return [javascript()];
-
-    case 'tonejs':
-      return [javascript()];
-
-    case 'webaudio':
-      return [javascript()];
-
-    case 'midi':
-      return [javascript()];
-  }
+  return [
+    javascript(),
+    getEngineCompletions(engine),
+  ];
 }
