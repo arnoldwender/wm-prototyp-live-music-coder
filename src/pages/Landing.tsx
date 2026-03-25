@@ -4,6 +4,7 @@
    and a powered-by footer.
    ---------------------------------------------------------- */
 
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '../components/molecules'
 import { HeroSection } from '../components/organisms/HeroSection'
@@ -45,9 +46,19 @@ function EngineDot({ color }: { color: string }) {
 function Landing() {
   const { t } = useTranslation()
 
+  /* Override body overflow:hidden from global.css — landing page needs to scroll */
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    return () => {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+    };
+  }, []);
+
   return (
     <main
-      className="min-h-screen overflow-y-auto"
+      className="min-h-screen"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Top bar with language switcher */}
