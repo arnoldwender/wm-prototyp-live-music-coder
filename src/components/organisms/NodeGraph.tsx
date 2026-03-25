@@ -5,6 +5,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useEffect, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ReactFlow,
   Background,
@@ -57,6 +58,7 @@ function connectionsToEdges(connections: Connection[]): Edge[] {
 }
 
 export default function NodeGraph() {
+  const { t } = useTranslation()
   const files = useAppStore((s) => s.files)
 
   /* Find the currently active file */
@@ -98,11 +100,41 @@ export default function NodeGraph() {
     return 'var(--color-text-muted)'
   }, [])
 
+  /* When only 0-1 nodes exist (typical for single Strudel expressions),
+     show a helpful info message instead of a lonely node */
+  const showEmptyState = nodes.length <= 1
+
   return (
     <div
-      className="h-full w-full"
+      className="h-full w-full relative"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
+      {showEmptyState && (
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+        >
+          <div
+            className="text-center max-w-xs p-6 rounded-lg pointer-events-auto"
+            style={{
+              backgroundColor: 'var(--color-bg-elevated)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <div
+              className="text-sm font-medium mb-2"
+              style={{ color: 'var(--color-text)' }}
+            >
+              {t('graph.singleNodeTitle')}
+            </div>
+            <p
+              className="text-xs leading-relaxed"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {t('graph.singleNodeDesc')}
+            </p>
+          </div>
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
