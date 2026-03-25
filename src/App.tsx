@@ -1,9 +1,19 @@
-/* App root — entry point for the live music coding IDE */
+/* ──────────────────────────────────────────────────────────
+   App root — BrowserRouter with Landing and Editor routes.
+   ────────────────────────────────────────────────────────── */
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Landing from './pages/Landing'
+import Editor from './pages/Editor'
+
 function App() {
   return (
-    <main id="app">
-      <h1>Live Music Coder</h1>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/editor" element={<Editor />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
