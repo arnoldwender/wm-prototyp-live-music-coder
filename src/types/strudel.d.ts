@@ -30,6 +30,16 @@ declare module '@strudel/transpiler' {
   export function transpiler(code: string): string
 }
 
+declare module '@strudel/web' {
+  export function initStrudel(options?: Record<string, unknown>): Promise<{
+    scheduler: { start(): void; stop(): void; setPattern(p: unknown): void }
+    evaluate: (code: string, autostart?: boolean) => Promise<unknown>
+    start: () => void
+    stop: () => void
+    [key: string]: unknown
+  }>
+}
+
 declare module 'superdough' {
   /** Load a sample map from a URL (e.g. 'github:tidalcycles/Dirt-Samples/master') */
   export function samples(
