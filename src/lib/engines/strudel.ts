@@ -17,10 +17,12 @@ export class StrudelEngine extends BaseEngine {
 
   async init(): Promise<void> {
     /* Dynamic import to enable code splitting */
-    const [{ repl }, { initAudioOnFirstClick, webaudioOutput, getAudioContext }] = await Promise.all([
+    const [{ repl }, webaudioModule] = await Promise.all([
       import('@strudel/core'),
       import('@strudel/webaudio'),
     ])
+
+    const { initAudioOnFirstClick, webaudioOutput, getAudioContext } = webaudioModule
 
     /* Also load mini-notation and tonal for full pattern support */
     await Promise.all([
@@ -29,6 +31,17 @@ export class StrudelEngine extends BaseEngine {
     ])
 
     initAudioOnFirstClick()
+
+    /* Load default Dirt-Samples from Strudel CDN so sounds like
+     * bd, sd, hh, and banks like RolandTR808 work out of the box.
+     * samples() lives in superdough, re-exported at runtime through
+     * @strudel/webaudio but missing from its TS declarations. */
+    try {
+      const { samples } = await import('superdough')
+      await samples('github:tidalcycles/Dirt-Samples/master')
+    } catch (err) {
+      console.warn('[Strudel] Failed to load default samples — oscillator sounds still work:', err)
+    }
 
     /* Strudel creates its own AudioContext via getAudioContext().
      * We need to route its output through our master gain. */
@@ -48,9 +61,12 @@ export class StrudelEngine extends BaseEngine {
     if (!this.scheduler) throw new Error('Strudel not initialized')
 
     try {
+      /* Strip REPL-style $: prefix that users copy from Strudel REPL */
+      const cleanCode = code.replace(/^\$\s*:\s*/gm, '')
+
       /* Use the transpiler for full syntax support */
       const { transpiler } = await import('@strudel/transpiler')
-      const transpiled = transpiler(code)
+      const transpiled = transpiler(cleanCode)
 
       /* Evaluate the transpiled code to get a Pattern */
       const pattern = await Function(`"use strict"; return (async () => { ${transpiled} })()`)()

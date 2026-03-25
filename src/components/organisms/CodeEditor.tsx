@@ -6,7 +6,7 @@
    the orchestrator when playback is active.
    ────────────────────────────────────────────────────────── */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
@@ -22,6 +22,9 @@ export function CodeEditor() {
   const viewRef = useRef<EditorView | null>(null);
   const evaluatorRef = useRef<ReturnType<typeof createEvaluator> | null>(null);
 
+  /* Error state — shows the last evaluation error below the editor */
+  const [evalError, setEvalError] = useState<string | null>(null);
+
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const isPlaying = useAppStore((s) => s.isPlaying);
@@ -35,8 +38,11 @@ export function CodeEditor() {
     evaluatorRef.current = createEvaluator(
       (code) => orch.evaluate(code, activeFile.engine),
       500,
-      (err) => console.error('[CodeEditor] Eval error:', err.message),
-      () => {},
+      (err) => {
+        console.error('[CodeEditor] Eval error:', err.message);
+        setEvalError(err.message);
+      },
+      () => setEvalError(null),
     );
   }, [activeFile?.id, activeFile?.engine]);
 
@@ -93,6 +99,40 @@ export function CodeEditor() {
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
       <FileTabs />
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
+
+      {/* Evaluation error bar — visible feedback when code fails to parse/run */}
+      {evalError && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="flex items-center shrink-0"
+          style={{
+            backgroundColor: 'var(--color-error)',
+            color: 'var(--color-bg)',
+            fontSize: 'var(--font-size-xs)',
+            fontFamily: 'var(--font-family-mono)',
+            padding: 'var(--space-2) var(--space-4)',
+            gap: 'var(--space-3)',
+          }}
+        >
+          <span className="flex-1 truncate">{evalError}</span>
+          <button
+            type="button"
+            onClick={() => setEvalError(null)}
+            aria-label="Dismiss error"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              fontSize: 'var(--font-size-sm)',
+              lineHeight: 1,
+            }}
+          >
+            &times;
+          </button>
+        </div>
+      )}
     </div>
   );
 }

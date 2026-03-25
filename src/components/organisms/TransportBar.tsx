@@ -52,6 +52,18 @@ function TransportBar() {
       togglePlay()
     } else {
       await orch.start()
+
+      /* Evaluate the active file's code so there is a pattern to play.
+       * Without this, pressing Play with no prior edit produces silence. */
+      const activeFile = useAppStore.getState().files.find((f) => f.active)
+      if (activeFile?.code) {
+        try {
+          await orch.evaluate(activeFile.code, activeFile.engine)
+        } catch (err) {
+          console.error('[TransportBar] Initial evaluate failed:', err)
+        }
+      }
+
       togglePlay()
     }
   }

@@ -15,24 +15,24 @@ export interface StarterTemplate {
 
 export const STARTER_TEMPLATES: StarterTemplate[] = [
   {
-    id: 'strudel-drums',
-    name: 'Strudel Drum Pattern',
-    description: 'A classic drum pattern with kick, snare, and hi-hats',
-    engine: 'strudel',
-    code: `s("bd sd [~ bd] sd").bank("RolandTR808")
-.speed("<1 1.5 1 0.5>")
-.sometimes(x => x.delay(.5))`,
-  },
-  {
     id: 'strudel-melody',
     name: 'Strudel Melody',
-    description: 'A melodic pattern with sawtooth synth',
+    description: 'A melodic pattern with sawtooth synth — works instantly, no samples needed',
     engine: 'strudel',
     code: `note("<c3 e3 g3 b3>(3,8)")
 .s("sawtooth")
 .lpf(800)
 .delay(.25)
 .room(.5)`,
+  },
+  {
+    id: 'strudel-drums',
+    name: 'Strudel Drum Pattern',
+    description: 'A classic drum pattern with kick, snare, and hi-hats (requires sample loading)',
+    engine: 'strudel',
+    code: `s("bd sd [~ bd] sd").bank("RolandTR808")
+.speed("<1 1.5 1 0.5>")
+.sometimes(x => x.delay(.5))`,
   },
   {
     id: 'tonejs-synth',
