@@ -1,0 +1,14 @@
+/* Global styles — Tailwind + design tokens */
+@import "tailwindcss";
+
+/* Minimal reset for initial scaffold */
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #fafafa;
+  background: #09090b;
+}
