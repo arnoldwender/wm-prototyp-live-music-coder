@@ -6,6 +6,8 @@
 
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useMediaQuery } from '../../lib/useMediaQuery'
+import { MoreHorizontal } from 'lucide-react'
 import {
   Play,
   Square,
@@ -41,6 +43,10 @@ function TransportBar() {
   const stop = useAppStore((s) => s.stop)
   const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
+
+  /* Responsive — hide secondary actions on mobile behind overflow menu */
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  const [showOverflow, setShowOverflow] = useState(false)
 
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
@@ -102,7 +108,7 @@ function TransportBar() {
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderBottom: '1px solid var(--color-border)',
-        padding: 'var(--space-3) var(--space-6)',
+        padding: isMobile ? 'var(--space-2) var(--space-3)' : 'var(--space-3) var(--space-6)',
         height: '48px',
       }}
     >
@@ -192,83 +198,170 @@ function TransportBar() {
           <EngineSelector />
         </ToolbarGroup>
 
-        {/* Node Graph toggle */}
-        <ToolbarGroup separator={false}>
-          <Tooltip content={t('panels.graph')}>
-            <Button
-              variant="icon"
-              active={useAppStore.getState().layout.showGraph}
-              onClick={() => useAppStore.getState().toggleGraph()}
-              aria-label={t('panels.graph')}
-            >
-              <Icon icon={GitBranch} size={16} />
-            </Button>
-          </Tooltip>
-        </ToolbarGroup>
+        {/* Node Graph toggle — hidden on mobile (graph not available) */}
+        {!isMobile && (
+          <ToolbarGroup separator={false}>
+            <Tooltip content={t('panels.graph')}>
+              <Button
+                variant="icon"
+                active={useAppStore.getState().layout.showGraph}
+                onClick={() => useAppStore.getState().toggleGraph()}
+                aria-label={t('panels.graph')}
+              >
+                <Icon icon={GitBranch} size={16} />
+              </Button>
+            </Tooltip>
+          </ToolbarGroup>
+        )}
       </div>
 
       {/* --- Right side: Actions and settings --- */}
       <div className="flex items-center">
-        {/* Undo / Redo */}
-        <ToolbarGroup>
-          <Tooltip content={t('toolbar.undo')}>
-            <Button variant="icon" aria-label={t('toolbar.undo')}>
-              <Icon icon={Undo2} size={16} />
-            </Button>
-          </Tooltip>
+        {/* Desktop: show all toolbar actions inline */}
+        {!isMobile && (
+          <>
+            {/* Undo / Redo */}
+            <ToolbarGroup>
+              <Tooltip content={t('toolbar.undo')}>
+                <Button variant="icon" aria-label={t('toolbar.undo')}>
+                  <Icon icon={Undo2} size={16} />
+                </Button>
+              </Tooltip>
 
-          <Tooltip content={t('toolbar.redo')}>
-            <Button variant="icon" aria-label={t('toolbar.redo')}>
-              <Icon icon={Redo2} size={16} />
-            </Button>
-          </Tooltip>
-        </ToolbarGroup>
+              <Tooltip content={t('toolbar.redo')}>
+                <Button variant="icon" aria-label={t('toolbar.redo')}>
+                  <Icon icon={Redo2} size={16} />
+                </Button>
+              </Tooltip>
+            </ToolbarGroup>
 
-        {/* Share / Gist */}
-        <ToolbarGroup>
-          <Tooltip content={t('toolbar.share')}>
-            <Button variant="icon" onClick={() => setShowShare(true)} aria-label={t('toolbar.share')}>
-              <Icon icon={Share2} size={16} />
-            </Button>
-          </Tooltip>
+            {/* Share / Gist */}
+            <ToolbarGroup>
+              <Tooltip content={t('toolbar.share')}>
+                <Button variant="icon" onClick={() => setShowShare(true)} aria-label={t('toolbar.share')}>
+                  <Icon icon={Share2} size={16} />
+                </Button>
+              </Tooltip>
 
-          <Tooltip content={t('toolbar.gist')}>
-            <Button variant="icon" onClick={() => setShowGist(true)} aria-label={t('toolbar.gist')}>
-              <Icon icon={FileCode2} size={16} />
-            </Button>
-          </Tooltip>
-        </ToolbarGroup>
+              <Tooltip content={t('toolbar.gist')}>
+                <Button variant="icon" onClick={() => setShowGist(true)} aria-label={t('toolbar.gist')}>
+                  <Icon icon={FileCode2} size={16} />
+                </Button>
+              </Tooltip>
+            </ToolbarGroup>
 
-        {/* Collection / Achievements toggle */}
-        <ToolbarGroup>
-          <Tooltip content={t('collection.title')}>
-            <Button
-              variant="icon"
-              active={showCollection}
-              onClick={() => setShowCollection(!showCollection)}
-              aria-label={t('collection.title')}
-            >
-              <Icon icon={Trophy} size={16} />
-            </Button>
-          </Tooltip>
-        </ToolbarGroup>
+            {/* Collection / Achievements toggle */}
+            <ToolbarGroup>
+              <Tooltip content={t('collection.title')}>
+                <Button
+                  variant="icon"
+                  active={showCollection}
+                  onClick={() => setShowCollection(!showCollection)}
+                  aria-label={t('collection.title')}
+                >
+                  <Icon icon={Trophy} size={16} />
+                </Button>
+              </Tooltip>
+            </ToolbarGroup>
 
-        {/* Settings / Help toggle */}
-        <ToolbarGroup>
-          <Tooltip content={t('toolbar.settings')}>
-            <Button
-              variant="icon"
-              active={showHelp}
-              onClick={() => setShowHelp(!showHelp)}
-              aria-label={t('toolbar.settings')}
-            >
-              <Icon icon={Settings} size={16} />
-            </Button>
-          </Tooltip>
-        </ToolbarGroup>
+            {/* Settings / Help toggle */}
+            <ToolbarGroup>
+              <Tooltip content={t('toolbar.settings')}>
+                <Button
+                  variant="icon"
+                  active={showHelp}
+                  onClick={() => setShowHelp(!showHelp)}
+                  aria-label={t('toolbar.settings')}
+                >
+                  <Icon icon={Settings} size={16} />
+                </Button>
+              </Tooltip>
+            </ToolbarGroup>
 
-        {/* Language switcher (last, no separator) */}
-        <LanguageSwitcher />
+            {/* Language switcher (last, no separator) */}
+            <LanguageSwitcher />
+          </>
+        )}
+
+        {/* Mobile: settings + overflow menu for secondary actions */}
+        {isMobile && (
+          <>
+            {/* Settings — always visible on mobile */}
+            <Tooltip content={t('toolbar.settings')}>
+              <Button
+                variant="icon"
+                active={showHelp}
+                onClick={() => setShowHelp(!showHelp)}
+                aria-label={t('toolbar.settings')}
+              >
+                <Icon icon={Settings} size={16} />
+              </Button>
+            </Tooltip>
+
+            {/* Overflow menu toggle */}
+            <div style={{ position: 'relative' }}>
+              <Tooltip content={t('toolbar.more', 'More')}>
+                <Button
+                  variant="icon"
+                  active={showOverflow}
+                  onClick={() => setShowOverflow(!showOverflow)}
+                  aria-label={t('toolbar.more', 'More')}
+                >
+                  <Icon icon={MoreHorizontal} size={16} />
+                </Button>
+              </Tooltip>
+
+              {/* Overflow dropdown — secondary actions */}
+              {showOverflow && (
+                <nav
+                  aria-label="More actions"
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: 'var(--space-2)',
+                    backgroundColor: 'var(--color-bg-elevated)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-2)',
+                    zIndex: 50,
+                    minWidth: '160px',
+                    boxShadow: 'var(--shadow-lg)',
+                  }}
+                >
+                  <Button
+                    variant="icon"
+                    onClick={() => { setShowShare(true); setShowOverflow(false) }}
+                    aria-label={t('toolbar.share')}
+                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                  >
+                    <Icon icon={Share2} size={16} /> {t('toolbar.share')}
+                  </Button>
+                  <Button
+                    variant="icon"
+                    onClick={() => { setShowGist(true); setShowOverflow(false) }}
+                    aria-label={t('toolbar.gist')}
+                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                  >
+                    <Icon icon={FileCode2} size={16} /> {t('toolbar.gist')}
+                  </Button>
+                  <Button
+                    variant="icon"
+                    onClick={() => { setShowCollection(!showCollection); setShowOverflow(false) }}
+                    aria-label={t('collection.title')}
+                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                  >
+                    <Icon icon={Trophy} size={16} /> {t('collection.title')}
+                  </Button>
+                  <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-2) 0' }} />
+                  <div style={{ padding: '0 var(--space-2)' }}>
+                    <LanguageSwitcher />
+                  </div>
+                </nav>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </header>
 

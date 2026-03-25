@@ -8,6 +8,7 @@
 
 import { useCallback, useRef, type ReactNode } from 'react'
 import { useAppStore } from '../lib/store'
+import { useMediaQuery } from '../lib/useMediaQuery'
 
 interface EditorLayoutProps {
   /** Top toolbar (TransportBar) */
@@ -26,6 +27,9 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
   const layout = useAppStore((s) => s.layout)
   const setEditorWidth = useAppStore((s) => s.setEditorWidth)
   const setVisualizerHeight = useAppStore((s) => s.setVisualizerHeight)
+
+  /* Below 768px: stacked layout, no graph, fixed visualizer height */
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
   /* Ref for the main content area — used to compute resize percentages */
   const mainRef = useRef<HTMLDivElement>(null)
@@ -89,9 +93,12 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
     [setVisualizerHeight]
   )
 
-  /* Derived size values */
-  const topHeight = `${100 - layout.visualizerHeight}%`
-  const bottomHeight = `${layout.visualizerHeight}%`
+  /* Derived size values — desktop uses percentage, mobile uses fixed height */
+  const topHeight = isMobile ? undefined : `${100 - layout.visualizerHeight}%`
+  const bottomHeight = isMobile ? '200px' : `${layout.visualizerHeight}%`
+
+  /* On mobile: graph is always hidden, editor takes full width */
+  const showGraph = !isMobile && layout.showGraph
 
   return (
     <div className="flex flex-col h-full">
@@ -100,19 +107,25 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
 
       {/* ── Main content area ── */}
       <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
-        {/* Top zone: editor + graph (graph hidden by default) */}
-        <div className="flex min-h-0" style={{ height: topHeight }}>
-          {/* Editor panel — full width when graph is hidden */}
+        {/* Top zone: editor + graph (stacked vertically on mobile) */}
+        <div
+          className={isMobile ? 'flex flex-col flex-1 min-h-0' : 'flex min-h-0'}
+          style={topHeight ? { height: topHeight } : undefined}
+        >
+          {/* Editor panel — full width on mobile, percentage on desktop */}
           <section
             aria-label="Editor"
             className="min-w-0 overflow-auto"
-            style={{ width: layout.showGraph ? `${layout.editorWidth}%` : '100%' }}
+            style={{
+              width: isMobile ? '100%' : showGraph ? `${layout.editorWidth}%` : '100%',
+              flex: isMobile ? '1 1 0%' : undefined,
+            }}
           >
             {editor}
           </section>
 
-          {/* Vertical resize handle + Graph panel — only when graph is visible */}
-          {layout.showGraph && (
+          {/* Vertical resize handle + Graph panel — desktop only when graph is visible */}
+          {showGraph && (
             <>
               <div
                 role="separator"
@@ -143,30 +156,35 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
           )}
         </div>
 
-        {/* Horizontal resize handle */}
-        <div
-          role="separator"
-          aria-orientation="horizontal"
-          tabIndex={0}
-          onMouseDown={handleHorizontalResize}
-          className="shrink-0 cursor-row-resize transition-colors"
-          style={{
-            height: '1px',
-            backgroundColor: 'var(--color-border)',
-          }}
-          onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
-          }}
-        />
+        {/* Horizontal resize handle — hidden on mobile (no drag resize) */}
+        {!isMobile && (
+          <div
+            role="separator"
+            aria-orientation="horizontal"
+            tabIndex={0}
+            onMouseDown={handleHorizontalResize}
+            className="shrink-0 cursor-row-resize transition-colors"
+            style={{
+              height: '1px',
+              backgroundColor: 'var(--color-border)',
+            }}
+            onMouseEnter={(e) => {
+              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
+            }}
+            onMouseLeave={(e) => {
+              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
+            }}
+          />
+        )}
 
-        {/* Bottom zone: visualizers */}
+        {/* Bottom zone: visualizers — fixed 200px on mobile, percentage on desktop */}
         <section
           aria-label="Visualizers"
-          className="min-h-0 overflow-auto"
-          style={{ height: bottomHeight }}
+          className="min-h-0 overflow-auto shrink-0"
+          style={{
+            height: bottomHeight,
+            borderTop: isMobile ? '1px solid var(--color-border)' : undefined,
+          }}
         >
           {visualizers}
         </section>
