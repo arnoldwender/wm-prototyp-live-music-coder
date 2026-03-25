@@ -35,18 +35,36 @@ export function StrudelEditor() {
 
         if (!mounted || !containerRef.current) return;
 
-        /* prebake returns the initStrudel promise — loads samples, registers functions */
+        /* prebake loads synths + registers functions. We also explicitly
+         * load the Dirt-Samples from GitHub CDN for drum sounds. */
         const prebakePromise = initStrudel();
 
         const mirror = new StrudelMirror({
           root: containerRef.current,
           initialCode: activeFile?.code ?? '',
-          prebake: async () => { await prebakePromise; },
+          prebake: async () => {
+            await prebakePromise;
+            /* Load default drum/instrument samples from Strudel CDN */
+            try {
+              const { samples } = await import('superdough');
+              await samples('github:tidalcycles/Dirt-Samples/master');
+              console.log('[StrudelEditor] Dirt-Samples loaded from CDN');
+            } catch (err) {
+              console.warn('[StrudelEditor] Failed to load Dirt-Samples:', err);
+            }
+          },
           drawTime: [0, 0],
           bgFill: false,
         });
 
         mirrorRef.current = mirror;
+
+        /* Wait for full init including sample loading */
+        await prebakePromise;
+        try {
+          const { samples } = await import('superdough');
+          await samples('github:tidalcycles/Dirt-Samples/master');
+        } catch { /* already loaded in prebake or failed */ }
 
         /* Listen for code changes in the StrudelMirror editor */
         const checkCode = () => {
@@ -62,7 +80,7 @@ export function StrudelEditor() {
         const interval = setInterval(checkCode, 500);
 
         setReady(true);
-        console.log('[StrudelEditor] StrudelMirror initialized with live highlighting');
+        console.log('[StrudelEditor] StrudelMirror ready — samples loaded');
 
         return () => {
           clearInterval(interval);
@@ -162,7 +180,7 @@ export function StrudelEditor() {
             className="w-1.5 h-1.5 rounded-full"
             style={{ backgroundColor: ready ? 'var(--color-success)' : 'var(--color-warning)' }}
           />
-          {ready ? 'Strudel ready' : 'Loading...'}
+          {ready ? 'Strudel ready (samples loaded)' : 'Loading samples...'}
         </span>
       </div>
 
