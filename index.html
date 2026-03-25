@@ -27,6 +27,39 @@
     <meta name="author" content="Wender Media" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#a855f7" />
+
+    <!-- JSON-LD structured data: WebApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Live Music Coder",
+      "description": "Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and audio-reactive Beatling creatures.",
+      "url": "https://live-music-coder.pro",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires a modern browser with Web Audio API support",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Wender Media",
+        "url": "https://wendermedia.de"
+      },
+      "inLanguage": ["en", "de", "es"],
+      "featureList": [
+        "4 audio engines (Strudel, Tone.js, Web Audio API, MIDI)",
+        "Visual node graph",
+        "Real-time waveform and spectrum visualizers",
+        "Audio-reactive Beatling creatures",
+        "GitHub Gist sharing",
+        "No installation required"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
