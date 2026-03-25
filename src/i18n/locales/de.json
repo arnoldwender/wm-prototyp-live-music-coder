@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "Live Music Coder",
+    "tagline": "Musik programmieren. Klang sehen. Kreaturen züchten."
+  },
+  "transport": {
+    "play": "Abspielen",
+    "stop": "Stopp",
+    "record": "Aufnahme",
+    "bpm": "BPM"
+  },
+  "toolbar": {
+    "undo": "Rückgängig",
+    "redo": "Wiederherstellen",
+    "share": "Teilen",
+    "gist": "Als Gist exportieren",
+    "settings": "Einstellungen",
+    "language": "Sprache"
+  },
+  "engines": {
+    "strudel": "Strudel",
+    "tonejs": "Tone.js",
+    "webaudio": "WebAudio",
+    "midi": "MIDI",
+    "midiWarning": "MIDI ist nur ein Ausgang — keine Audio-Engine-Verarbeitung"
+  },
+  "panels": {
+    "editor": "Editor",
+    "graph": "Graph",
+    "waveform": "Wellenform",
+    "spectrum": "Spektrum",
+    "timeline": "Zeitleiste",
+    "beatlings": "Beatlings"
+  },
+  "status": {
+    "engine": "Engine",
+    "cpu": "CPU",
+    "creatures": "Kreaturen",
+    "ready": "Bereit"
+  },
+  "landing": {
+    "hero": "Programmiere deine Musik live",
+    "subtitle": "Eine visuelle Entwicklungsumgebung für Live-Coding mit mehreren Audio-Engines und digitalen Kreaturen, die mit deinem Sound wachsen.",
+    "cta": "Jetzt loslegen"
+  }
+}

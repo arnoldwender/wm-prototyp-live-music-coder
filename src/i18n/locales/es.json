@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "Live Music Coder",
+    "tagline": "Programa música. Visualiza el sonido. Cría criaturas."
+  },
+  "transport": {
+    "play": "Reproducir",
+    "stop": "Detener",
+    "record": "Grabar",
+    "bpm": "BPM"
+  },
+  "toolbar": {
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "share": "Compartir",
+    "gist": "Exportar Gist",
+    "settings": "Ajustes",
+    "language": "Idioma"
+  },
+  "engines": {
+    "strudel": "Strudel",
+    "tonejs": "Tone.js",
+    "webaudio": "WebAudio",
+    "midi": "MIDI",
+    "midiWarning": "MIDI es solo salida — sin procesamiento de audio"
+  },
+  "panels": {
+    "editor": "Editor",
+    "graph": "Grafo",
+    "waveform": "Forma de onda",
+    "spectrum": "Espectro",
+    "timeline": "Línea de tiempo",
+    "beatlings": "Beatlings"
+  },
+  "status": {
+    "engine": "Motor",
+    "cpu": "CPU",
+    "creatures": "Criaturas",
+    "ready": "Listo"
+  },
+  "landing": {
+    "hero": "Programa tu música en vivo",
+    "subtitle": "Un IDE visual para programar música en vivo con múltiples motores de audio y criaturas digitales que evolucionan con tu sonido.",
+    "cta": "Empezar a programar"
+  }
+}

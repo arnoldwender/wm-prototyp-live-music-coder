@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "Live Music Coder",
+    "tagline": "Code music. See sound. Grow creatures."
+  },
+  "transport": {
+    "play": "Play",
+    "stop": "Stop",
+    "record": "Record",
+    "bpm": "BPM"
+  },
+  "toolbar": {
+    "undo": "Undo",
+    "redo": "Redo",
+    "share": "Share",
+    "gist": "Export Gist",
+    "settings": "Settings",
+    "language": "Language"
+  },
+  "engines": {
+    "strudel": "Strudel",
+    "tonejs": "Tone.js",
+    "webaudio": "WebAudio",
+    "midi": "MIDI",
+    "midiWarning": "MIDI is output-only — no audio engine processing"
+  },
+  "panels": {
+    "editor": "Editor",
+    "graph": "Graph",
+    "waveform": "Waveform",
+    "spectrum": "Spectrum",
+    "timeline": "Timeline",
+    "beatlings": "Beatlings"
+  },
+  "status": {
+    "engine": "Engine",
+    "cpu": "CPU",
+    "creatures": "Creatures",
+    "ready": "Ready"
+  },
+  "landing": {
+    "hero": "Live code your music",
+    "subtitle": "A visual IDE for live coding music with multiple audio engines and digital creatures that evolve with your sound.",
+    "cta": "Start Coding"
+  }
+}
