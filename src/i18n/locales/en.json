@@ -3,6 +3,10 @@
     "name": "Live Music Coder",
     "tagline": "Code music. See sound. Grow creatures."
   },
+  "nav": {
+    "openEditor": "Open Editor",
+    "backToHome": "Back to home"
+  },
   "transport": {
     "play": "Play",
     "stop": "Stop",

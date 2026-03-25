@@ -1,11 +1,12 @@
 /* ----------------------------------------------------------
-   Landing page — hero section, feature grid, example gallery.
-   Scrollable full-page layout with nav, section dividers,
-   and a powered-by footer.
+   Landing page — header navbar, hero section, feature grid,
+   example gallery, and powered-by footer.
    ---------------------------------------------------------- */
 
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
 import { HeroSection } from '../components/organisms/HeroSection'
 import { FeatureGrid } from '../components/organisms/FeatureGrid'
@@ -61,13 +62,74 @@ function Landing() {
       className="min-h-screen"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
-      {/* Top bar with language switcher */}
-      <nav className="flex justify-end p-4">
-        <LanguageSwitcher />
+      {/* Skip-to-content link for accessibility */}
+      <a
+        href="#hero"
+        className="sr-only focus:not-sr-only"
+        style={{
+          position: 'absolute',
+          top: 'var(--space-2)',
+          left: 'var(--space-2)',
+          zIndex: 100,
+          padding: 'var(--space-2) var(--space-4)',
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        Skip to content
+      </a>
+
+      {/* --- Header navbar --- */}
+      <nav
+        aria-label="Main navigation"
+        className="flex items-center justify-between"
+        style={{
+          height: '64px',
+          padding: '0 var(--space-6)',
+          backgroundColor: 'var(--color-bg-alt)',
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        {/* Left: Logo linked to home */}
+        <Link
+          to="/"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+          aria-label={t('nav.backToHome')}
+        >
+          <Logo showTagline size="sm" />
+        </Link>
+
+        {/* Right: Language switcher + CTA button */}
+        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
+          <LanguageSwitcher />
+
+          <Link
+            to="/editor"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: 'var(--space-2) var(--space-4)',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-bg)',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-bold)',
+              borderRadius: 'var(--radius-md)',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.openEditor')}
+          </Link>
+        </div>
       </nav>
 
       {/* Hero with animated waveform, gradient text, and CTA */}
-      <HeroSection />
+      <section id="hero">
+        <HeroSection />
+      </section>
 
       <SectionDivider />
 

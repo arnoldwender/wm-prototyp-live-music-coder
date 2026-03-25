@@ -3,6 +3,10 @@
     "name": "Live Music Coder",
     "tagline": "Programa música. Visualiza el sonido. Cría criaturas."
   },
+  "nav": {
+    "openEditor": "Abrir editor",
+    "backToHome": "Volver al inicio"
+  },
   "transport": {
     "play": "Reproducir",
     "stop": "Detener",

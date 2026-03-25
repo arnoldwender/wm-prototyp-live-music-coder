@@ -3,6 +3,10 @@
     "name": "Live Music Coder",
     "tagline": "Musik programmieren. Klang sehen. Kreaturen züchten."
   },
+  "nav": {
+    "openEditor": "Editor öffnen",
+    "backToHome": "Zurück zur Startseite"
+  },
   "transport": {
     "play": "Abspielen",
     "stop": "Stopp",

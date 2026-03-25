@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { useMediaQuery } from '../../lib/useMediaQuery'
 import { MoreHorizontal } from 'lucide-react'
 import {
@@ -24,7 +25,7 @@ import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
 import { getRecorder } from '../../lib/audio/recorder'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
-import { Button, Icon, Tooltip } from '../atoms'
+import { Button, Icon, Logo, Tooltip } from '../atoms'
 import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog, HelpPanel } from '../molecules'
 import { GistDialog } from './GistDialog'
 import { CollectionPanel } from './CollectionPanel'
@@ -112,8 +113,23 @@ function TransportBar() {
         height: '48px',
       }}
     >
-      {/* --- Left side: Transport controls --- */}
+      {/* --- Left side: Logo + Transport controls --- */}
       <div className="flex items-center">
+        {/* Logo — links back to landing page */}
+        <Link
+          to="/"
+          style={{
+            textDecoration: 'none',
+            color: 'inherit',
+            marginRight: 'var(--space-4)',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          aria-label={t('nav.backToHome')}
+        >
+          <Logo size="sm" />
+        </Link>
+
         {/* Play / Stop / Record */}
         <ToolbarGroup>
           <Tooltip content={t('transport.play')}>
