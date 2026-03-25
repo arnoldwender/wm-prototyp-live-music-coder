@@ -36,7 +36,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+      style={{ backgroundColor: 'var(--color-backdrop)' }}
     >
       <div
         className="rounded-lg p-8 max-w-2xl w-full mx-4"

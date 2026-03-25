@@ -51,10 +51,11 @@ const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
   },
 }
 
-/** Active state overlay — highlights the button background */
+/** Active state overlay — distinct from hover with primary color at reduced opacity */
 const activeOverride: React.CSSProperties = {
-  backgroundColor: 'var(--color-bg-hover)',
-  color: 'var(--color-text)',
+  backgroundColor: 'var(--color-primary)',
+  color: 'white',
+  opacity: 0.8,
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -65,7 +66,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...(active ? activeOverride : {}),
       border: variantStyles[variant].border ?? 'none',
       cursor: rest.disabled ? 'not-allowed' : 'pointer',
-      opacity: rest.disabled ? 0.5 : 1,
+      opacity: rest.disabled ? 0.5 : (active ? 0.8 : 1),
+      outline: 'none',
       transition: 'var(--transition-fast)',
       fontFamily: 'var(--font-family-sans)',
       fontSize: 'var(--font-size-sm)',
@@ -77,8 +79,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={`hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
+        className={`hover:brightness-110 ${className}`}
         style={merged}
+        onFocus={(e) => {
+          /* Focus-visible style — matches theme primary color */
+          if (e.target.matches(':focus-visible')) {
+            e.target.style.outline = '2px solid var(--color-primary)'
+            e.target.style.outlineOffset = '2px'
+          }
+        }}
+        onBlur={(e) => {
+          e.target.style.outline = 'none'
+          e.target.style.outlineOffset = '0'
+        }}
         {...rest}
       >
         {children}

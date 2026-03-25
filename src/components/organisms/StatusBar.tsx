@@ -33,11 +33,11 @@ function StatusBar() {
         </Badge>
       </div>
 
-      {/* Right: CPU, creatures, status */}
+      {/* Right: file count, creatures, status */}
       <div className="flex items-center gap-4">
-        {/* CPU usage placeholder */}
+        {/* File count from store */}
         <span>
-          {t('status.cpu')}: 0%
+          {t('status.files')}: {useAppStore.getState().files.length}
         </span>
 
         {/* Creature count placeholder */}

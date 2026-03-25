@@ -37,7 +37,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      style={{ backgroundColor: 'var(--color-backdrop)' }}
     >
       <div
         className="rounded-lg max-w-lg w-full mx-4"

@@ -4,7 +4,7 @@
    Right: Undo/Redo/Share/Gist, Settings, LanguageSwitcher
    ────────────────────────────────────────────────────────── */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useMediaQuery } from '../../lib/useMediaQuery'
@@ -48,6 +48,25 @@ function TransportBar() {
   /* Responsive — hide secondary actions on mobile behind overflow menu */
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [showOverflow, setShowOverflow] = useState(false)
+
+  /* Ref for click-outside detection on overflow menu */
+  const overflowRef = useRef<HTMLDivElement>(null)
+
+  /** Close overflow menu when clicking outside */
+  const handleClickOutside = useCallback((e: MouseEvent) => {
+    if (overflowRef.current && !overflowRef.current.contains(e.target as Node)) {
+      setShowOverflow(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (showOverflow) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showOverflow, handleClickOutside])
 
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
@@ -315,7 +334,7 @@ function TransportBar() {
             </Tooltip>
 
             {/* Overflow menu toggle */}
-            <div style={{ position: 'relative' }}>
+            <div ref={overflowRef} style={{ position: 'relative' }}>
               <Tooltip content={t('toolbar.more', 'More')}>
                 <Button
                   variant="icon"

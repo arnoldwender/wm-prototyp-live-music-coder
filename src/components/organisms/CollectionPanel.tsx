@@ -51,7 +51,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
         style={{
           color: unlocked ? 'var(--color-warning)' : 'var(--color-text-muted)',
           flexShrink: 0,
-          marginTop: '2px',
+          marginTop: 'var(--space-1)',
         }}
       >
         {unlocked ? <Trophy size={18} /> : <Lock size={18} />}
@@ -72,7 +72,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
           style={{
             fontSize: 'var(--font-size-xs)',
             color: 'var(--color-text-muted)',
-            marginTop: '2px',
+            marginTop: 'var(--space-1)',
           }}
         >
           {achievement.description}

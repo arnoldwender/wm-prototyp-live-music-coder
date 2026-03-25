@@ -5,6 +5,7 @@
    ────────────────────────────────────────────────────────── */
 
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../lib/store';
 import { VisualizerToggle } from '../molecules/VisualizerToggle';
 import { WaveformVisualizer } from './WaveformVisualizer';
@@ -14,6 +15,7 @@ import { BeatlingPanel } from './BeatlingPanel';
 
 /** Composes all visualizer panels with toggle controls */
 export function VisualizerDashboard() {
+  const { t } = useTranslation();
   const visiblePanels = useAppStore((s) => s.layout.visiblePanels);
 
   /* Build array of only visible panels — each gets equal flex width */
@@ -39,7 +41,7 @@ export function VisualizerDashboard() {
             className="flex-1 flex items-center justify-center"
             style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}
           >
-            No visualizers active
+            {t('panels.noVisualizers')}
           </div>
         ) : (
           activePanels.map(({ key, component }) => (

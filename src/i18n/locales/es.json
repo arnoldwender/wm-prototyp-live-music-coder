@@ -34,11 +34,12 @@
     "waveform": "Forma de onda",
     "spectrum": "Espectro",
     "timeline": "Línea de tiempo",
-    "beatlings": "Beatlings"
+    "beatlings": "Beatlings",
+    "noVisualizers": "Sin visualizadores activos"
   },
   "status": {
     "engine": "Motor",
-    "cpu": "CPU",
+    "files": "Archivos",
     "creatures": "Criaturas",
     "ready": "Listo"
   },

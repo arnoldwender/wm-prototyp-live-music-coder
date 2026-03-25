@@ -34,11 +34,12 @@
     "waveform": "Waveform",
     "spectrum": "Spectrum",
     "timeline": "Timeline",
-    "beatlings": "Beatlings"
+    "beatlings": "Beatlings",
+    "noVisualizers": "No visualizers active"
   },
   "status": {
     "engine": "Engine",
-    "cpu": "CPU",
+    "files": "Files",
     "creatures": "Creatures",
     "ready": "Ready"
   },
