@@ -16,10 +16,11 @@ import {
   addEdge,
   BackgroundVariant,
 } from '@xyflow/react'
-import type { Connection as RFConnection, Node, Edge } from '@xyflow/react'
+import type { Connection as RFConnection, Node, Edge, EdgeChange } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
 import { parseCode } from '../../lib/parser'
+import { generateCode } from '../../lib/codegen'
 import { EngineNode } from '../atoms'
 import { ENGINE_COLORS } from '../../lib/constants'
 import { useAppStore } from '../../lib/store'
@@ -57,6 +58,34 @@ function connectionsToEdges(connections: Connection[]): Edge[] {
   }))
 }
 
+/** Convert React Flow nodes back to EngineBlocks for code generation */
+function nodesToBlocks(nodes: Node[]): EngineBlock[] {
+  return nodes.map(n => ({
+    id: n.id,
+    engine: (n.data as Record<string, unknown>).engine as EngineBlock['engine'],
+    type: (n.data as Record<string, unknown>).blockType as EngineBlock['type'],
+    code: (n.data as Record<string, unknown>).code as string,
+    params: {},
+    inputs: (n.data as Record<string, unknown>).blockType !== 'source'
+      ? [{ id: 'in', label: 'Input', type: 'audio' as const }]
+      : [],
+    outputs: (n.data as Record<string, unknown>).blockType !== 'output'
+      ? [{ id: 'out', label: 'Output', type: 'audio' as const }]
+      : [],
+  }));
+}
+
+/** Convert React Flow edges back to Connection objects for code generation */
+function edgesToConnections(edges: Edge[]): Connection[] {
+  return edges.map(e => ({
+    id: e.id,
+    sourceBlockId: e.source,
+    sourcePortId: e.sourceHandle ?? 'out',
+    targetBlockId: e.target,
+    targetPortId: e.targetHandle ?? 'in',
+  }));
+}
+
 export default function NodeGraph() {
   const { t } = useTranslation()
   const files = useAppStore((s) => s.files)
@@ -83,12 +112,46 @@ export default function NodeGraph() {
     setEdges(connectionsToEdges(connections))
   }, [activeFile?.code, activeFile?.engine, activeFile?.id, setNodes, setEdges])
 
+  /** Regenerate code from current graph state and push it to the active file */
+  const syncGraphToCode = useCallback(
+    (currentNodes: Node[], currentEdges: Edge[]) => {
+      if (!activeFile) return
+      const blocks = nodesToBlocks(currentNodes)
+      const connections = edgesToConnections(currentEdges)
+      const newCode = generateCode(blocks, connections, activeFile.engine)
+      useAppStore.getState().updateFileCode(activeFile.id, newCode)
+    },
+    [activeFile],
+  )
+
   /* Handle manual edge creation via drag in the canvas */
   const onConnect = useCallback(
     (params: RFConnection) => {
-      setEdges((eds) => addEdge(params, eds))
+      setEdges((eds) => {
+        const nextEdges = addEdge(params, eds)
+        /* Regenerate code with the newly added edge */
+        syncGraphToCode(nodes, nextEdges)
+        return nextEdges
+      })
     },
-    [setEdges],
+    [setEdges, syncGraphToCode, nodes],
+  )
+
+  /* Wrap onEdgesChange to detect edge removals and regenerate code */
+  const handleEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      onEdgesChange(changes)
+      const hasRemovals = changes.some((c) => c.type === 'remove')
+      if (hasRemovals) {
+        /* Compute surviving edges after removals */
+        const removedIds = new Set(
+          changes.filter((c) => c.type === 'remove').map((c) => c.id),
+        )
+        const survivingEdges = edges.filter((e) => !removedIds.has(e.id))
+        syncGraphToCode(nodes, survivingEdges)
+      }
+    },
+    [onEdgesChange, edges, nodes, syncGraphToCode],
   )
 
   /** Color minimap nodes by their engine */
@@ -139,7 +202,7 @@ export default function NodeGraph() {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}

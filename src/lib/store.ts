@@ -47,6 +47,7 @@ interface AppState {
   removeFile: (fileId: string) => void
   setActiveFile: (fileId: string) => void
   updateFileCode: (fileId: string, code: string) => void
+  setFileEngine: (fileId: string, engine: EngineType) => void
   renameFile: (fileId: string, name: string) => void
   getActiveFile: () => ProjectFile | undefined
 }
@@ -177,6 +178,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((s) => ({
       files: s.files.map((f) =>
         f.id === fileId ? { ...f, code } : f,
+      ),
+    })),
+
+  /** Change a file's audio engine */
+  setFileEngine: (fileId: string, engine: EngineType) =>
+    set((s) => ({
+      files: s.files.map((f) =>
+        f.id === fileId ? { ...f, engine } : f,
       ),
     })),
 

@@ -19,29 +19,41 @@ function EngineSelector() {
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
 
   return (
-    <select
-      value={defaultEngine}
-      onChange={(e) => setDefaultEngine(e.target.value as EngineType)}
-      aria-label={t('status.engine')}
-      className="focus-visible:outline-2 focus-visible:outline-offset-2"
-      style={{
-        backgroundColor: 'var(--color-bg-elevated)',
-        color: 'var(--color-text)',
-        fontSize: 'var(--font-size-sm)',
-        fontFamily: 'var(--font-family-sans)',
-        padding: 'var(--space-2) var(--space-6)',
-        borderRadius: 'var(--radius-md)',
-        border: `2px solid ${ENGINE_COLORS[defaultEngine]}`,
-        cursor: 'pointer',
-        transition: 'var(--transition-fast)',
-      }}
-    >
-      {ENGINE_OPTIONS.map((engine) => (
-        <option key={engine} value={engine}>
-          {t(`engines.${engine}`)}
-        </option>
-      ))}
-    </select>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <select
+        value={defaultEngine}
+        onChange={(e) => setDefaultEngine(e.target.value as EngineType)}
+        aria-label={t('status.engine')}
+        className="focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          backgroundColor: 'var(--color-bg-elevated)',
+          color: 'var(--color-text)',
+          fontSize: 'var(--font-size-sm)',
+          fontFamily: 'var(--font-family-sans)',
+          padding: 'var(--space-2) var(--space-6)',
+          borderRadius: 'var(--radius-md)',
+          border: `2px solid ${ENGINE_COLORS[defaultEngine]}`,
+          cursor: 'pointer',
+          transition: 'var(--transition-fast)',
+        }}
+      >
+        {ENGINE_OPTIONS.map((engine) => (
+          <option key={engine} value={engine}>
+            {t(`engines.${engine}`)}
+          </option>
+        ))}
+      </select>
+      {/* MIDI output-only warning badge */}
+      {defaultEngine === 'midi' && (
+        <span style={{
+          fontSize: 'var(--font-size-xs)',
+          color: 'var(--color-warning)',
+          marginLeft: 'var(--space-2)',
+        }}>
+          {t('engines.midiWarning')}
+        </span>
+      )}
+    </div>
   )
 }
 

@@ -16,13 +16,19 @@ interface TemplateSelectorProps {
 /** First-visit template picker modal */
 export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
   const updateFileCode = useAppStore((s) => s.updateFileCode)
+  const setFileEngine = useAppStore((s) => s.setFileEngine)
+  const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const files = useAppStore((s) => s.files)
 
+  /** Apply template code AND engine to the active file */
   const handleSelect = (template: StarterTemplate) => {
     const activeFile = files.find((f) => f.active)
     if (activeFile) {
       updateFileCode(activeFile.id, template.code)
+      setFileEngine(activeFile.id, template.engine)
     }
+    /* Also update the global default engine to match the template */
+    setDefaultEngine(template.engine)
     localStorage.setItem('lmc-onboarded', 'true')
     onSelect()
   }
