@@ -5,7 +5,8 @@
   },
   "nav": {
     "openEditor": "Abrir editor",
-    "backToHome": "Volver al inicio"
+    "backToHome": "Volver al inicio",
+    "docs": "Documentación"
   },
   "transport": {
     "play": "Reproducir",
@@ -229,6 +230,111 @@
       "waveshaper": "Crear nodo de distorsión",
       "connect": "Conectar nodos entre sí",
       "mastergain": "Nodo de volumen de salida principal"
+    }
+  },
+  "docs": {
+    "skipToContent": "Saltar al contenido",
+    "navigation": "Navegación de documentación",
+    "sidebarLabel": "Secciones de documentación",
+    "sidebarTitle": "Documentación",
+    "pageNavigation": "Navegación de página",
+    "gettingStarted": {
+      "title": "Primeros Pasos",
+      "intro": "Live coding es una práctica de performance donde escribes código que genera música en tiempo real. En lugar de componer previamente, construyes patrones sobre la marcha — el público escucha los cambios mientras tecleas.",
+      "firstPatternHeading": "Tu primer patrón",
+      "firstPatternText": "Abre el editor y escribe un patrón de batería simple. Presiona Ctrl+Enter para escucharlo. El patrón se repite automáticamente y puedes editarlo mientras suena.",
+      "workflowHeading": "Flujo de trabajo básico",
+      "step1": "Abre el editor y elige un motor de audio (Strudel es el predeterminado)",
+      "step2": "Escribe un patrón usando mini-notación o llamadas a funciones",
+      "step3": "Presiona Ctrl+Enter para evaluar y escuchar tu código",
+      "step4": "Edita el código en vivo — los cambios se aplican en el siguiente ciclo",
+      "tip": "Usa los visualizadores de abajo para ver la forma de onda, el espectro y la línea de tiempo del patrón en tiempo real. Las criaturas Beatling aparecerán y evolucionarán según tu música."
+    },
+    "strudelBasics": {
+      "title": "Fundamentos de Strudel",
+      "intro": "Strudel es una versión en JavaScript del lenguaje de live coding TidalCycles. Usa un modelo de temporización basado en ciclos donde los patrones se repiten y transforman.",
+      "whatIsHeading": "¿Qué es Strudel?",
+      "whatIsText": "Strudel te permite describir patrones musicales con expresiones concisas. Cada patrón dura un ciclo y se repite infinitamente. Encadenas funciones para añadir sonidos, notas, efectos y transformaciones.",
+      "firstPatternsHeading": "Primeros patrones",
+      "firstPatternsText": "Usa note() para melodías y sound() para muestras. El método .s() selecciona la fuente de sonido — osciladores como sawtooth o bancos de muestras como RolandTR808.",
+      "chainingHeading": "Encadenar efectos",
+      "chainingText": "Encadena métodos para dar forma a tu sonido. Cada función transforma el patrón y lo pasa al siguiente. El orden importa — filtros antes de reverb suena diferente que reverb antes de filtros."
+    },
+    "miniNotation": {
+      "title": "Mini-Notación",
+      "intro": "La mini-notación es la sintaxis compacta de Strudel para describir patrones rítmicos dentro de cadenas de texto. Empaqueta ritmos complejos en expresiones cortas y legibles.",
+      "syntaxHeading": "Referencia de sintaxis",
+      "space": "Espacio — separa eventos secuenciales en un ciclo: \"bd sd hh sd\"",
+      "brackets": "[ ] — subdivide un paso en partes iguales: \"bd [hh hh hh] sd\"",
+      "angle": "< > — alterna un valor por ciclo: \"<bd sd> hh\"",
+      "tilde": "~ — silencio / pausa: \"bd ~ sd ~\"",
+      "star": "* — repetir N veces: \"hh*8\" toca 8 hi-hats por paso",
+      "slash": "/ — ralentizar: \"bd/2\" suena cada dos ciclos",
+      "comma": ", — tocar simultáneamente (acorde): \"c3,e3,g3\"",
+      "parens": "( ) — ritmo euclidiano: \"bd(3,8)\" distribuye 3 golpes en 8 pasos",
+      "question": "? — eliminar aleatoriamente (50% de probabilidad): \"hh?\"",
+      "examplesHeading": "Ejemplos"
+    },
+    "soundsSamples": {
+      "title": "Sonidos y Muestras",
+      "intro": "Strudel incluye una amplia gama de muestras y osciladores integrados. Usa sound() para activar muestras y note().s() para síntesis tonal.",
+      "drumsHeading": "Muestras de batería",
+      "bd": "bd — Bombo",
+      "sd": "sd — Caja",
+      "hh": "hh — Hi-hat cerrado",
+      "oh": "oh — Hi-hat abierto",
+      "cp": "cp — Palmas",
+      "lt": "lt — Tom grave",
+      "mt": "mt — Tom medio",
+      "ht": "ht — Tom agudo",
+      "banksHeading": "Bancos de muestras",
+      "banksText": "Usa .bank() para cambiar entre modelos de caja de ritmos. RolandTR808 y RolandTR909 son bancos clásicos con conjuntos completos de muestras para cada tipo de tambor.",
+      "oscillatorsHeading": "Osciladores",
+      "oscillatorsText": "Para síntesis, usa .s() con tipos de oscilador: sawtooth (brillante, zumbante), sine (puro, limpio), square (hueco, retro) y triangle (suave, melódico)."
+    },
+    "effects": {
+      "title": "Efectos",
+      "intro": "Los efectos moldean el timbre, el espacio y la dinámica de tus patrones. Encadénalos después de tu fuente de sonido para esculpir el sonido perfecto.",
+      "filterHeading": "Filtros",
+      "filterText": "lpf(frecuencia) es un filtro pasa-bajos que corta frecuencias altas — valores más bajos oscurecen el sonido. hpf(frecuencia) es un filtro pasa-altos que elimina el rumble de graves.",
+      "reverbDelayHeading": "Reverb y Delay",
+      "reverbDelayText": "room(cantidad) añade reverberación de 0 (seco) a 1 (totalmente húmedo). delay(cantidad) añade eco con retroalimentación. Combínalos para texturas espaciales y atmosféricas.",
+      "dynamicsHeading": "Dinámica y control",
+      "gain": "gain(0-1) — nivel de volumen del patrón",
+      "pan": "pan(0-1) — posición estéreo: 0 = izquierda, 0.5 = centro, 1 = derecha",
+      "speed": "speed(valor) — velocidad de reproducción: 2 = doble, 0.5 = mitad",
+      "dec": "dec(segundos) — tiempo de decaimiento para sonidos percusivos",
+      "sustain": "sustain(segundos) — duración de sostenimiento de una nota"
+    },
+    "patternTricks": {
+      "title": "Trucos de Patrones",
+      "intro": "Combina y transforma patrones para crear composiciones complejas a partir de bloques simples. Estas técnicas son el corazón de la creatividad en live coding.",
+      "layeringHeading": "Capas con stack()",
+      "layeringText": "stack() reproduce múltiples patrones simultáneamente. Construye patrones de batería, líneas de bajo y melodías como capas separadas y combínalas en una mezcla completa.",
+      "transformHeading": "Transformaciones",
+      "fast": "fast(n) — acelerar el patrón por factor n",
+      "slow": "slow(n) — ralentizar el patrón por factor n",
+      "rev": "rev() — invertir el orden del patrón",
+      "jux": "jux(fn) — aplicar función a una copia en el otro canal estéreo",
+      "every": "every(n, fn) — aplicar función solo cada N ciclos",
+      "sometimes": "sometimes(fn) — aplicar función con 50% de probabilidad por ciclo",
+      "euclideanHeading": "Ritmos euclidianos",
+      "euclideanText": "Los ritmos euclidianos distribuyen N pulsos lo más uniformemente posible en M pasos. Muchos ritmos tradicionales del mundo son euclidianos: (3,8) es el tresillo cubano, (5,8) es el Cinquillo."
+    },
+    "shortcuts": {
+      "title": "Atajos de Teclado",
+      "intro": "Domina estos atajos para mantenerte en el flujo durante la performance. Funcionan en el editor de código y durante la reproducción.",
+      "editorHeading": "Atajos del editor",
+      "run": "Ctrl+Enter — evaluar código e iniciar reproducción",
+      "undo": "Ctrl+Z — deshacer última edición",
+      "redo": "Ctrl+Shift+Z — rehacer última edición deshecha",
+      "search": "Ctrl+F — abrir buscar/reemplazar en el editor",
+      "fold": "Ctrl+Shift+[ — plegar/colapsar bloque de código",
+      "transportHeading": "Controles de transporte",
+      "play": "Ctrl+Enter — iniciar o actualizar reproducción",
+      "stop": "Ctrl+. — detener todo el audio",
+      "tipsHeading": "Consejos de performance",
+      "tipsText": "Mantén tus patrones cortos y modulares. Usa líneas separadas para batería, bajo y melodía para poder comentar o modificar capas individuales rápidamente. Ctrl+Enter evalúa todo el código a la vez, para que puedas preparar cambios en múltiples líneas antes de aplicarlos."
     }
   }
 }

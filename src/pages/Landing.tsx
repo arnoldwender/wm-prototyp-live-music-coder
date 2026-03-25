@@ -101,9 +101,21 @@ function Landing() {
           <Logo showTagline size="sm" />
         </Link>
 
-        {/* Right: Language switcher + CTA button */}
+        {/* Right: Language switcher + Docs link + CTA button */}
         <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
           <LanguageSwitcher />
+
+          <Link
+            to="/docs"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.docs')}
+          </Link>
 
           <Link
             to="/editor"

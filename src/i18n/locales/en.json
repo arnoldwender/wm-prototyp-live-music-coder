@@ -5,7 +5,8 @@
   },
   "nav": {
     "openEditor": "Open Editor",
-    "backToHome": "Back to home"
+    "backToHome": "Back to home",
+    "docs": "Documentation"
   },
   "transport": {
     "play": "Play",
@@ -229,6 +230,111 @@
       "waveshaper": "Create distortion node",
       "connect": "Connect nodes together",
       "mastergain": "Master output gain node"
+    }
+  },
+  "docs": {
+    "skipToContent": "Skip to content",
+    "navigation": "Documentation navigation",
+    "sidebarLabel": "Documentation sections",
+    "sidebarTitle": "Documentation",
+    "pageNavigation": "Page navigation",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "intro": "Live coding is a performance practice where you write code that generates music in real time. Instead of composing beforehand, you build patterns on the fly — the audience hears changes as you type.",
+      "firstPatternHeading": "Your First Pattern",
+      "firstPatternText": "Open the editor and type a simple drum pattern. Press Ctrl+Enter to hear it play. The pattern loops automatically and you can edit it while it plays.",
+      "workflowHeading": "Basic Workflow",
+      "step1": "Open the editor and choose an audio engine (Strudel is the default)",
+      "step2": "Type a pattern using mini-notation or function calls",
+      "step3": "Press Ctrl+Enter to evaluate and hear your code",
+      "step4": "Edit the code live — changes take effect on the next cycle",
+      "tip": "Use the visualizers at the bottom to see your waveform, spectrum, and pattern timeline in real time. Beatling creatures will spawn and evolve based on your music."
+    },
+    "strudelBasics": {
+      "title": "Strudel Basics",
+      "intro": "Strudel is a JavaScript port of the TidalCycles live coding language. It uses a cycle-based timing model where patterns repeat and transform over time.",
+      "whatIsHeading": "What Is Strudel?",
+      "whatIsText": "Strudel lets you describe musical patterns with concise expressions. Each pattern has a duration of one cycle and repeats infinitely. You chain functions to add sounds, notes, effects, and transformations.",
+      "firstPatternsHeading": "Your First Patterns",
+      "firstPatternsText": "Use note() for melodies and sound() for samples. The .s() method selects the sound source — oscillators like sawtooth or sample banks like RolandTR808.",
+      "chainingHeading": "Chaining Effects",
+      "chainingText": "Chain methods to shape your sound. Each function transforms the pattern and passes it to the next. Order matters — filters before reverb sounds different than reverb before filters."
+    },
+    "miniNotation": {
+      "title": "Mini-Notation",
+      "intro": "Mini-notation is Strudel's compact syntax for describing rhythmic patterns inside strings. It packs complex rhythms into short, readable expressions.",
+      "syntaxHeading": "Syntax Reference",
+      "space": "Space — separates sequential events in a cycle: \"bd sd hh sd\"",
+      "brackets": "[ ] — subdivide a step into equal parts: \"bd [hh hh hh] sd\"",
+      "angle": "< > — alternate one value per cycle: \"<bd sd> hh\"",
+      "tilde": "~ — rest / silence: \"bd ~ sd ~\"",
+      "star": "* — repeat N times: \"hh*8\" plays 8 hi-hats per step",
+      "slash": "/ — slow down: \"bd/2\" plays every other cycle",
+      "comma": ", — play simultaneously (chord): \"c3,e3,g3\"",
+      "parens": "( ) — Euclidean rhythm: \"bd(3,8)\" distributes 3 hits over 8 steps",
+      "question": "? — randomly remove (50% chance): \"hh?\"",
+      "examplesHeading": "Examples"
+    },
+    "soundsSamples": {
+      "title": "Sounds & Samples",
+      "intro": "Strudel comes with a wide range of built-in samples and oscillators. Use sound() to trigger samples and note().s() for pitched synthesis.",
+      "drumsHeading": "Drum Samples",
+      "bd": "bd — Bass drum",
+      "sd": "sd — Snare drum",
+      "hh": "hh — Closed hi-hat",
+      "oh": "oh — Open hi-hat",
+      "cp": "cp — Clap",
+      "lt": "lt — Low tom",
+      "mt": "mt — Mid tom",
+      "ht": "ht — High tom",
+      "banksHeading": "Sample Banks",
+      "banksText": "Use .bank() to switch between drum machine models. RolandTR808 and RolandTR909 are classic banks with full sample sets for each drum type.",
+      "oscillatorsHeading": "Oscillators",
+      "oscillatorsText": "For synthesis, use .s() with oscillator types: sawtooth (bright, buzzy), sine (pure, clean), square (hollow, retro), and triangle (soft, mellow)."
+    },
+    "effects": {
+      "title": "Effects",
+      "intro": "Effects shape the timbre, space, and dynamics of your patterns. Chain them after your sound source to sculpt the perfect sound.",
+      "filterHeading": "Filters",
+      "filterText": "lpf(frequency) is a low-pass filter that cuts high frequencies — lower values make the sound darker. hpf(frequency) is a high-pass filter that removes bass rumble.",
+      "reverbDelayHeading": "Reverb & Delay",
+      "reverbDelayText": "room(amount) adds reverb from 0 (dry) to 1 (fully wet). delay(amount) adds echo with feedback. Combine them for spacious, atmospheric textures.",
+      "dynamicsHeading": "Dynamics & Control",
+      "gain": "gain(0-1) — set volume level for the pattern",
+      "pan": "pan(0-1) — stereo position: 0 = left, 0.5 = center, 1 = right",
+      "speed": "speed(value) — sample playback speed: 2 = double speed, 0.5 = half",
+      "dec": "dec(seconds) — decay time for percussive sounds",
+      "sustain": "sustain(seconds) — how long a note is held"
+    },
+    "patternTricks": {
+      "title": "Pattern Tricks",
+      "intro": "Combine and transform patterns to create complex compositions from simple building blocks. These techniques are the core of live coding creativity.",
+      "layeringHeading": "Layering with stack()",
+      "layeringText": "stack() plays multiple patterns simultaneously. Build drum patterns, bass lines, and melodies as separate layers and combine them into a full mix.",
+      "transformHeading": "Transformations",
+      "fast": "fast(n) — speed up the pattern by factor n",
+      "slow": "slow(n) — slow down the pattern by factor n",
+      "rev": "rev() — reverse the pattern order",
+      "jux": "jux(fn) — apply function to a copy panned to the other stereo channel",
+      "every": "every(n, fn) — apply function only every N cycles",
+      "sometimes": "sometimes(fn) — apply function with 50% probability each cycle",
+      "euclideanHeading": "Euclidean Rhythms",
+      "euclideanText": "Euclidean rhythms distribute N pulses as evenly as possible over M steps. Many traditional rhythms from around the world are Euclidean: (3,8) is the Cuban tresillo, (5,8) is the Cinquillo."
+    },
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "intro": "Master these shortcuts to stay in the flow while performing. They work in the code editor and during playback.",
+      "editorHeading": "Editor Shortcuts",
+      "run": "Ctrl+Enter — evaluate code and start playing",
+      "undo": "Ctrl+Z — undo last edit",
+      "redo": "Ctrl+Shift+Z — redo last undone edit",
+      "search": "Ctrl+F — open search/replace in editor",
+      "fold": "Ctrl+Shift+[ — fold/collapse code block",
+      "transportHeading": "Transport Controls",
+      "play": "Ctrl+Enter — start or update playback",
+      "stop": "Ctrl+. — stop all audio",
+      "tipsHeading": "Performance Tips",
+      "tipsText": "Keep your patterns short and modular. Use separate lines for drums, bass, and melody so you can quickly comment out or modify individual layers. The Ctrl+Enter shortcut evaluates all code at once, so you can prepare changes across multiple lines before committing them."
     }
   }
 }
