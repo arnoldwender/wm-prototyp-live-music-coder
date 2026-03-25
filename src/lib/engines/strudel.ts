@@ -14,6 +14,9 @@ import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engi
 export class StrudelEngine extends BaseEngine {
   name: EngineType = 'strudel'
   private scheduler: any = null
+  private replEvaluate: ((code: string) => Promise<any>) | null = null
+  private replStart: (() => void) | null = null
+  private replStop: (() => void) | null = null
 
   async init(): Promise<void> {
     /* Dynamic import to enable code splitting */
@@ -24,7 +27,7 @@ export class StrudelEngine extends BaseEngine {
 
     const { initAudioOnFirstClick, webaudioOutput, getAudioContext } = webaudioModule
 
-    /* Also load mini-notation and tonal for full pattern support */
+    /* Load mini-notation and tonal for full pattern support */
     await Promise.all([
       import('@strudel/mini'),
       import('@strudel/tonal'),
@@ -33,9 +36,7 @@ export class StrudelEngine extends BaseEngine {
     initAudioOnFirstClick()
 
     /* Load default Dirt-Samples from Strudel CDN so sounds like
-     * bd, sd, hh, and banks like RolandTR808 work out of the box.
-     * samples() lives in superdough, re-exported at runtime through
-     * @strudel/webaudio but missing from its TS declarations. */
+     * bd, sd, hh, and banks like RolandTR808 work out of the box. */
     try {
       const { samples } = await import('superdough')
       await samples('github:tidalcycles/Dirt-Samples/master')
@@ -43,36 +44,35 @@ export class StrudelEngine extends BaseEngine {
       console.warn('[Strudel] Failed to load default samples — oscillator sounds still work:', err)
     }
 
-    /* Strudel creates its own AudioContext via getAudioContext().
-     * We need to route its output through our master gain. */
+    /* Create the Strudel REPL instance — it handles transpilation,
+     * evaluation, and pattern scheduling internally. We use its
+     * evaluate() method instead of manual transpiler + Function(). */
     const strudelCtx = getAudioContext()
-
     const replInstance = repl({
       defaultOutput: webaudioOutput,
       getTime: () => strudelCtx.currentTime,
     })
 
     this.scheduler = replInstance.scheduler
+    this.replEvaluate = replInstance.evaluate
+    this.replStart = replInstance.start
+    this.replStop = replInstance.stop
 
+    console.log('[Strudel] Engine initialized')
   }
 
-  /** Evaluate Strudel code and set as active pattern */
+  /** Evaluate Strudel code using the repl's built-in evaluate().
+   * This handles transpilation, mini-notation parsing, and pattern
+   * scheduling automatically — no manual Function() needed. */
   async evaluate(code: string): Promise<void> {
-    if (!this.scheduler) throw new Error('Strudel not initialized')
+    if (!this.replEvaluate) throw new Error('Strudel not initialized')
 
     try {
       /* Strip REPL-style $: prefix that users copy from Strudel REPL */
       const cleanCode = code.replace(/^\$\s*:\s*/gm, '')
+      if (!cleanCode.trim()) return
 
-      /* Use the transpiler for full syntax support */
-      const { transpiler } = await import('@strudel/transpiler')
-      const transpiled = transpiler(cleanCode)
-
-      /* Evaluate the transpiled code to get a Pattern */
-      const pattern = await Function(`"use strict"; return (async () => { ${transpiled} })()`)()
-      if (pattern?.queryArc) {
-        this.scheduler.setPattern(pattern)
-      }
+      await this.replEvaluate(cleanCode)
     } catch (err) {
       console.error('[Strudel] Evaluation error:', err)
       throw err
@@ -94,16 +94,19 @@ export class StrudelEngine extends BaseEngine {
   }
 
   start(): void {
-    this.scheduler?.start()
+    this.replStart?.()
   }
 
   stop(): void {
-    this.scheduler?.stop()
+    this.replStop?.()
   }
 
   dispose(): void {
     this.stop()
     super.dispose()
     this.scheduler = null
+    this.replEvaluate = null
+    this.replStart = null
+    this.replStop = null
   }
 }
