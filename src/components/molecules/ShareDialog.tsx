@@ -38,6 +38,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
+      onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
     >
       <div
         className="rounded-lg max-w-lg w-full mx-4"

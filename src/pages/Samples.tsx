@@ -10,11 +10,7 @@ import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
 import type { SampleEntry } from '../data/sample-library'
-
-/** Encode code for URL hash transport to editor */
-function encodeForEditor(code: string): string {
-  return encodeURIComponent(code)
-}
+import { encodeToUrl } from '../lib/persistence/url'
 
 /** Category filter pill button */
 function CategoryPill({
@@ -147,7 +143,7 @@ function SampleCard({ sample, t }: { sample: SampleEntry; t: (key: string) => st
 
       {/* Try in Editor button */}
       <button
-        onClick={() => navigate(`/editor#code=${encodeForEditor(sample.example)}`)}
+        onClick={() => navigate(`/editor#code=${encodeToUrl({ code: sample.example, bpm: 120, engine: 'strudel' as const })}`)}
         style={{
           display: 'inline-flex',
           alignItems: 'center',

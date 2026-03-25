@@ -74,7 +74,7 @@ export function deserializeProject(json: string): Project {
     files: parsed.files ?? [{ id: 'file_1', name: 'main.js', engine: 'strudel', code: '', active: true }],
     graph: parsed.graph ?? { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
     layout: parsed.layout ?? {
-      editorWidth: 50, graphWidth: 50, visualizerHeight: 30,
+      editorWidth: 50, graphWidth: 50, visualizerHeight: 30, showGraph: false,
       visiblePanels: { waveform: true, spectrum: true, timeline: true, beatlings: true },
     },
     ecosystem: parsed.ecosystem ?? { creatures: [], golGrid: { width: 64, height: 64, liveCells: [] }, collection: [] },

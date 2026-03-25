@@ -39,6 +39,10 @@ export function CodeEditor() {
   const isPlaying = useAppStore((s) => s.isPlaying);
   const activeFile = files.find((f) => f.active);
 
+  /* Ref to avoid stale isPlaying closure in CM6 updateListener */
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
+
   /** Manually evaluate the current code — works regardless of play state */
   const handleManualEvaluate = useCallback(async () => {
     if (!activeFile) return;
@@ -81,8 +85,8 @@ export function CodeEditor() {
       if (update.docChanged) {
         const code = update.state.doc.toString();
         updateFileCode(activeFile.id, code);
-        /* Auto-evaluate when playing AND autoUpdate is on */
-        if (isPlaying && autoUpdate) {
+        /* Auto-evaluate when playing AND autoUpdate is on — use ref to avoid stale closure */
+        if (isPlayingRef.current && autoUpdate) {
           evaluatorRef.current?.evaluate(code);
         }
       }

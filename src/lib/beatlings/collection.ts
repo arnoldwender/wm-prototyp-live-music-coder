@@ -15,7 +15,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'first_codefly', name: 'Code Light', description: 'A Codefly appeared', unlockedAt: null },
   { id: 'full_ecosystem', name: 'Full Ecosystem', description: 'All 6 species active at once', unlockedAt: null },
   { id: 'ascended_one', name: 'Ascended One', description: 'A creature reached Ascended stage', unlockedAt: null },
-  { id: 'silence_master', name: 'Silence Master', description: 'A creature dreamed for 60 seconds', unlockedAt: null },
 ];
 
 /** Unlock an achievement by id if not already unlocked. Returns new array. */

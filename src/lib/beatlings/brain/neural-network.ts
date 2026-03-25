@@ -1,3 +1,4 @@
+// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    NEURAL NETWORK — The growing brain

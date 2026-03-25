@@ -23,7 +23,7 @@ export function CanvasVisualizer({ draw, className = '' }: CanvasVisualizerProps
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
     const ctx = canvas.getContext('2d');
-    if (ctx) ctx.scale(dpr, dpr);
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }, []);
 
   useEffect(() => {

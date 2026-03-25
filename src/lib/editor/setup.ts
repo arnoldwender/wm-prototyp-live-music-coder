@@ -8,7 +8,7 @@ import { keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, 
 import { EditorState } from '@codemirror/state';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
-import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
+import { completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { bracketMatching, indentOnInput, foldGutter, foldKeymap } from '@codemirror/language';
 import { darkTheme, darkHighlight } from './theme';
 import type { Extension } from '@codemirror/state';
@@ -31,7 +31,7 @@ export function getBaseExtensions(): Extension[] {
     indentOnInput(),
     bracketMatching(),
     closeBrackets(),
-    autocompletion(),
+    /* autocompletion() is provided by engine-specific completions.ts — omitted here to avoid conflicts */
     foldGutter(),
 
     /* Keybindings — order matters for priority */

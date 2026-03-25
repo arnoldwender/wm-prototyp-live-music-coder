@@ -13,8 +13,6 @@ import {
   Play,
   Square,
   Circle,
-  Undo2,
-  Redo2,
   Share2,
   FileCode2,
   Settings,
@@ -44,6 +42,10 @@ function TransportBar() {
   const stop = useAppStore((s) => s.stop)
   const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
+
+  /* Graph toggle — reactive selectors instead of imperative getState() */
+  const showGraph = useAppStore((s) => s.layout.showGraph)
+  const toggleGraph = useAppStore((s) => s.toggleGraph)
 
   /* Responsive — hide secondary actions on mobile behind overflow menu */
   const isMobile = useMediaQuery('(max-width: 768px)')
@@ -239,8 +241,8 @@ function TransportBar() {
             <Tooltip content={t('panels.graph')}>
               <Button
                 variant="icon"
-                active={useAppStore.getState().layout.showGraph}
-                onClick={() => useAppStore.getState().toggleGraph()}
+                active={showGraph}
+                onClick={toggleGraph}
                 aria-label={t('panels.graph')}
               >
                 <Icon icon={GitBranch} size={16} />
@@ -255,21 +257,6 @@ function TransportBar() {
         {/* Desktop: show all toolbar actions inline */}
         {!isMobile && (
           <>
-            {/* Undo / Redo */}
-            <ToolbarGroup>
-              <Tooltip content={t('toolbar.undo')}>
-                <Button variant="icon" aria-label={t('toolbar.undo')}>
-                  <Icon icon={Undo2} size={16} />
-                </Button>
-              </Tooltip>
-
-              <Tooltip content={t('toolbar.redo')}>
-                <Button variant="icon" aria-label={t('toolbar.redo')}>
-                  <Icon icon={Redo2} size={16} />
-                </Button>
-              </Tooltip>
-            </ToolbarGroup>
-
             {/* Share / Gist */}
             <ToolbarGroup>
               <Tooltip content={t('toolbar.share')}>

@@ -12,6 +12,7 @@ import { Badge } from '../atoms'
 function StatusBar() {
   const { t } = useTranslation()
   const defaultEngine = useAppStore((s) => s.defaultEngine)
+  const fileCount = useAppStore((s) => s.files.length)
 
   return (
     <footer
@@ -37,7 +38,7 @@ function StatusBar() {
       <div className="flex items-center gap-4">
         {/* File count from store */}
         <span>
-          {t('status.files')}: {useAppStore.getState().files.length}
+          {t('status.files')}: {fileCount}
         </span>
 
         {/* Creature count placeholder */}

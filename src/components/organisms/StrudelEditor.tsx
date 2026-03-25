@@ -45,7 +45,10 @@ export function StrudelEditor() {
   const [evalError, setEvalError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
-  const [playing, setPlaying] = useState(false);
+
+  /* Use store's isPlaying as single source of truth — avoids drift with TransportBar */
+  const isPlaying = useAppStore((s) => s.isPlaying);
+  const togglePlay = useAppStore((s) => s.togglePlay);
 
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
@@ -107,7 +110,7 @@ export function StrudelEditor() {
 
   /* Highlight loop — queries scheduler for active haps and marks their code positions */
   useEffect(() => {
-    if (!playing) {
+    if (!isPlaying) {
       /* Clear highlights when stopped */
       if (viewRef.current) {
         viewRef.current.dispatch({ effects: setHighlights.of([]) });
@@ -166,7 +169,7 @@ export function StrudelEditor() {
       running = false;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [playing]);
+  }, [isPlaying]);
 
   const handleEvaluate = useCallback(async () => {
     if (!replRef.current) { setEvalError('Not ready'); return; }
@@ -179,25 +182,23 @@ export function StrudelEditor() {
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
-      if (!playing) {
+      if (!isPlaying) {
         replRef.current.start();
-        setPlaying(true);
-        useAppStore.getState().togglePlay();
+        togglePlay();
       }
     } catch (err) {
       setEvalError(err instanceof Error ? err.message : String(err));
     } finally {
       setEvaluating(false);
     }
-  }, [playing]);
+  }, [isPlaying, togglePlay]);
 
   const handleStop = useCallback(() => {
     replRef.current?.stop();
-    if (playing) {
-      setPlaying(false);
-      if (useAppStore.getState().isPlaying) useAppStore.getState().togglePlay();
+    if (isPlaying) {
+      togglePlay();
     }
-  }, [playing]);
+  }, [isPlaying, togglePlay]);
 
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -213,7 +214,7 @@ export function StrudelEditor() {
             <Square size={12} /> Stop
           </Button>
         </Tooltip>
-        {playing && (
+        {isPlaying && (
           <span className="flex items-center gap-1" style={{ fontSize: '10px', color: 'var(--color-success)', fontFamily: 'var(--font-family-mono)' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
             Playing
@@ -225,7 +226,7 @@ export function StrudelEditor() {
         </span>
       </div>
 
-      {playing && (
+      {isPlaying && (
         <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label="Playing" />
       )}
 

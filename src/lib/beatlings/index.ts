@@ -151,6 +151,12 @@ export class BeatlingWorld {
   getAchievements(): Achievement[] { return this.achievements; }
   getGol(): GolBrain { return this.gol; }
 
+  /** Terminate the Web Worker to prevent resource leaks */
+  dispose(): void {
+    this.worker?.terminate();
+    this.worker = null;
+  }
+
   /** Try spawning creatures — max 2 per species, 120-frame cooldown */
   private trySpawn(features: AudioFeatures): void {
     const allSpecies: Species[] = ['beatling', 'looplet', 'synthling', 'glitchbit', 'wavelet', 'codefly'];

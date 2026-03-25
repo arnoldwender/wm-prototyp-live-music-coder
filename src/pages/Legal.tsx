@@ -79,6 +79,7 @@ function Legal() {
       <article
         className="max-w-3xl mx-auto"
         style={{ padding: 'var(--space-8) var(--space-6)', lineHeight: 'var(--line-height-loose)' }}
+        /* SECURITY: Content is static HTML from data/legal.ts — never from user input */
         dangerouslySetInnerHTML={{ __html: tab === 'impressum' ? IMPRESSUM_HTML : DATENSCHUTZ_HTML }}
       />
 

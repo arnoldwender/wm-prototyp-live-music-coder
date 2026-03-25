@@ -37,6 +37,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
+      onKeyDown={(e) => { if (e.key === 'Escape') onSelect() }}
     >
       <div
         className="rounded-lg p-8 max-w-2xl w-full mx-4"
