@@ -70,6 +70,21 @@ Add to the corresponding `index.ts` barrel export.
 - Mock AnalyserNode for audio tests (no real AudioContext in jsdom)
 - Store tests: reset state in `beforeEach` with `useAppStore.setState(useAppStore.getInitialState())`
 
+## Pages
+
+| Page | Route | Source |
+| ---- | ----- | ------ |
+| Landing | `/` | `src/pages/Landing.tsx` |
+| Editor | `/editor` | `src/pages/Editor.tsx` |
+| Docs | `/docs`, `/docs/:sectionId` | `src/pages/Docs.tsx` + `src/data/docs.ts` |
+| Samples | `/samples` | `src/pages/Samples.tsx` + `src/data/sample-library.ts` |
+| Examples | `/examples` | `src/pages/Examples.tsx` + `src/data/example-library.ts` |
+| Legal | `/legal` | `src/pages/Legal.tsx` + `src/data/legal.ts` |
+
+## Superdough Audio Tap
+
+Strudel uses superdough for audio synthesis. The `src/lib/audio/strudel-tap.ts` module taps into superdough's audio output to feed the shared `AudioContext` analyser, enabling visualizers and Beatlings to react to Strudel patterns. Type declarations for superdough are in `src/types/strudel.d.ts`.
+
 ## i18n
 
 - 3 languages: DE, EN, ES

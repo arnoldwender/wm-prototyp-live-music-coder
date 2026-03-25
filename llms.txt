@@ -4,7 +4,7 @@
 A browser-based live coding music IDE. Users write code to make music in real time. Features a CodeMirror 6 editor, React Flow node graph, 4 audio engines, Canvas 2D visualizers, and audio-reactive creatures called Beatlings.
 
 ## Live URL
-https://wm-prototyp-live-music-coder.netlify.app
+https://live-music-coder.pro
 
 ## Tech Stack
 React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React Flow, @strudel/core, Tone.js, Web Audio API, WebMidi.js, Canvas 2D, i18next (DE/EN/ES), idb, lz-string, @octokit/rest, Framer Motion 12, Vitest.
@@ -37,10 +37,15 @@ Beatling (drums/bounce), Looplet (loops/orbit), Synthling (melody/flow), Glitchb
 - NEVER hardcode colors/spacing — use design tokens
 - This is Vite + React SPA, NOT Next.js
 - AGPL-3.0 license (Strudel dependency)
-- 104 tests, 19 test files
+- 122 source files (TS/TSX), 104 tests across 19 test files
 - Colocated tests (foo.test.ts next to foo.ts)
 
-## Entry Points
-- / → Landing page (hero, features, examples)
-- /editor → Main IDE (code editor, node graph, visualizers, Beatlings)
-- /editor#code=... → Load shared project from URL hash
+## Routes (8)
+- `/` → Landing page (hero, features, examples)
+- `/editor` → Main IDE (code editor, node graph, visualizers, Beatlings)
+- `/editor#code=...` → Load shared project from URL hash
+- `/docs` → Documentation hub
+- `/docs/:sectionId` → Individual doc section
+- `/samples` → Sample library browser
+- `/examples` → Curated code examples per engine
+- `/legal` → Impressum, Datenschutz, Lizenzen

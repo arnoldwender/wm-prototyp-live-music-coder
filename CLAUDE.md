@@ -2,8 +2,8 @@
 
 Browser-based live coding music IDE with code editor, visual node graph, 4 audio engines, visualizers, and audio-reactive Beatling mascot ecosystem.
 
-**Live:** https://wm-prototyp-live-music-coder.netlify.app
-**Repo:** https://github.com/arnoldwender/wm-prototyp-live-music-coder (private)
+**Live:** <https://live-music-coder.pro>
+**Repo:** <https://github.com/arnoldwender/wm-prototyp-live-music-coder> (private)
 
 ## Tech Stack
 
@@ -55,14 +55,18 @@ One shared `AudioContext`. Each engine adapter implements a common `EngineAdapte
 ```
 src/
 ├── components/
-│   ├── atoms/           # Button, Icon, Toggle, Badge, Tooltip, TabButton, CanvasVisualizer, EngineNode
+│   ├── atoms/           # Button, Icon, Toggle, Badge, Tooltip, TabButton, CanvasVisualizer, EngineNode, Logo, WaveformBackground
 │   ├── molecules/       # ToolbarGroup, EngineSelector, LanguageSwitcher, FileTabs, VisualizerToggle, FeatureCard, ShareDialog, HelpPanel
-│   └── organisms/       # TransportBar, StatusBar, CodeEditor, NodeGraph, WaveformVisualizer, SpectrumVisualizer, PatternTimeline, VisualizerDashboard, BeatlingPanel, GistDialog, HeroSection, FeatureGrid, ExampleGallery, TemplateSelector
+│   └── organisms/       # TransportBar, StatusBar, CodeEditor, StrudelEditor, NodeGraph, WaveformVisualizer, SpectrumVisualizer, PatternTimeline, VisualizerDashboard, BeatlingPanel, CollectionPanel, GistDialog, HeroSection, FeatureGrid, ExampleGallery, TemplateSelector, TutorialOverlay
 ├── layouts/
 │   └── EditorLayout.tsx # Resizable 3-zone: top (editor+graph), middle (visualizers), bottom (status)
 ├── pages/
 │   ├── Landing.tsx      # Hero + features + examples
-│   └── Editor.tsx       # Main IDE: CodeEditor + NodeGraph + VisualizerDashboard
+│   ├── Editor.tsx       # Main IDE: CodeEditor + NodeGraph + VisualizerDashboard
+│   ├── Docs.tsx         # Documentation hub (/docs, /docs/:sectionId)
+│   ├── Samples.tsx      # Sample library browser (/samples)
+│   ├── Examples.tsx     # Curated code examples per engine (/examples)
+│   └── Legal.tsx        # Impressum, Datenschutz, Lizenzen (/legal)
 ├── lib/
 │   ├── store.ts         # Zustand: transport, engine, layout, file management
 │   ├── history.ts       # Undo/redo (100-entry cap)
@@ -72,12 +76,17 @@ src/
 │   ├── editor/          # CM6 theme, setup, extensions, debounced evaluator
 │   ├── parser/          # Code → graph extraction (regex-based, per engine)
 │   ├── codegen/         # Graph → code generation (per engine templates)
-│   ├── audio/           # Shared AudioContext, AudioAnalyzer, AudioRecorder
+│   ├── audio/           # Shared AudioContext, AudioAnalyzer, AudioRecorder, strudel-tap (superdough audio tap)
 │   ├── persistence/     # IndexedDB, URL sharing (lz-string), GitHub Gist (octokit)
 │   ├── visualizers/     # Waveform, spectrum, timeline drawing (Canvas 2D)
-│   └── beatlings/       # Mascot ecosystem (brain, GoL, species, evolution, renderer)
+│   ├── beatlings/       # Mascot ecosystem (brain, GoL, species, evolution, renderer, audio-bridge)
+│   └── useMediaQuery.ts # Responsive media query hook
 ├── data/
-│   └── templates.ts     # Starter code templates per engine
+│   ├── templates.ts     # Starter code templates per engine
+│   ├── docs.ts          # Documentation content
+│   ├── sample-library.ts # Audio sample catalog by category
+│   ├── example-library.ts # Curated code examples per engine
+│   └── legal.ts         # Legal page content (Impressum, Datenschutz, Lizenzen)
 ├── i18n/
 │   └── locales/         # de.json, en.json, es.json
 ├── styles/
@@ -86,8 +95,11 @@ src/
 ├── types/
 │   ├── engine.ts        # EngineType, EngineBlock, Connection, EngineAdapter
 │   ├── project.ts       # Project, ProjectFile, PanelLayout
-│   └── beatling.ts      # Species, Stage, BeatlingState, Achievement
-├── App.tsx              # Router: / → Landing, /editor → Editor
+│   ├── beatling.ts      # Species, Stage, BeatlingState, Achievement
+│   └── strudel.d.ts     # Type declarations for superdough and @strudel/* modules
+├── workers/
+│   └── beatling-worker.ts # Web Worker for Beatling brain computation
+├── App.tsx              # Router: 8 routes (/, /editor, /docs, /docs/:id, /samples, /examples, /legal)
 └── main.tsx             # Entry: i18n init, global CSS, React render
 ```
 

@@ -4,15 +4,19 @@
 
 A browser-based live coding music IDE. Write code, hear music instantly. Features a visual node graph, 4 audio engines, real-time visualizers, and audio-reactive creatures called Beatlings.
 
-**Live:** <https://wm-prototyp-live-music-coder.netlify.app>
+**Live:** <https://live-music-coder.pro>
 
 ## Features
 
 - **Code Editor** — CodeMirror 6 with dark theme, multi-tab files, per-engine syntax highlighting, live evaluation (500ms debounce)
 - **Node Graph** — React Flow canvas showing audio routing as draggable nodes, auto-derived from code
 - **4 Audio Engines** — Strudel (pattern-based), Tone.js (synths/effects), Web Audio API (raw), MIDI (output)
-- **Visualizers** — Waveform, spectrum analyzer, pattern timeline — all Canvas 2D at 60fps
+- **Visualizers** — Waveform, spectrum analyzer, pattern timeline — all Canvas 2D at 60fps, superdough audio tap for Strudel integration
 - **Beatling Ecosystem** — 6 creature species with neural network + Game of Life dual-brain, audio-reactive spawning, evolution stages
+- **Sample Library** — Browse and preview built-in audio samples by category
+- **Example Gallery** — Curated code examples per engine with one-click load into editor
+- **Documentation** — In-app docs with engine guides, API reference, and tutorials
+- **Legal Pages** — Impressum, Datenschutz, Lizenzen
 - **Persistence** — IndexedDB autosave, URL sharing (lz-string), GitHub Gist save/load
 - **Audio Recording** — Record session output as WebM
 - **i18n** — German, English, Spanish
@@ -27,6 +31,18 @@ npm run dev
 
 Open <http://localhost:5173> — landing page with examples. Click "Start Coding" to open the IDE.
 
+## Routes
+
+| Path | Page |
+| ---- | ---- |
+| `/` | Landing page (hero, features, examples) |
+| `/editor` | Main IDE (code editor, node graph, visualizers, Beatlings) |
+| `/docs` | Documentation hub |
+| `/docs/:id` | Individual doc section |
+| `/samples` | Sample library browser |
+| `/examples` | Curated code examples per engine |
+| `/legal` | Impressum, Datenschutz, Lizenzen |
+
 ## Tech Stack
 
 React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React Flow, Strudel, Tone.js, Web Audio API, WebMidi.js, Canvas 2D, i18next, Framer Motion 12, Vitest.
@@ -36,7 +52,7 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 ```bash
 npm run dev        # Dev server (localhost:5173)
 npm run build      # TypeScript + Vite production build
-npm run test       # 104 tests across 19 files
+npm run test       # 104 tests (19 files)
 npm run test:watch # Watch mode
 npm run lint       # ESLint
 npm run preview    # Preview production build

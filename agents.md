@@ -2,11 +2,13 @@
 
 ## Project
 
-**wm-prototyp-live-music-coder** — Browser-based live coding music IDE with code editor, visual node graph, 4 audio engines, visualizers, and Beatling mascot ecosystem.
+**wm-prototyp-live-music-coder** — Browser-based live coding music IDE with code editor, visual node graph, 4 audio engines, visualizers, and Beatling mascot ecosystem. 122 source files, 104 tests, 8 routes.
+
+**Live:** <https://live-music-coder.pro>
 
 ## What This Project Does
 
-Users write code in the browser to create music in real time. The app supports 4 audio engines (Strudel patterns, Tone.js synths, raw Web Audio API, MIDI output). A visual node graph shows the audio routing. Canvas 2D visualizers (waveform, spectrum, timeline) react to the audio. Audio-reactive creatures called Beatlings spawn and evolve based on what the user plays.
+Users write code in the browser to create music in real time. The app supports 4 audio engines (Strudel patterns, Tone.js synths, raw Web Audio API, MIDI output). A visual node graph shows the audio routing. Canvas 2D visualizers (waveform, spectrum, timeline) react to the audio via superdough audio tap. Audio-reactive creatures called Beatlings spawn and evolve based on what the user plays. Additional pages provide a sample library, curated code examples, documentation, and legal pages.
 
 ## Tech Stack
 
@@ -15,7 +17,7 @@ Users write code in the browser to create music in real time. The app supports 4
 - @strudel/core (patterns), Tone.js (synths), Web Audio API, WebMidi.js
 - Canvas 2D (visualizers + Beatlings), i18next (DE/EN/ES)
 - idb (IndexedDB), lz-string (URL sharing), @octokit/rest (Gist)
-- Vitest (104 tests), Netlify (deployment)
+- Vitest (104 tests, 19 files), Netlify (deployment)
 
 ## Key Architecture Decisions
 
@@ -37,6 +39,20 @@ Users write code in the browser to create music in real time. The app supports 4
 - `src/lib/beatlings/` — mascot ecosystem (brain, GoL, species, evolution, renderer)
 - `src/lib/persistence/` — IndexedDB, URL sharing, Gist
 - `src/lib/visualizers/` — Canvas 2D drawing functions
+- `src/data/` — templates, docs, sample-library, example-library, legal content
+- `src/pages/` — Landing, Editor, Docs, Samples, Examples, Legal
+- `src/types/strudel.d.ts` — superdough and @strudel/* type declarations
+- `src/workers/` — Web Worker for Beatling brain computation
+
+## Routes (8)
+
+- `/` → Landing page
+- `/editor` → Main IDE
+- `/docs` → Documentation hub
+- `/docs/:sectionId` → Individual doc section
+- `/samples` → Sample library browser
+- `/examples` → Curated code examples
+- `/legal` → Impressum, Datenschutz, Lizenzen
 
 ## Rules
 
