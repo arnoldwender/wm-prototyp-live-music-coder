@@ -18,24 +18,32 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
     }
 
     /* Reconnect EVERY call — superdough recreates its audio chain dynamically.
-     * Web Audio silently ignores duplicate connections, so this is safe. */
+     * Web Audio silently ignores duplicate connections, so this is safe.
+     *
+     * Audio chain: orbits → channelMerger → destinationGain → ctx.destination
+     * We tap the destinationGain node which carries all mixed audio.
+     * The SuperdoughAudioController.output.destinationGain is the final gain
+     * before the speakers — connecting our analyser here captures everything. */
     try {
       const controller = sd.getSuperdoughAudioController();
-      if (controller?.destinationGain) {
-        controller.destinationGain.connect(analyser);
+      /* destinationGain lives on controller.output (SuperdoughOutput), not controller */
+      const destGain = controller?.output?.destinationGain;
+      if (destGain) {
+        destGain.connect(analyser);
         return analyser;
       }
-    } catch { /* controller not ready */ }
+      /* Fallback: older versions may have it directly on controller */
+      if ((controller as any)?.destinationGain) {
+        (controller as any).destinationGain.connect(analyser);
+        return analyser;
+      }
+    } catch { /* controller not ready — audio hasn't started yet */ }
 
+    /* Fallback: try the compressor output (legacy superdough versions) */
     try {
       const comp = sd.getCompressor();
       if (comp) { comp.connect(analyser); return analyser; }
     } catch { /* no compressor */ }
-
-    try {
-      const gain = sd.gainNode();
-      if (gain) { gain.connect(analyser); return analyser; }
-    } catch { /* no gain */ }
 
     /* Return analyser even if not connected — visualizer will show flat line
      * instead of crashing. Next call will try connecting again. */
