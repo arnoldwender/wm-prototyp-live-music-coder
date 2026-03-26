@@ -116,6 +116,8 @@ interface AppState {
   creatureStats: CreatureStat[]
   selectedCreatureId: string | null
   showBrainPanel: boolean
+  showSidePanel: boolean
+  toggleSidePanel: () => void
   setCreatureCount: (count: number) => void
   setCreatureStats: (stats: CreatureStat[]) => void
   selectCreature: (id: string | null) => void
@@ -195,6 +197,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   creatureStats: [],
   selectedCreatureId: null,
   showBrainPanel: false,
+  showSidePanel: false,
+  toggleSidePanel: () => set((s) => ({ showSidePanel: !s.showSidePanel })),
 
   /* --- Gamification initial state --- */
   pendingToast: null,

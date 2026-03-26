@@ -21,9 +21,11 @@ interface EditorLayoutProps {
   visualizers: ReactNode
   /** Bottom status bar */
   statusBar: ReactNode
+  /** Right sidebar (Samples, Reference, Console, Settings) */
+  sidePanel?: ReactNode
 }
 
-function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: EditorLayoutProps) {
+function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePanel }: EditorLayoutProps) {
   const layout = useAppStore((s) => s.layout)
   const setEditorWidth = useAppStore((s) => s.setEditorWidth)
   const setVisualizerHeight = useAppStore((s) => s.setVisualizerHeight)
@@ -133,6 +135,8 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
       {/* ── Toolbar ── */}
       <header className="shrink-0">{toolbar}</header>
 
+      {/* ── Main area: content + side panel ── */}
+      <div className="flex-1 flex min-h-0">
       {/* ── Main content area ── */}
       <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
         {/* Top zone: editor + graph (stacked vertically on mobile) */}
@@ -220,6 +224,10 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar }: Editor
         >
           {visualizers}
         </section>
+      </div>
+
+      {/* ── Side panel (Samples, Reference, Console, Settings) ── */}
+      {sidePanel}
       </div>
 
       {/* ── Status bar ── */}

@@ -18,6 +18,7 @@ import {
   Settings,
   GitBranch,
   Trophy,
+  PanelRightOpen,
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
@@ -296,6 +297,20 @@ function TransportBar() {
                   aria-label={t('toolbar.settings')}
                 >
                   <Icon icon={Settings} size={16} />
+                </Button>
+              </Tooltip>
+            </ToolbarGroup>
+
+            {/* Side panel toggle (Samples, Reference, Console, Settings) */}
+            <ToolbarGroup>
+              <Tooltip content={t('sidePanel.toggle')}>
+                <Button
+                  variant="icon"
+                  active={useAppStore.getState().showSidePanel}
+                  onClick={() => useAppStore.getState().toggleSidePanel()}
+                  aria-label={t('sidePanel.toggle')}
+                >
+                  <Icon icon={PanelRightOpen} size={16} />
                 </Button>
               </Tooltip>
             </ToolbarGroup>

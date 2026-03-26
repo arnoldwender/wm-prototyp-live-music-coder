@@ -443,6 +443,13 @@
     "impressum": "Impressum",
     "datenschutz": "Privacy Policy"
   },
+  "sidePanel": {
+    "toggle": "Toggle Panel",
+    "samples": "Samples",
+    "reference": "Reference",
+    "console": "Console",
+    "settings": "Settings"
+  },
   "gamification": {
     "achievementUnlocked": "Achievement Unlocked",
     "streakDays": "{{count}} day streak",

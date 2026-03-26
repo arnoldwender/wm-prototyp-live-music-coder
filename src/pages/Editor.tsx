@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
 import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
+import { SidePanel } from '../components/organisms/SidePanel'
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
@@ -142,6 +143,7 @@ function Editor() {
         graph={<NodeGraph />}
         visualizers={<VisualizerDashboard />}
         statusBar={<StatusBar />}
+        sidePanel={<SidePanel />}
       />
       {showTemplateSelector && (
         <TemplateSelector onSelect={() => {

@@ -443,6 +443,13 @@
     "impressum": "Aviso legal",
     "datenschutz": "Política de privacidad"
   },
+  "sidePanel": {
+    "toggle": "Alternar panel",
+    "samples": "Samples",
+    "reference": "Referencia",
+    "console": "Consola",
+    "settings": "Ajustes"
+  },
   "gamification": {
     "achievementUnlocked": "Logro desbloqueado",
     "streakDays": "{{count}} día de racha",
