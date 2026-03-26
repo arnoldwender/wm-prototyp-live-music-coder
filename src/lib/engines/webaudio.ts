@@ -1,16 +1,16 @@
 /* ──────────────────────────────────────────────────────────
    Web Audio engine adapter — raw Web Audio API access.
    Maximum flexibility — users create oscillators, filters,
-   gains directly. Code is evaluated with AudioContext in scope.
+   gains directly. Provides AudioContext already resumed.
    ────────────────────────────────────────────────────────── */
 
 import { BaseEngine } from './base'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
-import { getMasterGain } from '../audio/context'
+import { getSharedContext, getMasterGain, resumeContext } from '../audio/context'
 
 /** Raw Web Audio API engine adapter.
  * Maximum flexibility — users create oscillators, filters, gains directly.
- * Code is evaluated with AudioContext in scope. */
+ * Intercepts `new AudioContext()` so user code uses the shared (resumed) context. */
 export class WebAudioEngine extends BaseEngine {
   name: EngineType = 'webaudio'
 
@@ -32,15 +32,27 @@ export class WebAudioEngine extends BaseEngine {
     return wrapper
   }
 
-  /** Evaluate raw Web Audio code with ctx and masterGain in scope.
+  /** Evaluate raw Web Audio code with AudioContext in scope.
+   * Intercepts `new AudioContext()` so user code reuses the shared (resumed) context.
    * SECURITY NOTE: Uses Function() constructor intentionally — this is a live
-   * coding IDE where executing user-written code is the core feature. Code runs
-   * in the browser sandbox. Users must press Play to evaluate (no auto-eval). */
+   * coding IDE where executing user-written code is the core feature. */
   async evaluate(code: string): Promise<void> {
-    const ctx = this.getContext()
+    /* Resume shared context before eval (browser requires user gesture) */
+    await resumeContext()
+    const ctx = getSharedContext()
     const masterGain = getMasterGain()
+
+    /* Replace `new AudioContext()` with our pre-resumed shared context.
+     * Users expect to create their own ctx, but a fresh one would be suspended. */
+    const patchedCode = code.replace(/new\s+AudioContext\s*\(\s*\)/g, 'ctx')
+
     try {
-      await Function('ctx', 'masterGain', `"use strict"; return (async () => { ${code} })()`)(ctx, masterGain)
+      await Function('ctx', 'masterGain', 'AudioContext', `"use strict"; return (async () => { ${patchedCode} })()`)(
+        ctx, masterGain,
+        /* Provide AudioContext constructor that returns the shared context */
+        function AudioContextProxy() { return ctx }
+      )
+      console.log('[WebAudio] Code evaluated successfully')
     } catch (err) {
       console.error('[WebAudio] Evaluation error:', err)
       throw err

@@ -2,16 +2,16 @@
 /* ──────────────────────────────────────────────────────────
    Tone.js engine adapter — high-level synths and effects.
    Provides synth factory (7 types), transport control, and
-   BPM sync. Uses shared AudioContext via Tone.setContext().
+   BPM sync. Resumes AudioContext before every evaluation.
    ────────────────────────────────────────────────────────── */
 
 import { BaseEngine } from './base'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
-import { getSharedContext, getMasterGain } from '../audio/context'
+import { getMasterGain } from '../audio/context'
 
 /** Tone.js engine adapter.
  * Provides high-level synth creation and transport control.
- * Uses shared AudioContext via Tone.setContext(). */
+ * Uses Tone's own AudioContext (not shared) for full compatibility. */
 export class ToneJsEngine extends BaseEngine {
   name: EngineType = 'tonejs'
   private Tone: typeof import('tone') | null = null
@@ -19,14 +19,13 @@ export class ToneJsEngine extends BaseEngine {
   async init(): Promise<void> {
     /* Dynamic import for code splitting */
     this.Tone = await import('tone')
-    /* Use our shared AudioContext */
-    this.Tone.setContext(getSharedContext())
+    /* Let Tone.js manage its own AudioContext for full .toDestination() compat.
+     * Previously we forced shared context, which broke routing. */
   }
 
   async createNode(block: EngineBlock): Promise<AudioNodeWrapper> {
     if (!this.Tone) throw new Error('Tone.js not initialized')
 
-    /* Create a synth based on block params or default to basic Synth */
     const synthType = block.params.synthType?.value ?? 0
     const synth = this.createSynth(synthType)
 
@@ -49,9 +48,26 @@ export class ToneJsEngine extends BaseEngine {
    * in the browser sandbox. Users must press Play to evaluate (no auto-eval). */
   async evaluate(code: string): Promise<void> {
     if (!this.Tone) throw new Error('Tone.js not initialized')
+
+    /* Resume AudioContext before evaluation — browsers suspend until user gesture */
+    try {
+      const ctx = this.Tone.getContext().rawContext
+      if (ctx && (ctx as AudioContext).state === 'suspended') {
+        await (ctx as AudioContext).resume()
+      }
+    } catch { /* context resume failed, Tone may handle it */ }
+
+    /* Stop and cancel any previous transport events to start fresh */
+    try {
+      this.Tone.getTransport().stop()
+      this.Tone.getTransport().cancel()
+    } catch { /* transport not started yet */ }
+
     try {
       const Tone = this.Tone
+      /* Wrap in async IIFE — user code can use top-level await, const, etc. */
       await Function('Tone', `"use strict"; return (async () => { ${code} })()`)(Tone)
+      console.log('[Tone.js] Code evaluated successfully')
     } catch (err) {
       console.error('[Tone.js] Evaluation error:', err)
       throw err

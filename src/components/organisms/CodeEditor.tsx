@@ -53,6 +53,9 @@ export function CodeEditor() {
     const orch = getOrchestrator();
     try {
       setEvalError(null);
+      /* Resume AudioContext — browsers require user gesture before playback */
+      const { resumeContext } = await import('../../lib/audio/context');
+      await resumeContext();
       await orch.evaluate(activeFile.code, activeFile.engine);
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();
