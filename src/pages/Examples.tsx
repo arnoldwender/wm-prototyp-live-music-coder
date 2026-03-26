@@ -11,11 +11,7 @@ import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
-
-/** Encode code for URL hash transport to editor */
-function encodeForEditor(code: string): string {
-  return encodeURIComponent(code)
-}
+import { encodeToUrl } from '../lib/persistence/url'
 
 /** Difficulty badge color map */
 const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
@@ -170,7 +166,7 @@ function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) =
 
       {/* Try button */}
       <button
-        onClick={() => navigate(`/editor#code=${encodeForEditor(example.code)}`)}
+        onClick={() => navigate(`/editor#code=${encodeToUrl({ code: example.code, bpm: 120, engine: example.engine })}`)}
         style={{
           display: 'inline-flex',
           alignItems: 'center',

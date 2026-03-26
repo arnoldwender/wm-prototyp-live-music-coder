@@ -108,6 +108,20 @@ export function StrudelEditor() {
     return () => { viewRef.current?.destroy(); viewRef.current = null; };
   }, [activeFile?.id, activeFile?.engine]);
 
+  /* Sync external store code changes into CM6 — handles URL-loaded code
+   * from Samples/Examples pages where updateFileCode runs before the view
+   * is created, or when code is set from outside the editor */
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !activeFile) return;
+    const currentDoc = view.state.doc.toString();
+    if (currentDoc !== activeFile.code) {
+      view.dispatch({
+        changes: { from: 0, to: currentDoc.length, insert: activeFile.code },
+      });
+    }
+  }, [activeFile?.code]);
+
   /* Highlight loop — queries scheduler for active haps and marks their code positions */
   useEffect(() => {
     if (!isPlaying) {
