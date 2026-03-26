@@ -43,14 +43,19 @@ export function StrudelEditor() {
         /* Expose REPL globally for pianoroll and other visualizers */
         (window as any).__strudelRepl = repl;
 
-        /* Load Dirt-Samples */
+        /* Load Dirt-Samples — try multiple approaches */
         try {
           await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
-        } catch {
+          console.log('[StrudelEditor] Samples loaded via REPL evaluate');
+        } catch (e1) {
+          console.warn('[StrudelEditor] REPL samples failed, trying direct import:', e1);
           try {
             const { samples } = await import('@strudel/webaudio');
             await samples('github:tidalcycles/Dirt-Samples/master');
-          } catch { /* samples failed */ }
+            console.log('[StrudelEditor] Samples loaded via direct import');
+          } catch (e2) {
+            console.error('[StrudelEditor] All sample loading methods failed:', e2);
+          }
         }
 
         /* Load Strudel CM6 extensions (sliders, highlighting, widgets) */
@@ -204,12 +209,14 @@ export function StrudelEditor() {
 
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
-      await replRef.current.evaluate(code);
+
+      /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
+      console.log('[StrudelEditor] Evaluating code...', code.slice(0, 80));
+      await replRef.current.evaluate(code, true);
+      console.log('[StrudelEditor] Evaluate success, scheduler active');
 
       /* Force visualizer tap to reconnect — superdough recreates audio chain on evaluate */
       resetStrudelTap();
-
-      /* Schedule a delayed reconnect to catch late audio chain initialization */
       setTimeout(() => resetStrudelTap(), 200);
       setTimeout(() => resetStrudelTap(), 500);
 
@@ -225,7 +232,6 @@ export function StrudelEditor() {
         evalStore.unlockAchievement('speed_demon');
       }
       if (!isPlaying) {
-        replRef.current.start();
         togglePlay();
       }
     } catch (err) {
@@ -236,7 +242,9 @@ export function StrudelEditor() {
   }, [isPlaying, togglePlay]);
 
   const handleStop = useCallback(() => {
-    replRef.current?.stop();
+    try {
+      replRef.current?.stop();
+    } catch { /* stop may fail if not started */ }
     if (isPlaying) {
       togglePlay();
     }
