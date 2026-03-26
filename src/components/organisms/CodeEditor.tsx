@@ -84,7 +84,11 @@ export function CodeEditor() {
     evaluatorRef.current?.cancel();
     const orch = getOrchestrator();
     evaluatorRef.current = createEvaluator(
-      (code) => orch.evaluate(code, activeFile.engine),
+      async (code) => {
+        /* Resume context — may have been suspended since initial user gesture */
+        await resumeContext();
+        await orch.evaluate(code, activeFile.engine);
+      },
       500,
       (err) => {
         console.error('[CodeEditor] Eval error:', err.message);
@@ -106,8 +110,9 @@ export function CodeEditor() {
       if (update.docChanged) {
         const code = update.state.doc.toString();
         updateFileCode(activeFile.id, code);
-        /* Auto-evaluate when playing AND autoUpdate is on — use refs to avoid stale closures */
-        if (isPlayingRef.current && autoUpdateRef.current) {
+        /* Live mode: auto-evaluate on every code change when enabled.
+     * Works for ALL engines — no need to press Play first. */
+        if (autoUpdateRef.current) {
           evaluatorRef.current?.evaluate(code);
         }
       }
