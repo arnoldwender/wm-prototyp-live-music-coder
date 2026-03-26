@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { drawWaveform } from './waveform';
 
+/* Mock gradient object returned by createLinearGradient */
+const mockGradient = { addColorStop: vi.fn() };
+
 function createMockCtx(): CanvasRenderingContext2D {
   return {
     clearRect: vi.fn(),
@@ -12,13 +15,21 @@ function createMockCtx(): CanvasRenderingContext2D {
     closePath: vi.fn(),
     fillRect: vi.fn(),
     fillText: vi.fn(),
+    arc: vi.fn(),
+    createLinearGradient: vi.fn(() => mockGradient),
+    save: vi.fn(),
+    restore: vi.fn(),
     strokeStyle: '',
     fillStyle: '',
     lineWidth: 0,
+    lineJoin: 'round',
+    lineCap: 'round',
     globalAlpha: 1,
     font: '',
     textAlign: 'start' as CanvasTextAlign,
     setLineDash: vi.fn(),
+    shadowColor: '',
+    shadowBlur: 0,
   } as unknown as CanvasRenderingContext2D;
 }
 

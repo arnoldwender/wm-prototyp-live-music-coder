@@ -132,8 +132,8 @@ function drawCreature(
   ctx: CanvasRenderingContext2D,
   creature: CreatureRenderData,
   time: number,
-  canvasW: number,
-  canvasH: number,
+  _canvasW: number,
+  _canvasH: number,
 ): void {
   const def = SPECIES[creature.species];
   const sizeMul = getStageSizeMultiplier(creature.stage);
@@ -406,7 +406,7 @@ function drawSpeciesFeature(
   drawX: number,
   drawY: number,
   size: number,
-  offsetX: number,
+  _offsetX: number,
   offsetY: number,
   t: number,
   energy: number,

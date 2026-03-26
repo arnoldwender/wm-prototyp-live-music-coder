@@ -26,8 +26,6 @@ function Editor() {
   const setBpm = useAppStore((s) => s.setBpm)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const checkStreak = useAppStore((s) => s.checkStreak)
-  const showToast = useAppStore((s) => s.showToast)
-  const sessionStats = useAppStore((s) => s.sessionStats)
 
   /* Per-page SEO meta tags */
   usePageMeta({

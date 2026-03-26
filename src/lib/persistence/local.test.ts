@@ -27,7 +27,7 @@ function createMockProject(): Project {
       graphWidth: 0,
       visualizerHeight: 30,
       showGraph: false,
-      visiblePanels: { waveform: true, spectrum: true, timeline: true, beatlings: true },
+      visiblePanels: { waveform: true, spectrum: true, timeline: true, beatlings: true, brain: false },
     },
     ecosystem: {
       creatures: [],

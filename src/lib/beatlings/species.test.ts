@@ -16,22 +16,22 @@ describe('Species', () => {
   });
 
   it('spawns Beatling on beat detection', () => {
-    const features: AudioFeatures = { rms: 0.5, peak: 0.8, hasBeat: true, dominantFreq: 100, complexity: 0.3, isTyping: false };
+    const features: AudioFeatures = { rms: 0.5, peak: 0.8, hasBeat: true, dominantFreq: 100, complexity: 0.3, isTyping: false, energyTrend: 0, complexityTrend: 0, beatDensity: 0, musicalMomentum: 0 };
     expect(shouldSpawn('beatling', features)).toBe(true);
   });
 
   it('spawns Wavelet on low frequency', () => {
-    const features: AudioFeatures = { rms: 0.4, peak: 0.5, hasBeat: false, dominantFreq: 80, complexity: 0.2, isTyping: false };
+    const features: AudioFeatures = { rms: 0.4, peak: 0.5, hasBeat: false, dominantFreq: 80, complexity: 0.2, isTyping: false, energyTrend: 0, complexityTrend: 0, beatDensity: 0, musicalMomentum: 0 };
     expect(shouldSpawn('wavelet', features)).toBe(true);
   });
 
   it('spawns Codefly when typing', () => {
-    const features: AudioFeatures = { rms: 0, peak: 0, hasBeat: false, dominantFreq: 0, complexity: 0, isTyping: true };
+    const features: AudioFeatures = { rms: 0, peak: 0, hasBeat: false, dominantFreq: 0, complexity: 0, isTyping: true, energyTrend: 0, complexityTrend: 0, beatDensity: 0, musicalMomentum: 0 };
     expect(shouldSpawn('codefly', features)).toBe(true);
   });
 
   it('does not spawn without matching conditions', () => {
-    const features: AudioFeatures = { rms: 0, peak: 0, hasBeat: false, dominantFreq: 500, complexity: 0, isTyping: false };
+    const features: AudioFeatures = { rms: 0, peak: 0, hasBeat: false, dominantFreq: 500, complexity: 0, isTyping: false, energyTrend: 0, complexityTrend: 0, beatDensity: 0, musicalMomentum: 0 };
     expect(shouldSpawn('beatling', features)).toBe(false);
   });
 });

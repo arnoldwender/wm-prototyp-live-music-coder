@@ -30,6 +30,14 @@
     "tonejs": "Tone.js",
     "webaudio": "WebAudio",
     "midi": "MIDI",
+    "strudelLabel": "Patterns",
+    "tonejsLabel": "Synths",
+    "webaudioLabel": "Roh-Audio",
+    "midiLabel": "MIDI Aus",
+    "strudelDesc": "Musterbasiertes Live Coding",
+    "tonejsDesc": "Synthesizer & Effekte",
+    "webaudioDesc": "Low-Level Audio-Nodes",
+    "midiDesc": "Externes Gerät ansteuern",
     "midiWarning": "MIDI ist nur ein Ausgang — keine Audio-Engine-Verarbeitung"
   },
   "panels": {
