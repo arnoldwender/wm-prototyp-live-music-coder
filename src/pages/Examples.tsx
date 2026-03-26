@@ -62,9 +62,28 @@ function CategoryPill({
   )
 }
 
+/** Extract sample/sound names from code */
+function extractSounds(code: string): string[] {
+  const sounds = new Set<string>()
+  /* Match s("name"), sound("name"), .s("name") */
+  const sMatches = code.matchAll(/(?:^|\.)s(?:ound)?\s*\(\s*["']([^"']+)["']/g)
+  for (const m of sMatches) m[1].split(/\s+/).forEach(s => sounds.add(s.replace(/[*/?<>\[\](),:]+.*/, '')))
+  /* Match note("...").s("name") */
+  const noteS = code.matchAll(/\.s\s*\(\s*["']([^"']+)["']/g)
+  for (const m of noteS) sounds.add(m[1])
+  /* Match Tone.js synth types */
+  const toneTypes = code.matchAll(/new\s+Tone\.(\w*Synth)/g)
+  for (const m of toneTypes) sounds.add(m[1])
+  /* Match oscillator types */
+  const oscTypes = code.matchAll(/type\s*[=:]\s*["'](sine|square|sawtooth|triangle|custom)["']/g)
+  for (const m of oscTypes) sounds.add(m[1])
+  return Array.from(sounds).filter(s => s.length > 0 && s.length < 20).slice(0, 8)
+}
+
 /** Single example pattern card */
 function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) => string }) {
   const navigate = useNavigate()
+  const sounds = useMemo(() => extractSounds(example.code), [example.code])
 
   return (
     <article
@@ -155,6 +174,28 @@ function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) =
           {t(`examples.${example.difficulty}`)}
         </span>
       </div>
+
+      {/* Sounds used in this pattern */}
+      {sounds.length > 0 && (
+        <div className="flex flex-wrap gap-1" style={{ marginBottom: 'var(--space-3)' }}>
+          {sounds.map((s) => (
+            <span
+              key={s}
+              style={{
+                fontSize: '10px',
+                fontFamily: 'var(--font-family-mono)',
+                color: ENGINE_COLORS[example.engine],
+                backgroundColor: 'var(--color-bg)',
+                padding: '1px var(--space-2)',
+                borderRadius: 'var(--radius-sm)',
+                border: `1px solid ${ENGINE_COLORS[example.engine]}33`,
+              }}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Code preview — first 3 lines */}
       <pre
