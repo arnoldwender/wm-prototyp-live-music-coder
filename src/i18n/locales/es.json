@@ -433,5 +433,12 @@
   "legal": {
     "impressum": "Aviso legal",
     "datenschutz": "Política de privacidad"
+  },
+  "gamification": {
+    "achievementUnlocked": "Logro desbloqueado",
+    "streakDays": "{{count}} día de racha",
+    "streakDays_plural": "{{count}} días de racha",
+    "sessionSummary": "Sesión completada",
+    "sessionDetails": "Sesión: {{minutes}} min | {{evaluations}} evaluaciones | {{creatures}} criaturas"
   }
 }

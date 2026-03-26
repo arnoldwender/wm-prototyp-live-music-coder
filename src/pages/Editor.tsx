@@ -1,13 +1,15 @@
 /* ──────────────────────────────────────────────────────────
    Editor page — assembles the IDE shell with EditorLayout.
-   On mount: loads shared code from URL hash, or shows the
-   template selector for first-time visitors.
+   On mount: loads shared code from URL hash, checks streak,
+   initializes session stats. Shows template selector for
+   first-time visitors. Renders achievement toast overlay.
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
 import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
+import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
@@ -23,6 +25,9 @@ function Editor() {
   const updateFileCode = useAppStore((s) => s.updateFileCode)
   const setBpm = useAppStore((s) => s.setBpm)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
+  const checkStreak = useAppStore((s) => s.checkStreak)
+  const showToast = useAppStore((s) => s.showToast)
+  const sessionStats = useAppStore((s) => s.sessionStats)
 
   /* Per-page SEO meta tags */
   usePageMeta({
@@ -31,8 +36,11 @@ function Editor() {
     path: '/editor',
   })
 
-  /* On mount: check URL hash for shared code, or show template selector */
+  /* On mount: check streak, load shared code, or show template selector */
   useEffect(() => {
+    /* Check and update daily streak */
+    checkStreak()
+
     const shared = readShareFromUrl()
     if (shared) {
       /* URL hash contains shared code — load it into the active file */
@@ -54,14 +62,31 @@ function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  /* Stop all audio when leaving the editor page */
+  /* Stop all audio when leaving the editor page + show session summary */
   useEffect(() => {
     return () => {
       const orch = getOrchestrator()
       orch.stop()
       /* Reset store play state so TransportBar is correct on re-entry */
       useAppStore.getState().stop()
+
+      /* Show session summary toast if session was > 60 seconds */
+      const stats = useAppStore.getState().sessionStats
+      const elapsed = Math.floor((Date.now() - stats.startTime) / 1000)
+      if (elapsed > 60) {
+        const minutes = Math.floor(elapsed / 60)
+        useAppStore.getState().showToast({
+          icon: '\uD83D\uDCCA',
+          title: t('gamification.sessionSummary'),
+          description: t('gamification.sessionDetails', {
+            minutes,
+            evaluations: stats.evaluations,
+            creatures: stats.creaturesSpawned,
+          }),
+        })
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const dismissWarning = useCallback(() => setShowSharedWarning(false), [])
@@ -126,6 +151,9 @@ function Editor() {
       {showTutorial && (
         <TutorialOverlay onComplete={() => setShowTutorial(false)} />
       )}
+
+      {/* Achievement toast overlay — renders above everything */}
+      <AchievementToast />
     </>
   )
 }

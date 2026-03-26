@@ -60,10 +60,28 @@ export function BeatlingPanel() {
     worldRef.current.update(isTypingRef.current, isPlayingRef.current);
     worldRef.current.draw(ctx, width, height, time);
 
-    /* Sync creature stats to store every 30 frames for StatusBar + BrainPanel */
+    /* Sync creature stats to store every 30 frames for StatusBar + BrainPanel.
+     * Also grant user XP based on activity: playing music and alive creatures. */
     if (frameCount.current % 30 === 0) {
       const creatures = worldRef.current.getCreatures();
       const store = useAppStore.getState();
+
+      /* Track new creature spawns for session stats */
+      const prevCount = store.creatureCount;
+      if (creatures.length > prevCount) {
+        for (let i = 0; i < creatures.length - prevCount; i++) {
+          store.trackCreatureSpawn();
+        }
+      }
+
+      /* Grant user XP: +0.5 for playing music, +0.1 per creature alive */
+      if (isPlayingRef.current) {
+        store.addUserXp(0.5);
+      }
+      if (creatures.length > 0) {
+        store.addUserXp(creatures.length * 0.1);
+      }
+
       store.setCreatureCount(creatures.length);
       store.setCreatureStats(creatures.map((c: any) => ({
         id: c.id,

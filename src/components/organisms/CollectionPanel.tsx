@@ -9,7 +9,16 @@ import { useTranslation } from 'react-i18next'
 import { Trophy, Lock, X } from 'lucide-react'
 import { ACHIEVEMENTS } from '../../lib/beatlings/collection'
 import { Button } from '../atoms'
-import type { Achievement } from '../../types/beatling'
+import type { Achievement, AchievementTier } from '../../types/beatling'
+
+/** Tier border color mapping for achievement cards */
+const TIER_COLORS: Record<AchievementTier, string> = {
+  bronze: 'var(--color-warning)',
+  silver: 'var(--color-text-muted)',
+  gold: 'var(--color-warning)',
+  platinum: 'var(--color-primary)',
+  secret: 'var(--color-accent)',
+}
 
 interface CollectionPanelProps {
   onClose: () => void
@@ -36,7 +45,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
     <article
       style={{
         backgroundColor: 'var(--color-bg-elevated)',
-        border: '1px solid var(--color-border)',
+        border: `1px solid ${unlocked ? TIER_COLORS[achievement.tier] : 'var(--color-border)'}`,
         borderRadius: 'var(--radius-md)',
         padding: 'var(--space-sm)',
         display: 'flex',
@@ -46,15 +55,20 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
         transition: 'var(--transition-fast)',
       }}
     >
-      {/* Lock/Unlock icon */}
+      {/* Achievement icon or lock */}
       <div
         style={{
-          color: unlocked ? 'var(--color-warning)' : 'var(--color-text-muted)',
           flexShrink: 0,
           marginTop: 'var(--space-1)',
+          fontSize: 'var(--font-size-lg)',
+          lineHeight: 1,
         }}
       >
-        {unlocked ? <Trophy size={18} /> : <Lock size={18} />}
+        {unlocked ? (
+          <span aria-hidden="true">{achievement.icon}</span>
+        ) : (
+          <Lock size={18} style={{ color: 'var(--color-text-muted)' }} />
+        )}
       </div>
 
       {/* Achievement details */}

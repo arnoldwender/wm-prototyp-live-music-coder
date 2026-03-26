@@ -1,5 +1,6 @@
 /* ──────────────────────────────────────────────────────────
-   App store — global state for transport, engine, and layout
+   App store — global state for transport, engine, layout,
+   gamification (XP, streaks, toasts, session stats).
    Uses Zustand for lightweight reactive state management.
    ────────────────────────────────────────────────────────── */
 
@@ -27,8 +28,70 @@ export interface CreatureStat {
 }
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
 
+/** Toast data for achievement notifications */
+export interface ToastData {
+  title: string
+  description: string
+  icon: string
+}
+
+/** Streak tracking state */
+export interface StreakState {
+  current: number
+  lastActiveDate: string | null
+}
+
+/** Session statistics for end-of-session summary */
+export interface SessionStats {
+  startTime: number
+  evaluations: number
+  creaturesSpawned: number
+}
+
 /** Visible panel names that can be toggled */
 type PanelName = keyof PanelLayout['visiblePanels']
+
+/** XP required to reach a given level: 100 * n^1.5 */
+export function xpForLevel(n: number): number {
+  return Math.floor(100 * Math.pow(n, 1.5))
+}
+
+/** Calculate level from total XP */
+function calculateLevel(xp: number): number {
+  let level = 1
+  while (level < 50 && xp >= xpForLevel(level + 1)) {
+    level++
+  }
+  return level
+}
+
+/** Load streak from localStorage */
+function loadStreak(): StreakState {
+  try {
+    const raw = localStorage.getItem('lmc-streak')
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore parse errors */ }
+  return { current: 0, lastActiveDate: null }
+}
+
+/** Persist streak to localStorage */
+function saveStreak(streak: StreakState): void {
+  try {
+    localStorage.setItem('lmc-streak', JSON.stringify(streak))
+  } catch { /* ignore storage errors */ }
+}
+
+/** Get today's date as YYYY-MM-DD string */
+function todayString(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+/** Get yesterday's date as YYYY-MM-DD string */
+function yesterdayString(): string {
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+  return d.toISOString().slice(0, 10)
+}
 
 /** Application state shape */
 interface AppState {
@@ -55,6 +118,25 @@ interface AppState {
   setCreatureStats: (stats: CreatureStat[]) => void
   selectCreature: (id: string | null) => void
   toggleBrainPanel: () => void
+
+  /* Gamification: Achievement toast */
+  pendingToast: ToastData | null
+  showToast: (toast: ToastData) => void
+  dismissToast: () => void
+
+  /* Gamification: User XP & Level */
+  userXp: number
+  userLevel: number
+  addUserXp: (amount: number) => void
+
+  /* Gamification: Streak */
+  streak: StreakState
+  checkStreak: () => void
+
+  /* Gamification: Session stats */
+  sessionStats: SessionStats
+  incrementEval: () => void
+  trackCreatureSpawn: () => void
 
   /* Transport actions */
   togglePlay: () => void
@@ -103,11 +185,58 @@ export const useAppStore = create<AppState>()((set, get) => ({
   selectedCreatureId: null,
   showBrainPanel: false,
 
+  /* --- Gamification initial state --- */
+  pendingToast: null,
+  userXp: 0,
+  userLevel: 1,
+  streak: loadStreak(),
+  sessionStats: { startTime: Date.now(), evaluations: 0, creaturesSpawned: 0 },
+
   /* --- Beatling ecosystem --- */
   setCreatureCount: (count: number) => set({ creatureCount: count }),
   setCreatureStats: (stats: CreatureStat[]) => set({ creatureStats: stats }),
   selectCreature: (id: string | null) => set({ selectedCreatureId: id, showBrainPanel: id !== null }),
   toggleBrainPanel: () => set((s) => ({ showBrainPanel: !s.showBrainPanel, selectedCreatureId: null })),
+
+  /* --- Gamification: Toast --- */
+  showToast: (toast: ToastData) => set({ pendingToast: toast }),
+  dismissToast: () => set({ pendingToast: null }),
+
+  /* --- Gamification: XP & Level --- */
+  addUserXp: (amount: number) => set((s) => {
+    const newXp = s.userXp + amount
+    const newLevel = calculateLevel(newXp)
+    return { userXp: newXp, userLevel: newLevel }
+  }),
+
+  /* --- Gamification: Streak --- */
+  checkStreak: () => set((s) => {
+    const today = todayString()
+    const yesterday = yesterdayString()
+    let newStreak: StreakState
+
+    if (s.streak.lastActiveDate === today) {
+      /* Already active today — no change */
+      return {}
+    } else if (s.streak.lastActiveDate === yesterday) {
+      /* Consecutive day — increment streak */
+      newStreak = { current: s.streak.current + 1, lastActiveDate: today }
+    } else {
+      /* Gap or first visit — reset to 1 */
+      newStreak = { current: 1, lastActiveDate: today }
+    }
+
+    saveStreak(newStreak)
+    return { streak: newStreak }
+  }),
+
+  /* --- Gamification: Session stats --- */
+  incrementEval: () => set((s) => ({
+    sessionStats: { ...s.sessionStats, evaluations: s.sessionStats.evaluations + 1 },
+  })),
+  trackCreatureSpawn: () => set((s) => ({
+    sessionStats: { ...s.sessionStats, creaturesSpawned: s.sessionStats.creaturesSpawned + 1 },
+  })),
 
   /* --- Transport actions --- */
 

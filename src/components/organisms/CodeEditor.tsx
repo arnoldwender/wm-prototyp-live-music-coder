@@ -54,6 +54,8 @@ export function CodeEditor() {
     try {
       setEvalError(null);
       await orch.evaluate(activeFile.code, activeFile.engine);
+      /* Track evaluation for session stats */
+      useAppStore.getState().incrementEval();
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[CodeEditor] Manual eval error:', msg);

@@ -12,6 +12,7 @@ import { getEngineExtensions } from '../../lib/editor/extensions';
 import { Button, Tooltip } from '../atoms';
 import { Play, Square, Loader2 } from 'lucide-react';
 
+
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
 
@@ -220,6 +221,8 @@ export function StrudelEditor() {
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
+      /* Track evaluation for session stats */
+      useAppStore.getState().incrementEval();
       if (!isPlaying) {
         replRef.current.start();
         togglePlay();

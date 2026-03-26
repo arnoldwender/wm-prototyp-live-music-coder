@@ -433,5 +433,12 @@
   "legal": {
     "impressum": "Impressum",
     "datenschutz": "Datenschutz"
+  },
+  "gamification": {
+    "achievementUnlocked": "Erfolg freigeschaltet",
+    "streakDays": "{{count}} Tag Serie",
+    "streakDays_plural": "{{count}} Tage Serie",
+    "sessionSummary": "Sitzung beendet",
+    "sessionDetails": "Sitzung: {{minutes}} Min | {{evaluations}} Auswertungen | {{creatures}} Kreaturen"
   }
 }
