@@ -12,7 +12,7 @@ export default defineConfig({
   resolve: {
     /* Force a single superdough instance — Vite may pre-bundle two copies
      * (one from @strudel/web, one standalone) causing a dead audio chain */
-    dedupe: ['superdough'],
+    dedupe: ['superdough', '@strudel/core'],
   },
   build: {
     rollupOptions: {
