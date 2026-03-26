@@ -175,28 +175,91 @@ const SAMPLE_CATEGORIES = [
   { id: 'misc', label: 'Misc', samples: ['birds', 'birds3', 'wind', 'numbers', 'can'] },
 ];
 
+/* Engine-specific sample categories */
+const TONEJS_CATEGORIES = [
+  { id: 'synths', label: 'Synthesizers', samples: ['Synth', 'FMSynth', 'AMSynth', 'MonoSynth', 'PolySynth', 'PluckSynth', 'MembraneSynth', 'MetalSynth'] },
+  { id: 'oscillators', label: 'Oscillators', samples: ['sine', 'square', 'sawtooth', 'triangle'] },
+  { id: 'effects', label: 'Effects', samples: ['Reverb', 'Delay', 'Chorus', 'Distortion', 'Phaser', 'Tremolo', 'AutoFilter', 'AutoPanner'] },
+  { id: 'sources', label: 'Sources', samples: ['Player', 'Noise', 'Oscillator', 'OmniOscillator'] },
+];
+
+const WEBAUDIO_CATEGORIES = [
+  { id: 'oscillators', label: 'Oscillators', samples: ['sine', 'square', 'sawtooth', 'triangle'] },
+  { id: 'nodes', label: 'Audio Nodes', samples: ['GainNode', 'BiquadFilter', 'DelayNode', 'ConvolverNode', 'DynamicsCompressor', 'WaveShaper', 'StereoPanner'] },
+];
+
 function SampleBrowser() {
   const [search, setSearch] = useState('');
   const [expandedCat, setExpandedCat] = useState<string | null>('drums');
   const inputRef = useRef<HTMLInputElement>(null);
+  const activeEngine = useAppStore((s) => {
+    const file = s.files.find(f => f.active);
+    return file?.engine ?? 'strudel';
+  });
+
+  /* Pick categories based on active engine */
+  const baseCats = activeEngine === 'tonejs' ? TONEJS_CATEGORIES
+    : activeEngine === 'webaudio' ? WEBAUDIO_CATEGORIES
+    : SAMPLE_CATEGORIES;
 
   const insertSample = useCallback((sample: string) => {
-    /* Insert sample code into the active file */
+    /* Insert engine-appropriate sample code into the active file */
     const store = useAppStore.getState();
     const activeFile = store.files.find((f) => f.active);
-    if (activeFile) {
-      const code = activeFile.code;
-      const insertion = code.trim() ? `\n.s("${sample}")` : `s("${sample}")`;
-      store.updateFileCode(activeFile.id, code + insertion);
+    if (!activeFile) return;
+
+    const engine = activeFile.engine;
+    const code = activeFile.code;
+    let insertion = '';
+
+    /* Generate code per engine */
+    switch (engine) {
+      case 'strudel':
+        insertion = code.trim() ? `\ns("${sample}")` : `s("${sample}")`;
+        break;
+      case 'tonejs':
+        if (['sine', 'square', 'sawtooth', 'triangle'].includes(sample)) {
+          insertion = `\nconst synth = new Tone.Synth({oscillator:{type:"${sample}"}}).toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
+        } else if (sample.endsWith('Synth')) {
+          insertion = `\nconst synth = new Tone.${sample}().toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
+        } else if (['Reverb', 'Delay', 'Chorus', 'Distortion', 'Phaser', 'Tremolo', 'AutoFilter', 'AutoPanner'].includes(sample)) {
+          insertion = `\nconst effect = new Tone.${sample}().toDestination();\nconst synth = new Tone.Synth().connect(effect);\nsynth.triggerAttackRelease("C4", "8n");`;
+        } else if (sample === 'Noise') {
+          insertion = `\nconst noise = new Tone.Noise("white").toDestination();\nnoise.start();\nsetTimeout(() => noise.stop(), 1000);`;
+        } else if (sample === 'Player') {
+          insertion = `\n// Tone.Player requires a URL to an audio file\nconst player = new Tone.Player().toDestination();`;
+        } else {
+          insertion = `\nconst synth = new Tone.Synth().toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
+        }
+        break;
+      case 'webaudio':
+        if (['sine', 'square', 'sawtooth', 'triangle'].includes(sample)) {
+          insertion = `\nconst osc = ctx.createOscillator();\nosc.type = "${sample}";\nosc.frequency.value = 440;\nconst gain = ctx.createGain();\ngain.gain.value = 0.3;\nosc.connect(gain).connect(ctx.destination);\nosc.start();`;
+        } else if (sample === 'GainNode') {
+          insertion = `\nconst gain = ctx.createGain();\ngain.gain.value = 0.5;\ngain.connect(ctx.destination);`;
+        } else if (sample === 'BiquadFilter') {
+          insertion = `\nconst filter = ctx.createBiquadFilter();\nfilter.type = "lowpass";\nfilter.frequency.value = 800;\nfilter.connect(ctx.destination);`;
+        } else if (sample === 'DelayNode') {
+          insertion = `\nconst delay = ctx.createDelay();\ndelay.delayTime.value = 0.3;\ndelay.connect(ctx.destination);`;
+        } else if (sample === 'StereoPanner') {
+          insertion = `\nconst panner = ctx.createStereoPanner();\npanner.pan.value = 0;\npanner.connect(ctx.destination);`;
+        } else {
+          insertion = `\n// ${sample}\nconst node = ctx.create${sample.replace('Node', '')}();\nnode.connect(ctx.destination);`;
+        }
+        break;
+      default:
+        insertion = `\n// ${sample}`;
     }
+
+    store.updateFileCode(activeFile.id, code + insertion);
   }, []);
 
   const filtered = search.trim()
-    ? SAMPLE_CATEGORIES.map((cat) => ({
+    ? baseCats.map((cat) => ({
         ...cat,
         samples: cat.samples.filter((s) => s.toLowerCase().includes(search.toLowerCase())),
       })).filter((cat) => cat.samples.length > 0)
-    : SAMPLE_CATEGORIES;
+    : baseCats;
 
   return (
     <div style={{ padding: 'var(--space-2)' }}>
@@ -266,7 +329,7 @@ function SampleBrowser() {
                   key={sample}
                   type="button"
                   onClick={() => insertSample(sample)}
-                  title={`Insert s("${sample}")`}
+                  title={`Insert ${sample}`}
                   style={{
                     padding: 'var(--space-1) var(--space-2)',
                     backgroundColor: 'var(--color-bg-elevated)',
