@@ -195,8 +195,9 @@ function Examples() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<ExampleEntry['difficulty'] | null>(null)
 
-  /* Override body overflow — this page needs to scroll */
+  /* Set page title + override body overflow for scrolling */
   useEffect(() => {
+    document.title = 'Code Examples — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {
@@ -252,7 +253,7 @@ function Examples() {
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        Skip to content
+        {t('a11y.skipToContent')}
       </a>
 
       {/* --- Header navbar --- */}
@@ -355,6 +356,7 @@ function Examples() {
 
       {/* --- Search and filter controls --- */}
       <section
+        id="filters"
         style={{
           maxWidth: '1200px',
           margin: '0 auto',

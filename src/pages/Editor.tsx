@@ -20,8 +20,9 @@ function Editor() {
   const setBpm = useAppStore((s) => s.setBpm)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
 
-  /* On mount: check URL hash for shared code, or show template selector */
+  /* On mount: set page title, check URL hash for shared code, or show template selector */
   useEffect(() => {
+    document.title = 'Editor — Live Music Coder'
     const shared = readShareFromUrl()
     if (shared) {
       /* URL hash contains shared code — load it into the active file */

@@ -171,8 +171,9 @@ function Samples() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [showVariations, setShowVariations] = useState(false)
 
-  /* Override body overflow — this page needs to scroll */
+  /* Set page title + override body overflow for scrolling */
   useEffect(() => {
+    document.title = 'Sample Library — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {
@@ -225,7 +226,7 @@ function Samples() {
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        Skip to content
+        {t('a11y.skipToContent')}
       </a>
 
       {/* --- Header navbar --- */}
@@ -328,6 +329,7 @@ function Samples() {
 
       {/* --- Search and filter controls --- */}
       <section
+        id="filters"
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
@@ -445,7 +447,7 @@ function Samples() {
         style={{ color: 'var(--color-text-muted)' }}
       >
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          Live Music Coder — Open Source (AGPL-3.0)
+          {t('footer.license')}
         </p>
       </footer>
     </main>

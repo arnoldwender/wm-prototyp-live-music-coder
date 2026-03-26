@@ -47,8 +47,9 @@ function EngineDot({ color }: { color: string }) {
 function Landing() {
   const { t } = useTranslation()
 
-  /* Override body overflow:hidden from global.css — landing page needs to scroll */
+  /* Set page title + override body overflow for scrolling */
   useEffect(() => {
+    document.title = 'Live Music Coder — Browser-Based Live Coding Music IDE';
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     return () => {
@@ -79,7 +80,7 @@ function Landing() {
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        Skip to content
+        {t('a11y.skipToContent')}
       </a>
 
       {/* --- Header navbar --- */}
@@ -171,12 +172,16 @@ function Landing() {
       <SectionDivider />
 
       {/* Feature highlights grid with Lucide icons */}
-      <FeatureGrid />
+      <section id="features">
+        <FeatureGrid />
+      </section>
 
       <SectionDivider />
 
       {/* Pre-built example demos */}
-      <ExampleGallery />
+      <section id="examples">
+        <ExampleGallery />
+      </section>
 
       <SectionDivider />
 
@@ -201,12 +206,12 @@ function Landing() {
 
         {/* Legal links + License */}
         <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
+          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
           <span>|</span>
           <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
         </p>
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          Live Music Coder — Open Source (AGPL-3.0)
+          {t('footer.license')}
         </p>
       </footer>
     </main>

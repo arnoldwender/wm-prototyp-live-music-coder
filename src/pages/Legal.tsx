@@ -14,7 +14,9 @@ function Legal() {
     location.hash === '#datenschutz' ? 'datenschutz' : 'impressum'
   );
 
+  /* Set page title + override body overflow for scrolling */
   useEffect(() => {
+    document.title = 'Legal — Live Music Coder';
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     return () => {
@@ -31,7 +33,7 @@ function Legal() {
         className="flex items-center justify-between"
         style={{ height: '64px', padding: '0 var(--space-6)', backgroundColor: 'var(--color-bg-alt)', borderBottom: '1px solid var(--color-border)' }}
       >
-        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }} aria-label={t('nav.backToHome')}>
           <Logo showTagline size="sm" />
         </Link>
         <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>

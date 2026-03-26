@@ -114,8 +114,9 @@ function Docs() {
     }
   }, [sectionId, navigate])
 
-  /* Override body overflow:hidden — docs page needs to scroll */
+  /* Set page title + override body overflow for scrolling */
   useEffect(() => {
+    document.title = 'Documentation — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {
