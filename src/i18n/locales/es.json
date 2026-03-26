@@ -406,7 +406,9 @@
     "ready": "Listo",
     "loading": "Cargando...",
     "evaluating": "Evaluando...",
-    "liveMode": "Modo en vivo"
+    "liveMode": "Modo en vivo",
+    "sharedCodeWarning": "Este código fue cargado desde una URL compartida. Revísalo antes de ejecutarlo.",
+    "dismiss": "Cerrar"
   },
   "templates": {
     "title": "Elige una plantilla inicial",

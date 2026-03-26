@@ -4,7 +4,8 @@
    template selector for first-time visitors.
    ────────────────────────────────────────────────────────── */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
 import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
 import { readShareFromUrl } from '../lib/persistence/url'
@@ -13,8 +14,10 @@ import { getOrchestrator } from '../lib/orchestrator'
 import { usePageMeta } from '../lib/usePageMeta'
 
 function Editor() {
+  const { t } = useTranslation()
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [showSharedWarning, setShowSharedWarning] = useState(false)
 
   const files = useAppStore((s) => s.files)
   const updateFileCode = useAppStore((s) => s.updateFileCode)
@@ -39,6 +42,8 @@ function Editor() {
       }
       setBpm(shared.bpm)
       setDefaultEngine(shared.engine)
+      /* Show security warning — code was loaded from an external URL */
+      setShowSharedWarning(true)
     } else if (!localStorage.getItem('lmc-onboarded')) {
       /* First visit — show the template selector */
       setShowTemplateSelector(true)
@@ -59,8 +64,49 @@ function Editor() {
     }
   }, [])
 
+  const dismissWarning = useCallback(() => setShowSharedWarning(false), [])
+
   return (
     <>
+      {/* Security warning when code was loaded from a shared URL */}
+      {showSharedWarning && (
+        <div
+          role="alert"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-2) var(--space-4)',
+            backgroundColor: 'var(--color-warning)',
+            color: 'var(--color-bg)',
+            fontSize: 'var(--font-size-xs)',
+            fontWeight: 'var(--font-weight-bold)',
+          }}
+        >
+          <span style={{ flex: 1 }}>{t('editor.sharedCodeWarning')}</span>
+          <button
+            type="button"
+            onClick={dismissWarning}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              fontSize: 'var(--font-size-base)',
+              lineHeight: 1,
+              padding: 'var(--space-1)',
+            }}
+            aria-label={t('editor.dismiss')}
+          >
+            &times;
+          </button>
+        </div>
+      )}
       <EditorLayout
         toolbar={<TransportBar />}
         editor={<CodeEditor />}

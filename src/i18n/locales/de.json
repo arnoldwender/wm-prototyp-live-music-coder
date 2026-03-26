@@ -406,7 +406,9 @@
     "ready": "Bereit",
     "loading": "Laden...",
     "evaluating": "Auswerten...",
-    "liveMode": "Live-Modus"
+    "liveMode": "Live-Modus",
+    "sharedCodeWarning": "Dieser Code wurde aus einer geteilten URL geladen. Bitte vor dem Ausführen überprüfen.",
+    "dismiss": "Schließen"
   },
   "templates": {
     "title": "Wähle eine Startvorlage",

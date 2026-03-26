@@ -406,7 +406,9 @@
     "ready": "Ready",
     "loading": "Loading...",
     "evaluating": "Evaluating...",
-    "liveMode": "Live mode"
+    "liveMode": "Live mode",
+    "sharedCodeWarning": "This code was loaded from a shared URL. Review it before running.",
+    "dismiss": "Dismiss"
   },
   "templates": {
     "title": "Choose a starter template",
