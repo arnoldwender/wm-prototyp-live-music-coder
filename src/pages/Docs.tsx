@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
+import { usePageMeta } from '../lib/usePageMeta'
 import { docSections } from '../data/docs'
 import type { DocBlock } from '../data/docs'
 
@@ -114,9 +115,15 @@ function Docs() {
     }
   }, [sectionId, navigate])
 
-  /* Set page title + override body overflow for scrolling */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Documentation — Live Music Coder',
+    description: 'Learn how to use Live Music Coder: Strudel patterns, Tone.js synths, Web Audio nodes, MIDI output, and the visual node graph.',
+    path: '/docs',
+  })
+
+  /* Override body overflow for scrolling */
   useEffect(() => {
-    document.title = 'Documentation — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {

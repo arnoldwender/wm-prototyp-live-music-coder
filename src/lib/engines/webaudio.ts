@@ -32,7 +32,10 @@ export class WebAudioEngine extends BaseEngine {
     return wrapper
   }
 
-  /** Evaluate raw Web Audio code with ctx and masterGain in scope */
+  /** Evaluate raw Web Audio code with ctx and masterGain in scope.
+   * SECURITY NOTE: Uses Function() constructor intentionally — this is a live
+   * coding IDE where executing user-written code is the core feature. Code runs
+   * in the browser sandbox. Users must press Play to evaluate (no auto-eval). */
   async evaluate(code: string): Promise<void> {
     const ctx = this.getContext()
     const masterGain = getMasterGain()

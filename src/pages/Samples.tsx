@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
+import { usePageMeta } from '../lib/usePageMeta'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
 import type { SampleEntry } from '../data/sample-library'
 import { encodeToUrl } from '../lib/persistence/url'
@@ -171,9 +172,15 @@ function Samples() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [showVariations, setShowVariations] = useState(false)
 
-  /* Set page title + override body overflow for scrolling */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Sample Library — Live Music Coder',
+    description: 'Browse 218 Dirt-Samples for live coding music. Filter by category, search by name, and load samples directly into the editor.',
+    path: '/samples',
+  })
+
+  /* Override body overflow for scrolling */
   useEffect(() => {
-    document.title = 'Sample Library — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {

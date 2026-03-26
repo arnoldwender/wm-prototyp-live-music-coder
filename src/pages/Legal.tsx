@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../components/atoms';
 import { LanguageSwitcher } from '../components/molecules';
 import { IMPRESSUM_HTML, DATENSCHUTZ_HTML } from '../data/legal';
+import { usePageMeta } from '../lib/usePageMeta';
 
 function Legal() {
   const { t } = useTranslation();
@@ -14,9 +15,15 @@ function Legal() {
     location.hash === '#datenschutz' ? 'datenschutz' : 'impressum'
   );
 
-  /* Set page title + override body overflow for scrolling */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Legal — Live Music Coder',
+    description: 'Impressum und Datenschutzerklärung für Live Music Coder.',
+    path: '/legal',
+  });
+
+  /* Override body overflow for scrolling */
   useEffect(() => {
-    document.title = 'Legal — Live Music Coder';
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     return () => {

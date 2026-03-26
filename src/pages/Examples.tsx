@@ -12,6 +12,7 @@ import { LanguageSwitcher } from '../components/molecules'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
 import { encodeToUrl } from '../lib/persistence/url'
+import { usePageMeta } from '../lib/usePageMeta'
 
 /** Difficulty badge color map */
 const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
@@ -195,9 +196,15 @@ function Examples() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<ExampleEntry['difficulty'] | null>(null)
 
-  /* Set page title + override body overflow for scrolling */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Code Examples — Live Music Coder',
+    description: '165+ curated live coding patterns for Strudel, Tone.js, and Web Audio. Browse by category and difficulty, then load directly into the editor.',
+    path: '/examples',
+  })
+
+  /* Override body overflow for scrolling */
   useEffect(() => {
-    document.title = 'Code Examples — Live Music Coder'
     document.body.style.overflow = 'auto'
     document.body.style.height = 'auto'
     return () => {

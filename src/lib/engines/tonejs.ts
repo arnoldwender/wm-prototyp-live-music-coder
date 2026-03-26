@@ -43,7 +43,10 @@ export class ToneJsEngine extends BaseEngine {
     return wrapper
   }
 
-  /** Evaluate Tone.js code with Tone in scope */
+  /** Evaluate Tone.js code with Tone in scope.
+   * SECURITY NOTE: Uses Function() constructor intentionally — this is a live
+   * coding IDE where executing user-written code is the core feature. Code runs
+   * in the browser sandbox. Users must press Play to evaluate (no auto-eval). */
   async evaluate(code: string): Promise<void> {
     if (!this.Tone) throw new Error('Tone.js not initialized')
     try {

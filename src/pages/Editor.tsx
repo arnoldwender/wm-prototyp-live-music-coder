@@ -10,6 +10,7 @@ import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, Te
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
+import { usePageMeta } from '../lib/usePageMeta'
 
 function Editor() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
@@ -20,9 +21,15 @@ function Editor() {
   const setBpm = useAppStore((s) => s.setBpm)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
 
-  /* On mount: set page title, check URL hash for shared code, or show template selector */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Editor — Live Music Coder',
+    description: 'Live coding music editor with 4 audio engines, visual node graph, real-time waveform and spectrum visualizers.',
+    path: '/editor',
+  })
+
+  /* On mount: check URL hash for shared code, or show template selector */
   useEffect(() => {
-    document.title = 'Editor — Live Music Coder'
     const shared = readShareFromUrl()
     if (shared) {
       /* URL hash contains shared code — load it into the active file */

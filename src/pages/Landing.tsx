@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '../components/molecules'
 import { HeroSection } from '../components/organisms/HeroSection'
 import { FeatureGrid } from '../components/organisms/FeatureGrid'
 import { ExampleGallery } from '../components/organisms/ExampleGallery'
+import { usePageMeta } from '../lib/usePageMeta'
 
 /** Subtle horizontal divider with center fade */
 function SectionDivider() {
@@ -47,9 +48,15 @@ function EngineDot({ color }: { color: string }) {
 function Landing() {
   const { t } = useTranslation()
 
-  /* Set page title + override body overflow for scrolling */
+  /* Per-page SEO meta tags */
+  usePageMeta({
+    title: 'Live Music Coder — Browser-Based Live Coding Music IDE',
+    description: 'Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and audio-reactive Beatling creatures.',
+    path: '/',
+  })
+
+  /* Override body overflow for scrolling */
   useEffect(() => {
-    document.title = 'Live Music Coder — Browser-Based Live Coding Music IDE';
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     return () => {
