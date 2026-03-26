@@ -45,12 +45,11 @@ export function StrudelEditor() {
 
         /* Load Dirt-Samples + register synth sounds */
         try {
-          /* Register built-in synth sounds (piano, etc.) first */
+          /* Init audio on first click if available */
           try {
             const webaudio = await import('@strudel/webaudio');
-            if (webaudio.registerSynthSounds) await webaudio.registerSynthSounds();
-            if (webaudio.initAudioOnFirstClick) webaudio.initAudioOnFirstClick();
-          } catch { /* synth registration not available */ }
+            if (typeof webaudio.initAudioOnFirstClick === 'function') webaudio.initAudioOnFirstClick();
+          } catch { /* not available */ }
 
           /* Load samples via REPL (preferred — makes them available to patterns) */
           await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
