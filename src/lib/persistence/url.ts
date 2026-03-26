@@ -6,6 +6,9 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import type { EngineType } from '../../types/engine';
 
+/** Valid engine identifiers — used to validate URL-decoded data */
+const VALID_ENGINES: readonly EngineType[] = ['strudel', 'tonejs', 'webaudio', 'midi'] as const;
+
 /** Data structure for URL-shared code snippets */
 export interface UrlShareData {
   code: string;
@@ -26,10 +29,14 @@ export function decodeFromUrl(hash: string): UrlShareData | null {
     if (!json) return null;
     const parsed = JSON.parse(json);
     if (!parsed.code && parsed.code !== '') return null;
+    /* Validate engine is a known EngineType — fall back to strudel for unknown values */
+    const engine: EngineType = VALID_ENGINES.includes(parsed.engine)
+      ? parsed.engine
+      : 'strudel';
     return {
       code: parsed.code ?? '',
       bpm: parsed.bpm ?? 120,
-      engine: parsed.engine ?? 'strudel',
+      engine,
     };
   } catch {
     return null;

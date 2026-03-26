@@ -62,9 +62,10 @@ i18n
 /* Restore console.log after i18next init */
 console.log = _origLog
 
-/* Persist language choice on change */
+/* Persist language choice and sync document lang attribute on change */
 i18n.on('languageChanged', (lng) => {
   try { localStorage.setItem(STORAGE_KEY, lng) } catch { /* unavailable */ }
+  document.documentElement.lang = lng
 })
 
 export default i18n
