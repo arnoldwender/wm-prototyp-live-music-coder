@@ -245,7 +245,9 @@ function drawCreature(
 
   /* === EYES === */
   const eyeSpacing = size * 0.3;
-  const eyeY = drawY - size * 0.1;
+  /* Synthling has teardrop shape — shift eyes down into the body area */
+  const eyeYOffset = creature.species === 'synthling' ? size * 0.15 : -size * 0.1;
+  const eyeY = drawY + eyeYOffset;
   const eyeSize = size * 0.28;
   const pupilSize = eyeSize * 0.5;
 
@@ -284,7 +286,7 @@ function drawCreature(
   }
 
   /* === MOUTH — driven by emotional state and energy === */
-  const mouthY = drawY + size * 0.35;
+  const mouthY = drawY + (creature.species === 'synthling' ? size * 0.5 : size * 0.35);
   const mouthW = size * 0.4;
   ctx.strokeStyle = VIZ_COLORS.bg;
   ctx.lineWidth = Math.max(1.5, size * 0.08);

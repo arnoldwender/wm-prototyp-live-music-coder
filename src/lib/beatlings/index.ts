@@ -284,6 +284,31 @@ export class BeatlingWorld {
     brain.stimulate('touch_sense', features.hasBeat ? 0.8 * evolutionBoost : 0);
     brain.stimulate('proximity_sense', features.complexity * evolutionBoost);
 
+    /* Species-specific amplification — each reacts more to their trigger */
+    switch (creature.species) {
+      case 'beatling':
+        if (features.hasBeat) brain.stimulate('touch_sense', 0.5);
+        brain.stimulate('hunger_sense', features.beatDensity * 0.4);
+        break;
+      case 'looplet':
+        brain.stimulate('proximity_sense', features.complexity * 0.3);
+        brain.stimulate('proximity_sense', features.complexityTrend * 0.3);
+        break;
+      case 'synthling':
+        if (features.dominantFreq > 300) brain.stimulate('food_sense', 0.4);
+        break;
+      case 'glitchbit':
+        brain.stimulate('hunger_sense', features.peak * 0.4);
+        break;
+      case 'wavelet':
+        if (features.dominantFreq < 200) brain.stimulate('food_sense', 0.5);
+        brain.stimulate('hunger_sense', features.rms * 0.3);
+        break;
+      case 'codefly':
+        if (features.isTyping) brain.stimulate('proximity_sense', 0.6);
+        break;
+    }
+
     /* Musical evolution drives emotional neurons directly:
      * Rising energy/complexity → positive emotion (excitement, joy)
      * Declining energy → neutral/negative emotion (calm, sadness)
