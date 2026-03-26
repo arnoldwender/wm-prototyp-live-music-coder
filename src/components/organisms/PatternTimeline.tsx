@@ -13,7 +13,7 @@ export function PatternTimeline() {
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
     frameCount.current++;
-    if (frameCount.current % 30 === 0) {
+    if (frameCount.current % 15 === 0 || frameCount.current <= 3) {
       getStrudelAnalyser().then((node) => {
         /* Only create a new AudioAnalyzer when the underlying node changes */
         if (node && node !== lastNodeRef.current) {

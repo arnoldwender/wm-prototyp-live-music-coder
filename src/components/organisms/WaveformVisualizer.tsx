@@ -12,15 +12,14 @@ export function WaveformVisualizer() {
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     frameCount.current++;
 
-    /* Reconnect every 30 frames (~0.5s) — superdough creates nodes lazily */
-    if (frameCount.current % 30 === 0) {
+    /* Reconnect every 15 frames (~250ms) — aggressive reconnection for reliability */
+    if (frameCount.current % 15 === 0 || frameCount.current <= 3) {
       getStrudelAnalyser().then((node) => {
-        /* Only create a new AudioAnalyzer when the underlying node changes */
         if (node && node !== lastNodeRef.current) {
           lastNodeRef.current = node;
           analyzerRef.current = new AudioAnalyzer(node);
         }
-      }).catch(() => { /* Audio tap unavailable — ignore */ });
+      }).catch(() => {});
     }
 
     if (analyzerRef.current) {

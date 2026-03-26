@@ -1,73 +1,63 @@
-/* Tap into superdough's audio output for visualization.
- * Reconnects on every call because superdough recreates nodes dynamically.
- * Uses @strudel/webaudio (NOT 'superdough' directly) to ensure we get
- * the SAME module instance that Strudel's audio engine uses. */
+/* Universal audio tap for visualization.
+ * Strategy: try Strudel's superdough controller first, then fall back
+ * to the shared AudioContext's master analyser. Works for ALL engines. */
 
-let analyser: AnalyserNode | null = null;
-let connected = false;
+import { getMasterAnalyser } from './context';
 
+let strudelAnalyser: AnalyserNode | null = null;
+let strudelConnected = false;
+
+/**
+ * Returns an AnalyserNode that receives audio data for visualization.
+ * Tries Strudel's superdough tap first (for Strudel engine), then falls
+ * back to the shared context's master analyser (for Tone.js / WebAudio).
+ */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
+  /* Strategy 1: Strudel's superdough controller */
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
-    if (!ctx || ctx.state === 'closed') return null;
+    if (ctx && ctx.state !== 'closed') {
+      /* Create analyser in superdough's AudioContext */
+      if (!strudelAnalyser || strudelAnalyser.context !== ctx) {
+        strudelAnalyser = ctx.createAnalyser();
+        strudelAnalyser.fftSize = 2048;
+        strudelAnalyser.smoothingTimeConstant = 0.85;
+        strudelConnected = false;
+      }
 
-    /* Create analyser once in superdough's AudioContext */
-    if (!analyser || analyser.context !== ctx) {
-      analyser = ctx.createAnalyser();
-      analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.85;
-      connected = false;
+      if (!strudelConnected) {
+        try {
+          const controller = sd.getSuperdoughAudioController();
+          const destGain = controller?.output?.destinationGain;
+          if (destGain) {
+            destGain.connect(strudelAnalyser);
+            strudelConnected = true;
+            return strudelAnalyser;
+          }
+        } catch { /* controller not ready */ }
+      } else {
+        return strudelAnalyser;
+      }
     }
+  } catch { /* Strudel not available */ }
 
-    /* Already connected — just return */
-    if (connected) return analyser;
+  /* Strategy 2: Shared context master analyser — works for Tone.js / WebAudio.
+   * The chain is masterGain → masterAnalyser → destination, so any audio
+   * routed through getMasterGain() is already captured here. */
+  try {
+    const master = getMasterAnalyser();
+    if (master) return master;
+  } catch { /* shared context not ready */ }
 
-    /* Strategy 1: Tap the controller's output.destinationGain
-     * This is the final gain node before speakers — all audio passes through it. */
-    try {
-      const controller = sd.getSuperdoughAudioController();
-      const destGain = controller?.output?.destinationGain;
-      if (destGain) {
-        destGain.connect(analyser);
-        connected = true;
-        return analyser;
-      }
-    } catch { /* controller not ready yet */ }
-
-    /* Strategy 2: If controller isn't ready, try to insert our analyser
-     * between the context's destination input. We create a gain node,
-     * connect it to both the destination and our analyser. This works
-     * even before superdough's controller initializes. */
-    try {
-      /* Check if there's a destination we can tap.
-       * We connect the analyser to the destination — this doesn't intercept
-       * audio but the analyser still gets data if anything is connected
-       * to the destination. For proper tapping we need the source node. */
-      if (!connected && ctx.state === 'running') {
-        /* Last resort: create a MediaStreamDestination to capture all output.
-         * This is heavy but guaranteed to work. Only do this once. */
-        const mediaStream = ctx.createMediaStreamDestination();
-        const source = ctx.createMediaStreamSource(mediaStream.stream);
-        source.connect(analyser);
-        /* We can't easily connect the existing output to mediaStream,
-         * so this fallback won't work well. Return unconnected analyser. */
-      }
-    } catch { /* fallback failed */ }
-
-    /* Return analyser even if not connected — visualizer shows flat line.
-     * Next call will try connecting again. */
-    return analyser;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-/** Reset connection state — call after code re-evaluation to force reconnect.
- * Nulls the analyser so visualizers detect a node change and recreate theirs. */
+/** Reset Strudel connection state — call after code re-evaluation.
+ * Nulls the strudel analyser so it reconnects on next frame. */
 export function resetStrudelTap(): void {
-  connected = false;
-  analyser = null;
+  strudelConnected = false;
+  strudelAnalyser = null;
 }
 
 export async function getStrudelSampleRate(): Promise<number> {
