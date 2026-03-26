@@ -21,15 +21,30 @@ export class ToneJsEngine extends BaseEngine {
 
     /* Force Tone onto the shared AudioContext — MUST happen before any nodes.
      * This makes .toDestination() route through sharedCtx.destination. */
-    const sharedCtx = getSharedContext()
-    this.Tone.setContext(sharedCtx)
+    try {
+      const sharedCtx = getSharedContext()
+      this.Tone.setContext(sharedCtx)
+    } catch (e) {
+      console.warn('[Tone.js] setContext failed, using Tone default context:', e)
+    }
 
-    /* Tap Tone's master output for visualizers.
-     * Tone.getDestination().connect(node) adds a parallel connection from
-     * Destination's output GainNode to our masterAnalyser, without breaking
-     * the existing Destination → speakers chain. */
-    const analyser = getMasterAnalyser()
-    this.Tone.getDestination().connect(analyser)
+    /* Tap Tone's master output for visualizers — connect Destination to masterAnalyser.
+     * Wrapped in try/catch because Destination may not be ready until first note. */
+    try {
+      const analyser = getMasterAnalyser()
+      this.Tone.getDestination().connect(analyser)
+    } catch (e) {
+      console.warn('[Tone.js] Destination tap failed, will retry after evaluate:', e)
+    }
+  }
+
+  /** Reconnect Tone's destination to masterAnalyser (called after evaluate) */
+  private connectDestinationTap(): void {
+    if (!this.Tone) return
+    try {
+      const analyser = getMasterAnalyser()
+      this.Tone.getDestination().connect(analyser)
+    } catch { /* not ready yet */ }
   }
 
   async createNode(block: EngineBlock): Promise<AudioNodeWrapper> {
@@ -74,9 +89,10 @@ export class ToneJsEngine extends BaseEngine {
       const Tone = this.Tone
       await Function('Tone', `"use strict"; return (async () => { ${code} })()`)(Tone)
       console.log('[Tone.js] Code evaluated successfully')
-      /* Reset visualizer tap to force reconnect */
+      /* Reconnect visualizer tap after evaluate — Tone's destination is now active */
+      this.connectDestinationTap()
       resetStrudelTap()
-      setTimeout(() => resetStrudelTap(), 300)
+      setTimeout(() => { this.connectDestinationTap(); resetStrudelTap(); }, 300)
     } catch (err) {
       console.error('[Tone.js] Evaluation error:', err)
       throw err
