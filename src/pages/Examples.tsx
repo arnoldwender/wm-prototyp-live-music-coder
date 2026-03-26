@@ -12,7 +12,9 @@ import { LanguageSwitcher } from '../components/molecules'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
 import { encodeToUrl } from '../lib/persistence/url'
+import { ENGINE_COLORS } from '../lib/constants'
 import { usePageMeta } from '../lib/usePageMeta'
+import type { EngineType } from '../types/engine'
 
 /** Difficulty badge color map */
 const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
@@ -20,6 +22,13 @@ const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
   intermediate: 'var(--color-warning)',
   advanced: 'var(--color-error)',
 }
+
+/** Engine labels for filter pills */
+const ENGINE_LABELS: { id: EngineType; label: string; icon: string }[] = [
+  { id: 'strudel', label: 'Strudel', icon: '♩' },
+  { id: 'tonejs', label: 'Tone.js', icon: '🎹' },
+  { id: 'webaudio', label: 'WebAudio', icon: '〰' },
+]
 
 /** Category filter pill */
 function CategoryPill({
@@ -69,8 +78,8 @@ function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) =
         flexDirection: 'column',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'var(--color-strudel)'
-        e.currentTarget.style.boxShadow = 'var(--shadow-glow-strudel)'
+        e.currentTarget.style.borderColor = ENGINE_COLORS[example.engine]
+        e.currentTarget.style.boxShadow = `0 0 12px ${ENGINE_COLORS[example.engine]}22`
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = 'var(--color-border)'
@@ -89,18 +98,21 @@ function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) =
         >
           {example.name}
         </h3>
-        {/* Engine color dot — always Strudel purple */}
+        {/* Engine color dot + label */}
         <span
+          className="flex items-center gap-1"
           aria-label={`Engine: ${example.engine}`}
-          style={{
+          style={{ fontSize: '10px', color: 'var(--color-text-muted)', flexShrink: 0 }}
+        >
+          <span style={{
             display: 'inline-block',
             width: '8px',
             height: '8px',
             borderRadius: 'var(--radius-full)',
-            backgroundColor: 'var(--color-strudel)',
-            flexShrink: 0,
-          }}
-        />
+            backgroundColor: ENGINE_COLORS[example.engine],
+          }} />
+          {example.engine === 'strudel' ? 'Strudel' : example.engine === 'tonejs' ? 'Tone.js' : 'WebAudio'}
+        </span>
       </div>
 
       {/* Description */}
@@ -195,6 +207,7 @@ function Examples() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<ExampleEntry['difficulty'] | null>(null)
+  const [activeEngine, setActiveEngine] = useState<EngineType | null>(null)
 
   /* Per-page SEO meta tags */
   usePageMeta({
@@ -217,6 +230,9 @@ function Examples() {
   const filteredExamples = useMemo(() => {
     const query = search.toLowerCase().trim()
     return EXAMPLE_LIBRARY.filter((example: ExampleEntry) => {
+      /* Engine filter */
+      if (activeEngine && example.engine !== activeEngine) return false
+
       /* Category filter */
       if (activeCategory && example.category !== activeCategory) return false
 
@@ -410,6 +426,29 @@ function Examples() {
               label={cat}
               active={activeCategory === cat}
               onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+            />
+          ))}
+        </div>
+
+        {/* Engine filter pills */}
+        <div
+          className="flex flex-wrap items-center"
+          style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
+        >
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginRight: 'var(--space-2)' }}>
+            Engine:
+          </span>
+          <CategoryPill
+            label="All"
+            active={activeEngine === null}
+            onClick={() => setActiveEngine(null)}
+          />
+          {ENGINE_LABELS.map(({ id, label, icon }) => (
+            <CategoryPill
+              key={id}
+              label={`${icon} ${label}`}
+              active={activeEngine === id}
+              onClick={() => setActiveEngine(activeEngine === id ? null : id)}
             />
           ))}
         </div>
