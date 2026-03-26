@@ -63,7 +63,7 @@ function Legal() {
             fontWeight: 'var(--font-weight-medium)',
           }}
         >
-          Impressum
+          {t('legal.impressum')}
         </button>
         <button
           role="tab"
@@ -109,7 +109,7 @@ function Legal() {
       `}</style>
 
       <footer className="text-center py-8" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
-        Live Music Coder — Open Source (AGPL-3.0)
+        {t('footer.license')}
       </footer>
     </main>
   );

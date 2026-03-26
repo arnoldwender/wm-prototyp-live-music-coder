@@ -389,6 +389,40 @@
       "tipsText": "Halte deine Patterns kurz und modular. Nutze separate Zeilen für Drums, Bass und Melodie, damit du schnell einzelne Layer auskommentieren oder ändern kannst. Strg+Enter wertet den gesamten Code auf einmal aus, sodass du Änderungen über mehrere Zeilen vorbereiten kannst."
     }
   },
+  "a11y": {
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "footer": {
+    "license": "Live Music Coder — Open Source (AGPL-3.0)"
+  },
+  "share": {
+    "copied": "Kopiert!",
+    "copyUrl": "URL kopieren"
+  },
+  "editor": {
+    "run": "Ausführen",
+    "stop": "Stopp",
+    "playing": "Wiedergabe",
+    "ready": "Bereit",
+    "loading": "Laden...",
+    "evaluating": "Auswerten...",
+    "liveMode": "Live-Modus"
+  },
+  "templates": {
+    "title": "Wähle eine Startvorlage",
+    "subtitle": "Wähle eine aus, um loszulegen. Du kannst sie jederzeit ändern.",
+    "skip": "Überspringen — Standard verwenden"
+  },
+  "gist": {
+    "tokenSaved": "Token gespeichert",
+    "tokenCleared": "Token gelöscht",
+    "saveToken": "Token speichern",
+    "saveToGist": "Als Gist speichern",
+    "loadFromGist": "Aus Gist laden",
+    "saving": "Speichern...",
+    "loading": "Laden...",
+    "clear": "Löschen"
+  },
   "legal": {
     "impressum": "Impressum",
     "datenschutz": "Datenschutz"

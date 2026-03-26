@@ -7,6 +7,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useEffect, useRef, useCallback, useState, lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EditorState, EditorSelection } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
@@ -25,6 +26,7 @@ const StrudelEditor = lazy(() =>
 
 /** Main code editor — uses StrudelEditor for Strudel tabs, generic CM6 for others */
 export function CodeEditor() {
+  const { t } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const evaluatorRef = useRef<ReturnType<typeof createEvaluator> | null>(null);
@@ -211,7 +213,7 @@ export function CodeEditor() {
             className="!py-0.5 !px-2 text-xs"
           >
             <Play size={12} />
-            Run
+            {t('editor.run')}
           </Button>
         </Tooltip>
 
@@ -225,7 +227,7 @@ export function CodeEditor() {
             onChange={(e) => setAutoUpdate(e.target.checked)}
             className="cursor-pointer"
           />
-          Live mode
+          {t('editor.liveMode')}
         </label>
 
         {/* Platform-aware keyboard shortcut hint */}

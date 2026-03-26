@@ -70,20 +70,20 @@ export function GistDialog({ onClose }: GistDialogProps) {
 
   const handleSaveToken = () => {
     setStoredToken(token, remember)
-    setStatus('Token saved')
+    setStatus(t('gist.tokenSaved'))
   }
 
   const handleClearToken = () => {
     clearStoredToken()
     setToken('')
-    setStatus('Token cleared')
+    setStatus(t('gist.tokenCleared'))
   }
 
   /* --- Gist save handler — builds Project from current store state --- */
 
   const handleSave = async () => {
     setSaving(true)
-    setStatus('Saving...')
+    setStatus(t('gist.saving'))
     try {
       const store = useAppStore.getState()
       const now = new Date().toISOString()
@@ -120,7 +120,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
       setStatus('Invalid Gist ID or URL')
       return
     }
-    setStatus('Loading...')
+    setStatus(t('gist.loading'))
     try {
       const project = await loadFromGist(gistId)
       useAppStore.setState({
@@ -217,11 +217,11 @@ export function GistDialog({ onClose }: GistDialogProps) {
           </div>
           <div className="flex" style={{ gap: 'var(--space-3)' }}>
             <Button variant="secondary" onClick={handleSaveToken}>
-              Save Token
+              {t('gist.saveToken')}
             </Button>
             {hasToken && (
               <Button variant="ghost" onClick={handleClearToken} className="flex items-center gap-1">
-                <Trash2 size={14} /> Clear
+                <Trash2 size={14} /> {t('gist.clear')}
               </Button>
             )}
           </div>
@@ -236,7 +236,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
             className="w-full flex items-center justify-center gap-2"
           >
             <Upload size={16} />
-            <span>Save to Gist</span>
+            <span>{t('gist.saveToGist')}</span>
           </Button>
         </section>
 
@@ -271,7 +271,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
             className="w-full flex items-center justify-center gap-2"
           >
             <Download size={16} />
-            <span>Load from Gist</span>
+            <span>{t('gist.loadFromGist')}</span>
           </Button>
         </section>
 

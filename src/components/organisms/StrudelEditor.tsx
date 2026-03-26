@@ -3,6 +3,7 @@
  * Implements its own pattern highlighting without StrudelMirror dependency. */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EditorState, StateField, StateEffect } from '@codemirror/state';
 import { EditorView, Decoration, type DecorationSet } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
@@ -38,6 +39,7 @@ const highlightField = StateField.define<DecorationSet>({
 });
 
 export function StrudelEditor() {
+  const { t } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const replRef = useRef<any>(null);
@@ -224,28 +226,28 @@ export function StrudelEditor() {
         <Tooltip content="Evaluate & play (Ctrl+Enter)">
           <Button variant="ghost" onClick={handleEvaluate} disabled={!ready || evaluating} className="!py-0.5 !px-2 text-xs">
             {evaluating ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />}
-            {evaluating ? 'Evaluating...' : 'Run'}
+            {evaluating ? t('editor.evaluating') : t('editor.run')}
           </Button>
         </Tooltip>
         <Tooltip content="Stop playback">
           <Button variant="ghost" onClick={handleStop} className="!py-0.5 !px-2 text-xs">
-            <Square size={12} /> Stop
+            <Square size={12} /> {t('editor.stop')}
           </Button>
         </Tooltip>
         {isPlaying && (
           <span className="flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)', fontFamily: 'var(--font-family-mono)' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
-            Playing
+            {t('editor.playing')}
           </span>
         )}
         <span className="ml-auto flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ready ? 'var(--color-success)' : 'var(--color-warning)' }} />
-          {ready ? 'Ready' : 'Loading...'}
+          {ready ? t('editor.ready') : t('editor.loading')}
         </span>
       </div>
 
       {isPlaying && (
-        <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label="Playing" />
+        <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label={t('editor.playing')} />
       )}
 
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />

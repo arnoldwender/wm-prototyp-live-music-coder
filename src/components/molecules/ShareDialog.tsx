@@ -125,7 +125,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
         {/* Copy button with checkmark feedback */}
         <Button variant="primary" onClick={handleCopy} className="w-full flex items-center justify-center gap-2">
           {copied ? <Check size={16} /> : <Copy size={16} />}
-          <span>{copied ? 'Copied!' : 'Copy URL'}</span>
+          <span>{copied ? t('share.copied') : t('share.copyUrl')}</span>
         </Button>
       </div>
     </div>

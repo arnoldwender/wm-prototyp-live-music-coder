@@ -389,6 +389,40 @@
       "tipsText": "Mantén tus patrones cortos y modulares. Usa líneas separadas para batería, bajo y melodía para poder comentar o modificar capas individuales rápidamente. Ctrl+Enter evalúa todo el código a la vez, para que puedas preparar cambios en múltiples líneas antes de aplicarlos."
     }
   },
+  "a11y": {
+    "skipToContent": "Saltar al contenido"
+  },
+  "footer": {
+    "license": "Live Music Coder — Código abierto (AGPL-3.0)"
+  },
+  "share": {
+    "copied": "¡Copiado!",
+    "copyUrl": "Copiar URL"
+  },
+  "editor": {
+    "run": "Ejecutar",
+    "stop": "Detener",
+    "playing": "Reproduciendo",
+    "ready": "Listo",
+    "loading": "Cargando...",
+    "evaluating": "Evaluando...",
+    "liveMode": "Modo en vivo"
+  },
+  "templates": {
+    "title": "Elige una plantilla inicial",
+    "subtitle": "Elige una para empezar. Puedes cambiarla en cualquier momento.",
+    "skip": "Omitir — usar predeterminada"
+  },
+  "gist": {
+    "tokenSaved": "Token guardado",
+    "tokenCleared": "Token eliminado",
+    "saveToken": "Guardar token",
+    "saveToGist": "Guardar en Gist",
+    "loadFromGist": "Cargar desde Gist",
+    "saving": "Guardando...",
+    "loading": "Cargando...",
+    "clear": "Eliminar"
+  },
   "legal": {
     "impressum": "Aviso legal",
     "datenschutz": "Política de privacidad"

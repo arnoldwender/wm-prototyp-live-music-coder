@@ -5,6 +5,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { STARTER_TEMPLATES, type StarterTemplate } from '../../data/templates'
 import { useAppStore } from '../../lib/store'
 import { Button } from '../atoms'
@@ -16,6 +17,7 @@ interface TemplateSelectorProps {
 
 /** First-visit template picker modal */
 export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
+  const { t } = useTranslation()
   const updateFileCode = useAppStore((s) => s.updateFileCode)
   const setFileEngine = useAppStore((s) => s.setFileEngine)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
@@ -86,10 +88,10 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
           className="text-2xl font-bold mb-2"
           style={{ color: 'var(--color-text)' }}
         >
-          Choose a starter template
+          {t('templates.title')}
         </h2>
         <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-          Pick one to get started. You can always change it later.
+          {t('templates.subtitle')}
         </p>
 
         {/* Template cards grid */}
@@ -130,7 +132,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
           }}
           className="mt-4 w-full"
         >
-          Skip — use default
+          {t('templates.skip')}
         </Button>
       </div>
     </div>

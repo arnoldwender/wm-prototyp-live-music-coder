@@ -477,7 +477,7 @@ function Examples() {
         style={{ color: 'var(--color-text-muted)' }}
       >
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          Live Music Coder — Open Source (AGPL-3.0)
+          {t('footer.license')}
         </p>
       </footer>
     </main>

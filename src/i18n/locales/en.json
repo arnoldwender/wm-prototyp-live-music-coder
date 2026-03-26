@@ -389,6 +389,40 @@
       "tipsText": "Keep your patterns short and modular. Use separate lines for drums, bass, and melody so you can quickly comment out or modify individual layers. The Ctrl+Enter shortcut evaluates all code at once, so you can prepare changes across multiple lines before committing them."
     }
   },
+  "a11y": {
+    "skipToContent": "Skip to content"
+  },
+  "footer": {
+    "license": "Live Music Coder — Open Source (AGPL-3.0)"
+  },
+  "share": {
+    "copied": "Copied!",
+    "copyUrl": "Copy URL"
+  },
+  "editor": {
+    "run": "Run",
+    "stop": "Stop",
+    "playing": "Playing",
+    "ready": "Ready",
+    "loading": "Loading...",
+    "evaluating": "Evaluating...",
+    "liveMode": "Live mode"
+  },
+  "templates": {
+    "title": "Choose a starter template",
+    "subtitle": "Pick one to get started. You can always change it later.",
+    "skip": "Skip — use default"
+  },
+  "gist": {
+    "tokenSaved": "Token saved",
+    "tokenCleared": "Token cleared",
+    "saveToken": "Save Token",
+    "saveToGist": "Save to Gist",
+    "loadFromGist": "Load from Gist",
+    "saving": "Saving...",
+    "loading": "Loading...",
+    "clear": "Clear"
+  },
   "legal": {
     "impressum": "Impressum",
     "datenschutz": "Privacy Policy"
