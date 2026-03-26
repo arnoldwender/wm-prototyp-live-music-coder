@@ -123,44 +123,58 @@ function SampleCard({ sample, t }: { sample: SampleEntry; t: (key: string) => st
         )}
       </div>
 
-      {/* Code preview */}
-      <code
-        style={{
-          display: 'block',
-          fontSize: 'var(--font-size-xs)',
-          fontFamily: 'var(--font-family-mono)',
-          color: 'var(--color-text-secondary)',
-          backgroundColor: 'var(--color-bg)',
-          padding: 'var(--space-2) var(--space-3)',
-          borderRadius: 'var(--radius-sm)',
-          marginBottom: 'var(--space-3)',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {sample.example}
-      </code>
+      {/* Tags */}
+      {sample.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1" style={{ marginBottom: 'var(--space-2)' }}>
+          {sample.tags.slice(0, 5).map((tag) => (
+            <span key={tag} style={{
+              fontSize: '10px',
+              color: 'var(--color-text-muted)',
+              backgroundColor: 'var(--color-bg)',
+              padding: '1px var(--space-2)',
+              borderRadius: 'var(--radius-sm)',
+            }}>
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
 
-      {/* Try in Editor button */}
-      <button
-        onClick={() => navigate(`/editor#code=${encodeToUrl({ code: sample.example, bpm: 120, engine: 'strudel' as const })}`)}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: 'var(--space-2) var(--space-4)',
-          backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-bg)',
-          fontSize: 'var(--font-size-xs)',
-          fontWeight: 'var(--font-weight-bold)',
-          borderRadius: 'var(--radius-md)',
-          border: 'none',
-          cursor: 'pointer',
-          transition: 'var(--transition-fast)',
-        }}
-      >
-        {t('samples.tryInEditor')}
-      </button>
+      {/* Quick patterns — multiple ways to use this sample */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
+        {[
+          sample.example,
+          `s("${sample.name}*4").gain(0.6)`,
+          sample.variations > 1 ? `s("${sample.name}:${Math.floor(sample.variations / 2)}").speed(0.8)` : null,
+        ].filter(Boolean).map((code, i) => (
+          <button
+            key={i}
+            onClick={() => navigate(`/editor#code=${encodeToUrl({ code: code!, bpm: 120, engine: 'strudel' as const })}`)}
+            style={{
+              display: 'block',
+              width: '100%',
+              fontSize: '11px',
+              fontFamily: 'var(--font-family-mono)',
+              color: 'var(--color-text-secondary)',
+              backgroundColor: 'var(--color-bg)',
+              padding: 'var(--space-2) var(--space-3)',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              transition: 'var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-text)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)' }}
+            title={`Open in editor: ${code}`}
+          >
+            {code}
+          </button>
+        ))}
+      </div>
     </article>
   )
 }
