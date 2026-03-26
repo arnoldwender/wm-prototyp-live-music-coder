@@ -17,6 +17,7 @@ import { getEngineExtensions } from '../../lib/editor/extensions';
 import { createEvaluator } from '../../lib/editor/evaluate';
 import { resumeContext } from '../../lib/audio/context';
 import { FileTabs } from '../molecules/FileTabs';
+import { ErrorBar } from '../molecules/ErrorBar';
 import { Play } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
 
@@ -263,38 +264,9 @@ export function CodeEditor() {
 
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 
-      {/* Evaluation error bar — visible feedback when code fails to parse/run */}
+      {/* Evaluation error — beginner-friendly with help toggle */}
       {evalError && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="flex items-center shrink-0"
-          style={{
-            backgroundColor: 'var(--color-error)',
-            color: 'var(--color-bg)',
-            fontSize: 'var(--font-size-xs)',
-            fontFamily: 'var(--font-family-mono)',
-            padding: 'var(--space-2) var(--space-4)',
-            gap: 'var(--space-3)',
-          }}
-        >
-          <span className="flex-1 truncate">{evalError}</span>
-          <button
-            type="button"
-            onClick={() => setEvalError(null)}
-            aria-label="Dismiss error"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              fontSize: 'var(--font-size-sm)',
-              lineHeight: 1,
-            }}
-          >
-            &times;
-          </button>
-        </div>
+        <ErrorBar error={evalError} onDismiss={() => setEvalError(null)} />
       )}
     </div>
   );

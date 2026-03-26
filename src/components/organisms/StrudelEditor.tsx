@@ -11,6 +11,7 @@ import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { Button, Tooltip } from '../atoms';
+import { ErrorBar } from '../molecules/ErrorBar';
 import { Play, Square, Loader2 } from 'lucide-react';
 
 export function StrudelEditor() {
@@ -326,10 +327,7 @@ export function StrudelEditor() {
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 
       {evalError && (
-        <div role="alert" aria-live="assertive" className="flex items-center shrink-0" style={{ backgroundColor: 'var(--color-error)', color: 'var(--color-bg)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-mono)', padding: 'var(--space-2) var(--space-4)', gap: 'var(--space-3)' }}>
-          <span className="flex-1 truncate">{evalError}</span>
-          <button type="button" onClick={() => setEvalError(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 'var(--font-size-base)' }}>&times;</button>
-        </div>
+        <ErrorBar error={evalError} onDismiss={() => setEvalError(null)} />
       )}
     </div>
   );
