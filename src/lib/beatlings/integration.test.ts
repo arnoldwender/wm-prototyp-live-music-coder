@@ -10,15 +10,24 @@ describe('BeatlingWorld with neural brain', () => {
     world.dispose();
   });
 
-  it('runs update for 100 frames without crashing (no audio = no spawns)', () => {
+  it('seeds dormant eggs without audio (ambient mode)', () => {
     const world = new BeatlingWorld(16, 16);
 
-    for (let i = 0; i < 100; i++) {
+    /* Run enough frames for all 6 eggs to be seeded */
+    for (let i = 0; i < 700; i++) {
       world.update(false);
     }
 
-    /* No creatures spawn without audio (features.rms = 0) */
-    expect(world.getCreatures().length).toBe(0);
+    /* Eggs should appear as dormant seeds — at least 1, up to 6 */
+    const creatures = world.getCreatures();
+    expect(creatures.length).toBeGreaterThan(0);
+    expect(creatures.length).toBeLessThanOrEqual(6);
+
+    /* All should be in egg stage (dormant, not hatched) */
+    for (const c of creatures) {
+      expect(c.stage).toBe('egg');
+    }
+
     world.dispose();
   });
 

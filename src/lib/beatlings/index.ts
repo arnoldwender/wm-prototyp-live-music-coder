@@ -98,6 +98,10 @@ export class BeatlingWorld {
       rms: 0, peak: 0, hasBeat: false, dominantFreq: 0, complexity: 0, isTyping,
     };
 
+    /* Seed mode: spawn dormant eggs while no audio is playing.
+     * Eggs sit idle until real music starts, then they hatch. */
+    this.seedEggs(features);
+
     /* Update GoL every 3 frames for performance */
     this.golTickCounter++;
     if (this.golTickCounter % 3 === 0) {
@@ -278,31 +282,116 @@ export class BeatlingWorld {
     }
   }
 
-  /** Translate audio features into GoL cell injections */
+  /** Seed dormant eggs when no audio is playing.
+   * One egg per species appears over 10 seconds of silence.
+   * When music starts (RMS > 0.15), all eggs hatch into babies. */
+  private seedTimer = 0;
+  private seeded = false;
+  private seedEggs(features: AudioFeatures): void {
+    const hasAudio = features.rms > 0.15;
+
+    /* Hatch existing eggs when audio starts */
+    if (hasAudio) {
+      for (const creature of this.creatures) {
+        if (creature.stage === 'egg') {
+          /* Give eggs a boost of XP to hatch into babies */
+          creature.xp = addXp(creature.xp, 'audio', 5);
+          creature.stage = getStage(creature.xp);
+        }
+      }
+      this.seeded = false; /* Allow re-seeding after audio stops again */
+      return;
+    }
+
+    /* No audio — gradually seed one egg per species over ~10 seconds */
+    if (this.seeded) return;
+    this.seedTimer++;
+
+    const allSpecies: Species[] = ['beatling', 'looplet', 'synthling', 'glitchbit', 'wavelet', 'codefly'];
+    const framesPerEgg = 100; /* ~1.7 seconds between each egg */
+
+    for (let i = 0; i < allSpecies.length; i++) {
+      const species = allSpecies[i];
+      const spawnFrame = (i + 1) * framesPerEgg;
+
+      if (this.seedTimer === spawnFrame) {
+        /* Only seed if no creatures of this species exist */
+        const exists = this.creatures.some((c) => c.species === species);
+        if (!exists) {
+          const brain = new NeuralNetwork();
+          brain.initialize();
+          this.creatures.push({
+            id: `seed_${species}_${Date.now()}`,
+            species,
+            stage: 'egg',
+            xp: { audio: 0, complexity: 0, interaction: 0 },
+            x: 0.15 + (i % 3) * 0.3 + Math.random() * 0.1,
+            y: 0.2 + Math.floor(i / 3) * 0.4 + Math.random() * 0.1,
+            energy: 0,
+            born: Date.now(),
+            brain,
+            consciousness: new ConsciousnessEngine(),
+            dreams: new DreamEngine(),
+            isSleeping: false,
+            phi: 0,
+          });
+        }
+      }
+    }
+
+    /* After all eggs are placed, stop seeding */
+    if (this.seedTimer > allSpecies.length * framesPerEgg) {
+      this.seeded = true;
+    }
+  }
+
+  /** Translate audio features into GoL cell injections.
+   * Also adds ambient patterns when no audio is playing so the
+   * GoL grid stays visually alive with gentle gliders and pulses. */
   private injectAudioIntoGol(features: AudioFeatures): void {
     const cx = Math.floor(this.gol.width / 2);
     const cy = Math.floor(this.gol.height / 2);
 
-    /* Beats → pulse pattern near center */
-    if (features.hasBeat) {
-      this.gol.injectPulse(cx + (Math.random() - 0.5) * 20, cy + (Math.random() - 0.5) * 20, 3);
-    }
-    /* Low frequency → gliders moving across the grid */
-    if (features.dominantFreq < 200 && features.rms > 0.15) {
-      this.gol.injectGlider(Math.random() * this.gol.width, Math.random() * this.gol.height);
-    }
-    /* High frequency → oscillators (blinkers) */
-    if (features.dominantFreq > 500 && features.rms > 0.15) {
-      this.gol.injectOscillator(Math.random() * this.gol.width, Math.random() * this.gol.height);
-    }
-    /* Volume drives general cell injection */
-    if (features.rms > 0.3) {
-      const count = Math.floor(features.rms * 5);
-      for (let i = 0; i < count; i++) {
-        this.gol.setCell(
-          Math.floor(Math.random() * this.gol.width),
-          Math.floor(Math.random() * this.gol.height),
-          true,
+    if (features.rms > 0.15) {
+      /* === Live audio mode — inject patterns driven by sound === */
+
+      /* Beats → pulse pattern near center */
+      if (features.hasBeat) {
+        this.gol.injectPulse(cx + (Math.random() - 0.5) * 20, cy + (Math.random() - 0.5) * 20, 3);
+      }
+      /* Low frequency → gliders */
+      if (features.dominantFreq < 200) {
+        this.gol.injectGlider(Math.random() * this.gol.width, Math.random() * this.gol.height);
+      }
+      /* High frequency → oscillators */
+      if (features.dominantFreq > 500) {
+        this.gol.injectOscillator(Math.random() * this.gol.width, Math.random() * this.gol.height);
+      }
+      /* Volume → random cells */
+      if (features.rms > 0.3) {
+        const count = Math.floor(features.rms * 5);
+        for (let i = 0; i < count; i++) {
+          this.gol.setCell(
+            Math.floor(Math.random() * this.gol.width),
+            Math.floor(Math.random() * this.gol.height),
+            true,
+          );
+        }
+      }
+    } else {
+      /* === Ambient mode — gentle background activity === */
+      /* Slowly inject a glider every ~90 frames to keep GoL alive */
+      if (this.golTickCounter % 90 === 0) {
+        this.gol.injectGlider(
+          Math.random() * this.gol.width,
+          Math.random() * this.gol.height,
+        );
+      }
+      /* Occasional oscillator for visual variety */
+      if (this.golTickCounter % 150 === 0) {
+        this.gol.injectOscillator(
+          Math.random() * this.gol.width,
+          Math.random() * this.gol.height,
         );
       }
     }
