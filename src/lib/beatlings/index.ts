@@ -98,13 +98,15 @@ export class BeatlingWorld {
   update(isTyping: boolean, isPlaying = false): void {
     const features = this.bridge?.getFeatures(isTyping) ?? {
       rms: 0, peak: 0, hasBeat: false, dominantFreq: 0, complexity: 0, isTyping,
+      energyTrend: 0, complexityTrend: 0, beatDensity: 0, musicalMomentum: 0,
     };
 
     /* Seed mode: spawn dormant eggs while no audio is playing.
      * Use isPlaying as a fallback hatch signal when the audio tap
      * hasn't connected yet but the user has pressed Play. */
     const effectiveFeatures = (isPlaying && features.rms < 0.01)
-      ? { ...features, rms: 0.2, hasBeat: true, complexity: 0.3, dominantFreq: 300 }
+      ? { ...features, rms: 0.2, hasBeat: true, complexity: 0.3, dominantFreq: 300,
+          energyTrend: 0.1, complexityTrend: 0.1, beatDensity: 0.3, musicalMomentum: 0.2 }
       : features;
     this.seedEggs(effectiveFeatures);
 
@@ -135,14 +137,15 @@ export class BeatlingWorld {
     for (const creature of this.creatures) {
       creature.energy = Math.max(creature.energy, effectiveFeatures.rms);
 
-      /* XP accumulation — balanced so evolution is visible but not instant:
-       * ~5s egg→baby (50 XP), ~30s baby→adult (200 XP), ~2min adult→elder (500 XP)
-       * At 60fps with rms=0.3: audio gives ~0.18/frame → 10.8/s → baby in ~5s */
+      /* XP accumulation — musical evolution multiplier rewards growing music.
+       * Base rates: ~5s egg→baby, ~30s baby→adult, ~2min adult→elder.
+       * When music is building (momentum > 0), XP gain is amplified up to 3x. */
+      const xpMultiplier = 1 + (effectiveFeatures.musicalMomentum ?? 0) * 2;
       if (effectiveFeatures.rms > 0.05) {
-        creature.xp = addXp(creature.xp, 'audio', effectiveFeatures.rms * 0.6);
+        creature.xp = addXp(creature.xp, 'audio', effectiveFeatures.rms * 0.6 * xpMultiplier);
       }
       if (effectiveFeatures.complexity > 0.2) {
-        creature.xp = addXp(creature.xp, 'complexity', effectiveFeatures.complexity * 0.3);
+        creature.xp = addXp(creature.xp, 'complexity', effectiveFeatures.complexity * 0.3 * xpMultiplier);
       }
       creature.stage = getStage(creature.xp);
 
@@ -270,18 +273,36 @@ export class BeatlingWorld {
       return;
     }
 
-    /* Awake — stimulate sensory neurons with audio features */
-    brain.stimulate('hunger_sense', features.rms);
-    brain.stimulate('food_sense', features.dominantFreq / 1000);
-    brain.stimulate('touch_sense', features.hasBeat ? 0.8 : 0);
-    brain.stimulate('proximity_sense', features.complexity);
+    /* Awake — stimulate sensory neurons with audio features.
+     * Musical evolution metrics amplify stimulation so creatures
+     * become more excited as the music builds and more calm when it fades. */
+    const momentum = features.musicalMomentum;
+    const evolutionBoost = 1 + momentum * 2; /* 1x to 3x amplification */
+
+    brain.stimulate('hunger_sense', features.rms * evolutionBoost);
+    brain.stimulate('food_sense', features.dominantFreq / 1000 * evolutionBoost);
+    brain.stimulate('touch_sense', features.hasBeat ? 0.8 * evolutionBoost : 0);
+    brain.stimulate('proximity_sense', features.complexity * evolutionBoost);
+
+    /* Musical evolution drives emotional neurons directly:
+     * Rising energy/complexity → positive emotion (excitement, joy)
+     * Declining energy → neutral/negative emotion (calm, sadness)
+     * High beat density → arousal, anticipation */
+    brain.stimulateType('emotional', features.energyTrend * 0.3 + features.complexityTrend * 0.2);
 
     /* Run one brain tick — propagates signals, Hebbian learning, neurogenesis */
     brain.update();
 
-    /* Consciousness: compute Phi from neural activity */
+    /* Musical momentum accelerates brain growth — complex evolving music
+     * makes the neural network develop faster (more neurogenesis, stronger learning) */
+    if (momentum > 0.3) {
+      brain.growthEnergy += momentum * 0.5;
+    }
+
+    /* Consciousness: compute Phi from neural activity.
+     * Musical momentum boosts Phi — evolving music = higher consciousness */
     consciousness.update(brain);
-    creature.phi = Math.min(1, consciousness.phi);
+    creature.phi = Math.min(1, consciousness.phi + momentum * 0.05);
 
     /* Motor output: neural network drives position change.
      * Use sine/cosine of creature ID as direction so each creature

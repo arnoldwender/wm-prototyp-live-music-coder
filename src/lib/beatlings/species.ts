@@ -5,7 +5,8 @@
 
 import type { Species } from '../../types/beatling';
 
-/** Audio features extracted per frame for spawn checks and brain stimulation */
+/** Audio features extracted per frame for spawn checks and brain stimulation.
+ * Includes temporal metrics that track how the music evolves over time. */
 export interface AudioFeatures {
   rms: number;
   peak: number;
@@ -13,6 +14,11 @@ export interface AudioFeatures {
   dominantFreq: number;
   complexity: number;
   isTyping: boolean;
+  /* Temporal evolution metrics — how the music is changing */
+  energyTrend: number;      /* -1 to 1: negative = getting quieter, positive = getting louder */
+  complexityTrend: number;  /* -1 to 1: negative = simplifying, positive = getting richer */
+  beatDensity: number;      /* 0 to 1: how many beats in the last 2 seconds */
+  musicalMomentum: number;  /* 0 to 1: combined energy+complexity growth rate */
 }
 
 /** Full species definition including visual traits and spawn logic */

@@ -44,6 +44,10 @@ describe('BeatlingWorld with neural brain', () => {
         dominantFreq: 440,
         complexity: 0.6,
         isTyping: false,
+        energyTrend: 0.2,
+        complexityTrend: 0.1,
+        beatDensity: 0.3,
+        musicalMomentum: 0.2,
       }),
     };
 
@@ -82,6 +86,10 @@ describe('BeatlingWorld with neural brain', () => {
         dominantFreq: 220,
         complexity: 0.4,
         isTyping: false,
+        energyTrend: 0.1,
+        complexityTrend: 0.05,
+        beatDensity: 0.2,
+        musicalMomentum: 0.15,
       }),
     };
 
