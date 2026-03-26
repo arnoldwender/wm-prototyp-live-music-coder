@@ -7,21 +7,24 @@ import { useAppStore } from '../../lib/store';
 
 export function BeatlingPanel() {
   const worldRef = useRef<BeatlingWorld | null>(null);
-  const bridgeConnected = useRef(false);
   const frameCount = useRef(0);
   const lastCodeRef = useRef('');
+  const lastNodeRef = useRef<AnalyserNode | null>(null);
 
   /* Track typing: detect code changes in the active file */
   const files = useAppStore((s) => s.files);
+  const isPlaying = useAppStore((s) => s.isPlaying);
   const activeCode = files.find((f) => f.active)?.code ?? '';
   const isTypingRef = useRef(false);
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
 
   /* Detect code changes as "typing" — stays true for 60 frames after last change */
   const typingCooldown = useRef(0);
   useEffect(() => {
     if (activeCode !== lastCodeRef.current) {
       lastCodeRef.current = activeCode;
-      typingCooldown.current = 60; /* ~1 second of "typing" after each change */
+      typingCooldown.current = 60;
       isTypingRef.current = true;
     }
   }, [activeCode]);
@@ -41,18 +44,20 @@ export function BeatlingPanel() {
       if (typingCooldown.current === 0) isTypingRef.current = false;
     }
 
-    /* Try to connect audio bridge every 0.5s until successful */
-    if (!bridgeConnected.current && frameCount.current % 30 === 0) {
+    /* Reconnect audio bridge every 60 frames (~1s) — superdough recreates
+     * its audio chain on every evaluate(), so we must keep reconnecting.
+     * Only create a new AudioAnalyzer when the AnalyserNode changes. */
+    if (frameCount.current % 60 === 0) {
       getStrudelAnalyser().then(async (node) => {
-        if (node && worldRef.current) {
+        if (node && worldRef.current && node !== lastNodeRef.current) {
+          lastNodeRef.current = node;
           const sr = await getStrudelSampleRate();
           worldRef.current.setAudioBridge(new AudioAnalyzer(node), sr);
-          bridgeConnected.current = true;
         }
-      }).catch(() => { /* Audio tap unavailable — ignore */ });
+      }).catch(() => { /* Audio tap unavailable */ });
     }
 
-    worldRef.current.update(isTypingRef.current);
+    worldRef.current.update(isTypingRef.current, isPlayingRef.current);
     worldRef.current.draw(ctx, width, height, time);
   }, []);
 

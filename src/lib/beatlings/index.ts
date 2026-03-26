@@ -92,20 +92,26 @@ export class BeatlingWorld {
     this.bridge = new AudioBridge(analyzer, sampleRate);
   }
 
-  /** Update the ecosystem one frame */
-  update(isTyping: boolean): void {
+  /** Update the ecosystem one frame.
+   * @param isTyping — true when the user is actively editing code
+   * @param isPlaying — true when the transport is playing (store state) */
+  update(isTyping: boolean, isPlaying = false): void {
     const features = this.bridge?.getFeatures(isTyping) ?? {
       rms: 0, peak: 0, hasBeat: false, dominantFreq: 0, complexity: 0, isTyping,
     };
 
     /* Seed mode: spawn dormant eggs while no audio is playing.
-     * Eggs sit idle until real music starts, then they hatch. */
-    this.seedEggs(features);
+     * Use isPlaying as a fallback hatch signal when the audio tap
+     * hasn't connected yet but the user has pressed Play. */
+    const effectiveFeatures = (isPlaying && features.rms < 0.01)
+      ? { ...features, rms: 0.2, hasBeat: true, complexity: 0.3, dominantFreq: 300 }
+      : features;
+    this.seedEggs(effectiveFeatures);
 
     /* Update GoL every 3 frames for performance */
     this.golTickCounter++;
     if (this.golTickCounter % 3 === 0) {
-      this.injectAudioIntoGol(features);
+      this.injectAudioIntoGol(effectiveFeatures);
 
       /* Offload GoL step to Web Worker when available, otherwise sync */
       if (this.worker && !this.workerBusy) {
@@ -123,18 +129,19 @@ export class BeatlingWorld {
     }
 
     /* Try spawn new creatures based on audio features */
-    this.trySpawn(features);
+    this.trySpawn(effectiveFeatures);
 
     /* Update existing creatures — neural brain + energy + XP */
     for (const creature of this.creatures) {
-      creature.energy = features.rms;
+      creature.energy = Math.max(creature.energy, effectiveFeatures.rms);
 
-      /* XP accumulation from audio features */
-      if (features.rms > 0.1) {
-        creature.xp = addXp(creature.xp, 'audio', features.rms * 0.1);
+      /* XP accumulation from audio features — scaled so creatures evolve
+       * noticeably during a typical session (~30s egg→baby, ~2min→adult) */
+      if (effectiveFeatures.rms > 0.05) {
+        creature.xp = addXp(creature.xp, 'audio', effectiveFeatures.rms * 2);
       }
-      if (features.complexity > 0.3) {
-        creature.xp = addXp(creature.xp, 'complexity', features.complexity * 0.05);
+      if (effectiveFeatures.complexity > 0.2) {
+        creature.xp = addXp(creature.xp, 'complexity', effectiveFeatures.complexity * 1);
       }
       creature.stage = getStage(creature.xp);
 
@@ -142,7 +149,7 @@ export class BeatlingWorld {
        * Wrapped in try/catch to prevent brain errors from killing the draw loop. */
       if (this.golTickCounter % 3 === 0) {
         try {
-          this.updateCreatureBrain(creature, features);
+          this.updateCreatureBrain(creature, effectiveFeatures);
         } catch (err) {
           console.warn('[BeatlingWorld] Brain update error:', err);
         }
@@ -152,11 +159,15 @@ export class BeatlingWorld {
     /* Check achievements after state updates */
     this.checkAchievements();
 
-    /* Despawn egg creatures after 10s of silence */
+    /* Despawn: only remove creatures that have been silent AND idle for 60s.
+     * Never despawn creatures while any audio or typing is happening.
+     * Seed eggs (id starts with "seed_") are never despawned — they persist
+     * until music hatches them. */
     if (features.rms < 0.01 && !features.isTyping) {
       this.creatures = this.creatures.filter((c) => {
-        const alive = Date.now() - c.born < 10000 || c.stage !== 'egg';
-        return alive;
+        if (c.id.startsWith('seed_')) return true; /* seed eggs persist */
+        const age = Date.now() - c.born;
+        return age < 60000 || c.stage !== 'egg'; /* 60s timeout for audio-spawned eggs */
       });
     }
   }
@@ -290,12 +301,12 @@ export class BeatlingWorld {
   private seedEggs(features: AudioFeatures): void {
     const hasAudio = features.rms > 0.15;
 
-    /* Hatch existing eggs when audio starts */
+    /* Hatch existing eggs when audio starts — give enough XP to become babies */
     if (hasAudio) {
       for (const creature of this.creatures) {
         if (creature.stage === 'egg') {
-          /* Give eggs a boost of XP to hatch into babies */
-          creature.xp = addXp(creature.xp, 'audio', 5);
+          /* Baby threshold is 50 XP — give a full hatch boost */
+          creature.xp = addXp(creature.xp, 'audio', 60);
           creature.stage = getStage(creature.xp);
         }
       }
