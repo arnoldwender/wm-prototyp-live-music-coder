@@ -56,10 +56,11 @@ export class WebAudioEngine extends BaseEngine {
     try {
       /* Provide `destination` as masterGain — anything connected here flows
        * through masterGain → masterAnalyser → real destination (speakers) */
+      console.log('[WebAudio] Patched code:', patchedCode.slice(0, 200))
       await Function('ctx', 'masterGain', 'destination', `"use strict"; return (async () => { ${patchedCode} })()`)(
         ctx, masterGain, masterGain
       )
-      console.log('[WebAudio] Code evaluated successfully')
+      console.log('[WebAudio] Code evaluated successfully, ctx.state:', ctx.state)
       resetStrudelTap()
     } catch (err) {
       console.error('[WebAudio] Evaluation error:', err)
