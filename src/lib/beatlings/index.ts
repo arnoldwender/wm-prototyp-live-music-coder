@@ -183,6 +183,13 @@ export class BeatlingWorld {
       energy: c.energy,
       phi: c.phi,
       isSleeping: c.isSleeping,
+      /* Brain metrics for visualization */
+      neuronCount: c.brain.neurons.size,
+      synapseCount: c.brain.synapses.size,
+      intelligence: c.brain.intelligence,
+      emotionalState: c.brain.getEmotionalState(),
+      totalFirings: c.brain.totalFirings,
+      motorOutput: c.brain.getMotorOutput(),
     }));
     drawBeatlingWorld(ctx, width, height, this.gol, renderData, time);
   }
