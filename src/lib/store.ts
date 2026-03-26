@@ -21,6 +21,9 @@ export interface CreatureStat {
   totalFirings: number
   isSleeping: boolean
   xpTotal: number
+  /* Normalized 0-1 position for canvas hit-testing */
+  x: number
+  y: number
 }
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
 
@@ -46,8 +49,12 @@ interface AppState {
   /* Beatling ecosystem — synced from BeatlingPanel every frame */
   creatureCount: number
   creatureStats: CreatureStat[]
+  selectedCreatureId: string | null
+  showBrainPanel: boolean
   setCreatureCount: (count: number) => void
   setCreatureStats: (stats: CreatureStat[]) => void
+  selectCreature: (id: string | null) => void
+  toggleBrainPanel: () => void
 
   /* Transport actions */
   togglePlay: () => void
@@ -93,10 +100,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
   files: [{ ...DEFAULT_FILE }],
   creatureCount: 0,
   creatureStats: [],
+  selectedCreatureId: null,
+  showBrainPanel: false,
 
   /* --- Beatling ecosystem --- */
   setCreatureCount: (count: number) => set({ creatureCount: count }),
   setCreatureStats: (stats: CreatureStat[]) => set({ creatureStats: stats }),
+  selectCreature: (id: string | null) => set({ selectedCreatureId: id, showBrainPanel: id !== null }),
+  toggleBrainPanel: () => set((s) => ({ showBrainPanel: !s.showBrainPanel, selectedCreatureId: null })),
 
   /* --- Transport actions --- */
 

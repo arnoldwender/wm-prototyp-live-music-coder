@@ -14,6 +14,8 @@ function StatusBar() {
   const defaultEngine = useAppStore((s) => s.defaultEngine)
   const fileCount = useAppStore((s) => s.files.length)
   const creatureCount = useAppStore((s) => s.creatureCount)
+  const toggleBrainPanel = useAppStore((s) => s.toggleBrainPanel)
+  const showBrainPanel = useAppStore((s) => s.showBrainPanel)
 
   return (
     <footer
@@ -42,10 +44,23 @@ function StatusBar() {
           {t('status.files')}: {fileCount}
         </span>
 
-        {/* Live creature count from BeatlingWorld */}
-        <span>
+        {/* Live creature count — clickable to toggle Brain Panel */}
+        <button
+          type="button"
+          onClick={toggleBrainPanel}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: showBrainPanel ? 'var(--color-primary)' : 'inherit',
+            cursor: 'pointer',
+            fontSize: 'inherit',
+            fontFamily: 'inherit',
+            padding: 0,
+          }}
+          aria-label={t('status.toggleBrain', 'Toggle brain panel')}
+        >
           {t('status.creatures')}: {creatureCount}/12
-        </span>
+        </button>
 
         {/* Ready indicator */}
         <span

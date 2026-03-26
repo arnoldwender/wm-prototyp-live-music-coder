@@ -77,12 +77,38 @@ export function BeatlingPanel() {
         totalFirings: c.brain?.totalFirings ?? 0,
         isSleeping: c.isSleeping ?? false,
         xpTotal: (c.xp?.audio ?? 0) + (c.xp?.complexity ?? 0) + (c.xp?.interaction ?? 0),
+        x: c.x ?? 0,
+        y: c.y ?? 0,
       })));
     }
   }, []);
 
+  /* Click on canvas → find nearest creature → select it */
+  const handleCanvasClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) / rect.width;
+    const clickY = (e.clientY - rect.top) / rect.height;
+    const stats = useAppStore.getState().creatureStats;
+
+    /* Find creature closest to click within 0.08 normalized distance */
+    let closest: string | null = null;
+    let minDist = 0.08;
+    for (const c of stats) {
+      const dist = Math.sqrt((c.x - clickX) ** 2 + (c.y - clickY) ** 2);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = c.id;
+      }
+    }
+    useAppStore.getState().selectCreature(closest);
+  }, []);
+
   return (
-    <div className="h-full w-full" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div
+      className="h-full w-full"
+      style={{ backgroundColor: 'var(--color-bg)', cursor: 'pointer' }}
+      onClick={handleCanvasClick}
+    >
       <CanvasVisualizer draw={draw} />
     </div>
   );

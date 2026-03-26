@@ -67,7 +67,7 @@ function nextStageInfo(stage: string, xp: number): string {
 }
 
 /** Single creature brain card */
-function CreatureCard({ creature }: { creature: CreatureStat }) {
+function CreatureCard({ creature, isSelected }: { creature: CreatureStat; isSelected: boolean }) {
   const def = SPECIES[creature.species];
   const nextXpThreshold = creature.stage === 'egg' ? XP_THRESHOLDS.baby
     : creature.stage === 'baby' ? XP_THRESHOLDS.adult
@@ -76,16 +76,20 @@ function CreatureCard({ creature }: { creature: CreatureStat }) {
     : 1000;
 
   return (
-    <article style={{
-      backgroundColor: 'var(--color-bg-alt)',
-      border: '1px solid var(--color-border)',
-      borderLeft: `3px solid ${def.color}`,
-      borderRadius: 'var(--radius-md)',
-      padding: 'var(--space-3)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 'var(--space-2)',
-    }}>
+    <article
+      onClick={() => useAppStore.getState().selectCreature(creature.id)}
+      style={{
+        backgroundColor: isSelected ? 'var(--color-bg-elevated)' : 'var(--color-bg-alt)',
+        border: isSelected ? `1px solid ${def.color}` : '1px solid var(--color-border)',
+        borderLeft: `3px solid ${def.color}`,
+        borderRadius: 'var(--radius-md)',
+        padding: 'var(--space-3)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-2)',
+        cursor: 'pointer',
+        transition: 'var(--transition-fast)',
+      }}>
       {/* Header: species name + stage + sleep indicator */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
@@ -159,6 +163,8 @@ function CreatureCard({ creature }: { creature: CreatureStat }) {
 export function BrainPanel() {
   const { t } = useTranslation();
   const stats = useAppStore((s) => s.creatureStats);
+  const selectedId = useAppStore((s) => s.selectedCreatureId);
+  const selected = selectedId ? stats.find((c) => c.id === selectedId) : null;
 
   if (stats.length === 0) {
     return (
@@ -209,9 +215,68 @@ export function BrainPanel() {
         </span>
       </div>
 
+      {/* Selected creature detail — expanded view */}
+      {selected && (
+        <div style={{
+          backgroundColor: 'var(--color-bg-elevated)',
+          border: `1px solid ${SPECIES[selected.species].color}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 'var(--space-3)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-2)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: SPECIES[selected.species].color,
+              textTransform: 'capitalize',
+            }}>
+              {selected.species} — {t('brain.detail', 'Detail')}
+            </span>
+            <button
+              type="button"
+              onClick={() => useAppStore.getState().selectCreature(null)}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-base)' }}
+            >
+              &times;
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-1) var(--space-3)' }}>
+            <Stat label={t('brain.neurons', 'Neurons')} value={selected.neuronCount} />
+            <Stat label={t('brain.synapses', 'Synapses')} value={selected.synapseCount} />
+            <Stat label={t('brain.firings', 'Firings')} value={selected.totalFirings} />
+            <Stat label={t('brain.iq', 'IQ')} value={selected.intelligence} />
+            <Stat label={t('brain.phi', 'Phi (\u03A6)')} value={selected.phi} />
+            <Stat label={t('brain.emotion', 'Emotion')} value={`${emotionEmoji(selected.emotionalState)} ${selected.emotionalState.toFixed(2)}`} />
+            <Stat label={t('brain.xp', 'Total XP')} value={selected.xpTotal} />
+            <Stat label={t('brain.stage', 'Stage')} value={selected.stage} />
+          </div>
+          <div>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+              {t('brain.role', 'Role')}: {SPECIES[selected.species].role}
+            </span>
+          </div>
+          <div>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+              {nextStageInfo(selected.stage, selected.xpTotal)}
+            </span>
+          </div>
+          {/* Consciousness bar */}
+          <MiniBar value={selected.phi} max={1} color={SPECIES[selected.species].color} />
+          {/* XP bar */}
+          <MiniBar
+            value={selected.xpTotal}
+            max={selected.stage === 'egg' ? XP_THRESHOLDS.baby : selected.stage === 'baby' ? XP_THRESHOLDS.adult : selected.stage === 'adult' ? XP_THRESHOLDS.elder : XP_THRESHOLDS.ascended}
+            color="var(--color-success)"
+          />
+        </div>
+      )}
+
       {/* Creature cards */}
       {stats.map((creature) => (
-        <CreatureCard key={creature.id} creature={creature} />
+        <CreatureCard key={creature.id} creature={creature} isSelected={creature.id === selectedId} />
       ))}
     </div>
   );

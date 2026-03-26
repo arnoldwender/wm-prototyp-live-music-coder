@@ -18,6 +18,7 @@ import { BrainPanel } from './BrainPanel';
 export function VisualizerDashboard() {
   const { t } = useTranslation();
   const visiblePanels = useAppStore((s) => s.layout.visiblePanels);
+  const showBrainPanel = useAppStore((s) => s.showBrainPanel);
 
   /* Build array of only visible panels — each gets equal flex width */
   const activePanels = [
@@ -28,7 +29,7 @@ export function VisualizerDashboard() {
       key: 'beatlings',
       component: <BeatlingPanel />,
     },
-    visiblePanels.brain && {
+    (visiblePanels.brain || showBrainPanel) && {
       key: 'brain',
       component: <BrainPanel />,
     },
