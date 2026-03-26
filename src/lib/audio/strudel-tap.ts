@@ -1,25 +1,23 @@
 /* Universal audio tap for visualization — works for ALL engines.
  *
- * Strategy priority:
- * 1. Strudel: tap superdough's destinationGain (Strudel's own AudioContext)
- * 2. Tone.js: tap Tone's destination via its own AudioContext
- * 3. Shared context: tap masterAnalyser (WebAudio engine routes through here)
+ * Strategy:
+ * 1. Strudel: tap superdough's destinationGain (Strudel has its own AudioContext)
+ * 2. Fallback: shared context masterAnalyser (Tone.js + WebAudio route through this)
  *
- * Never caches a "miss" — retries Strudel/Tone connection every call. */
+ * Tone.js: setContext(sharedCtx) + Destination.connect(masterAnalyser) in init()
+ * WebAudio: evaluates with shared ctx + masterGain already in the chain */
 
 import { getMasterAnalyser } from './context';
 
 let strudelAnalyser: AnalyserNode | null = null;
 let strudelConnected = false;
 
-let toneAnalyser: AnalyserNode | null = null;
-let toneConnected = false;
-
 /**
- * Returns an AnalyserNode with live audio data for visualization.
+ * Returns an AnalyserNode with live audio data.
+ * Tries Strudel superdough first, falls back to shared masterAnalyser.
  */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
-  /* Strategy 1: Strudel superdough controller */
+  /* Strategy 1: Strudel's superdough controller (its own AudioContext) */
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
@@ -39,62 +37,25 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
             destGain.connect(strudelAnalyser);
             strudelConnected = true;
           }
-        } catch { /* controller not ready */ }
+        } catch { /* controller not ready — retry next frame */ }
       }
 
       if (strudelConnected) return strudelAnalyser;
     }
   } catch { /* Strudel not available */ }
 
-  /* Strategy 2: Tone.js — tap into Tone's own AudioContext destination */
-  try {
-    const Tone = await import('tone');
-    const toneCtx = Tone.getContext().rawContext as AudioContext;
-    if (toneCtx && toneCtx.state === 'running') {
-      if (!toneAnalyser || toneAnalyser.context !== toneCtx) {
-        toneAnalyser = toneCtx.createAnalyser();
-        toneAnalyser.fftSize = 2048;
-        toneAnalyser.smoothingTimeConstant = 0.85;
-        toneConnected = false;
-      }
-
-      if (!toneConnected) {
-        try {
-          /* Tap Tone's master output — Tone.getDestination() returns the master output node */
-          const dest = Tone.getDestination();
-          const rawOutput = (dest as any).output || (dest as any)._gainNode;
-          if (rawOutput && rawOutput.connect) {
-            rawOutput.connect(toneAnalyser);
-            toneConnected = true;
-          } else {
-            /* Fallback: connect via the raw context destination's input */
-            const masterGain = toneCtx.createGain();
-            masterGain.connect(toneCtx.destination);
-            masterGain.connect(toneAnalyser);
-            /* Can't easily intercept existing connections, but the analyser
-             * will at least be in the right context for future connections */
-          }
-        } catch { /* Tone destination not ready */ }
-      }
-
-      if (toneConnected) return toneAnalyser;
-    }
-  } catch { /* Tone.js not loaded — that's fine */ }
-
-  /* Strategy 3: Shared context masterAnalyser — WebAudio engine routes here */
+  /* Strategy 2: Shared masterAnalyser — Tone.js and WebAudio both route here */
   try {
     return getMasterAnalyser();
-  } catch { /* shared context not ready */ }
+  } catch { /* not ready */ }
 
   return null;
 }
 
-/** Reset all connection states — call after code re-evaluation. */
+/** Reset connection state — call after evaluate to force reconnect. */
 export function resetStrudelTap(): void {
   strudelConnected = false;
   strudelAnalyser = null;
-  toneConnected = false;
-  toneAnalyser = null;
 }
 
 export async function getStrudelSampleRate(): Promise<number> {
