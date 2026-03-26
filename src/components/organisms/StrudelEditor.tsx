@@ -5,7 +5,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditorState, StateField, StateEffect } from '@codemirror/state';
-import { EditorView, Decoration, type DecorationSet } from '@codemirror/view';
+import { EditorView, Decoration, type DecorationSet, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
@@ -100,6 +100,16 @@ export function StrudelEditor() {
       }
     });
 
+    /* Ctrl+Enter / Cmd+Enter keybinding to evaluate code */
+    const evalKeymap = keymap.of([{
+      key: 'Ctrl-Enter',
+      mac: 'Cmd-Enter',
+      run: () => {
+        handleEvaluate();
+        return true;
+      },
+    }]);
+
     const state = EditorState.create({
       doc: activeFile.code,
       extensions: [
@@ -107,6 +117,7 @@ export function StrudelEditor() {
         ...getEngineExtensions(activeFile.engine),
         highlightField,
         updateListener,
+        evalKeymap,
       ],
     });
 
@@ -199,6 +210,13 @@ export function StrudelEditor() {
     setEvaluating(true);
     setEvalError(null);
     try {
+      /* Resume AudioContext — Web Audio requires a user gesture before playback */
+      try {
+        const { getAudioContext } = await import('superdough');
+        const ctx = getAudioContext();
+        if (ctx?.state === 'suspended') await ctx.resume();
+      } catch { /* AudioContext resume failed — Strudel will handle it */ }
+
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
