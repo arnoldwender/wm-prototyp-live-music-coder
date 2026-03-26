@@ -13,6 +13,7 @@ function StatusBar() {
   const { t } = useTranslation()
   const defaultEngine = useAppStore((s) => s.defaultEngine)
   const fileCount = useAppStore((s) => s.files.length)
+  const creatureCount = useAppStore((s) => s.creatureCount)
 
   return (
     <footer
@@ -41,9 +42,9 @@ function StatusBar() {
           {t('status.files')}: {fileCount}
         </span>
 
-        {/* Creature count placeholder */}
+        {/* Live creature count from BeatlingWorld */}
         <span>
-          {t('status.creatures')}: 0/6
+          {t('status.creatures')}: {creatureCount}/12
         </span>
 
         {/* Ready indicator */}

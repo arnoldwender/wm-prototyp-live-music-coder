@@ -59,6 +59,12 @@ export function BeatlingPanel() {
 
     worldRef.current.update(isTypingRef.current, isPlayingRef.current);
     worldRef.current.draw(ctx, width, height, time);
+
+    /* Sync creature count to store every 30 frames for StatusBar display */
+    if (frameCount.current % 30 === 0) {
+      const count = worldRef.current.getCreatures().length;
+      useAppStore.getState().setCreatureCount(count);
+    }
   }, []);
 
   return (

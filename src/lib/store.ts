@@ -27,6 +27,10 @@ interface AppState {
   /* Files */
   files: ProjectFile[]
 
+  /* Beatling ecosystem — synced from BeatlingPanel every frame */
+  creatureCount: number
+  setCreatureCount: (count: number) => void
+
   /* Transport actions */
   togglePlay: () => void
   stop: () => void
@@ -69,6 +73,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
   defaultEngine: DEFAULT_ENGINE,
   layout: { ...DEFAULT_LAYOUT, visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels } },
   files: [{ ...DEFAULT_FILE }],
+  creatureCount: 0,
+
+  /* --- Beatling ecosystem --- */
+  setCreatureCount: (count: number) => set({ creatureCount: count }),
 
   /* --- Transport actions --- */
 

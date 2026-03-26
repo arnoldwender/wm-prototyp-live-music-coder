@@ -135,13 +135,14 @@ export class BeatlingWorld {
     for (const creature of this.creatures) {
       creature.energy = Math.max(creature.energy, effectiveFeatures.rms);
 
-      /* XP accumulation from audio features — scaled so creatures evolve
-       * noticeably during a typical session (~30s egg→baby, ~2min→adult) */
+      /* XP accumulation — balanced so evolution is visible but not instant:
+       * ~5s egg→baby (50 XP), ~30s baby→adult (200 XP), ~2min adult→elder (500 XP)
+       * At 60fps with rms=0.3: audio gives ~0.18/frame → 10.8/s → baby in ~5s */
       if (effectiveFeatures.rms > 0.05) {
-        creature.xp = addXp(creature.xp, 'audio', effectiveFeatures.rms * 2);
+        creature.xp = addXp(creature.xp, 'audio', effectiveFeatures.rms * 0.6);
       }
       if (effectiveFeatures.complexity > 0.2) {
-        creature.xp = addXp(creature.xp, 'complexity', effectiveFeatures.complexity * 1);
+        creature.xp = addXp(creature.xp, 'complexity', effectiveFeatures.complexity * 0.3);
       }
       creature.stage = getStage(creature.xp);
 
