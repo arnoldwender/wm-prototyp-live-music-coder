@@ -64,7 +64,7 @@ export class WebAudioEngine extends BaseEngine {
       await Function('ctx', 'out', `"use strict"; return (async () => { ${patchedCode} })()`)(
         ctxProxy, masterGain
       )
-      console.log('[WebAudio] Code evaluated, ctx.state:', ctx.state)
+      /* Audio chain: user nodes → masterGain → masterAnalyser → speakers */
       resetStrudelTap()
     } catch (err) {
       console.error('[WebAudio] Evaluation error:', err)

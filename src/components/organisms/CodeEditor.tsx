@@ -57,9 +57,7 @@ export function CodeEditor() {
       /* Resume AudioContext IMMEDIATELY in the click handler — no dynamic import
        * that could lose the user gesture context in some browsers */
       await resumeContext();
-      console.log(`[CodeEditor] Evaluating ${activeFile.engine} code (${activeFile.code.length} chars):`, activeFile.code.slice(0, 80));
       await orch.evaluate(activeFile.code, activeFile.engine);
-      console.log(`[CodeEditor] Evaluation complete for ${activeFile.engine}`);
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
