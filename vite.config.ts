@@ -9,6 +9,19 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        /* Split heavy deps into separate chunks — loaded on demand */
+        manualChunks(id: string) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router') || id.includes('node_modules/zustand')) return 'vendor-react'
+          if (id.includes('node_modules/@codemirror')) return 'vendor-codemirror'
+          if (id.includes('node_modules/@xyflow')) return 'vendor-reactflow'
+          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) return 'vendor-i18n'
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

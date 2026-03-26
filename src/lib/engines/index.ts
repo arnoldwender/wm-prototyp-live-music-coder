@@ -1,28 +1,33 @@
 /* ──────────────────────────────────────────────────────────
-   Engine registry — barrel exports + factory + metadata.
-   Creates engine adapters by type and provides display info.
+   Engine registry — barrel exports + lazy factory + metadata.
+   Engines are loaded on demand to avoid bundling Tone.js (636KB)
+   and WebMidi (68KB) when only Strudel is used.
    ────────────────────────────────────────────────────────── */
 
 import type { EngineType, EngineAdapter } from '../../types/engine'
-import { StrudelEngine } from './strudel'
-import { ToneJsEngine } from './tonejs'
-import { WebAudioEngine } from './webaudio'
-import { MidiEngine } from './midi'
 
-/* Re-export all engine classes */
-export { StrudelEngine } from './strudel'
-export { ToneJsEngine } from './tonejs'
-export { WebAudioEngine } from './webaudio'
-export { MidiEngine } from './midi'
+/* Re-export base class (lightweight, always needed) */
 export { BaseEngine } from './base'
 
-/** Create an engine adapter by type */
-export function createEngine(type: EngineType): EngineAdapter {
+/** Lazily create an engine adapter by type — code-splits heavy deps */
+export async function createEngineAsync(type: EngineType): Promise<EngineAdapter> {
   switch (type) {
-    case 'strudel': return new StrudelEngine()
-    case 'tonejs': return new ToneJsEngine()
-    case 'webaudio': return new WebAudioEngine()
-    case 'midi': return new MidiEngine()
+    case 'strudel': {
+      const { StrudelEngine } = await import('./strudel')
+      return new StrudelEngine()
+    }
+    case 'tonejs': {
+      const { ToneJsEngine } = await import('./tonejs')
+      return new ToneJsEngine()
+    }
+    case 'webaudio': {
+      const { WebAudioEngine } = await import('./webaudio')
+      return new WebAudioEngine()
+    }
+    case 'midi': {
+      const { MidiEngine } = await import('./midi')
+      return new MidiEngine()
+    }
   }
 }
 

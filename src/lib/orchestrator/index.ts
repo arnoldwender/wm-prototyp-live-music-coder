@@ -6,7 +6,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { AudioGraph } from './graph'
-import { createEngine } from '../engines'
+import { createEngineAsync } from '../engines'
 import { resumeContext } from '../audio/context'
 import type { EngineType, EngineAdapter } from '../../types/engine'
 import type { OrchestratorState } from './types'
@@ -28,8 +28,9 @@ export class Orchestrator {
 
   /** Lazily initialize an engine (only when first needed) */
   async getEngine(type: EngineType): Promise<EngineAdapter> {
+    /* Lazy-load engine module on first access — code-splits heavy deps */
     if (!this.engines.has(type)) {
-      const engine = createEngine(type)
+      const engine = await createEngineAsync(type)
       this.engines.set(type, engine)
     }
     const engine = this.engines.get(type)!
