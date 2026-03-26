@@ -18,10 +18,10 @@ function XpBar() {
   const nextLevelXp = xpForLevel(userLevel + 1)
   const xpInLevel = userXp - currentLevelXp
   const xpNeeded = nextLevelXp - currentLevelXp
-  const progress = xpNeeded > 0 ? Math.min(xpInLevel / xpNeeded, 1) : 0
+  const progress = xpNeeded > 0 ? Math.max(0, Math.min(xpInLevel / xpNeeded, 1)) : 0
 
-  /* Bar width in characters (6 chars total) */
-  const filledChars = Math.round(progress * 6)
+  /* Bar width in characters (6 chars total) — clamp to prevent negative .repeat() */
+  const filledChars = Math.max(0, Math.min(6, Math.round(progress * 6)))
   const emptyChars = 6 - filledChars
   const barText = '\u2588'.repeat(filledChars) + '\u2591'.repeat(emptyChars)
 

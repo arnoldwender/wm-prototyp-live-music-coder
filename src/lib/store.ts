@@ -51,9 +51,10 @@ export interface SessionStats {
 /** Visible panel names that can be toggled */
 type PanelName = keyof PanelLayout['visiblePanels']
 
-/** XP required to reach a given level: 100 * n^1.5 */
+/** XP required to reach a given level. Level 1 starts at 0 XP. */
 export function xpForLevel(n: number): number {
-  return Math.floor(100 * Math.pow(n, 1.5))
+  if (n <= 1) return 0
+  return Math.floor(100 * Math.pow(n - 1, 1.5))
 }
 
 /** Calculate level from total XP */
