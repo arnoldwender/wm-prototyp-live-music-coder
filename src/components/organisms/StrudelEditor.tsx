@@ -23,6 +23,10 @@ export function StrudelEditor() {
   const [evalError, setEvalError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
+  const [liveMode, setLiveMode] = useState(true);
+  const liveModeRef = useRef(true);
+  liveModeRef.current = liveMode;
+  const evalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isPlaying = useAppStore((s) => s.isPlaying);
   const togglePlay = useAppStore((s) => s.togglePlay);
@@ -93,7 +97,21 @@ export function StrudelEditor() {
 
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
-        updateFileCode(activeFile.id, update.state.doc.toString());
+        const code = update.state.doc.toString();
+        updateFileCode(activeFile.id, code);
+        /* Live mode: debounced auto-evaluate on every code change */
+        if (liveModeRef.current && replRef.current && isPlaying) {
+          if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
+          evalTimerRef.current = setTimeout(async () => {
+            try {
+              await replRef.current.evaluate(code, true);
+              resetStrudelTap();
+              setEvalError(null);
+            } catch (err) {
+              setEvalError(err instanceof Error ? err.message : String(err));
+            }
+          }, 500);
+        }
       }
     });
 
@@ -276,6 +294,19 @@ export function StrudelEditor() {
             <Square size={12} /> {t('editor.stop')}
           </Button>
         </Tooltip>
+        {/* Live mode toggle */}
+        <label
+          className="flex items-center gap-1.5 cursor-pointer select-none"
+          style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}
+        >
+          <input
+            type="checkbox"
+            checked={liveMode}
+            onChange={(e) => setLiveMode(e.target.checked)}
+            className="cursor-pointer"
+          />
+          {t('editor.liveMode')}
+        </label>
         {isPlaying && (
           <span className="flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)', fontFamily: 'var(--font-family-mono)' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
