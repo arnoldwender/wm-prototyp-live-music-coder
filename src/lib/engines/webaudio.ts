@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    Web Audio engine adapter — raw Web Audio API access.
-   Provides a pre-resumed AudioContext with masterGain chain.
-   Intercepts .connect(destination) calls to route through
-   masterGain → masterAnalyser → destination for visualization.
+   Tracks all created sources/nodes so they can be stopped
+   on re-evaluate (prevents overlapping playback).
    ────────────────────────────────────────────────────────── */
 
 import { BaseEngine } from './base'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
-import { getSharedContext, getMasterGain, resumeContext } from '../audio/context'
+import { getSharedContext, getMasterGain, getMasterAnalyser, resumeContext } from '../audio/context'
 import { resetStrudelTap } from '../audio/strudel-tap'
 
 export class WebAudioEngine extends BaseEngine {
   name: EngineType = 'webaudio'
+  /* Track all sources created by user code so we can stop them on re-eval */
+  private activeSources: AudioScheduledSourceNode[] = []
 
   async init(): Promise<void> {
     /* No external deps — Web Audio API is native */
@@ -33,38 +34,45 @@ export class WebAudioEngine extends BaseEngine {
   }
 
   /** Evaluate raw Web Audio code.
-   * User code gets `ctx` (AudioContext) and `out` (masterGain → analyser → speakers).
-   * No regex patching — user connects to `out` or `ctx.destination` directly.
-   * We intercept ctx.destination connections via a Proxy. */
+   * Stops all previous sources before running new code. */
   async evaluate(code: string): Promise<void> {
     await resumeContext()
+
+    /* Stop all previously created sources to prevent overlapping playback */
+    this.stopAllSources()
+
     const ctx = getSharedContext()
     const masterGain = getMasterGain()
+    const activeSources = this.activeSources
 
-    /* Create a proxy of ctx that intercepts .destination to return masterGain.
-     * This way user code like `osc.connect(ctx.destination)` routes through
-     * masterGain → masterAnalyser → real destination automatically. */
+    /* Proxy ctx: intercept .destination → masterGain, and track created sources */
     const ctxProxy = new Proxy(ctx, {
       get(target, prop) {
         if (prop === 'destination') return masterGain
+
+        /* Intercept createOscillator/createBufferSource to track sources */
+        if (prop === 'createOscillator' || prop === 'createBufferSource' || prop === 'createConstantSource') {
+          return (...args: any[]) => {
+            const source = (target as any)[prop](...args)
+            activeSources.push(source)
+            return source
+          }
+        }
+
         const val = (target as any)[prop]
         return typeof val === 'function' ? val.bind(target) : val
       }
     })
 
-    /* Strip user's `const/let/var ctx = new AudioContext()` — we inject our proxied ctx.
-     * Also replace any standalone `new AudioContext()` with the proxied ctx. */
+    /* Strip user's new AudioContext() */
     const patchedCode = code
       .replace(/(?:const|let|var)\s+ctx\s*=\s*new\s+AudioContext\s*\([^)]*\)\s*;?/g, '/* ctx provided by engine */')
       .replace(/new\s+AudioContext\s*\([^)]*\)/g, 'ctx')
 
     try {
-      /* `ctx` = proxied AudioContext (destination → masterGain)
-       * `out` = masterGain directly (convenience alias) */
       await Function('ctx', 'out', `"use strict"; return (async () => { ${patchedCode} })()`)(
         ctxProxy, masterGain
       )
-      /* Audio chain: user nodes → masterGain → masterAnalyser → speakers */
       resetStrudelTap()
     } catch (err) {
       console.error('[WebAudio] Evaluation error:', err)
@@ -73,12 +81,30 @@ export class WebAudioEngine extends BaseEngine {
   }
 
   start(): void {
-    /* Web Audio nodes are started individually via code */
+    /* Web Audio nodes are started individually via user code */
   }
 
   stop(): void {
+    this.stopAllSources()
     for (const wrapper of this.nodes.values()) {
       try { wrapper.node.disconnect() } catch { /* ok */ }
     }
+  }
+
+  /** Stop and disconnect all tracked audio sources */
+  private stopAllSources(): void {
+    for (const src of this.activeSources) {
+      try { src.stop() } catch { /* already stopped */ }
+      try { src.disconnect() } catch { /* ok */ }
+    }
+    this.activeSources = []
+    /* Reconnect masterGain chain in case user code added extra connections */
+    try {
+      const mg = getMasterGain()
+      const an = getMasterAnalyser()
+      mg.disconnect()
+      mg.connect(an)
+      an.connect(getSharedContext().destination)
+    } catch { /* reconnect failed */ }
   }
 }
