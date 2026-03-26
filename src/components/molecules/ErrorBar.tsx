@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────────────────
-   ErrorBar — shows evaluation errors with beginner-friendly
-   help toggle. Raw error + optional expanded explanation.
+   ErrorBar — cyberpunk-styled error diagnostics panel.
+   Glitch header, scanline animation, terminal-style help.
    ────────────────────────────────────────────────────────── */
 
 import { useState } from 'react';
@@ -11,7 +11,6 @@ interface ErrorBarProps {
   onDismiss: () => void;
 }
 
-/** Error bar with toggleable beginner help */
 export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
   const [showHelp, setShowHelp] = useState(true);
   const friendly = getFriendlyError(error);
@@ -22,43 +21,86 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
       aria-live="polite"
       className="shrink-0"
       style={{
-        backgroundColor: 'var(--color-bg-elevated)',
-        borderTop: '2px solid var(--color-error)',
+        backgroundColor: 'rgba(15, 0, 0, 0.95)',
+        borderTop: '1px solid var(--color-error)',
         fontSize: 'var(--font-size-xs)',
         fontFamily: 'var(--font-family-mono)',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {/* Error header — raw message + controls */}
+      {/* Scanline overlay effect */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px)',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }} />
+
+      {/* Error header */}
       <div
         className="flex items-center"
         style={{
           padding: 'var(--space-2) var(--space-4)',
-          gap: 'var(--space-2)',
-          color: 'var(--color-error)',
+          gap: 'var(--space-3)',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
-        <span style={{ fontWeight: 'var(--font-weight-bold)', flexShrink: 0 }}>Error</span>
-        <span className="flex-1 truncate" style={{ color: 'var(--color-text)' }}>
+        {/* Glitch-style error label */}
+        <span style={{
+          color: 'var(--color-error)',
+          fontWeight: 'var(--font-weight-bold)',
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          fontSize: '10px',
+          textShadow: '0 0 8px rgba(239,68,68,0.6), 2px 0 rgba(239,68,68,0.3), -2px 0 rgba(59,130,246,0.3)',
+          flexShrink: 0,
+        }}>
+          ERR
+        </span>
+
+        {/* Separator dot */}
+        <span style={{
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--color-error)',
+          boxShadow: '0 0 6px var(--color-error)',
+          animation: 'pulse 1s ease-in-out infinite',
+          flexShrink: 0,
+        }} />
+
+        {/* Error title */}
+        <span className="flex-1 truncate" style={{
+          color: 'var(--color-text)',
+          fontSize: '12px',
+        }}>
           {friendly ? friendly.title : error}
         </span>
 
-        {/* Help toggle */}
+        {/* Help toggle — styled as terminal command */}
         {friendly && (
           <button
             type="button"
             onClick={() => setShowHelp(!showHelp)}
             style={{
-              background: 'none',
-              border: '1px solid var(--color-border)',
+              background: showHelp ? 'rgba(168,85,247,0.15)' : 'transparent',
+              border: '1px solid',
+              borderColor: showHelp ? 'var(--color-primary)' : 'var(--color-border)',
               borderRadius: 'var(--radius-sm)',
               color: showHelp ? 'var(--color-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
               fontSize: '10px',
-              padding: '1px var(--space-2)',
+              padding: '2px var(--space-2)',
               flexShrink: 0,
+              fontFamily: 'var(--font-family-mono)',
+              letterSpacing: '0.05em',
+              transition: 'var(--transition-fast)',
             }}
           >
-            {showHelp ? 'Hide help' : 'Show help'}
+            {showHelp ? '[ HIDE ]' : '[ HELP ]'}
           </button>
         )}
 
@@ -72,44 +114,76 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             border: 'none',
             color: 'var(--color-text-muted)',
             cursor: 'pointer',
-            fontSize: 'var(--font-size-base)',
+            fontSize: '14px',
             lineHeight: 1,
-            padding: 'var(--space-1)',
+            padding: '2px',
             flexShrink: 0,
+            transition: 'var(--transition-fast)',
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-error)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)' }}
         >
           &times;
         </button>
       </div>
 
-      {/* Expanded help — explanation + fix suggestion */}
+      {/* Expanded help — terminal-style diagnostics */}
       {friendly && showHelp && (
         <div
           style={{
             padding: '0 var(--space-4) var(--space-3)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-2)',
+            position: 'relative',
+            zIndex: 2,
           }}
         >
-          <div style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-family-sans)', fontSize: 'var(--font-size-xs)', lineHeight: 'var(--line-height-base)' }}>
+          {/* Explanation — terminal prompt style */}
+          <div style={{
+            color: 'var(--color-text-secondary)',
+            fontFamily: 'var(--font-family-mono)',
+            fontSize: '11px',
+            lineHeight: '1.6',
+            padding: 'var(--space-2) 0',
+          }}>
+            <span style={{ color: 'var(--color-text-muted)', userSelect: 'none' }}>{'> '}</span>
             {friendly.explanation}
           </div>
+
+          {/* Fix suggestion — highlighted block */}
           <div style={{
             color: 'var(--color-success)',
-            fontFamily: 'var(--font-family-sans)',
-            fontSize: 'var(--font-size-xs)',
-            backgroundColor: 'var(--color-bg)',
+            fontFamily: 'var(--font-family-mono)',
+            fontSize: '11px',
+            backgroundColor: 'rgba(34, 197, 94, 0.08)',
             padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
-            borderLeft: '3px solid var(--color-success)',
+            borderLeft: '2px solid var(--color-success)',
+            lineHeight: '1.6',
           }}>
-            <strong>Fix:</strong> {friendly.fix}
+            <span style={{ color: 'rgba(34,197,94,0.5)', userSelect: 'none' }}>{'$ '}</span>
+            {friendly.fix}
           </div>
-          {/* Raw error for advanced users */}
-          <details style={{ color: 'var(--color-text-muted)' }}>
-            <summary style={{ cursor: 'pointer', fontSize: '10px' }}>Raw error</summary>
-            <code style={{ fontSize: '10px', wordBreak: 'break-all' }}>{error}</code>
+
+          {/* Raw error — collapsible */}
+          <details style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
+            <summary style={{
+              cursor: 'pointer',
+              fontSize: '10px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              userSelect: 'none',
+            }}>
+              stack trace
+            </summary>
+            <code style={{
+              display: 'block',
+              fontSize: '10px',
+              wordBreak: 'break-all',
+              color: 'var(--color-text-muted)',
+              padding: 'var(--space-2) 0',
+              opacity: 0.7,
+            }}>
+              {error}
+            </code>
           </details>
         </div>
       )}
