@@ -1,9 +1,11 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { BeatlingWorld } from '../../lib/beatlings';
+import { TIER_XP } from '../../lib/beatlings/collection';
 import { AudioAnalyzer } from '../../lib/audio/analyzer';
 import { getStrudelAnalyser, getStrudelSampleRate } from '../../lib/audio/strudel-tap';
 import { useAppStore } from '../../lib/store';
+import type { Achievement } from '../../types/beatling';
 
 export function BeatlingPanel() {
   const worldRef = useRef<BeatlingWorld | null>(null);
@@ -98,6 +100,27 @@ export function BeatlingPanel() {
         x: c.x ?? 0,
         y: c.y ?? 0,
       })));
+
+      /* Sync achievements from world to store — detect newly unlocked ones
+       * and fire toast notifications + XP rewards for each */
+      const worldAchievements: Achievement[] = worldRef.current.getAchievements();
+      const storeAchievements = store.achievements;
+      const newlyUnlocked = worldAchievements.filter(
+        (wa) => wa.unlockedAt !== null && !storeAchievements.find((sa) => sa.id === wa.id && sa.unlockedAt !== null),
+      );
+      if (newlyUnlocked.length > 0) {
+        store.setAchievements(worldAchievements);
+        /* Fire toast + XP for each newly unlocked achievement */
+        for (const achievement of newlyUnlocked) {
+          store.showToast({ icon: achievement.icon, title: achievement.name, description: achievement.description });
+          store.addUserXp(TIER_XP[achievement.tier]);
+        }
+      }
+
+      /* Check long_session achievement — 30+ minutes in current session */
+      if (Date.now() - store.sessionStats.startTime > 30 * 60 * 1000) {
+        store.unlockAchievement('long_session');
+      }
     }
   }, []);
 

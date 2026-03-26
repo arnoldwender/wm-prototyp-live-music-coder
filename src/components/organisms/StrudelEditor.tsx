@@ -221,8 +221,19 @@ export function StrudelEditor() {
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
-      /* Track evaluation for session stats */
-      useAppStore.getState().incrementEval();
+      /* Track evaluation for session stats + unlock achievements */
+      const evalStore = useAppStore.getState();
+      evalStore.incrementEval();
+      evalStore.unlockAchievement('first_play');
+      evalStore.trackEngine('strudel');
+      /* Check complex_pattern — 5+ lines of code */
+      if (code.split('\n').filter((l: string) => l.trim()).length >= 5) {
+        evalStore.unlockAchievement('complex_pattern');
+      }
+      /* Check speed_demon — evaluate within 5 seconds of session start */
+      if (Date.now() - evalStore.sessionStats.startTime < 5000) {
+        evalStore.unlockAchievement('speed_demon');
+      }
       if (!isPlaying) {
         replRef.current.start();
         togglePlay();

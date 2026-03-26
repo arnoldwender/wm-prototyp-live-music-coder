@@ -476,6 +476,7 @@ export class BeatlingWorld {
   /** Check and unlock achievements based on current creature state */
   private checkAchievements(): void {
     const speciesPresent = new Set(this.creatures.map((c) => c.species));
+    const allSpecies: Species[] = ['beatling', 'looplet', 'synthling', 'glitchbit', 'wavelet', 'codefly'];
 
     /* First-species achievements */
     for (const species of speciesPresent) {
@@ -493,6 +494,41 @@ export class BeatlingWorld {
     /* Ascended — any creature reached final stage */
     if (this.creatures.some((c) => c.stage === 'ascended') && !isUnlocked(this.achievements, 'ascended_one')) {
       this.achievements = checkAchievement(this.achievements, 'ascended_one');
+    }
+
+    /* All species evolved — all 6 species have at least one creature past egg stage */
+    if (!isUnlocked(this.achievements, 'all_species_evolved')) {
+      const evolvedSpecies = new Set(
+        this.creatures.filter((c) => c.stage !== 'egg').map((c) => c.species),
+      );
+      if (allSpecies.every((sp) => evolvedSpecies.has(sp))) {
+        this.achievements = checkAchievement(this.achievements, 'all_species_evolved');
+      }
+    }
+
+    /* High consciousness — any creature has phi > 0.5 */
+    if (!isUnlocked(this.achievements, 'high_consciousness')) {
+      if (this.creatures.some((c) => c.phi > 0.5)) {
+        this.achievements = checkAchievement(this.achievements, 'high_consciousness');
+      }
+    }
+
+    /* Neural storm — sum of totalFirings across all creatures > 1000 */
+    if (!isUnlocked(this.achievements, 'hundred_firings')) {
+      const totalFirings = this.creatures.reduce((sum, c) => sum + c.brain.totalFirings, 0);
+      if (totalFirings > 1000) {
+        this.achievements = checkAchievement(this.achievements, 'hundred_firings');
+      }
+    }
+
+    /* Transcendence — all 6 species have at least one ascended creature */
+    if (!isUnlocked(this.achievements, 'ascended_all')) {
+      const ascendedSpecies = new Set(
+        this.creatures.filter((c) => c.stage === 'ascended').map((c) => c.species),
+      );
+      if (allSpecies.every((sp) => ascendedSpecies.has(sp))) {
+        this.achievements = checkAchievement(this.achievements, 'ascended_all');
+      }
     }
   }
 }

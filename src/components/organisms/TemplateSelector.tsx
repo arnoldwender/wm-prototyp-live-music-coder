@@ -64,6 +64,8 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
     }
     /* Also update the global default engine to match the template */
     setDefaultEngine(template.engine)
+    /* Unlock template_used achievement */
+    useAppStore.getState().unlockAchievement('template_used')
     localStorage.setItem('lmc-onboarded', 'true')
     onSelect()
   }

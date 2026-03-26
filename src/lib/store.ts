@@ -7,7 +7,8 @@
 import { create } from 'zustand'
 import type { EngineType } from '../types/engine'
 import type { PanelLayout, ProjectFile } from '../types/project'
-import type { Species, Stage } from '../types/beatling'
+import type { Species, Stage, Achievement } from '../types/beatling'
+import { ACHIEVEMENTS, TIER_XP, isUnlocked } from './beatlings/collection'
 
 /** Brain stats for a single creature — synced to store for UI display */
 export interface CreatureStat {
@@ -125,6 +126,15 @@ interface AppState {
   showToast: (toast: ToastData) => void
   dismissToast: () => void
 
+  /* Gamification: Achievements — synced from BeatlingWorld + unlocked from UI */
+  achievements: Achievement[]
+  setAchievements: (achievements: Achievement[]) => void
+  unlockAchievement: (id: string) => void
+
+  /* Gamification: Engine usage tracking for 'all_engines' achievement */
+  usedEngines: Set<string>
+  trackEngine: (engine: string) => void
+
   /* Gamification: User XP & Level */
   userXp: number
   userLevel: number
@@ -188,6 +198,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   /* --- Gamification initial state --- */
   pendingToast: null,
+  achievements: ACHIEVEMENTS.map((a) => ({ ...a })),
+  usedEngines: new Set<string>(),
   userXp: 0,
   userLevel: 1,
   streak: loadStreak(),
@@ -202,6 +214,45 @@ export const useAppStore = create<AppState>()((set, get) => ({
   /* --- Gamification: Toast --- */
   showToast: (toast: ToastData) => set({ pendingToast: toast }),
   dismissToast: () => set({ pendingToast: null }),
+
+  /* --- Gamification: Achievements --- */
+  setAchievements: (achievements: Achievement[]) => set({ achievements }),
+
+  /** Unlock a single achievement by id — fires toast + grants XP.
+   * Called from UI components for gameplay-triggered achievements. */
+  unlockAchievement: (id: string) => {
+    const state = get()
+    if (isUnlocked(state.achievements, id)) return
+    const achievement = state.achievements.find((a) => a.id === id)
+    if (!achievement) return
+
+    const updated = state.achievements.map((a) =>
+      a.id === id ? { ...a, unlockedAt: Date.now().toString() } : a,
+    )
+    const xpReward = TIER_XP[achievement.tier]
+    const newXp = state.userXp + xpReward
+    const newLevel = calculateLevel(newXp)
+
+    set({
+      achievements: updated,
+      pendingToast: { icon: achievement.icon, title: achievement.name, description: achievement.description },
+      userXp: newXp,
+      userLevel: newLevel,
+    })
+  },
+
+  /* --- Gamification: Engine tracking --- */
+  trackEngine: (engine: string) => {
+    const state = get()
+    if (state.usedEngines.has(engine)) return
+    const newSet = new Set(state.usedEngines)
+    newSet.add(engine)
+    set({ usedEngines: newSet })
+    /* Check all_engines achievement — 4 engines total */
+    if (newSet.size >= 4) {
+      get().unlockAchievement('all_engines')
+    }
+  },
 
   /* --- Gamification: XP & Level --- */
   addUserXp: (amount: number) => set((s) => {
@@ -232,9 +283,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
   }),
 
   /* --- Gamification: Session stats --- */
-  incrementEval: () => set((s) => ({
-    sessionStats: { ...s.sessionStats, evaluations: s.sessionStats.evaluations + 1 },
-  })),
+  incrementEval: () => {
+    const s = get()
+    const newEvals = s.sessionStats.evaluations + 1
+    set({ sessionStats: { ...s.sessionStats, evaluations: newEvals } })
+    /* Check ten_evaluations achievement */
+    if (newEvals >= 10) {
+      get().unlockAchievement('ten_evaluations')
+    }
+  },
   trackCreatureSpawn: () => set((s) => ({
     sessionStats: { ...s.sessionStats, creaturesSpawned: s.sessionStats.creaturesSpawned + 1 },
   })),

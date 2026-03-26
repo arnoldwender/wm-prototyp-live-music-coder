@@ -41,6 +41,12 @@ function Editor() {
     /* Check and update daily streak */
     checkStreak()
 
+    /* Check night_owl achievement — coding after midnight (0:00 - 4:59) */
+    const hour = new Date().getHours()
+    if (hour >= 0 && hour < 5) {
+      useAppStore.getState().unlockAchievement('night_owl')
+    }
+
     const shared = readShareFromUrl()
     if (shared) {
       /* URL hash contains shared code — load it into the active file */

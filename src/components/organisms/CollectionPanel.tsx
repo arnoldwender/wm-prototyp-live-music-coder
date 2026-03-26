@@ -7,7 +7,7 @@
 
 import { useTranslation } from 'react-i18next'
 import { Trophy, Lock, X } from 'lucide-react'
-import { ACHIEVEMENTS } from '../../lib/beatlings/collection'
+import { useAppStore } from '../../lib/store'
 import { Button } from '../atoms'
 import type { Achievement, AchievementTier } from '../../types/beatling'
 
@@ -134,8 +134,11 @@ const SPECIES_LIST = [
 export function CollectionPanel({ onClose }: CollectionPanelProps) {
   const { t } = useTranslation()
 
+  /* Read live achievements from store — updated by BeatlingPanel sync + UI unlock calls */
+  const achievements = useAppStore((s) => s.achievements)
+
   /* Count unlocked achievements */
-  const unlockedCount = ACHIEVEMENTS.filter((a) => a.unlockedAt !== null).length
+  const unlockedCount = achievements.filter((a) => a.unlockedAt !== null).length
 
   return (
     <aside
@@ -179,12 +182,12 @@ export function CollectionPanel({ onClose }: CollectionPanelProps) {
             marginBottom: 'var(--space-md)',
           }}
         >
-          {unlockedCount} / {ACHIEVEMENTS.length} {t('collection.unlocked')}
+          {unlockedCount} / {achievements.length} {t('collection.unlocked')}
         </div>
 
         {/* Achievement cards */}
         <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-          {ACHIEVEMENTS.map((achievement) => (
+          {achievements.map((achievement) => (
             <AchievementCard key={achievement.id} achievement={achievement} />
           ))}
         </section>

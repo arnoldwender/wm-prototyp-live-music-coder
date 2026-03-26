@@ -105,6 +105,8 @@ export function GistDialog({ onClose }: GistDialogProps) {
         },
       }
       const result = await saveToGist(project)
+      /* Unlock first_save achievement after successful Gist save */
+      useAppStore.getState().unlockAchievement('first_save')
       setStatus(`Saved! Gist ID: ${result.id}`)
     } catch (err) {
       setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)

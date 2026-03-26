@@ -33,6 +33,8 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
+      /* Unlock first_share achievement when URL is successfully copied */
+      useAppStore.getState().unlockAchievement('first_share')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       /* Clipboard API may fail in insecure contexts or denied permissions */
