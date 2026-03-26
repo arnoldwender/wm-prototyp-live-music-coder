@@ -32,6 +32,7 @@ export const DEFAULT_LAYOUT: PanelLayout = {
     waveform: true,
     spectrum: true,
     timeline: true,
+    pianoroll: false,
     beatlings: true,
     brain: true,
   },

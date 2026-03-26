@@ -13,6 +13,7 @@ import { SpectrumVisualizer } from './SpectrumVisualizer';
 import { PatternTimeline } from './PatternTimeline';
 import { BeatlingPanel } from './BeatlingPanel';
 import { BrainPanel } from './BrainPanel';
+import { PianorollVisualizer } from './PianorollVisualizer';
 
 /** Composes all visualizer panels with toggle controls */
 export function VisualizerDashboard() {
@@ -25,6 +26,7 @@ export function VisualizerDashboard() {
     visiblePanels.waveform && { key: 'waveform', component: <WaveformVisualizer /> },
     visiblePanels.spectrum && { key: 'spectrum', component: <SpectrumVisualizer /> },
     visiblePanels.timeline && { key: 'timeline', component: <PatternTimeline /> },
+    visiblePanels.pianoroll && { key: 'pianoroll', component: <PianorollVisualizer /> },
     visiblePanels.beatlings && {
       key: 'beatlings',
       component: <BeatlingPanel />,

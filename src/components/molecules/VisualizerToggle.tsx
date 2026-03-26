@@ -4,7 +4,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useTranslation } from 'react-i18next';
-import { Activity, BarChart3, Clock, Bug, Brain } from 'lucide-react';
+import { Activity, BarChart3, Clock, Piano, Bug, Brain } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { Button } from '../atoms';
@@ -15,6 +15,7 @@ const panels: { key: keyof PanelLayout['visiblePanels']; Icon: LucideIcon }[] = 
   { key: 'waveform', Icon: Activity },
   { key: 'spectrum', Icon: BarChart3 },
   { key: 'timeline', Icon: Clock },
+  { key: 'pianoroll', Icon: Piano },
   { key: 'beatlings', Icon: Bug },
   { key: 'brain', Icon: Brain },
 ];

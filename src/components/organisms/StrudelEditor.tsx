@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* Strudel editor — uses initStrudel() for audio + custom CM6 highlighting.
- * Implements its own pattern highlighting without StrudelMirror dependency. */
+/* Strudel editor — integrates @strudel/codemirror for slider widgets,
+ * pattern highlighting, and full REPL features alongside custom CM6. */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EditorState, StateField, StateEffect } from '@codemirror/state';
-import { EditorView, Decoration, type DecorationSet, keymap } from '@codemirror/view';
+import { EditorView, keymap } from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
 import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
@@ -13,61 +13,37 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { Button, Tooltip } from '../atoms';
 import { Play, Square, Loader2 } from 'lucide-react';
 
-
-/* Custom CM6 highlight system — marks code ranges that are currently sounding */
-const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
-
-const highlightField = StateField.define<DecorationSet>({
-  create() {
-    return Decoration.none;
-  },
-  update(decorations, tr) {
-    decorations = decorations.map(tr.changes);
-    for (const effect of tr.effects) {
-      if (effect.is(setHighlights)) {
-        const marks = effect.value
-          .filter(({ from, to }) => from >= 0 && to <= tr.newDoc.length && from < to)
-          .map(({ from, to }) =>
-            Decoration.mark({
-              attributes: { style: 'background-color: var(--color-strudel-highlight-bg, rgba(168, 85, 247, 0.25)); outline: 1px solid var(--color-strudel-highlight-border, rgba(168, 85, 247, 0.5)); border-radius: 2px;' },
-            }).range(from, to)
-          );
-        decorations = Decoration.set(marks, true);
-      }
-    }
-    return decorations;
-  },
-  provide: (f) => EditorView.decorations.from(f),
-});
-
 export function StrudelEditor() {
   const { t } = useTranslation();
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const replRef = useRef<any>(null);
   const animFrameRef = useRef<number | null>(null);
+  const strudelExtRef = useRef<any>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
 
-  /* Use store's isPlaying as single source of truth — avoids drift with TransportBar */
   const isPlaying = useAppStore((s) => s.isPlaying);
   const togglePlay = useAppStore((s) => s.togglePlay);
-
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const activeFile = files.find((f) => f.active);
 
-  /* Initialize Strudel REPL */
+  /* Initialize Strudel REPL + load @strudel/codemirror extensions */
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
+        /* Load Strudel REPL */
         const { initStrudel } = await import('@strudel/web');
         const repl = await initStrudel();
         if (!mounted) return;
         replRef.current = repl;
+        /* Expose REPL globally for pianoroll and other visualizers */
+        (window as any).__strudelRepl = repl;
 
+        /* Load Dirt-Samples */
         try {
           await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
         } catch {
@@ -75,6 +51,14 @@ export function StrudelEditor() {
             const { samples } = await import('@strudel/webaudio');
             await samples('github:tidalcycles/Dirt-Samples/master');
           } catch { /* samples failed */ }
+        }
+
+        /* Load Strudel CM6 extensions (sliders, highlighting, widgets) */
+        try {
+          const strudelCM = await import('@strudel/codemirror');
+          strudelExtRef.current = strudelCM;
+        } catch (err) {
+          console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
 
         setReady(true);
@@ -86,12 +70,11 @@ export function StrudelEditor() {
     })();
     return () => {
       mounted = false;
-      /* Stop Strudel audio when component unmounts (e.g. leaving editor) */
       replRef.current?.stop();
     };
   }, []);
 
-  /* Create CM6 editor */
+  /* Create CM6 editor with Strudel extensions */
   useEffect(() => {
     if (!editorRef.current || !activeFile) return;
     viewRef.current?.destroy();
@@ -112,24 +95,39 @@ export function StrudelEditor() {
       },
     }]);
 
+    /* Build extension list — add Strudel slider/highlight/widget plugins when available */
+    const extensions = [
+      ...getBaseExtensions(),
+      ...getEngineExtensions(activeFile.engine),
+      updateListener,
+      evalKeymap,
+    ];
+
+    /* Add Strudel-specific CM6 extensions if loaded */
+    const strudelCM = strudelExtRef.current;
+    if (strudelCM) {
+      try {
+        /* Slider widget plugin — allows slider(value, min, max, step) in code */
+        if (strudelCM.sliderPlugin) extensions.push(strudelCM.sliderPlugin);
+        /* Widget plugin — supports other inline widgets */
+        if (strudelCM.widgetPlugin) extensions.push(strudelCM.widgetPlugin);
+        /* Pattern highlighting extension — marks active haps in code */
+        if (strudelCM.highlightExtension) extensions.push(strudelCM.highlightExtension);
+      } catch (err) {
+        console.warn('[StrudelEditor] Failed to add Strudel CM extensions:', err);
+      }
+    }
+
     const state = EditorState.create({
       doc: activeFile.code,
-      extensions: [
-        ...getBaseExtensions(),
-        ...getEngineExtensions(activeFile.engine),
-        highlightField,
-        updateListener,
-        evalKeymap,
-      ],
+      extensions,
     });
 
     viewRef.current = new EditorView({ state, parent: editorRef.current });
     return () => { viewRef.current?.destroy(); viewRef.current = null; };
-  }, [activeFile?.id, activeFile?.engine]);
+  }, [activeFile?.id, activeFile?.engine, ready]);
 
-  /* Sync external store code changes into CM6 — handles URL-loaded code
-   * from Samples/Examples pages where updateFileCode runs before the view
-   * is created, or when code is set from outside the editor */
+  /* Sync external store code changes into CM6 */
   useEffect(() => {
     const view = viewRef.current;
     if (!view || !activeFile) return;
@@ -141,12 +139,14 @@ export function StrudelEditor() {
     }
   }, [activeFile?.code]);
 
-  /* Highlight loop — queries scheduler for active haps and marks their code positions */
+  /* Highlight + slider update loop — uses Strudel's native highlighting when available */
   useEffect(() => {
     if (!isPlaying) {
       /* Clear highlights when stopped */
-      if (viewRef.current) {
-        viewRef.current.dispatch({ effects: setHighlights.of([]) });
+      const view = viewRef.current;
+      const strudelCM = strudelExtRef.current;
+      if (view && strudelCM?.setMiniLocations) {
+        try { strudelCM.setMiniLocations(view, []); } catch { /* ignore */ }
       }
       return;
     }
@@ -156,42 +156,25 @@ export function StrudelEditor() {
       if (!running) return;
       const view = viewRef.current;
       const repl = replRef.current;
+      const strudelCM = strudelExtRef.current;
 
       if (view && repl?.scheduler) {
         try {
-          const now = repl.scheduler.now();
-          const pattern = repl.state?.pattern;
-          if (pattern?.queryArc) {
-            const haps = pattern.queryArc(now, now + 0.125);
-            const ranges: { from: number; to: number }[] = [];
-
-            for (const hap of haps) {
-              if (!hap.context?.locations) continue;
-              for (const loc of hap.context.locations) {
-                /* loc has start/end as character offsets in the source code */
-                if (typeof loc.start === 'number' && typeof loc.end === 'number') {
-                  ranges.push({ from: loc.start, to: loc.end });
-                }
-                /* Some locations use {line, column} format */
-                else if (loc.start?.line !== undefined) {
-                  /* Convert line:col to absolute offset */
-                  const doc = view.state.doc;
-                  const startLine = Math.min(loc.start.line, doc.lines);
-                  const endLine = Math.min(loc.end?.line ?? startLine, doc.lines);
-                  const from = doc.line(startLine).from + (loc.start.column ?? 0);
-                  const to = doc.line(endLine).from + (loc.end?.column ?? doc.line(endLine).length);
-                  ranges.push({ from, to });
-                }
-              }
-            }
-
-            if (ranges.length > 0) {
-              view.dispatch({ effects: setHighlights.of(ranges) });
-            } else {
-              view.dispatch({ effects: setHighlights.of([]) });
-            }
+          /* Update Strudel's native mini-notation highlighting */
+          if (strudelCM?.updateMiniLocations && repl.state?.miniLocations) {
+            strudelCM.updateMiniLocations(view, repl.scheduler.now(), repl.state.miniLocations);
           }
-        } catch { /* ignore during pattern update */ }
+
+          /* Update slider widget values from the REPL state */
+          if (strudelCM?.updateSliderWidgets && strudelCM?.sliderValues) {
+            strudelCM.updateSliderWidgets(view, strudelCM.sliderValues);
+          }
+
+          /* Update other inline widgets */
+          if (strudelCM?.updateWidgets) {
+            strudelCM.updateWidgets(view);
+          }
+        } catch { /* ignore during pattern transitions */ }
       }
 
       animFrameRef.current = requestAnimationFrame(tick);
@@ -222,18 +205,22 @@ export function StrudelEditor() {
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
+
       /* Force visualizer tap to reconnect — superdough recreates audio chain on evaluate */
       resetStrudelTap();
+
+      /* Schedule a delayed reconnect to catch late audio chain initialization */
+      setTimeout(() => resetStrudelTap(), 200);
+      setTimeout(() => resetStrudelTap(), 500);
+
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
       evalStore.unlockAchievement('first_play');
       evalStore.trackEngine('strudel');
-      /* Check complex_pattern — 5+ lines of code */
       if (code.split('\n').filter((l: string) => l.trim()).length >= 5) {
         evalStore.unlockAchievement('complex_pattern');
       }
-      /* Check speed_demon — evaluate within 5 seconds of session start */
       if (Date.now() - evalStore.sessionStats.startTime < 5000) {
         evalStore.unlockAchievement('speed_demon');
       }

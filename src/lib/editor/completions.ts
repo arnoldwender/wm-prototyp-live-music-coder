@@ -38,6 +38,35 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'slow', type: 'function', detail: 'completions.strudel.slow', apply: '.slow(2)' },
   { label: 'dec', type: 'function', detail: 'completions.strudel.dec', apply: '.dec(0.2)' },
   { label: 'sustain', type: 'function', detail: 'completions.strudel.sustain', apply: '.sustain(0.5)' },
+  /* ── Interactive controls ────────────────────────────── */
+  { label: 'slider', type: 'function', detail: 'Interactive slider widget (drag to adjust)', apply: 'slider(0.5, 0, 1, 0.01)' },
+  { label: 'mouseX', type: 'property', detail: 'Mouse X position (0-1)', apply: 'mouseX' },
+  { label: 'mouseY', type: 'property', detail: 'Mouse Y position (0-1)', apply: 'mouseY' },
+  { label: 'range', type: 'function', detail: 'Map value to range', apply: '.range(0, 1)' },
+  /* ── Advanced pattern transforms ────────────────────── */
+  { label: 'mask', type: 'function', detail: 'Silence events not matching mask', apply: '.mask("")' },
+  { label: 'struct', type: 'function', detail: 'Apply rhythmic structure', apply: '.struct("")' },
+  { label: 'euclid', type: 'function', detail: 'Euclidean rhythm (pulses, steps)', apply: '.euclid(3, 8)' },
+  { label: 'chop', type: 'function', detail: 'Cut sample into N pieces', apply: '.chop(4)' },
+  { label: 'striate', type: 'function', detail: 'Layer sample slices', apply: '.striate(4)' },
+  { label: 'loopAt', type: 'function', detail: 'Loop sample to fit N cycles', apply: '.loopAt(1)' },
+  { label: 'ply', type: 'function', detail: 'Repeat each event N times', apply: '.ply(2)' },
+  { label: 'off', type: 'function', detail: 'Layer with offset copy', apply: '.off(0.125, x => x.note(12))' },
+  { label: 'superimpose', type: 'function', detail: 'Layer with transformed copy', apply: '.superimpose(x => x.fast(2))' },
+  { label: 'legato', type: 'function', detail: 'Relative note duration', apply: '.legato(0.5)' },
+  { label: 'attack', type: 'function', detail: 'Envelope attack time', apply: '.attack(0.01)' },
+  { label: 'release', type: 'function', detail: 'Envelope release time', apply: '.release(0.1)' },
+  { label: 'crush', type: 'function', detail: 'Bit crush effect', apply: '.crush(4)' },
+  { label: 'coarse', type: 'function', detail: 'Sample rate reduction', apply: '.coarse(8)' },
+  { label: 'shape', type: 'function', detail: 'Waveshaper distortion', apply: '.shape(0.5)' },
+  { label: 'vowel', type: 'function', detail: 'Formant filter (a, e, i, o, u)', apply: '.vowel("a")' },
+  { label: 'pianoroll', type: 'function', detail: 'Visualize as piano roll', apply: '.pianoroll()' },
+  { label: 'scope', type: 'function', detail: 'Visualize as oscilloscope', apply: '.scope()' },
+  /* ── Tonal music theory ────────────────────────────── */
+  { label: 'scale', type: 'function', detail: 'Map to musical scale', apply: '.scale("C:minor")' },
+  { label: 'voicings', type: 'function', detail: 'Automatic chord voicings', apply: '.voicings("lefthand")' },
+  { label: 'chord', type: 'function', detail: 'Play chord pattern', apply: 'chord("")' },
+  { label: 'transpose', type: 'function', detail: 'Transpose by semitones', apply: '.transpose(7)' },
   /* ── All 218 Dirt-Samples ─────────────────────────────── */
 
   /* 808 / 909 kits */
