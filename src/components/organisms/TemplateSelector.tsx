@@ -80,47 +80,58 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
       onKeyDown={handleKeyDown}
     >
       <div
-        className="rounded-lg p-8 max-w-2xl w-full mx-4"
+        className="rounded-lg max-w-md w-full mx-4"
         style={{
           backgroundColor: 'var(--color-bg-elevated)',
           border: '1px solid var(--color-border)',
+          padding: 'var(--space-6)',
+          maxHeight: '90vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <h2
-          className="text-2xl font-bold mb-2"
+          className="text-xl font-bold mb-1"
           style={{ color: 'var(--color-text)' }}
         >
           {t('templates.title')}
         </h2>
-        <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="mb-4" style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
           {t('templates.subtitle')}
         </p>
 
-        {/* Template cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {STARTER_TEMPLATES.map((t) => (
+        {/* Show only first 6 curated templates — not all 21 */}
+        <div className="flex flex-col gap-2 overflow-y-auto" style={{ flex: 1, minHeight: 0 }}>
+          {STARTER_TEMPLATES.slice(0, 6).map((tmpl) => (
             <button
-              key={t.id}
-              onClick={() => handleSelect(t)}
-              className="p-4 rounded-lg text-left transition-colors cursor-pointer"
+              key={tmpl.id}
+              onClick={() => handleSelect(tmpl)}
+              className="rounded-md text-left cursor-pointer"
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-3)',
                 backgroundColor: 'var(--color-bg)',
                 border: '1px solid var(--color-border)',
+                transition: 'var(--transition-fast)',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = ENGINE_COLORS[tmpl.engine] }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)' }}
             >
-              <div className="flex items-center gap-2 mb-1">
-                {/* Engine color dot */}
-                <span
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: ENGINE_COLORS[t.engine] }}
-                />
-                <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                  {t.name}
-                </span>
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: ENGINE_COLORS[tmpl.engine] }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--color-text)' }}>
+                  {tmpl.name}
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {tmpl.description}
+                </div>
               </div>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                {t.description}
-              </p>
             </button>
           ))}
         </div>
@@ -132,7 +143,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
             localStorage.setItem('lmc-onboarded', 'true')
             onSelect()
           }}
-          className="mt-4 w-full"
+          className="mt-3 w-full"
         >
           {t('templates.skip')}
         </Button>

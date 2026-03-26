@@ -22,6 +22,15 @@ function EngineSelector() {
   const { t } = useTranslation()
   const defaultEngine = useAppStore((s) => s.defaultEngine)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
+  const files = useAppStore((s) => s.files)
+  const setFileEngine = useAppStore((s) => s.setFileEngine)
+
+  /* Change engine for both global default and active file */
+  const handleEngineChange = (engine: EngineType) => {
+    setDefaultEngine(engine)
+    const activeFile = files.find((f) => f.active)
+    if (activeFile) setFileEngine(activeFile.id, engine)
+  }
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -111,7 +120,7 @@ function EngineSelector() {
                 type="button"
                 role="option"
                 aria-selected={isActive}
-                onClick={() => { setDefaultEngine(id); setOpen(false) }}
+                onClick={() => { handleEngineChange(id); setOpen(false) }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
