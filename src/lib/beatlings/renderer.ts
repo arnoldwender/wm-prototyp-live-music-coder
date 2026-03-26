@@ -9,6 +9,7 @@ import type { GolBrain } from './gol-brain';
 import type { Species, Stage } from '../../types/beatling';
 import { SPECIES } from './species';
 import { getStageSizeMultiplier, getStageGlow } from './evolution';
+import { drawSpeciesBody } from './shapes';
 
 /** Data passed from BeatlingWorld to the renderer per creature */
 interface CreatureRenderData {
@@ -214,7 +215,7 @@ function drawCreature(
     ctx.shadowBlur = glow * 25;
   }
 
-  /* === BODY === */
+  /* === BODY — unique bezier shape per species === */
   /* Emotional state tints the body — positive = brighter, negative = darker */
   const emotionTint = Math.max(-0.3, Math.min(0.3, emotionalState * 0.5));
   ctx.fillStyle = emotionTint > 0.05
@@ -222,8 +223,7 @@ function drawCreature(
     : emotionTint < -0.05
       ? darkenColor(def.color, -emotionTint)
       : def.color;
-  ctx.beginPath();
-  ctx.arc(drawX, drawY, size, 0, Math.PI * 2);
+  drawSpeciesBody(ctx, creature.species, drawX, drawY, size, t, energy);
   ctx.fill();
 
   ctx.shadowColor = 'transparent';
@@ -273,13 +273,13 @@ function drawCreature(
   ctx.arc(drawX + eyeSpacing - pupilSize * 0.3, eyeY - pupilSize * 0.3, pupilSize * 0.3, 0, Math.PI * 2);
   ctx.fill();
 
-  /* Blink */
+  /* Blink — eyelids cover eyes briefly */
   const blinkCycle = (t * 0.7 + id * 0.1) % 4;
   if (blinkCycle > 3.85) {
     ctx.fillStyle = emotionTint > 0.05 ? lightenColor(def.color, emotionTint) : def.color;
     ctx.beginPath();
-    ctx.arc(drawX - eyeSpacing, eyeY, eyeSize + 1, 0, Math.PI * 2);
-    ctx.arc(drawX + eyeSpacing, eyeY, eyeSize + 1, 0, Math.PI * 2);
+    ctx.arc(drawX - eyeSpacing, eyeY, eyeSize + 1.5, 0, Math.PI * 2);
+    ctx.arc(drawX + eyeSpacing, eyeY, eyeSize + 1.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -322,12 +322,13 @@ function drawCreature(
 
   /* === STAGE INDICATORS === */
   if (creature.stage === 'egg') {
+    /* Egg: dashed outline matching the species body shape */
     ctx.strokeStyle = def.dimColor;
     ctx.lineWidth = 2;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.arc(drawX, drawY, size + 4, 0, Math.PI * 2);
+    ctx.setLineDash([4, 4]);
+    drawSpeciesBody(ctx, creature.species, drawX, drawY, size + 5, t, 0.1);
     ctx.stroke();
+    /* Don't fill — the egg shell is just the outline */
     ctx.setLineDash([]);
   } else if (creature.stage === 'elder') {
     ctx.fillStyle = def.color;
