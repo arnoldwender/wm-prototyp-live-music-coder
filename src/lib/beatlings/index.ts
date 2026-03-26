@@ -283,11 +283,22 @@ export class BeatlingWorld {
     consciousness.update(brain);
     creature.phi = Math.min(1, consciousness.phi);
 
-    /* Motor output: neural network drives subtle position drift */
+    /* Motor output: neural network drives position change.
+     * Use sine/cosine of creature ID as direction so each creature
+     * drifts in a unique direction, not all toward bottom-right.
+     * Motor strength modulates speed, not direction. */
     const motor = brain.getMotorOutput();
-    const drift = 0.002; /* Small per-frame position change */
-    creature.x = Math.max(0.05, Math.min(0.95, creature.x + (motor.toward - motor.away) * drift));
-    creature.y = Math.max(0.05, Math.min(0.95, creature.y + motor.eat * drift * 0.5));
+    const motorStrength = (Math.abs(motor.toward) + Math.abs(motor.away) + Math.abs(motor.eat)) / 3;
+    const drift = 0.001 * motorStrength;
+    /* Unique angle per creature based on its spawn position */
+    const angle = (creature.x * 17 + creature.y * 31 + brain.tick * 0.002) * Math.PI * 2;
+    const dx = Math.cos(angle) * drift;
+    const dy = Math.sin(angle) * drift;
+    /* Soft boundary: reverse direction near edges */
+    const newX = creature.x + dx;
+    const newY = creature.y + dy;
+    creature.x = newX < 0.08 || newX > 0.92 ? creature.x - dx : newX;
+    creature.y = newY < 0.08 || newY > 0.92 ? creature.y - dy : newY;
 
     /* Accumulate sleep pressure while awake */
     dreams.accumulatePressure(
