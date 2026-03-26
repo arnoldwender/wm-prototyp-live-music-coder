@@ -8,6 +8,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Music, BookOpen, Terminal, Settings, X, Search, ChevronRight } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 import { Button } from '../atoms';
 
 /* ── Tab definitions ── */
@@ -23,6 +24,7 @@ const TABS: { id: TabId; Icon: typeof Music }[] = [
 /* ── Sidebar component ── */
 export function SidePanel() {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [activeTab, setActiveTab] = useState<TabId | null>(null);
   const showSidePanel = useAppStore((s) => s.showSidePanel);
   const toggleSidePanel = useAppStore((s) => s.toggleSidePanel);
@@ -48,11 +50,21 @@ export function SidePanel() {
     <aside
       className="flex h-full"
       style={{
-        borderLeft: '1px solid var(--color-border)',
-        backgroundColor: 'var(--color-bg)',
-        width: '320px',
-        minWidth: '280px',
-        maxWidth: '400px',
+        ...(isMobile
+          ? {
+              position: 'fixed' as const,
+              inset: 0,
+              zIndex: 100,
+              backgroundColor: 'var(--color-bg)',
+              width: '100%',
+            }
+          : {
+              borderLeft: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-bg)',
+              width: '320px',
+              minWidth: '280px',
+              maxWidth: '400px',
+            }),
       }}
     >
       {/* Tab strip — vertical icons */}

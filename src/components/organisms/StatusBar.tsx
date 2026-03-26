@@ -62,7 +62,7 @@ function StatusBar() {
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderTop: '1px solid var(--color-border)',
-        padding: 'var(--space-2) var(--space-6)',
+        padding: 'var(--space-2) var(--space-3)',
         height: '28px',
         fontSize: 'var(--font-size-xs)',
         color: 'var(--color-text-muted)',

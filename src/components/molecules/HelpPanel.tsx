@@ -342,7 +342,7 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
 
   return (
     <aside
-      className="fixed right-0 top-0 bottom-0 w-64 md:w-80 z-40 overflow-y-auto shadow-lg"
+      className="fixed right-0 top-0 bottom-0 w-full max-w-64 md:max-w-80 z-40 overflow-y-auto shadow-lg"
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderLeft: '1px solid var(--color-border)',

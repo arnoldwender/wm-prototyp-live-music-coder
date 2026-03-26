@@ -98,43 +98,60 @@ function Editor() {
 
   return (
     <>
-      {/* Security warning when code was loaded from a shared URL */}
+      {/* Security warning modal when code was loaded from a shared URL */}
       {showSharedWarning && (
         <div
-          role="alert"
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
+            inset: 0,
             zIndex: 1000,
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--space-3)',
-            padding: 'var(--space-2) var(--space-4)',
-            backgroundColor: 'var(--color-warning)',
-            color: 'var(--color-bg)',
-            fontSize: 'var(--font-size-xs)',
-            fontWeight: 'var(--font-weight-bold)',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+            padding: 'var(--space-4)',
           }}
         >
-          <span style={{ flex: 1 }}>{t('editor.sharedCodeWarning')}</span>
-          <button
-            type="button"
-            onClick={dismissWarning}
+          <div
+            role="alertdialog"
+            aria-label={t('editor.sharedCodeWarning')}
             style={{
-              background: 'none',
-              border: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              fontSize: 'var(--font-size-base)',
-              lineHeight: 1,
-              padding: 'var(--space-1)',
+              backgroundColor: 'var(--color-bg-elevated)',
+              border: '1px solid var(--color-warning)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-6)',
+              maxWidth: '400px',
+              width: '100%',
+              textAlign: 'center',
             }}
-            aria-label={t('editor.dismiss')}
           >
-            &times;
-          </button>
+            <div style={{ fontSize: '24px', marginBottom: 'var(--space-3)' }}>&#9888;</div>
+            <div style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text)',
+              marginBottom: 'var(--space-4)',
+              lineHeight: 'var(--line-height-base)',
+            }}>
+              {t('editor.sharedCodeWarning')}
+            </div>
+            <button
+              type="button"
+              onClick={dismissWarning}
+              style={{
+                backgroundColor: 'var(--color-warning)',
+                color: 'var(--color-bg)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-2) var(--space-6)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-bold)',
+                cursor: 'pointer',
+              }}
+            >
+              {t('editor.dismiss')}
+            </button>
+          </div>
         </div>
       )}
       <EditorLayout

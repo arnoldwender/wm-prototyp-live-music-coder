@@ -126,7 +126,7 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
 
   /* Derived size values — desktop uses percentage, mobile uses fixed height */
   const topHeight = isMobile || zenMode ? undefined : `${100 - layout.visualizerHeight}%`
-  const bottomHeight = isMobile ? '200px' : `${layout.visualizerHeight}%`
+  const bottomHeight = isMobile ? '120px' : `${layout.visualizerHeight}%`
 
   /* On mobile: graph is always hidden, editor takes full width */
   const showGraph = !isMobile && layout.showGraph

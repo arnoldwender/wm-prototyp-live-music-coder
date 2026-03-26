@@ -43,18 +43,26 @@ export function StrudelEditor() {
         /* Expose REPL globally for pianoroll and other visualizers */
         (window as any).__strudelRepl = repl;
 
-        /* Load Dirt-Samples — try multiple approaches */
+        /* Load Dirt-Samples + register synth sounds */
         try {
+          /* Register built-in synth sounds (piano, etc.) first */
+          try {
+            const webaudio = await import('@strudel/webaudio');
+            if (webaudio.registerSynthSounds) await webaudio.registerSynthSounds();
+            if (webaudio.initAudioOnFirstClick) webaudio.initAudioOnFirstClick();
+          } catch { /* synth registration not available */ }
+
+          /* Load samples via REPL (preferred — makes them available to patterns) */
           await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
-          console.log('[StrudelEditor] Samples loaded via REPL evaluate');
+          console.log('[StrudelEditor] Samples loaded via REPL');
         } catch (e1) {
-          console.warn('[StrudelEditor] REPL samples failed, trying direct import:', e1);
+          console.warn('[StrudelEditor] REPL samples failed:', e1);
           try {
             const { samples } = await import('@strudel/webaudio');
             await samples('github:tidalcycles/Dirt-Samples/master');
             console.log('[StrudelEditor] Samples loaded via direct import');
           } catch (e2) {
-            console.error('[StrudelEditor] All sample loading methods failed:', e2);
+            console.error('[StrudelEditor] Sample loading failed:', e2);
           }
         }
 
