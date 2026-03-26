@@ -59,9 +59,24 @@ export function serializeProject(project: Project): string {
   return JSON.stringify(project);
 }
 
+/** Valid engine types for input validation */
+const VALID_ENGINES = new Set(['strudel', 'tonejs', 'webaudio', 'midi']);
+
 /** Deserialize JSON to project with defaults for missing fields */
 export function deserializeProject(json: string): Project {
   const parsed = JSON.parse(json);
+
+  /* Validate critical fields to prevent unsafe deserialization */
+  if (parsed.files != null && !Array.isArray(parsed.files)) {
+    throw new Error('Invalid project: files must be an array');
+  }
+  if (parsed.bpm != null && (typeof parsed.bpm !== 'number' || !Number.isFinite(parsed.bpm))) {
+    throw new Error('Invalid project: bpm must be a finite number');
+  }
+  if (parsed.defaultEngine != null && !VALID_ENGINES.has(parsed.defaultEngine)) {
+    throw new Error(`Invalid project: unknown engine "${parsed.defaultEngine}"`);
+  }
+
   const now = new Date().toISOString();
   return {
     id: parsed.id ?? `project_${Date.now()}`,

@@ -4,6 +4,7 @@
    Sets 'lmc-onboarded' in localStorage to prevent re-show.
    ────────────────────────────────────────────────────────── */
 
+import { useEffect, useRef, useCallback } from 'react'
 import { STARTER_TEMPLATES, type StarterTemplate } from '../../data/templates'
 import { useAppStore } from '../../lib/store'
 import { Button } from '../atoms'
@@ -19,6 +20,38 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
   const setFileEngine = useAppStore((s) => s.setFileEngine)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const files = useAppStore((s) => s.files)
+  const backdropRef = useRef<HTMLDivElement>(null)
+
+  /* Focus trap — focus first focusable element on mount */
+  useEffect(() => {
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length > 0) focusable[0].focus()
+  }, [])
+
+  /* Focus trap — keep Tab cycling within the dialog */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') { onSelect(); return }
+    if (e.key !== 'Tab') return
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [onSelect])
 
   /** Apply template code AND engine to the active file */
   const handleSelect = (template: StarterTemplate) => {
@@ -35,9 +68,12 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
 
   return (
     <div
+      ref={backdropRef}
+      role="dialog"
+      aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
-      onKeyDown={(e) => { if (e.key === 'Escape') onSelect() }}
+      onKeyDown={handleKeyDown}
     >
       <div
         className="rounded-lg p-8 max-w-2xl w-full mx-4"

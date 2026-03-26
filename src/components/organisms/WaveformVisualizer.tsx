@@ -6,6 +6,7 @@ import { getStrudelAnalyser } from '../../lib/audio/strudel-tap';
 
 export function WaveformVisualizer() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
+  const lastNodeRef = useRef<AnalyserNode | null>(null);
   const frameCount = useRef(0);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -14,8 +15,12 @@ export function WaveformVisualizer() {
     /* Reconnect every 30 frames (~0.5s) — superdough creates nodes lazily */
     if (frameCount.current % 30 === 0) {
       getStrudelAnalyser().then((node) => {
-        if (node) analyzerRef.current = new AudioAnalyzer(node);
-      });
+        /* Only create a new AudioAnalyzer when the underlying node changes */
+        if (node && node !== lastNodeRef.current) {
+          lastNodeRef.current = node;
+          analyzerRef.current = new AudioAnalyzer(node);
+        }
+      }).catch(() => { /* Audio tap unavailable — ignore */ });
     }
 
     if (analyzerRef.current) {

@@ -4,7 +4,7 @@
    load project from Gist URL/ID.
    ────────────────────────────────────────────────────────── */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Upload, Download, Trash2 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
@@ -33,6 +33,38 @@ export function GistDialog({ onClose }: GistDialogProps) {
   const [saving, setSaving] = useState(false)
 
   const hasToken = !!getStoredToken()
+  const backdropRef = useRef<HTMLDivElement>(null)
+
+  /* Focus trap — focus first focusable element on mount */
+  useEffect(() => {
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length > 0) focusable[0].focus()
+  }, [])
+
+  /* Focus trap — keep Tab cycling within the dialog */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') { onClose(); return }
+    if (e.key !== 'Tab') return
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [onClose])
 
   /* --- Token management handlers --- */
 
@@ -114,9 +146,12 @@ export function GistDialog({ onClose }: GistDialogProps) {
 
   return (
     <div
+      ref={backdropRef}
+      role="dialog"
+      aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
-      onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+      onKeyDown={handleKeyDown}
     >
       <div
         className="rounded-lg max-w-lg w-full mx-4"
@@ -159,6 +194,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder="ghp_..."
+            aria-label="GitHub Personal Access Token"
             className="w-full rounded"
             style={{ ...inputStyle, marginBottom: 'var(--space-3)' }}
           />
@@ -220,6 +256,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
             value={gistInput}
             onChange={(e) => setGistInput(e.target.value)}
             placeholder="https://gist.github.com/user/abc123"
+            aria-label="Gist URL or ID"
             className="w-full rounded"
             style={{
               ...inputStyle,

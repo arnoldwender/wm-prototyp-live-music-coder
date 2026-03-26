@@ -36,4 +36,8 @@
   --color-error: #ef4444;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
+
+  /* --- Strudel highlight decorations (CodeMirror) --- */
+  --color-strudel-highlight-bg: rgba(168, 85, 247, 0.25);
+  --color-strudel-highlight-border: rgba(168, 85, 247, 0.5);
 }

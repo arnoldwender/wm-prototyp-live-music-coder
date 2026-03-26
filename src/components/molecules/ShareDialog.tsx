@@ -4,7 +4,7 @@
    visual checkmark feedback.
    ────────────────────────────────────────────────────────── */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Copy, Check, X } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
@@ -22,6 +22,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
   const bpm = useAppStore((s) => s.bpm)
   const activeFile = files.find((f) => f.active)
   const [copied, setCopied] = useState(false)
+  const backdropRef = useRef<HTMLDivElement>(null)
 
   /* Generate share URL from active file state */
   const shareUrl = activeFile
@@ -29,16 +30,55 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     : ''
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      /* Clipboard API may fail in insecure contexts or denied permissions */
+      setCopied(false)
+    }
   }
+
+  /* Focus trap — focus first focusable element on mount */
+  useEffect(() => {
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length > 0) focusable[0].focus()
+  }, [])
+
+  /* Focus trap — keep Tab cycling within the dialog */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') { onClose(); return }
+    if (e.key !== 'Tab') return
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [onClose])
 
   return (
     <div
+      ref={backdropRef}
+      role="dialog"
+      aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
-      onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
+      onKeyDown={handleKeyDown}
     >
       <div
         className="rounded-lg max-w-lg w-full mx-4"
@@ -68,6 +108,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
         <input
           readOnly
           value={shareUrl}
+          aria-label="Share URL"
           className="w-full rounded"
           style={{
             backgroundColor: 'var(--color-bg)',

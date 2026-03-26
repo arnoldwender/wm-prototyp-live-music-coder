@@ -7,6 +7,7 @@ import { useAppStore } from '../../lib/store';
 
 export function PatternTimeline() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
+  const lastNodeRef = useRef<AnalyserNode | null>(null);
   const frameCount = useRef(0);
   const bpm = useAppStore((s) => s.bpm);
 
@@ -14,8 +15,12 @@ export function PatternTimeline() {
     frameCount.current++;
     if (frameCount.current % 30 === 0) {
       getStrudelAnalyser().then((node) => {
-        if (node) analyzerRef.current = new AudioAnalyzer(node);
-      });
+        /* Only create a new AudioAnalyzer when the underlying node changes */
+        if (node && node !== lastNodeRef.current) {
+          lastNodeRef.current = node;
+          analyzerRef.current = new AudioAnalyzer(node);
+        }
+      }).catch(() => { /* Audio tap unavailable — ignore */ });
     }
     const rms = analyzerRef.current?.getRmsLevel() ?? 0;
     drawTimeline(ctx, width, height, bpm, time, rms);

@@ -226,6 +226,7 @@ export default function NodeGraph() {
             borderColor: 'var(--color-border)',
           }}
           nodeColor={miniMapNodeColor}
+          /* React Flow MiniMap renders maskColor into SVG, which cannot resolve CSS custom properties — hardcoded rgba is intentional */
           maskColor="rgba(0, 0, 0, 0.6)"
         />
       </ReactFlow>

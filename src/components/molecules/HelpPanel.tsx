@@ -269,6 +269,9 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
     navigator.clipboard.writeText(code).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
+    }).catch(() => {
+      /* Clipboard API may fail in insecure contexts or denied permissions */
+      setCopied(false)
     })
   }, [code])
 

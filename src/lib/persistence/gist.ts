@@ -65,7 +65,10 @@ export async function saveToGist(
       description: `Live Music Coder: ${project.name}`,
       files,
     });
-    return { id: response.data.id!, url: response.data.html_url! };
+    if (!response.data.id || !response.data.html_url) {
+      throw new Error('Gist update response missing id or html_url');
+    }
+    return { id: response.data.id, url: response.data.html_url };
   } else {
     /* Create new gist */
     const response = await octokit.gists.create({
@@ -73,7 +76,10 @@ export async function saveToGist(
       public: false,
       files,
     });
-    return { id: response.data.id!, url: response.data.html_url! };
+    if (!response.data.id || !response.data.html_url) {
+      throw new Error('Gist create response missing id or html_url');
+    }
+    return { id: response.data.id, url: response.data.html_url };
   }
 }
 

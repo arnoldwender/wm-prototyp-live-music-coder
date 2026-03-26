@@ -54,7 +54,7 @@ export function ExampleGallery() {
             className="px-3 py-1.5 rounded-full text-sm transition-all cursor-pointer"
             style={{
               backgroundColor: activeCategory === cat ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-              color: activeCategory === cat ? 'white' : 'var(--color-text-secondary)',
+              color: activeCategory === cat ? 'var(--color-bg)' : 'var(--color-text-secondary)',
               border: `1px solid ${activeCategory === cat ? 'var(--color-primary)' : 'var(--color-border)'}`,
             }}
           >

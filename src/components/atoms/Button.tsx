@@ -46,15 +46,15 @@ const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '36px',
-    minHeight: '36px',
+    minWidth: '44px',
+    minHeight: '44px',
   },
 }
 
 /** Active state overlay — distinct from hover with primary color at reduced opacity */
 const activeOverride: React.CSSProperties = {
   backgroundColor: 'var(--color-primary)',
-  color: 'white',
+  color: 'var(--color-bg)',
   opacity: 0.8,
 }
 

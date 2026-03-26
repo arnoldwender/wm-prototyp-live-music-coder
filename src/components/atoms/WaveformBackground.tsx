@@ -26,7 +26,7 @@ export function WaveformBackground() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '3px',
+        gap: 'var(--space-1)',
         overflow: 'hidden',
         pointerEvents: 'none',
         opacity: 0.12,

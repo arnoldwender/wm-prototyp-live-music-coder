@@ -26,7 +26,7 @@ const highlightField = StateField.define<DecorationSet>({
           .filter(({ from, to }) => from >= 0 && to <= tr.newDoc.length && from < to)
           .map(({ from, to }) =>
             Decoration.mark({
-              attributes: { style: 'background-color: rgba(168, 85, 247, 0.25); outline: 1px solid rgba(168, 85, 247, 0.5); border-radius: 2px;' },
+              attributes: { style: 'background-color: var(--color-strudel-highlight-bg, rgba(168, 85, 247, 0.25)); outline: 1px solid var(--color-strudel-highlight-border, rgba(168, 85, 247, 0.5)); border-radius: 2px;' },
             }).range(from, to)
           );
         decorations = Decoration.set(marks, true);
@@ -233,12 +233,12 @@ export function StrudelEditor() {
           </Button>
         </Tooltip>
         {isPlaying && (
-          <span className="flex items-center gap-1" style={{ fontSize: '10px', color: 'var(--color-success)', fontFamily: 'var(--font-family-mono)' }}>
+          <span className="flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)', fontFamily: 'var(--font-family-mono)' }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
             Playing
           </span>
         )}
-        <span className="ml-auto flex items-center gap-1" style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
+        <span className="ml-auto flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ready ? 'var(--color-success)' : 'var(--color-warning)' }} />
           {ready ? 'Ready' : 'Loading...'}
         </span>
@@ -251,9 +251,9 @@ export function StrudelEditor() {
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 
       {evalError && (
-        <div role="alert" aria-live="assertive" className="flex items-center shrink-0" style={{ backgroundColor: 'var(--color-error)', color: 'white', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-mono)', padding: 'var(--space-2) var(--space-4)', gap: 'var(--space-3)' }}>
+        <div role="alert" aria-live="assertive" className="flex items-center shrink-0" style={{ backgroundColor: 'var(--color-error)', color: 'var(--color-bg)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-mono)', padding: 'var(--space-2) var(--space-4)', gap: 'var(--space-3)' }}>
           <span className="flex-1 truncate">{evalError}</span>
-          <button type="button" onClick={() => setEvalError(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '16px' }}>&times;</button>
+          <button type="button" onClick={() => setEvalError(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 'var(--font-size-base)' }}>&times;</button>
         </div>
       )}
     </div>

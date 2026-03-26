@@ -81,7 +81,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
         {unlocked && achievement.unlockedAt && (
           <div
             style={{
-              fontSize: '10px',
+              fontSize: 'var(--font-size-xs)',
               color: 'var(--color-text-secondary)',
               marginTop: 'var(--space-xs)',
               fontFamily: 'var(--font-family-mono)',
@@ -93,7 +93,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
         {!unlocked && (
           <div
             style={{
-              fontSize: '10px',
+              fontSize: 'var(--font-size-xs)',
               color: 'var(--color-text-secondary)',
               marginTop: 'var(--space-xs)',
             }}

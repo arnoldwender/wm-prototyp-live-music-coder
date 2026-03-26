@@ -44,7 +44,8 @@ export function TabButton({ name, engine, active, onClick, onClose, closable }: 
           aria-label={`Close ${name}`}
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); onClose(); } }}
-          className="opacity-0 group-hover:opacity-100 ml-1 p-0.5 rounded hover:bg-[var(--color-bg-hover)] transition-opacity"
+          className="opacity-0 group-hover:opacity-100 ml-1 rounded hover:bg-[var(--color-bg-hover)] transition-opacity inline-flex items-center justify-center"
+          style={{ minWidth: '44px', minHeight: '44px' }}
         >
           <X size={12} />
         </span>

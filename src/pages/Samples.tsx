@@ -60,7 +60,7 @@ function SampleCard({ sample, t }: { sample: SampleEntry; t: (key: string) => st
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'var(--color-strudel)'
-        e.currentTarget.style.boxShadow = '0 0 12px rgba(168, 85, 247, 0.15)'
+        e.currentTarget.style.boxShadow = 'var(--shadow-glow-strudel)'
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = 'var(--color-border)'

@@ -25,7 +25,7 @@ export function BeatlingPanel() {
           worldRef.current.setAudioBridge(new AudioAnalyzer(node), sr);
           bridgeConnected.current = true;
         }
-      });
+      }).catch(() => { /* Audio tap unavailable — ignore */ });
     }
 
     worldRef.current.update(false);

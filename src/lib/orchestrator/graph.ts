@@ -145,14 +145,23 @@ export class AudioGraph {
     }
   }
 
-  /** Reconstructs an AudioGraph from serialized data */
+  /** Reconstructs an AudioGraph from serialized data with cycle validation */
   static deserialize(data: AudioGraphData): AudioGraph {
     const graph = new AudioGraph()
     for (const block of data.blocks) {
       graph.addBlock(block)
     }
+    /* Use connect() instead of direct map insertion to enforce cycle prevention */
     for (const conn of data.connections) {
-      graph.connections.set(conn.id, conn)
+      const result = graph.connect(
+        conn.sourceBlockId,
+        conn.sourcePortId,
+        conn.targetBlockId,
+        conn.targetPortId,
+      )
+      if (!result) {
+        console.warn(`[AudioGraph.deserialize] Skipped invalid/cyclic connection: ${conn.id}`)
+      }
     }
     return graph
   }

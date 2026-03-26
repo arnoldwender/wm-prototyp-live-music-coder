@@ -47,6 +47,11 @@ export class AudioRecorder {
         resolve(blob)
       }
 
+      this.mediaRecorder.onerror = (event) => {
+        this.cleanup()
+        reject(new Error(`MediaRecorder error: ${(event as MediaRecorderErrorEvent).error?.message ?? 'unknown'}`))
+      }
+
       this.mediaRecorder.stop()
     })
   }
