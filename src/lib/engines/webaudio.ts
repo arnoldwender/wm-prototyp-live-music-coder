@@ -42,15 +42,15 @@ export class WebAudioEngine extends BaseEngine {
     const ctx = getSharedContext()
     const masterGain = getMasterGain()
 
-    /* Replace `new AudioContext()` with our pre-resumed shared context.
-     * Users expect to create their own ctx, but a fresh one would be suspended. */
-    const patchedCode = code.replace(/new\s+AudioContext\s*\(\s*\)/g, 'ctx')
+    /* Remove `const ctx = new AudioContext()` lines entirely since we inject ctx.
+     * Also replace standalone `new AudioContext()` with the injected ctx. */
+    const patchedCode = code
+      .replace(/(?:const|let|var)\s+ctx\s*=\s*new\s+AudioContext\s*\(\s*\)\s*;?/g, '/* ctx provided by engine */')
+      .replace(/new\s+AudioContext\s*\(\s*\)/g, 'ctx')
 
     try {
-      await Function('ctx', 'masterGain', 'AudioContext', `"use strict"; return (async () => { ${patchedCode} })()`)(
-        ctx, masterGain,
-        /* Provide AudioContext constructor that returns the shared context */
-        function AudioContextProxy() { return ctx }
+      await Function('ctx', 'masterGain', `"use strict"; return (async () => { ${patchedCode} })()`)(
+        ctx, masterGain
       )
       console.log('[WebAudio] Code evaluated successfully')
     } catch (err) {
