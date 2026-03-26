@@ -9,6 +9,7 @@ import EditorLayout from '../layouts/EditorLayout'
 import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
+import { getOrchestrator } from '../lib/orchestrator'
 
 function Editor() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
@@ -38,6 +39,16 @@ function Editor() {
       setShowTutorial(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  /* Stop all audio when leaving the editor page */
+  useEffect(() => {
+    return () => {
+      const orch = getOrchestrator()
+      orch.stop()
+      /* Reset store play state so TransportBar is correct on re-entry */
+      useAppStore.getState().stop()
+    }
   }, [])
 
   return (
