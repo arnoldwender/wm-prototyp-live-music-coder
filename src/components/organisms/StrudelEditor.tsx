@@ -223,10 +223,15 @@ export function StrudelEditor() {
       await replRef.current.evaluate(code, true);
       console.log('[StrudelEditor] Evaluate success, scheduler active');
 
-      /* Force visualizer tap to reconnect — superdough recreates audio chain on evaluate */
+      /* Force visualizer tap to reconnect — superdough recreates audio chain lazily.
+       * The controller only initializes AFTER the first note plays, so we retry
+       * multiple times with increasing delays to catch it. */
       resetStrudelTap();
-      setTimeout(() => resetStrudelTap(), 200);
-      setTimeout(() => resetStrudelTap(), 500);
+      setTimeout(() => resetStrudelTap(), 100);
+      setTimeout(() => resetStrudelTap(), 300);
+      setTimeout(() => resetStrudelTap(), 600);
+      setTimeout(() => resetStrudelTap(), 1000);
+      setTimeout(() => resetStrudelTap(), 2000);
 
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();

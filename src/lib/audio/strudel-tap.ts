@@ -21,7 +21,7 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
-    if (ctx && ctx.state === 'running') {
+    if (ctx && ctx.state !== 'closed') {
       if (!strudelAnalyser || strudelAnalyser.context !== ctx) {
         strudelAnalyser = ctx.createAnalyser();
         strudelAnalyser.fftSize = 2048;

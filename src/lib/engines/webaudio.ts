@@ -43,15 +43,21 @@ export class WebAudioEngine extends BaseEngine {
     const ctx = getSharedContext()
     const masterGain = getMasterGain()
 
-    /* Remove `const ctx = new AudioContext()` lines entirely since we inject ctx.
-     * Also replace standalone `new AudioContext()` with the injected ctx. */
+    /* Patch user code:
+     * 1. Strip `const ctx = new AudioContext()` — we inject ctx
+     * 2. Replace `new AudioContext()` with ctx
+     * 3. Replace `ctx.destination` with destination (our masterGain)
+     *    so visualizers capture the audio */
     const patchedCode = code
       .replace(/(?:const|let|var)\s+ctx\s*=\s*new\s+AudioContext\s*\(\s*\)\s*;?/g, '/* ctx provided by engine */')
       .replace(/new\s+AudioContext\s*\(\s*\)/g, 'ctx')
+      .replace(/ctx\.destination/g, 'destination')
 
     try {
-      await Function('ctx', 'masterGain', `"use strict"; return (async () => { ${patchedCode} })()`)(
-        ctx, masterGain
+      /* Provide `destination` as masterGain — anything connected here flows
+       * through masterGain → masterAnalyser → real destination (speakers) */
+      await Function('ctx', 'masterGain', 'destination', `"use strict"; return (async () => { ${patchedCode} })()`)(
+        ctx, masterGain, masterGain
       )
       console.log('[WebAudio] Code evaluated successfully')
       resetStrudelTap()
