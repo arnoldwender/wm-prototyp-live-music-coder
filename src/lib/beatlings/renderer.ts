@@ -49,9 +49,9 @@ export function drawBeatlingWorld(
     }
   }
 
-  /* Draw creatures on top of the GoL grid */
+  /* Draw creatures on top of the GoL grid — scale 0-1 positions to canvas */
   for (const creature of creatures) {
-    drawCreature(ctx, creature, time);
+    drawCreature(ctx, { ...creature, x: creature.x * width, y: creature.y * height }, time);
   }
 }
 

@@ -176,8 +176,9 @@ export class BeatlingWorld {
           species,
           stage: 'egg',
           xp: { audio: 0, complexity: 0, interaction: 0 },
-          x: 50 + Math.random() * 300,
-          y: 50 + Math.random() * 150,
+          /* Position as 0-1 fractions — renderer scales to canvas size */
+          x: 0.1 + Math.random() * 0.8,
+          y: 0.1 + Math.random() * 0.8,
           energy: features.rms,
           born: Date.now(),
         });

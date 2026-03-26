@@ -18,7 +18,8 @@ export function SpectrumVisualizer() {
     if (analyzerRef.current) {
       drawSpectrum(ctx, width, height, analyzerRef.current.getFrequencyData());
     } else {
-      drawSpectrum(ctx, width, height, new Float32Array(1024));
+      /* Silence = -100 dB (Float32Array defaults to 0 which is max amplitude) */
+      drawSpectrum(ctx, width, height, new Float32Array(1024).fill(-100));
     }
   }, []);
 

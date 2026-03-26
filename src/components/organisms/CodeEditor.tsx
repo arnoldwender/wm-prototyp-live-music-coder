@@ -133,6 +133,20 @@ export function CodeEditor() {
     setupEvaluator();
   }, [setupEvaluator]);
 
+  /* Sync external store code changes into CM6 — handles URL-loaded code
+   * from Samples/Examples pages where updateFileCode runs before the view
+   * is created, or when code is set from outside the editor */
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !activeFile) return;
+    const currentDoc = view.state.doc.toString();
+    if (currentDoc !== activeFile.code) {
+      view.dispatch({
+        changes: { from: 0, to: currentDoc.length, insert: activeFile.code },
+      });
+    }
+  }, [activeFile?.code]);
+
   /* Listen for 'node-focus' custom events from EngineNode double-click.
    * Searches for the code string in the editor and selects it. */
   useEffect(() => {
