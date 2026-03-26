@@ -7,6 +7,7 @@
 import { BaseEngine } from './base'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
 import { getSharedContext, getMasterGain, resumeContext } from '../audio/context'
+import { resetStrudelTap } from '../audio/strudel-tap'
 
 /** Raw Web Audio API engine adapter.
  * Maximum flexibility — users create oscillators, filters, gains directly.
@@ -53,6 +54,7 @@ export class WebAudioEngine extends BaseEngine {
         ctx, masterGain
       )
       console.log('[WebAudio] Code evaluated successfully')
+      resetStrudelTap()
     } catch (err) {
       console.error('[WebAudio] Evaluation error:', err)
       throw err

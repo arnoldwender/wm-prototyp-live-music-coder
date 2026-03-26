@@ -8,6 +8,7 @@
 import { BaseEngine } from './base'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
 import { getMasterGain } from '../audio/context'
+import { resetStrudelTap } from '../audio/strudel-tap'
 
 /** Tone.js engine adapter.
  * Provides high-level synth creation and transport control.
@@ -68,6 +69,9 @@ export class ToneJsEngine extends BaseEngine {
       /* Wrap in async IIFE — user code can use top-level await, const, etc. */
       await Function('Tone', `"use strict"; return (async () => { ${code} })()`)(Tone)
       console.log('[Tone.js] Code evaluated successfully')
+      /* Reset visualizer tap so it reconnects to Tone's context */
+      resetStrudelTap()
+      setTimeout(() => resetStrudelTap(), 300)
     } catch (err) {
       console.error('[Tone.js] Evaluation error:', err)
       throw err
