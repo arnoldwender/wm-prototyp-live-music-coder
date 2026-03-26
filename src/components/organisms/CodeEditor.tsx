@@ -15,6 +15,7 @@ import { getOrchestrator } from '../../lib/orchestrator';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { createEvaluator } from '../../lib/editor/evaluate';
+import { resumeContext } from '../../lib/audio/context';
 import { FileTabs } from '../molecules/FileTabs';
 import { Play } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
@@ -53,8 +54,8 @@ export function CodeEditor() {
     const orch = getOrchestrator();
     try {
       setEvalError(null);
-      /* Resume AudioContext — browsers require user gesture before playback */
-      const { resumeContext } = await import('../../lib/audio/context');
+      /* Resume AudioContext IMMEDIATELY in the click handler — no dynamic import
+       * that could lose the user gesture context in some browsers */
       await resumeContext();
       await orch.evaluate(activeFile.code, activeFile.engine);
       /* Track evaluation for session stats + unlock achievements */
