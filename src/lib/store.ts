@@ -118,6 +118,8 @@ interface AppState {
   showBrainPanel: boolean
   showSidePanel: boolean
   toggleSidePanel: () => void
+  zenMode: boolean
+  toggleZenMode: () => void
   setCreatureCount: (count: number) => void
   setCreatureStats: (stats: CreatureStat[]) => void
   selectCreature: (id: string | null) => void
@@ -199,6 +201,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   showBrainPanel: false,
   showSidePanel: false,
   toggleSidePanel: () => set((s) => ({ showSidePanel: !s.showSidePanel })),
+  zenMode: false,
+  toggleZenMode: () => set((s) => ({ zenMode: !s.zenMode })),
 
   /* --- Gamification initial state --- */
   pendingToast: null,

@@ -26,6 +26,7 @@ interface EditorLayoutProps {
 }
 
 function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePanel }: EditorLayoutProps) {
+  const zenMode = useAppStore((s) => s.zenMode)
   const layout = useAppStore((s) => s.layout)
   const setEditorWidth = useAppStore((s) => s.setEditorWidth)
   const setVisualizerHeight = useAppStore((s) => s.setVisualizerHeight)
@@ -124,7 +125,7 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
   )
 
   /* Derived size values — desktop uses percentage, mobile uses fixed height */
-  const topHeight = isMobile ? undefined : `${100 - layout.visualizerHeight}%`
+  const topHeight = isMobile || zenMode ? undefined : `${100 - layout.visualizerHeight}%`
   const bottomHeight = isMobile ? '200px' : `${layout.visualizerHeight}%`
 
   /* On mobile: graph is always hidden, editor takes full width */
@@ -132,8 +133,8 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
 
   return (
     <div className="flex flex-col h-full">
-      {/* ── Toolbar ── */}
-      <header className="shrink-0">{toolbar}</header>
+      {/* ── Toolbar — hidden in zen mode ── */}
+      {!zenMode && <header className="shrink-0">{toolbar}</header>}
 
       {/* ── Main area: content + side panel ── */}
       <div className="flex-1 flex min-h-0">
@@ -190,8 +191,8 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
           )}
         </div>
 
-        {/* Horizontal resize handle — hidden on mobile (no drag resize) */}
-        {!isMobile && (
+        {/* Horizontal resize handle — hidden on mobile and zen mode */}
+        {!isMobile && !zenMode && (
           <div
             role="separator"
             aria-orientation="horizontal"
@@ -213,8 +214,8 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
           />
         )}
 
-        {/* Bottom zone: visualizers — fixed 200px on mobile, percentage on desktop */}
-        <section
+        {/* Bottom zone: visualizers — hidden in zen mode */}
+        {!zenMode && <section
           aria-label="Visualizers"
           className="min-h-0 overflow-auto shrink-0"
           style={{
@@ -223,15 +224,15 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
           }}
         >
           {visualizers}
-        </section>
+        </section>}
       </div>
 
-      {/* ── Side panel (Samples, Reference, Console, Settings) ── */}
-      {sidePanel}
+      {/* ── Side panel — hidden in zen mode ── */}
+      {!zenMode && sidePanel}
       </div>
 
-      {/* ── Status bar ── */}
-      <footer className="shrink-0">{statusBar}</footer>
+      {/* ── Status bar — hidden in zen mode ── */}
+      {!zenMode && <footer className="shrink-0">{statusBar}</footer>}
     </div>
   )
 }

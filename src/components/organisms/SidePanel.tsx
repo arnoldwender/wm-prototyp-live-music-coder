@@ -554,6 +554,9 @@ function SettingsPanel() {
   const [lineNumbers, setLineNumbers] = useState(() => localStorage.getItem('lmc-line-numbers') !== 'false');
   const [highlightEvents, setHighlightEvents] = useState(() => localStorage.getItem('lmc-highlight-events') !== 'false');
   const [flashOnEval, setFlashOnEval] = useState(() => localStorage.getItem('lmc-flash-eval') === 'true');
+  const [keybindings, setKeybindings] = useState(() => localStorage.getItem('lmc-keybindings') || 'default');
+  const zenMode = useAppStore((s) => s.zenMode);
+  const toggleZenMode = useAppStore((s) => s.toggleZenMode);
 
   /* Enumerate audio output devices */
   useEffect(() => {
@@ -633,6 +636,39 @@ function SettingsPanel() {
           style={{ width: '100%', accentColor: 'var(--color-primary)' }}
         />
       </div>
+
+      {/* Keybinding mode */}
+      <div>
+        <label style={labelStyle}>Keybindings</label>
+        <select
+          value={keybindings}
+          onChange={(e) => {
+            setKeybindings(e.target.value);
+            saveSetting('lmc-keybindings', e.target.value);
+          }}
+          aria-label="Keybindings"
+          style={inputStyle}
+        >
+          <option value="default">CodeMirror (Default)</option>
+          <option value="vim">Vim</option>
+          <option value="emacs">Emacs</option>
+          <option value="vscode">VS Code</option>
+        </select>
+      </div>
+
+      {/* Zen mode */}
+      <label
+        className="flex items-center gap-2 cursor-pointer"
+        style={{ fontSize: '12px', color: 'var(--color-text)' }}
+      >
+        <input
+          type="checkbox"
+          checked={zenMode}
+          onChange={() => toggleZenMode()}
+          style={{ accentColor: 'var(--color-primary)' }}
+        />
+        Zen Mode (hide UI, focus on code)
+      </label>
 
       {/* Toggle settings */}
       {[
