@@ -36,8 +36,11 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
           if (destGain) {
             destGain.connect(strudelAnalyser);
             strudelConnected = true;
+            console.log('[AudioTap] Strudel destinationGain connected to analyser');
           }
-        } catch { /* controller not ready — retry next frame */ }
+        } catch (e) {
+          console.warn('[AudioTap] Strudel controller not ready:', e);
+        }
       }
 
       if (strudelConnected) return strudelAnalyser;

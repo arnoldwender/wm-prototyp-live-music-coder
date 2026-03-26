@@ -44,7 +44,10 @@ export class ToneJsEngine extends BaseEngine {
     try {
       const analyser = getMasterAnalyser()
       this.Tone.getDestination().connect(analyser)
-    } catch { /* not ready yet */ }
+      console.log('[Tone.js] Destination connected to masterAnalyser')
+    } catch (e) {
+      console.warn('[Tone.js] Destination tap retry failed:', e)
+    }
   }
 
   async createNode(block: EngineBlock): Promise<AudioNodeWrapper> {
