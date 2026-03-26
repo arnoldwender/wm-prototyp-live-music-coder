@@ -11,6 +11,9 @@ import { addXp, getStage, type BeatlingXp } from './evolution';
 import { ACHIEVEMENTS, checkAchievement, isUnlocked } from './collection';
 import { drawBeatlingWorld } from './renderer';
 import { AudioAnalyzer } from '../audio/analyzer';
+import { NeuralNetwork } from './brain/neural-network';
+import { ConsciousnessEngine } from './brain/consciousness';
+import { DreamEngine } from './brain/dreams';
 import type { Species, Stage, Achievement } from '../../types/beatling';
 
 /* Barrel exports — all beatling modules available from single import */
@@ -31,6 +34,13 @@ interface Creature {
   y: number;
   energy: number;
   born: number;
+  /* Phase 2: Neural brain — each creature has its own neural network,
+   * consciousness engine, and dream engine for emergent behavior */
+  brain: NeuralNetwork;
+  consciousness: ConsciousnessEngine;
+  dreams: DreamEngine;
+  isSleeping: boolean;
+  phi: number; /* Consciousness level (0-1) — affects glow in renderer */
 }
 
 /** Manages the Beatling ecosystem — spawning, updating, rendering */
@@ -111,9 +121,11 @@ export class BeatlingWorld {
     /* Try spawn new creatures based on audio features */
     this.trySpawn(features);
 
-    /* Update existing creatures — energy and XP accumulation */
+    /* Update existing creatures — neural brain + energy + XP */
     for (const creature of this.creatures) {
       creature.energy = features.rms;
+
+      /* XP accumulation from audio features */
       if (features.rms > 0.1) {
         creature.xp = addXp(creature.xp, 'audio', features.rms * 0.1);
       }
@@ -121,6 +133,11 @@ export class BeatlingWorld {
         creature.xp = addXp(creature.xp, 'complexity', features.complexity * 0.05);
       }
       creature.stage = getStage(creature.xp);
+
+      /* Phase 2: Neural brain update — runs every 3 frames for performance */
+      if (this.golTickCounter % 3 === 0) {
+        this.updateCreatureBrain(creature, features);
+      }
     }
 
     /* Check achievements after state updates */
@@ -143,6 +160,8 @@ export class BeatlingWorld {
       x: c.x,
       y: c.y,
       energy: c.energy,
+      phi: c.phi,
+      isSleeping: c.isSleeping,
     }));
     drawBeatlingWorld(ctx, width, height, this.gol, renderData, time);
   }
@@ -171,6 +190,12 @@ export class BeatlingWorld {
       if (count >= 2) continue;
 
       if (shouldSpawn(species, features)) {
+        /* Initialize neural brain for the new creature */
+        const brain = new NeuralNetwork();
+        brain.initialize();
+        const consciousness = new ConsciousnessEngine();
+        const dreams = new DreamEngine();
+
         this.creatures.push({
           id: `${species}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
           species,
@@ -181,9 +206,70 @@ export class BeatlingWorld {
           y: 0.1 + Math.random() * 0.8,
           energy: features.rms,
           born: Date.now(),
+          brain,
+          consciousness,
+          dreams,
+          isSleeping: false,
+          phi: 0,
         });
         this.spawnCooldowns.set(species, 120); /* ~2 second cooldown at 60fps */
       }
+    }
+  }
+
+  /** Update a creature's neural brain with audio-derived stimulation.
+   * Audio features map to sensory neurons; motor output nudges position;
+   * consciousness Phi drives glow; dreams consolidate during silence. */
+  private updateCreatureBrain(creature: Creature, features: AudioFeatures): void {
+    const { brain, consciousness, dreams } = creature;
+
+    /* Check if creature should sleep (low energy, high sleep pressure) */
+    if (!creature.isSleeping && dreams.shouldSleep(creature.energy, dreams.sleepPressure)) {
+      creature.isSleeping = true;
+    }
+
+    if (creature.isSleeping) {
+      /* Dreaming — consolidate memories, prune weak synapses */
+      dreams.processDream(brain);
+
+      /* Wake up when audio returns or dream cycle completes */
+      if (features.rms > 0.2 || dreams.dreamPhase > Math.PI * 4) {
+        creature.isSleeping = false;
+        dreams.isDreaming = false;
+        dreams.dreamPhase = 0;
+        dreams.sleepPressure = 0;
+      }
+      return;
+    }
+
+    /* Awake — stimulate sensory neurons with audio features */
+    brain.stimulate('hunger_sense', features.rms);
+    brain.stimulate('food_sense', features.dominantFreq / 1000);
+    brain.stimulate('touch_sense', features.hasBeat ? 0.8 : 0);
+    brain.stimulate('proximity_sense', features.complexity);
+
+    /* Run one brain tick — propagates signals, Hebbian learning, neurogenesis */
+    brain.update();
+
+    /* Consciousness: compute Phi from neural activity */
+    consciousness.update(brain);
+    creature.phi = Math.min(1, consciousness.phi);
+
+    /* Motor output: neural network drives subtle position drift */
+    const motor = brain.getMotorOutput();
+    const drift = 0.002; /* Small per-frame position change */
+    creature.x = Math.max(0.05, Math.min(0.95, creature.x + (motor.toward - motor.away) * drift));
+    creature.y = Math.max(0.05, Math.min(0.95, creature.y + motor.eat * drift * 0.5));
+
+    /* Accumulate sleep pressure while awake */
+    dreams.accumulatePressure(
+      brain.totalFirings > 0 ? 0.5 : 0,
+      Math.abs(brain.getEmotionalState()),
+    );
+
+    /* Neural activity contributes to interaction XP */
+    if (brain.intelligence > 5) {
+      creature.xp = addXp(creature.xp, 'interaction', brain.intelligence * 0.001);
     }
   }
 

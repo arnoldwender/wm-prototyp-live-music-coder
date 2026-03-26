@@ -1,4 +1,4 @@
-// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
+/* Wired into BeatlingWorld — creatures sleep during silence, consolidate synapses */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    DREAMS — Memory consolidation during sleep

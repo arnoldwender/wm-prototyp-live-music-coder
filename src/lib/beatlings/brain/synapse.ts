@@ -1,4 +1,4 @@
-// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
+/* Wired into BeatlingWorld — synapses strengthen via Hebbian learning from audio */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    SYNAPSE — Connection between neurons

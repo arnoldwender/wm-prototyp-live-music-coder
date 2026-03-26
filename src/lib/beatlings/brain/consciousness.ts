@@ -1,4 +1,4 @@
-// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
+/* Wired into BeatlingWorld — Phi level drives creature glow rendering */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    CONSCIOUSNESS — Phi (Phi) Calculator

@@ -18,6 +18,8 @@ interface CreatureRenderData {
   x: number;
   y: number;
   energy: number; /* 0-1, drives animation intensity */
+  phi?: number; /* 0-1, consciousness level — drives glow intensity */
+  isSleeping?: boolean; /* True when dreaming — muted rendering */
 }
 
 /** Draw the Beatling ecosystem: GoL grid + creatures */
@@ -63,8 +65,16 @@ function drawCreature(
 ): void {
   const def = SPECIES[creature.species];
   const sizeMul = getStageSizeMultiplier(creature.stage);
-  const glow = getStageGlow(creature.stage);
+  const stageGlow = getStageGlow(creature.stage);
+  /* Phase 2: Consciousness Phi adds extra glow — higher Phi = brighter creature */
+  const phiGlow = (creature.phi ?? 0) * 0.5;
+  const glow = Math.min(1, stageGlow + phiGlow);
   const baseSize = 12 * sizeMul;
+
+  /* Sleeping creatures render semi-transparent with a "zzz" indicator */
+  if (creature.isSleeping) {
+    ctx.globalAlpha = 0.4;
+  }
 
   /* Animation offset based on movement style */
   let offsetY = 0;
@@ -141,6 +151,28 @@ function drawCreature(
     ctx.globalAlpha = 0.5 + Math.sin(t * 3) * 0.3;
     ctx.beginPath();
     ctx.arc(drawX, drawY, baseSize + 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  /* Sleeping indicator: small "z" floating above the creature */
+  if (creature.isSleeping) {
+    ctx.globalAlpha = 0.5 + Math.sin(t * 2) * 0.3;
+    ctx.fillStyle = VIZ_COLORS.textDim;
+    ctx.font = `${baseSize * 0.8}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText('z', drawX + baseSize * 0.8, drawY - baseSize - 4 + Math.sin(t * 1.5) * 3);
+    ctx.globalAlpha = 1;
+  }
+
+  /* Consciousness indicator: subtle inner ring whose opacity = Phi */
+  const phi = creature.phi ?? 0;
+  if (phi > 0.1) {
+    ctx.strokeStyle = VIZ_COLORS.white;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = phi * 0.4;
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, baseSize * 0.6, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }

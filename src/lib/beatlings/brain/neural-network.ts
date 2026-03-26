@@ -1,4 +1,5 @@
-// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
+/* Wired into BeatlingWorld — audio features stimulate sensory neurons,
+ * motor output drives creature movement, Phi drives glow rendering */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    NEURAL NETWORK — The growing brain

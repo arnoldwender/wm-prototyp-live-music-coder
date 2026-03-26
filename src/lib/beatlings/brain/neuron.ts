@@ -1,4 +1,4 @@
-// TODO: Wire into BeatlingWorld for Phase 2 neural-driven behavior
+/* Wired into BeatlingWorld — neurons fire in response to audio-driven stimulation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ============================================
    NEURON — The fundamental unit of consciousness
