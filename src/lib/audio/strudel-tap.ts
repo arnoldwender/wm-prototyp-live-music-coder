@@ -1,23 +1,39 @@
 /* Universal audio tap for visualization — works for ALL engines.
  *
- * Strategy:
- * 1. Strudel: tap superdough's destinationGain (Strudel has its own AudioContext)
- * 2. Fallback: shared context masterAnalyser (Tone.js + WebAudio route through this)
+ * Returns whichever analyser has ACTUAL audio data:
+ * - Strudel: superdough's destinationGain analyser (when Strudel is playing)
+ * - Tone.js / WebAudio: shared context masterAnalyser (always has their audio)
  *
- * Tone.js: setContext(sharedCtx) + Destination.connect(masterAnalyser) in init()
- * WebAudio: evaluates with shared ctx + masterGain already in the chain */
+ * Key insight: Strudel's analyser connects successfully but only has data
+ * when Strudel is playing. When other engines play, we must use masterAnalyser. */
 
 import { getMasterAnalyser } from './context';
 
 let strudelAnalyser: AnalyserNode | null = null;
 let strudelConnected = false;
 
+/* Reusable buffer for signal detection */
+let checkBuffer: Float32Array | null = null;
+
+/** Check if an analyser has actual audio signal (not silence) */
+function hasSignal(analyser: AnalyserNode): boolean {
+  if (!checkBuffer || checkBuffer.length !== analyser.frequencyBinCount) {
+    checkBuffer = new Float32Array(analyser.frequencyBinCount);
+  }
+  analyser.getFloatTimeDomainData(checkBuffer);
+  /* Check if any sample exceeds the noise floor */
+  for (let i = 0; i < checkBuffer.length; i += 16) {
+    if (Math.abs(checkBuffer[i]) > 0.001) return true;
+  }
+  return false;
+}
+
 /**
  * Returns an AnalyserNode with live audio data.
- * Tries Strudel superdough first, falls back to shared masterAnalyser.
+ * Checks both Strudel and shared analysers, returns whichever has signal.
  */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
-  /* Strategy 1: Strudel's superdough controller (its own AudioContext) */
+  /* Keep Strudel tap connected (even if not currently active) */
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
@@ -36,18 +52,18 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
           if (destGain) {
             destGain.connect(strudelAnalyser);
             strudelConnected = true;
-            console.log('[AudioTap] Strudel destinationGain connected to analyser');
           }
-        } catch (e) {
-          console.warn('[AudioTap] Strudel controller not ready:', e);
-        }
+        } catch { /* controller not ready */ }
       }
 
-      if (strudelConnected) return strudelAnalyser;
+      /* Return Strudel analyser ONLY if it has actual audio data */
+      if (strudelConnected && hasSignal(strudelAnalyser)) {
+        return strudelAnalyser;
+      }
     }
   } catch { /* Strudel not available */ }
 
-  /* Strategy 2: Shared masterAnalyser — Tone.js and WebAudio both route here */
+  /* Shared masterAnalyser — Tone.js and WebAudio route here */
   try {
     return getMasterAnalyser();
   } catch { /* not ready */ }
@@ -55,7 +71,7 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   return null;
 }
 
-/** Reset connection state — call after evaluate to force reconnect. */
+/** Reset connection state — call after evaluate. */
 export function resetStrudelTap(): void {
   strudelConnected = false;
   strudelAnalyser = null;
