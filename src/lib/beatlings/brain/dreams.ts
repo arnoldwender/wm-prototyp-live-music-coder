@@ -40,9 +40,12 @@ export class DreamEngine {
     this.sleepPressure = Math.min(1, this.sleepPressure);
   }
 
-  /* Should the creature fall asleep? */
-  shouldSleep(energy: number, sleepPressure: number): boolean {
-    return energy < 0.2 || this.sleepPressure > 0.7 || sleepPressure > 0.8;
+  /* Should the creature fall asleep?
+   * Only sleep when pressure has built up significantly — NOT based on
+   * raw energy (RMS), since RMS is typically 0-0.5 and would cause
+   * creatures to sleep permanently during normal playback. */
+  shouldSleep(_energy: number, _sleepPressure: number): boolean {
+    return this.sleepPressure > 0.8;
   }
 
   /* === MAIN DREAM CYCLE ===

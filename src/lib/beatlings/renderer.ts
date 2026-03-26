@@ -71,7 +71,10 @@ function drawCreature(
   const glow = Math.min(1, stageGlow + phiGlow);
   const baseSize = 12 * sizeMul;
 
-  /* Sleeping creatures render semi-transparent with a "zzz" indicator */
+  /* Save context to restore cleanly after drawing (sleeping alpha, glow shadow) */
+  ctx.save();
+
+  /* Sleeping creatures render semi-transparent */
   if (creature.isSleeping) {
     ctx.globalAlpha = 0.4;
   }
@@ -132,9 +135,7 @@ function drawCreature(
   ctx.arc(drawX + eyeOffset + 1, drawY - eyeOffset * 0.5, pupilSize, 0, Math.PI * 2);
   ctx.fill();
 
-  /* Reset shadow after creature body */
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
+  /* Shadow is cleaned up by ctx.restore() at end of function */
 
   /* Stage indicator: egg has dashed circle, ascended has pulsing halo */
   if (creature.stage === 'egg') {
@@ -174,6 +175,8 @@ function drawCreature(
     ctx.beginPath();
     ctx.arc(drawX, drawY, baseSize * 0.6, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.globalAlpha = 1;
   }
+
+  /* Restore canvas state — cleans up alpha, shadows, etc. */
+  ctx.restore();
 }

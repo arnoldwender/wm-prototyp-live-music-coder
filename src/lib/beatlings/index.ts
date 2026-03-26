@@ -134,9 +134,14 @@ export class BeatlingWorld {
       }
       creature.stage = getStage(creature.xp);
 
-      /* Phase 2: Neural brain update — runs every 3 frames for performance */
+      /* Phase 2: Neural brain update — runs every 3 frames for performance.
+       * Wrapped in try/catch to prevent brain errors from killing the draw loop. */
       if (this.golTickCounter % 3 === 0) {
-        this.updateCreatureBrain(creature, features);
+        try {
+          this.updateCreatureBrain(creature, features);
+        } catch (err) {
+          console.warn('[BeatlingWorld] Brain update error:', err);
+        }
       }
     }
 
