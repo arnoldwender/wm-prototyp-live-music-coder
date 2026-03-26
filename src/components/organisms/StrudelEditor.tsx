@@ -80,7 +80,11 @@ export function StrudelEditor() {
         setEvalError(`Init failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      /* Stop Strudel audio when component unmounts (e.g. leaving editor) */
+      replRef.current?.stop();
+    };
   }, []);
 
   /* Create CM6 editor */
