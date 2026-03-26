@@ -9,6 +9,7 @@ import { EditorView, Decoration, type DecorationSet, keymap } from '@codemirror/
 import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
+import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { Button, Tooltip } from '../atoms';
 import { Play, Square, Loader2 } from 'lucide-react';
 
@@ -221,6 +222,8 @@ export function StrudelEditor() {
       const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
       if (!code.trim()) { setEvaluating(false); return; }
       await replRef.current.evaluate(code);
+      /* Force visualizer tap to reconnect — superdough recreates audio chain on evaluate */
+      resetStrudelTap();
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
