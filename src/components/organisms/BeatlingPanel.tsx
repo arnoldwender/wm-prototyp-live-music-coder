@@ -60,10 +60,24 @@ export function BeatlingPanel() {
     worldRef.current.update(isTypingRef.current, isPlayingRef.current);
     worldRef.current.draw(ctx, width, height, time);
 
-    /* Sync creature count to store every 30 frames for StatusBar display */
+    /* Sync creature stats to store every 30 frames for StatusBar + BrainPanel */
     if (frameCount.current % 30 === 0) {
-      const count = worldRef.current.getCreatures().length;
-      useAppStore.getState().setCreatureCount(count);
+      const creatures = worldRef.current.getCreatures();
+      const store = useAppStore.getState();
+      store.setCreatureCount(creatures.length);
+      store.setCreatureStats(creatures.map((c: any) => ({
+        id: c.id,
+        species: c.species,
+        stage: c.stage,
+        neuronCount: c.brain?.neurons?.size ?? 0,
+        synapseCount: c.brain?.synapses?.size ?? 0,
+        intelligence: c.brain?.intelligence ?? 0,
+        emotionalState: c.brain?.getEmotionalState?.() ?? 0,
+        phi: c.phi ?? 0,
+        totalFirings: c.brain?.totalFirings ?? 0,
+        isSleeping: c.isSleeping ?? false,
+        xpTotal: (c.xp?.audio ?? 0) + (c.xp?.complexity ?? 0) + (c.xp?.interaction ?? 0),
+      })));
     }
   }, []);
 

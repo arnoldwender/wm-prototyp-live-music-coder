@@ -6,6 +6,22 @@
 import { create } from 'zustand'
 import type { EngineType } from '../types/engine'
 import type { PanelLayout, ProjectFile } from '../types/project'
+import type { Species, Stage } from '../types/beatling'
+
+/** Brain stats for a single creature — synced to store for UI display */
+export interface CreatureStat {
+  id: string
+  species: Species
+  stage: Stage
+  neuronCount: number
+  synapseCount: number
+  intelligence: number
+  emotionalState: number
+  phi: number
+  totalFirings: number
+  isSleeping: boolean
+  xpTotal: number
+}
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
 
 /** Visible panel names that can be toggled */
@@ -29,7 +45,9 @@ interface AppState {
 
   /* Beatling ecosystem — synced from BeatlingPanel every frame */
   creatureCount: number
+  creatureStats: CreatureStat[]
   setCreatureCount: (count: number) => void
+  setCreatureStats: (stats: CreatureStat[]) => void
 
   /* Transport actions */
   togglePlay: () => void
@@ -74,9 +92,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
   layout: { ...DEFAULT_LAYOUT, visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels } },
   files: [{ ...DEFAULT_FILE }],
   creatureCount: 0,
+  creatureStats: [],
 
   /* --- Beatling ecosystem --- */
   setCreatureCount: (count: number) => set({ creatureCount: count }),
+  setCreatureStats: (stats: CreatureStat[]) => set({ creatureStats: stats }),
 
   /* --- Transport actions --- */
 

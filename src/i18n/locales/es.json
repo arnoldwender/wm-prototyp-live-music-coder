@@ -39,7 +39,12 @@
     "spectrum": "Espectro",
     "timeline": "Línea de tiempo",
     "beatlings": "Beatlings",
+    "brain": "Cerebro",
     "noVisualizers": "Sin visualizadores activos"
+  },
+  "brain": {
+    "title": "Actividad Neural",
+    "empty": "Reproduce música para generar criaturas y ver su actividad neural"
   },
   "status": {
     "engine": "Motor",

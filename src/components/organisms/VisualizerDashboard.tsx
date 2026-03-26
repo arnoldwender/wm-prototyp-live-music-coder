@@ -12,6 +12,7 @@ import { WaveformVisualizer } from './WaveformVisualizer';
 import { SpectrumVisualizer } from './SpectrumVisualizer';
 import { PatternTimeline } from './PatternTimeline';
 import { BeatlingPanel } from './BeatlingPanel';
+import { BrainPanel } from './BrainPanel';
 
 /** Composes all visualizer panels with toggle controls */
 export function VisualizerDashboard() {
@@ -26,6 +27,10 @@ export function VisualizerDashboard() {
     visiblePanels.beatlings && {
       key: 'beatlings',
       component: <BeatlingPanel />,
+    },
+    visiblePanels.brain && {
+      key: 'brain',
+      component: <BrainPanel />,
     },
   ].filter(Boolean) as { key: string; component: ReactNode }[];
 

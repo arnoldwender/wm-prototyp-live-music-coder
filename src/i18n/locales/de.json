@@ -39,7 +39,12 @@
     "spectrum": "Spektrum",
     "timeline": "Zeitleiste",
     "beatlings": "Beatlings",
+    "brain": "Gehirn",
     "noVisualizers": "Keine Visualizer aktiv"
+  },
+  "brain": {
+    "title": "Neurale Aktivität",
+    "empty": "Spiele Musik, um Kreaturen zu spawnen und ihre neurale Aktivität zu sehen"
   },
   "status": {
     "engine": "Engine",

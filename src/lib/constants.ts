@@ -33,5 +33,6 @@ export const DEFAULT_LAYOUT: PanelLayout = {
     spectrum: true,
     timeline: true,
     beatlings: true,
+    brain: true,
   },
 }

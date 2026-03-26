@@ -39,7 +39,12 @@
     "spectrum": "Spectrum",
     "timeline": "Timeline",
     "beatlings": "Beatlings",
+    "brain": "Brain",
     "noVisualizers": "No visualizers active"
+  },
+  "brain": {
+    "title": "Neural Activity",
+    "empty": "Play music to spawn creatures and see their neural activity"
   },
   "status": {
     "engine": "Engine",
