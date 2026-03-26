@@ -14,6 +14,18 @@ declare module '@strudel/webaudio' {
   export function initAudioOnFirstClick(): void
   export function webaudioOutput(...args: unknown[]): unknown
   export function getAudioContext(): AudioContext
+  export function samples(
+    sampleMap: string | Record<string, unknown>,
+    baseUrl?: string,
+    options?: Record<string, unknown>,
+  ): Promise<void>
+  export function getSuperdoughAudioController(): {
+    output: {
+      destinationGain: GainNode | null;
+      channelMerger: ChannelMergerNode | null;
+    };
+    connectToDestination: (node: AudioNode, channels?: number[]) => void;
+  } | null
 }
 
 declare module '@strudel/mini' {
@@ -93,11 +105,12 @@ declare module 'superdough' {
     options?: Record<string, unknown>,
   ): Promise<void>
   export function getAudioContext(): AudioContext
-  export function getCompressor(): DynamicsCompressorNode | null
   export function gainNode(): GainNode | null
   export function getSuperdoughAudioController(): {
-    destinationGain: GainNode | null;
-    channelMerger: ChannelMergerNode | null;
+    output: {
+      destinationGain: GainNode | null;
+      channelMerger: ChannelMergerNode | null;
+    };
     connectToDestination: (node: AudioNode, channels?: number[]) => void;
   } | null
   export function getAnalyserById(id: string | number, fftSize?: number, smoothing?: number): AnalyserNode

@@ -71,7 +71,7 @@ export function StrudelEditor() {
           await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
         } catch {
           try {
-            const { samples } = await import('superdough');
+            const { samples } = await import('@strudel/webaudio');
             await samples('github:tidalcycles/Dirt-Samples/master');
           } catch { /* samples failed */ }
         }
@@ -213,7 +213,7 @@ export function StrudelEditor() {
     try {
       /* Resume AudioContext — Web Audio requires a user gesture before playback */
       try {
-        const { getAudioContext } = await import('superdough');
+        const { getAudioContext } = await import('@strudel/webaudio');
         const ctx = getAudioContext();
         if (ctx?.state === 'suspended') await ctx.resume();
       } catch { /* AudioContext resume failed — Strudel will handle it */ }

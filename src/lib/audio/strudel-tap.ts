@@ -6,7 +6,7 @@ let analyser: AnalyserNode | null = null;
 
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   try {
-    const sd = await import('superdough');
+    const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
     if (!ctx || ctx.state === 'closed') return null;
 
@@ -39,12 +39,6 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
       }
     } catch { /* controller not ready — audio hasn't started yet */ }
 
-    /* Fallback: try the compressor output (legacy superdough versions) */
-    try {
-      const comp = sd.getCompressor();
-      if (comp) { comp.connect(analyser); return analyser; }
-    } catch { /* no compressor */ }
-
     /* Return analyser even if not connected — visualizer will show flat line
      * instead of crashing. Next call will try connecting again. */
     return analyser;
@@ -55,7 +49,7 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
 
 export async function getStrudelSampleRate(): Promise<number> {
   try {
-    const { getAudioContext } = await import('superdough');
+    const { getAudioContext } = await import('@strudel/webaudio');
     return getAudioContext()?.sampleRate ?? 44100;
   } catch {
     return 44100;

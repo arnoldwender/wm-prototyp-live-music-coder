@@ -9,6 +9,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  resolve: {
+    /* Force a single superdough instance — Vite may pre-bundle two copies
+     * (one from @strudel/web, one standalone) causing a dead audio chain */
+    dedupe: ['superdough'],
+  },
   build: {
     rollupOptions: {
       output: {
