@@ -59,12 +59,13 @@ function Landing() {
 
   return (
     <main
+      id="main-content"
       className="min-h-screen"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Skip-to-content link for accessibility */}
       <a
-        href="#hero"
+        href="#main-content"
         className="sr-only focus:not-sr-only"
         style={{
           position: 'absolute',

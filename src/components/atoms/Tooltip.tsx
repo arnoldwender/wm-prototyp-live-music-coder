@@ -3,18 +3,24 @@
    Shows on mouse hover AND keyboard focus for a11y.
    ────────────────────────────────────────────────────────── */
 
-import { useState, type ReactNode } from 'react'
+import { useState, useId, cloneElement, isValidElement, type ReactElement } from 'react'
 
 interface TooltipProps {
   /** Tooltip text content */
   content: string
   /** Wrapped element — must be focusable for keyboard a11y */
-  children: ReactNode
+  children: ReactElement
 }
 
-/** Accessible tooltip — visible on hover and keyboard focus */
+/** Accessible tooltip — visible on hover and keyboard focus, linked via aria-describedby */
 function Tooltip({ content, children }: TooltipProps) {
   const [visible, setVisible] = useState(false)
+  const tooltipId = useId()
+
+  /* Clone child to inject aria-describedby linking to the tooltip */
+  const child = isValidElement(children)
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, { 'aria-describedby': tooltipId })
+    : children
 
   return (
     <span
@@ -24,11 +30,12 @@ function Tooltip({ content, children }: TooltipProps) {
       onFocus={() => setVisible(true)}
       onBlur={() => setVisible(false)}
     >
-      {children}
+      {child}
 
-      {/* Tooltip popup */}
+      {/* Tooltip popup — linked to trigger via id for screen readers */}
       {visible && (
         <span
+          id={tooltipId}
           role="tooltip"
           className="absolute left-1/2 z-50 pointer-events-none whitespace-nowrap"
           style={{

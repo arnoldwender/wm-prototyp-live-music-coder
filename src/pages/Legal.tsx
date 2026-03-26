@@ -27,6 +27,7 @@ function Legal() {
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
       {/* Header */}
       <nav
+        aria-label="Legal page navigation"
         className="flex items-center justify-between"
         style={{ height: '64px', padding: '0 var(--space-6)', backgroundColor: 'var(--color-bg-alt)', borderBottom: '1px solid var(--color-border)' }}
       >
@@ -41,9 +42,13 @@ function Legal() {
         </div>
       </nav>
 
-      {/* Tab navigation */}
-      <div className="flex justify-center" style={{ padding: 'var(--space-4)', gap: 'var(--space-2)', borderBottom: '1px solid var(--color-border)' }}>
+      {/* Tab navigation — ARIA tabs pattern */}
+      <div role="tablist" aria-label="Legal sections" className="flex justify-center" style={{ padding: 'var(--space-4)', gap: 'var(--space-2)', borderBottom: '1px solid var(--color-border)' }}>
         <button
+          role="tab"
+          aria-selected={tab === 'impressum'}
+          aria-controls="tabpanel-impressum"
+          id="tab-impressum"
           onClick={() => setTab('impressum')}
           className="cursor-pointer"
           style={{
@@ -59,6 +64,10 @@ function Legal() {
           Impressum
         </button>
         <button
+          role="tab"
+          aria-selected={tab === 'datenschutz'}
+          aria-controls="tabpanel-datenschutz"
+          id="tab-datenschutz"
           onClick={() => setTab('datenschutz')}
           className="cursor-pointer"
           style={{
@@ -75,8 +84,11 @@ function Legal() {
         </button>
       </div>
 
-      {/* Content */}
+      {/* Content — ARIA tabpanel */}
       <article
+        role="tabpanel"
+        id={`tabpanel-${tab}`}
+        aria-labelledby={`tab-${tab}`}
         className="max-w-3xl mx-auto"
         style={{ padding: 'var(--space-8) var(--space-6)', lineHeight: 'var(--line-height-loose)' }}
         /* SECURITY: Content is static HTML from data/legal.ts — never from user input */

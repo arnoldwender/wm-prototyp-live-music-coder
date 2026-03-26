@@ -68,12 +68,20 @@ export function ExampleGallery() {
         {templates.map((tmpl) => (
           <article
             key={tmpl.id}
+            role="button"
+            tabIndex={0}
             className="p-4 rounded-lg flex flex-col gap-2 transition-all cursor-pointer group"
             style={{
               backgroundColor: 'var(--color-bg-elevated)',
               border: '1px solid var(--color-border)',
             }}
             onClick={() => handleTryExample(tmpl)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleTryExample(tmpl)
+              }
+            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = ENGINE_DOT_COLORS[tmpl.engine] ?? 'var(--color-border)'
               e.currentTarget.style.transform = 'translateY(-2px)'
