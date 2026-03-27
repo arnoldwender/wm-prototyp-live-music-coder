@@ -1,20 +1,36 @@
 /* ──────────────────────────────────────────────────────────
-   CreaturesSidebar — creature cards with expandable neural stats
-   for the detail panel. Shows live creature list from the
-   Beatling ecosystem with species dot, name, stage, XP,
-   and neural network stats when selected.
+   CreaturesSidebar — creature cards for the detail panel.
+   Throttled to update every 2 seconds to prevent layout thrashing.
    ────────────────────────────────────────────────────────── */
 
+import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '../../lib/store';
 import { SPECIES } from '../../lib/beatlings/species';
+import type { CreatureStat } from '../../types/beatling';
 
 export function CreaturesSidebar() {
-  const creatureStats = useAppStore((s) => s.creatureStats);
   const selectedId = useAppStore((s) => s.selectedCreatureId);
   const selectCreature = useAppStore((s) => s.selectCreature);
 
-  /* Empty state — prompt user to play music */
-  if (creatureStats.length === 0) {
+  /* Throttled creature stats — only update every 2 seconds */
+  const [stats, setStats] = useState<CreatureStat[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    /* Initial read */
+    setStats(useAppStore.getState().creatureStats);
+
+    /* Poll every 2 seconds instead of subscribing to every store change */
+    timerRef.current = setInterval(() => {
+      setStats(useAppStore.getState().creatureStats);
+    }, 2000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  if (stats.length === 0) {
     return (
       <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: '11px', textAlign: 'center' }}>
         Play music to spawn creatures
@@ -24,7 +40,7 @@ export function CreaturesSidebar() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', padding: 'var(--space-2)' }}>
-      {creatureStats.map((c) => {
+      {stats.map((c) => {
         const spec = SPECIES[c.species as keyof typeof SPECIES];
         const isSelected = selectedId === c.id;
         return (
@@ -33,7 +49,6 @@ export function CreaturesSidebar() {
             type="button"
             onClick={() => selectCreature(isSelected ? null : c.id)}
             aria-pressed={isSelected}
-            aria-label={`${spec?.name || c.species} — ${c.stage}, ${Math.floor(c.xpTotal)} XP`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -46,10 +61,8 @@ export function CreaturesSidebar() {
               cursor: 'pointer',
               textAlign: 'left',
               width: '100%',
-              transition: 'var(--transition-fast)',
             }}
           >
-            {/* Species dot — colored indicator per creature type */}
             <span style={{
               width: '8px',
               height: '8px',
@@ -57,26 +70,20 @@ export function CreaturesSidebar() {
               backgroundColor: spec?.color || 'var(--color-primary)',
               flexShrink: 0,
             }} />
-            {/* Name + stage */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text)' }}>
                 {spec?.name || c.species}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                {c.stage} · {c.emotionalState > 0.5 ? 'excited' : c.emotionalState > 0.2 ? 'calm' : 'neutral'}
+                {c.stage} · {Math.floor(c.xpTotal)} XP
               </div>
             </div>
-            {/* XP counter */}
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
-              {Math.floor(c.xpTotal)} XP
-            </span>
           </button>
         );
       })}
 
-      {/* Selected creature detail — expandable neural stats grid */}
       {selectedId && (() => {
-        const c = creatureStats.find((s) => s.id === selectedId);
+        const c = stats.find((s) => s.id === selectedId);
         if (!c) return null;
         return (
           <div style={{
