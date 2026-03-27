@@ -65,12 +65,12 @@ export function ExampleGallery() {
 
     /* If already playing this one, stop it */
     if (playingId === template.id) {
-      stopPlaying()
+      await stopPlaying()
       return
     }
 
-    /* Stop previous */
-    stopPlaying()
+    /* Stop previous before starting new */
+    await stopPlaying()
 
     try {
       if (template.engine === 'strudel') {
