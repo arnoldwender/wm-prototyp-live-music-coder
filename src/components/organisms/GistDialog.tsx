@@ -30,7 +30,11 @@ export function GistDialog({ onClose }: GistDialogProps) {
   const [remember, setRemember] = useState(false)
   const [gistInput, setGistInput] = useState('')
   const [status, setStatus] = useState('')
+  const [gistUrl, setGistUrl] = useState('')
   const [saving, setSaving] = useState(false)
+  const [savedGists, setSavedGists] = useState<{ id: string; url: string; date: string }[]>(() => {
+    try { return JSON.parse(localStorage.getItem('lmc-saved-gists') || '[]') } catch { return [] }
+  })
 
   const hasToken = !!getStoredToken()
   const backdropRef = useRef<HTMLDivElement>(null)
@@ -105,9 +109,15 @@ export function GistDialog({ onClose }: GistDialogProps) {
         },
       }
       const result = await saveToGist(project)
-      /* Unlock first_save achievement after successful Gist save */
       useAppStore.getState().unlockAchievement('first_save')
-      setStatus(`Saved! Gist ID: ${result.id}`)
+      const url = `https://gist.github.com/${result.id}`
+      setGistUrl(url)
+      setStatus('Saved!')
+      /* Persist to saved gists history */
+      const entry = { id: result.id, url, date: new Date().toISOString() }
+      const updated = [entry, ...savedGists.filter(g => g.id !== result.id)].slice(0, 20)
+      setSavedGists(updated)
+      localStorage.setItem('lmc-saved-gists', JSON.stringify(updated))
     } catch (err) {
       setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)
     }
@@ -277,17 +287,63 @@ export function GistDialog({ onClose }: GistDialogProps) {
           </Button>
         </section>
 
-        {/* --- Status feedback --- */}
+        {/* --- Status + URL --- */}
         {status && (
-          <p
-            className="text-center"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-muted)',
-            }}
-          >
-            {status}
-          </p>
+          <div className="text-center" style={{ marginBottom: 'var(--space-3)' }}>
+            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{status}</p>
+            {gistUrl && (
+              <a
+                href={gistUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  marginTop: 'var(--space-2)',
+                  fontSize: 'var(--font-size-xs)',
+                  fontFamily: 'var(--font-family-mono)',
+                  color: 'var(--color-primary)',
+                  textDecoration: 'underline',
+                  wordBreak: 'break-all',
+                }}
+              >
+                {gistUrl}
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* --- Saved gists history --- */}
+        {savedGists.length > 0 && (
+          <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)' }}>
+            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>
+              Saved Gists
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxHeight: '120px', overflowY: 'auto' }}>
+              {savedGists.map((g) => (
+                <div key={g.id} className="flex items-center justify-between" style={{ fontSize: '11px', padding: 'var(--space-1) 0' }}>
+                  <a
+                    href={g.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-family-mono)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}
+                  >
+                    {g.id.slice(0, 12)}...
+                  </a>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
+                    {new Date(g.date).toLocaleDateString()}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setGistInput(g.url); }}
+                    title="Load this gist"
+                    style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '10px', marginLeft: 'var(--space-2)' }}
+                  >
+                    Load
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>
