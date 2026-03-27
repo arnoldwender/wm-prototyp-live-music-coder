@@ -124,7 +124,7 @@ export function StrudelEditor() {
       if (update.docChanged) {
         const code = update.state.doc.toString();
         updateFileCode(activeFile.id, code);
-        /* Live mode: debounced auto-evaluate on every code change */
+        /* Live mode: debounced auto-evaluate — only if code parses cleanly */
         if (liveModeRef.current && replRef.current && isPlaying) {
           if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
           evalTimerRef.current = setTimeout(async () => {
@@ -133,9 +133,10 @@ export function StrudelEditor() {
               resetStrudelTap();
               setEvalError(null);
             } catch (err) {
+              /* Show error in UI, not just console */
               setEvalError(err instanceof Error ? err.message : String(err));
             }
-          }, 500);
+          }, 800);
         }
       }
     });

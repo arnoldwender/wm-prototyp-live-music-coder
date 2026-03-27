@@ -78,6 +78,22 @@ const ERROR_PATTERNS: { pattern: RegExp; handler: (match: RegExpMatchArray, raw:
     }),
   },
   {
+    pattern: /is not a valid enum value of type OscillatorType/,
+    handler: () => ({
+      title: 'Invalid oscillator type',
+      explanation: 'The oscillator type must be one of: "sine", "square", "sawtooth", or "triangle".',
+      fix: 'Set osc.type = "sine" (or square, sawtooth, triangle). Custom types need createPeriodicWave().',
+    }),
+  },
+  {
+    pattern: /is not a valid enum value of type/,
+    handler: (_m, raw) => ({
+      title: 'Invalid value',
+      explanation: `You used a value that the Web Audio API doesn't accept. ${raw}`,
+      fix: 'Check the API reference in the sidebar for valid values.',
+    }),
+  },
+  {
     pattern: /Invalid or unexpected token/,
     handler: () => ({
       title: 'Invalid character',

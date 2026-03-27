@@ -124,13 +124,18 @@ export function CodeEditor() {
     const orch = getOrchestrator();
     evaluatorRef.current = createEvaluator(
       async (code) => {
-        /* Resume context — may have been suspended since initial user gesture */
+        /* Syntax pre-check — don't evaluate broken code in live mode.
+         * This prevents flooding errors while the user is mid-keystroke. */
+        try {
+          new Function(code);
+        } catch {
+          return; /* Silently skip — user is still typing */
+        }
         await resumeContext();
         await orch.evaluate(code, activeFile.engine);
       },
-      500,
+      800, /* Longer debounce for live mode — less aggressive */
       (err) => {
-        console.error('[CodeEditor] Eval error:', err.message);
         setEvalError(err.message);
       },
       () => setEvalError(null),
