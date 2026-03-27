@@ -8,8 +8,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
-import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay } from '../components/organisms'
-import { SidePanel } from '../components/organisms/SidePanel'
+import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel } from '../components/organisms'
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
@@ -156,11 +155,12 @@ function Editor() {
       )}
       <EditorLayout
         toolbar={<TransportBar />}
+        activityBar={<ActivityBar />}
         editor={<CodeEditor />}
         graph={<NodeGraph />}
         visualizers={<VisualizerDashboard />}
+        detailPanel={<DetailPanel />}
         statusBar={<StatusBar />}
-        sidePanel={<SidePanel />}
       />
       {showTemplateSelector && (
         <TemplateSelector onSelect={() => {

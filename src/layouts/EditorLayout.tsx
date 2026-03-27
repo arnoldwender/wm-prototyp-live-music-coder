@@ -1,8 +1,9 @@
 /* ──────────────────────────────────────────────────────────
-   EditorLayout — resizable three-panel IDE layout.
+   EditorLayout — 3-column IDE layout (VS Code style).
+   Left: activity bar (40px icon strip).
+   Center: editor zone (top, flex) + visualizer zone (bottom, resizable 15–60%).
+   Right: detail panel (collapsible, 280px).
    Toolbar at top, status bar at bottom.
-   Top zone: editor + graph with vertical resize handle.
-   Bottom zone: visualizers with horizontal resize handle.
    Panel sizes are driven by Zustand store (PanelLayout).
    ────────────────────────────────────────────────────────── */
 
@@ -13,19 +14,21 @@ import { useMediaQuery } from '../lib/useMediaQuery'
 interface EditorLayoutProps {
   /** Top toolbar (TransportBar) */
   toolbar: ReactNode
-  /** Left panel — code editor */
+  /** Left icon strip — activity bar (40px) */
+  activityBar: ReactNode
+  /** Code editor panel */
   editor: ReactNode
-  /** Right panel — node graph */
+  /** Node graph panel */
   graph: ReactNode
   /** Bottom panel — audio visualizers */
   visualizers: ReactNode
+  /** Right collapsible detail panel (samples, reference, console, creatures, settings) */
+  detailPanel: ReactNode
   /** Bottom status bar */
   statusBar: ReactNode
-  /** Right sidebar (Samples, Reference, Console, Settings) */
-  sidePanel?: ReactNode
 }
 
-function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePanel }: EditorLayoutProps) {
+function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detailPanel, statusBar }: EditorLayoutProps) {
   const zenMode = useAppStore((s) => s.zenMode)
   const layout = useAppStore((s) => s.layout)
   const setEditorWidth = useAppStore((s) => s.setEditorWidth)
@@ -37,7 +40,7 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
   /* Ref for the main content area — used to compute resize percentages */
   const mainRef = useRef<HTMLDivElement>(null)
 
-  /* ── Vertical resize (editor ↔ graph) ── */
+  /* ── Vertical resize (editor <-> graph) ── */
   const handleVerticalResize = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
@@ -66,7 +69,7 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
     [setEditorWidth]
   )
 
-  /* ── Horizontal resize (top zone ↔ visualizers) ── */
+  /* ── Horizontal resize (top zone <-> visualizers) ── */
   const handleHorizontalResize = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
@@ -77,8 +80,8 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
         const rect = main.getBoundingClientRect()
         /* Percentage measured from bottom */
         const pct = ((rect.bottom - ev.clientY) / rect.height) * 100
-        /* Clamp between 15% and 60% */
-        setVisualizerHeight(Math.min(60, Math.max(15, pct)))
+        /* Clamp between 15% and 40% — tighter range per plan spec */
+        setVisualizerHeight(Math.min(40, Math.max(15, pct)))
       }
 
       const onMouseUp = () => {
@@ -115,7 +118,7 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
     (e: React.KeyboardEvent) => {
       if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setVisualizerHeight(Math.min(60, layout.visualizerHeight + 2))
+        setVisualizerHeight(Math.min(40, layout.visualizerHeight + 2))
       } else if (e.key === 'ArrowDown') {
         e.preventDefault()
         setVisualizerHeight(Math.max(15, layout.visualizerHeight - 2))
@@ -133,105 +136,110 @@ function EditorLayout({ toolbar, editor, graph, visualizers, statusBar, sidePane
 
   return (
     <div className="flex flex-col h-full">
-      {/* ── Toolbar — hidden in zen mode ── */}
+      {/* ── Toolbar (40px) — hidden in zen mode ── */}
       {!zenMode && <header className="shrink-0">{toolbar}</header>}
 
-      {/* ── Main area: content + side panel ── */}
+      {/* ── 3-column main area: activityBar | mainContent | detailPanel ── */}
       <div className="flex-1 flex min-h-0">
-      {/* ── Main content area ── */}
-      <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
-        {/* Top zone: editor + graph (stacked vertically on mobile) */}
-        <div
-          className={isMobile ? 'flex flex-col flex-1 min-h-0' : 'flex min-h-0'}
-          style={topHeight ? { height: topHeight } : undefined}
-        >
-          {/* Editor panel — full width on mobile, percentage on desktop */}
-          <section
-            aria-label="Editor"
-            className="min-w-0 overflow-auto"
-            style={{
-              width: isMobile ? '100%' : showGraph ? `${layout.editorWidth}%` : '100%',
-              flex: isMobile ? '1 1 0%' : undefined,
-            }}
+        {/* Left: activity bar icon strip — hidden in zen mode and on mobile */}
+        {!zenMode && !isMobile && activityBar}
+
+        {/* Center: editor zone (top) + visualizer zone (bottom) */}
+        <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
+          {/* Top zone: editor + graph (stacked vertically on mobile) */}
+          <div
+            className={isMobile ? 'flex flex-col flex-1 min-h-0' : 'flex min-h-0'}
+            style={topHeight ? { height: topHeight } : undefined}
           >
-            {editor}
-          </section>
+            {/* Editor panel — full width on mobile, percentage on desktop */}
+            <section
+              aria-label="Editor"
+              className="min-w-0 overflow-auto"
+              style={{
+                width: isMobile ? '100%' : showGraph ? `${layout.editorWidth}%` : '100%',
+                flex: isMobile ? '1 1 0%' : undefined,
+              }}
+            >
+              {editor}
+            </section>
 
-          {/* Vertical resize handle + Graph panel — desktop only when graph is visible */}
-          {showGraph && (
-            <>
-              <div
-                role="separator"
-                aria-orientation="vertical"
-                aria-label="Resize editor and graph panels"
-                tabIndex={0}
-                onMouseDown={handleVerticalResize}
-                onKeyDown={handleVerticalKeyDown}
-                className="shrink-0 cursor-col-resize transition-colors"
-                style={{
-                  width: '1px',
-                  backgroundColor: 'var(--color-border)',
-                }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
-                }}
-              />
+            {/* Vertical resize handle + Graph panel — desktop only when graph is visible */}
+            {showGraph && (
+              <>
+                <div
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="Resize editor and graph panels"
+                  tabIndex={0}
+                  onMouseDown={handleVerticalResize}
+                  onKeyDown={handleVerticalKeyDown}
+                  className="shrink-0 cursor-col-resize transition-colors"
+                  style={{
+                    width: '1px',
+                    backgroundColor: 'var(--color-border)',
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
+                  }}
+                />
 
-              <section
-                aria-label="Graph"
-                className="min-w-0 overflow-auto"
-                style={{ width: `${layout.graphWidth}%` }}
-              >
-                {graph}
-              </section>
-            </>
+                <section
+                  aria-label="Graph"
+                  className="min-w-0 overflow-auto"
+                  style={{ width: `${layout.graphWidth}%` }}
+                >
+                  {graph}
+                </section>
+              </>
+            )}
+          </div>
+
+          {/* Horizontal resize handle — hidden on mobile and zen mode */}
+          {!isMobile && !zenMode && (
+            <div
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label="Resize editor and visualizer panels"
+              tabIndex={0}
+              onMouseDown={handleHorizontalResize}
+              onKeyDown={handleHorizontalKeyDown}
+              className="shrink-0 cursor-row-resize transition-colors"
+              style={{
+                height: '1px',
+                backgroundColor: 'var(--color-border)',
+              }}
+              onMouseEnter={(e) => {
+                ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
+              }}
+              onMouseLeave={(e) => {
+                ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
+              }}
+            />
+          )}
+
+          {/* Bottom zone: visualizers — hidden in zen mode */}
+          {!zenMode && (
+            <section
+              aria-label="Visualizers"
+              className="min-h-0 overflow-auto shrink-0"
+              style={{
+                height: bottomHeight,
+                borderTop: isMobile ? '1px solid var(--color-border)' : undefined,
+              }}
+            >
+              {visualizers}
+            </section>
           )}
         </div>
 
-        {/* Horizontal resize handle — hidden on mobile and zen mode */}
-        {!isMobile && !zenMode && (
-          <div
-            role="separator"
-            aria-orientation="horizontal"
-            aria-label="Resize editor and visualizer panels"
-            tabIndex={0}
-            onMouseDown={handleHorizontalResize}
-            onKeyDown={handleHorizontalKeyDown}
-            className="shrink-0 cursor-row-resize transition-colors"
-            style={{
-              height: '1px',
-              backgroundColor: 'var(--color-border)',
-            }}
-            onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-primary)'
-            }}
-            onMouseLeave={(e) => {
-              ;(e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-border)'
-            }}
-          />
-        )}
-
-        {/* Bottom zone: visualizers — hidden in zen mode */}
-        {!zenMode && <section
-          aria-label="Visualizers"
-          className="min-h-0 overflow-auto shrink-0"
-          style={{
-            height: bottomHeight,
-            borderTop: isMobile ? '1px solid var(--color-border)' : undefined,
-          }}
-        >
-          {visualizers}
-        </section>}
+        {/* Right: detail panel — hidden in zen mode and on mobile */}
+        {!zenMode && !isMobile && detailPanel}
       </div>
 
-      {/* ── Side panel — hidden in zen mode ── */}
-      {!zenMode && sidePanel}
-      </div>
-
-      {/* ── Status bar — hidden in zen mode ── */}
+      {/* ── Status bar (24px) — hidden in zen mode ── */}
       {!zenMode && <footer className="shrink-0">{statusBar}</footer>}
     </div>
   )
