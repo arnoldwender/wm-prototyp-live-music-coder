@@ -163,9 +163,10 @@ function Editor() {
         statusBar={<StatusBar />}
       />
 
-      {/* Hidden BeatlingWorld simulation — runs creature spawning, brains, evolution.
-       * Moved from visualizer zone but must keep running for CreaturesSidebar data. */}
-      <div style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+      {/* Hidden BeatlingWorld — always runs for creature spawning.
+       * When beatlings pill is ON, VisualizerDashboard also renders a visible one,
+       * but BeatlingWorld handles deduplication internally via singleton pattern. */}
+      <div style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
         <BeatlingPanel />
       </div>
       {showTemplateSelector && (

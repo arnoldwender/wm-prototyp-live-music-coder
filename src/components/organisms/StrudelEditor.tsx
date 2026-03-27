@@ -4,8 +4,8 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EditorView, keymap } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { EditorView, Decoration, type DecorationSet, keymap } from '@codemirror/view';
+import { EditorState, StateField, StateEffect } from '@codemirror/state';
 import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
@@ -13,6 +13,30 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
 import { Play, Square, Loader2 } from 'lucide-react';
+
+/* Custom CM6 highlight system — marks code ranges that are currently sounding */
+const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
+
+const highlightField = StateField.define<DecorationSet>({
+  create() { return Decoration.none; },
+  update(decorations, tr) {
+    decorations = decorations.map(tr.changes);
+    for (const effect of tr.effects) {
+      if (effect.is(setHighlights)) {
+        const marks = effect.value
+          .filter(({ from, to }) => from >= 0 && to <= tr.newDoc.length && from < to)
+          .map(({ from, to }) =>
+            Decoration.mark({
+              attributes: { style: 'background-color: rgba(168, 85, 247, 0.25); outline: 1px solid rgba(168, 85, 247, 0.5); border-radius: 2px;' },
+            }).range(from, to)
+          );
+        decorations = Decoration.set(marks, true);
+      }
+    }
+    return decorations;
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
 
 export function StrudelEditor() {
   const { t } = useTranslation();
@@ -126,15 +150,16 @@ export function StrudelEditor() {
       },
     }]);
 
-    /* Build extension list — add Strudel slider/highlight/widget plugins when available */
+    /* Build extension list with custom highlight field */
     const extensions = [
       ...getBaseExtensions(),
       ...getEngineExtensions(activeFile.engine),
+      highlightField,
       updateListener,
       evalKeymap,
     ];
 
-    /* Add Strudel-specific CM6 extensions if loaded */
+    /* Add Strudel-specific CM6 extensions if loaded (optional) */
     const strudelCM = strudelExtRef.current;
     if (strudelCM) {
       try {
@@ -170,14 +195,11 @@ export function StrudelEditor() {
     }
   }, [activeFile?.code]);
 
-  /* Highlight + slider update loop — uses Strudel's native highlighting when available */
+  /* Highlight loop — queries scheduler for active haps and marks their code positions */
   useEffect(() => {
     if (!isPlaying) {
-      /* Clear highlights when stopped */
-      const view = viewRef.current;
-      const strudelCM = strudelExtRef.current;
-      if (view && strudelCM?.setMiniLocations) {
-        try { strudelCM.setMiniLocations(view, []); } catch { /* ignore */ }
+      if (viewRef.current) {
+        viewRef.current.dispatch({ effects: setHighlights.of([]) });
       }
       return;
     }
@@ -187,25 +209,34 @@ export function StrudelEditor() {
       if (!running) return;
       const view = viewRef.current;
       const repl = replRef.current;
-      const strudelCM = strudelExtRef.current;
 
       if (view && repl?.scheduler) {
         try {
-          /* Update Strudel's native mini-notation highlighting */
-          if (strudelCM?.updateMiniLocations && repl.state?.miniLocations) {
-            strudelCM.updateMiniLocations(view, repl.scheduler.now(), repl.state.miniLocations);
-          }
+          const now = repl.scheduler.now();
+          const pattern = repl.state?.pattern;
+          if (pattern?.queryArc) {
+            const haps = pattern.queryArc(now, now + 0.125);
+            const ranges: { from: number; to: number }[] = [];
 
-          /* Update slider widget values from the REPL state */
-          if (strudelCM?.updateSliderWidgets && strudelCM?.sliderValues) {
-            strudelCM.updateSliderWidgets(view, strudelCM.sliderValues);
-          }
+            for (const hap of haps) {
+              if (!hap.context?.locations) continue;
+              for (const loc of hap.context.locations) {
+                if (typeof loc.start === 'number' && typeof loc.end === 'number') {
+                  ranges.push({ from: loc.start, to: loc.end });
+                } else if (loc.start?.line !== undefined) {
+                  const doc = view.state.doc;
+                  const startLine = Math.min(loc.start.line, doc.lines);
+                  const endLine = Math.min(loc.end?.line ?? startLine, doc.lines);
+                  const from = doc.line(startLine).from + (loc.start.column ?? 0);
+                  const to = doc.line(endLine).from + (loc.end?.column ?? doc.line(endLine).length);
+                  ranges.push({ from, to });
+                }
+              }
+            }
 
-          /* Update other inline widgets */
-          if (strudelCM?.updateWidgets) {
-            strudelCM.updateWidgets(view);
+            view.dispatch({ effects: setHighlights.of(ranges) });
           }
-        } catch { /* ignore during pattern transitions */ }
+        } catch { /* ignore during pattern update */ }
       }
 
       animFrameRef.current = requestAnimationFrame(tick);

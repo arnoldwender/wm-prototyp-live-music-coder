@@ -203,7 +203,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   creatureStats: [],
   selectedCreatureId: null,
   showBrainPanel: false,
-  activeDetailSection: null,
+  activeDetailSection: 'samples',
   detailPanelWidth: 280,
   setActiveDetailSection: (section: string | null) => set({ activeDetailSection: section }),
   setDetailPanelWidth: (width: number) => set({ detailPanelWidth: width }),
