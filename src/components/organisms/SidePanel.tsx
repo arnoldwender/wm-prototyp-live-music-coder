@@ -267,7 +267,7 @@ export function SampleBrowser() {
     <div style={{ padding: 'var(--space-2)' }}>
       {/* Search */}
       <div className="relative" style={{ marginBottom: 'var(--space-2)' }}>
-        <Search size={12} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+        <Search size={12} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
         <input
           ref={inputRef}
           type="text"
@@ -276,7 +276,7 @@ export function SampleBrowser() {
           placeholder="Search samples..."
           style={{
             width: '100%',
-            padding: 'var(--space-2) var(--space-2) var(--space-2) var(--space-8)',
+            padding: 'var(--space-2) var(--space-3) var(--space-2) 30px',
             backgroundColor: 'var(--color-bg-elevated)',
             color: 'var(--color-text)',
             border: '1px solid var(--color-border)',
@@ -467,7 +467,7 @@ export function ReferencePanel() {
   return (
     <div style={{ padding: 'var(--space-2)' }}>
       <div className="relative" style={{ marginBottom: 'var(--space-2)' }}>
-        <Search size={12} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+        <Search size={12} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
         <input
           type="text"
           value={search}
@@ -475,7 +475,7 @@ export function ReferencePanel() {
           placeholder="Search API..."
           style={{
             width: '100%',
-            padding: 'var(--space-2) var(--space-2) var(--space-2) var(--space-8)',
+            padding: 'var(--space-2) var(--space-3) var(--space-2) 30px',
             backgroundColor: 'var(--color-bg-elevated)',
             color: 'var(--color-text)',
             border: '1px solid var(--color-border)',
