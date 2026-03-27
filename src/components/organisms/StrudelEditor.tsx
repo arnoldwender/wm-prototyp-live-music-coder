@@ -273,9 +273,7 @@ export function StrudelEditor() {
       if (!code.trim()) { setEvaluating(false); return; }
 
       /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
-      console.log('[StrudelEditor] Evaluating code...', code.slice(0, 80));
       await replRef.current.evaluate(code, true);
-      console.log('[StrudelEditor] Evaluate success, scheduler active');
 
       /* Force visualizer tap to reconnect — superdough recreates audio chain lazily.
        * The controller only initializes AFTER the first note plays, so we retry

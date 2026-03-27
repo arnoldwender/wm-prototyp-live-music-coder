@@ -44,9 +44,8 @@ export class ToneJsEngine extends BaseEngine {
     try {
       const analyser = getMasterAnalyser()
       this.Tone.getDestination().connect(analyser)
-      console.log('[Tone.js] Destination connected to masterAnalyser')
-    } catch (e) {
-      console.warn('[Tone.js] Destination tap retry failed:', e)
+    } catch {
+      /* destination not ready yet */
     }
   }
 
@@ -91,7 +90,7 @@ export class ToneJsEngine extends BaseEngine {
     try {
       const Tone = this.Tone
       await Function('Tone', `"use strict"; return (async () => { ${code} })()`)(Tone)
-      console.log('[Tone.js] Code evaluated successfully')
+      /* Tone.js evaluate success */
       /* Reconnect visualizer tap after evaluate — Tone's destination is now active */
       this.connectDestinationTap()
       resetStrudelTap()
