@@ -1045,8 +1045,9 @@ export const EXAMPLE_LIBRARY: ExampleEntry[] = [
   },
 ];
 
-/** All unique categories */
+/** All unique categories — grouped by engine */
 export const EXAMPLE_CATEGORIES: string[] = [
+  /* Strudel */
   'Beginner',
   'Drums',
   'Bass',
@@ -1055,6 +1056,18 @@ export const EXAMPLE_CATEGORIES: string[] = [
   'Cinematic',
   'World',
   'Experimental',
+  /* Tone.js */
+  'Tone.js Synths',
+  'Tone.js Effects',
+  'Tone.js Sequencing',
+  'Tone.js Routing',
+  'Tone.js Advanced',
+  /* Web Audio */
+  'Web Audio Basics',
+  'Web Audio Filters',
+  'Web Audio Effects',
+  'Web Audio Routing',
+  'Web Audio Synthesis',
 ];
 
 /** Get patterns filtered by category */
