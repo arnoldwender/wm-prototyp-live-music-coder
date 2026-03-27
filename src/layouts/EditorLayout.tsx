@@ -139,13 +139,13 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
       {/* ── Toolbar (40px) — hidden in zen mode ── */}
       {!zenMode && <header className="shrink-0">{toolbar}</header>}
 
-      {/* ── 3-column main area: activityBar | mainContent | detailPanel ── */}
-      <div className="flex-1 flex min-h-0">
-        {/* Left: activity bar icon strip — hidden in zen mode and on mobile */}
+      {/* ── Main area with activity bar ── */}
+      <div className="flex-1 flex min-h-0" style={{ position: 'relative' }}>
+        {/* Left: activity bar icon strip — always visible, never shifts */}
         {!zenMode && !isMobile && activityBar}
 
-        {/* Center: editor zone (top) + visualizer zone (bottom) */}
-        <div ref={mainRef} className="flex-1 flex flex-col min-h-0">
+        {/* Center: editor zone (top) + visualizer zone (bottom) — takes all remaining space */}
+        <div ref={mainRef} className="flex-1 flex flex-col min-h-0 min-w-0">
           {/* Top zone: editor + graph (stacked vertically on mobile) */}
           <div
             className={isMobile ? 'flex flex-col flex-1 min-h-0' : 'flex min-h-0'}
@@ -235,8 +235,12 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
           )}
         </div>
 
-        {/* Right: detail panel — hidden in zen mode and on mobile */}
-        {!zenMode && !isMobile && detailPanel}
+        {/* Right: detail panel — overlays content, doesn't push editor */}
+        {!zenMode && !isMobile && (
+          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, zIndex: 10 }}>
+            {detailPanel}
+          </div>
+        )}
       </div>
 
       {/* ── Status bar (24px) — hidden in zen mode ── */}
