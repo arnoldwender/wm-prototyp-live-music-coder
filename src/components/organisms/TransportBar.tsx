@@ -197,9 +197,9 @@ function TransportBar() {
           <label className="flex items-center gap-2">
             <span
               style={{
-                fontSize: 'var(--font-size-xs)',
+                fontSize: '11px',
                 color: 'var(--color-text-muted)',
-                fontWeight: 'var(--font-weight-medium)',
+                fontWeight: 500,
               }}
             >
               {t('transport.bpm')}
@@ -216,7 +216,8 @@ function TransportBar() {
                 width: '56px',
                 backgroundColor: 'var(--color-bg-elevated)',
                 color: 'var(--color-text)',
-                fontSize: 'var(--font-size-sm)',
+                fontSize: '11px',
+                fontWeight: 700,
                 fontFamily: 'var(--font-family-mono)',
                 padding: 'var(--space-2) var(--space-3)',
                 borderRadius: 'var(--radius-sm)',

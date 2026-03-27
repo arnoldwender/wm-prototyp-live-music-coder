@@ -32,7 +32,7 @@ function XpBar() {
     <span
       style={{
         fontFamily: 'var(--font-family-mono)',
-        fontSize: '10px',
+        fontSize: '11px',
         color: 'var(--color-text-muted)',
         display: 'inline-flex',
         alignItems: 'center',
@@ -91,7 +91,7 @@ function StatusBar() {
         borderTop: '1px solid var(--color-border)',
         padding: '0 12px',
         height: '24px',
-        fontSize: '10px',
+        fontSize: '11px',
         color: 'var(--color-text-muted)',
         fontFamily: 'var(--font-family-mono)',
         whiteSpace: 'nowrap',
@@ -123,7 +123,7 @@ function StatusBar() {
         className="flex items-center justify-center"
         style={{ gap: '6px', flex: '1 1 auto', minWidth: 0 }}
       >
-        <span style={{ color: 'var(--color-text)' }}>
+        <span style={{ color: 'var(--color-text)', fontWeight: 700 }}>
           {bpm}
         </span>
         <span>BPM</span>

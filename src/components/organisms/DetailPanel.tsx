@@ -47,7 +47,7 @@ function AccordionSection({ id, title, children, defaultOpen = false }: Accordio
           border: 'none',
           color: 'var(--color-text)',
           cursor: 'pointer',
-          fontSize: '11px',
+          fontSize: '13px',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',

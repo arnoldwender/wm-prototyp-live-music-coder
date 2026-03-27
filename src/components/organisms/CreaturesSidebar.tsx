@@ -62,12 +62,12 @@ export function CreaturesSidebar() {
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text)' }}>
                 {spec?.name || c.species}
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
                 {c.stage} · {c.emotionalState > 0.5 ? 'excited' : c.emotionalState > 0.2 ? 'calm' : 'neutral'}
               </div>
             </div>
             {/* XP counter */}
-            <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
               {Math.floor(c.xpTotal)} XP
             </span>
           </button>
@@ -83,7 +83,7 @@ export function CreaturesSidebar() {
             padding: 'var(--space-3)',
             backgroundColor: 'var(--color-bg)',
             borderRadius: 'var(--radius-sm)',
-            fontSize: '10px',
+            fontSize: '11px',
             fontFamily: 'var(--font-family-mono)',
             color: 'var(--color-text-muted)',
             display: 'grid',
