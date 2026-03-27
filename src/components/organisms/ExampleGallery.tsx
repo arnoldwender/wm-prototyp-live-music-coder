@@ -3,7 +3,7 @@
  * Click play icon to hear the pattern instantly.
  * Click card body to open in editor. */
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Play, Square } from 'lucide-react'
@@ -34,10 +34,31 @@ export function ExampleGallery() {
     navigate(`/editor#code=${hash}`)
   }
 
-  const stopPlaying = () => {
+  const stopPlaying = async () => {
+    /* Stop Strudel */
     try { replRef.current?.stop() } catch { /* ok */ }
+    /* Stop Tone.js transport */
+    try {
+      const Tone = await import('tone')
+      Tone.getTransport().stop()
+      Tone.getTransport().cancel()
+    } catch { /* ok */ }
+    /* Stop WebAudio — disconnect masterGain to silence everything */
+    try {
+      const { getSharedContext, getMasterGain, getMasterAnalyser } = await import('../../lib/audio/context')
+      const mg = getMasterGain()
+      const an = getMasterAnalyser()
+      mg.disconnect()
+      mg.connect(an)
+      an.connect(getSharedContext().destination)
+    } catch { /* ok */ }
     setPlayingId(null)
   }
+
+  /* Stop all audio when component unmounts (navigating away) */
+  useEffect(() => {
+    return () => { stopPlaying() }
+  }, [])
 
   const handlePlay = async (e: React.MouseEvent, template: (typeof STARTER_TEMPLATES)[0]) => {
     e.stopPropagation()
