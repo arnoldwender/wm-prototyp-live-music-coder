@@ -178,45 +178,88 @@ function Landing() {
 
       <SectionDivider />
 
-      {/* Feature highlights grid with Lucide icons */}
+      {/* Stats bar — social proof */}
+      <section style={{ padding: 'var(--space-12) var(--space-4)', maxWidth: '800px', margin: '0 auto' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {[
+            { value: '4', label: 'Audio Engines' },
+            { value: '218+', label: 'Samples' },
+            { value: '150+', label: 'Patterns' },
+            { value: '6', label: 'Creature Species' },
+          ].map((stat) => (
+            <div key={stat.label}>
+              <div style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, fontFamily: 'var(--font-family-mono)', color: 'var(--color-primary)' }}>
+                {stat.value}
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: 'var(--space-1)' }}>
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <SectionDivider />
+
+      {/* Feature highlights — bento grid */}
       <section id="features">
         <FeatureGrid />
       </section>
 
       <SectionDivider />
 
-      {/* Pre-built example demos */}
+      {/* Example gallery */}
       <section id="examples">
         <ExampleGallery />
       </section>
 
       <SectionDivider />
 
-      {/* Footer with powered-by engines and license */}
-      <footer
-        className="text-center py-12"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        {/* Powered-by line with engine color dots */}
-        <p
-          className="flex items-center justify-center gap-3 mb-4"
-          style={{ fontSize: 'var(--font-size-xs)', letterSpacing: '0.05em' }}
+      {/* Bottom CTA */}
+      <section className="text-center" style={{ padding: 'var(--space-16) var(--space-4)' }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: 'var(--color-text)', marginBottom: 'var(--space-4)' }}>
+          Ready to make music?
+        </h2>
+        <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-8)', maxWidth: '400px', margin: '0 auto var(--space-8)' }}>
+          No install, no signup. Open the editor and start coding.
+        </p>
+        <Link
+          to="/editor"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-4) var(--space-10)',
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-bg)',
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 700,
+            borderRadius: 'var(--radius-lg)',
+            textDecoration: 'none',
+            transition: 'var(--transition-fast)',
+          }}
         >
-          {t('landing.poweredBy')}
-          <EngineDot color="var(--color-strudel)" />
-          Strudel
-          <EngineDot color="var(--color-tonejs)" />
-          Tone.js
-          <EngineDot color="var(--color-webaudio)" />
-          Web Audio
-        </p>
+          {t('landing.cta')}
+        </Link>
+      </section>
 
-        {/* Legal links + License */}
-        <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
-          <span>|</span>
-          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
-        </p>
+      {/* Footer */}
+      <footer style={{ borderTop: '1px solid var(--color-border)', padding: 'var(--space-8) var(--space-4)', color: 'var(--color-text-muted)' }}>
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Engines */}
+          <div className="flex items-center gap-3" style={{ fontSize: '11px' }}>
+            <EngineDot color="var(--color-strudel)" /> Strudel
+            <EngineDot color="var(--color-tonejs)" /> Tone.js
+            <EngineDot color="var(--color-webaudio)" /> Web Audio
+            <EngineDot color="var(--color-midi)" /> MIDI
+          </div>
+
+          {/* Links */}
+          <div className="flex items-center gap-4" style={{ fontSize: '11px' }}>
+            <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
+            <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
+          </div>
+        </div>
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
           {t('footer.license')}
         </p>
