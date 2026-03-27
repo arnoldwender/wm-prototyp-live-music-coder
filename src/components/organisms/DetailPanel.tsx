@@ -5,14 +5,13 @@
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
-import { useState, useEffect } from 'react';
 import { CreaturesSidebar } from './CreaturesSidebar';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 import { loadFromGist } from '../../lib/persistence/gist';
-import { useAppStore } from '../../lib/store';
 
 /* Saved Gists list — reads from localStorage */
 function SavedGistsList() {
