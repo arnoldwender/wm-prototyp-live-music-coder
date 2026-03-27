@@ -1,4 +1,5 @@
-// src/components/atoms/ActivityBarButton.tsx
+/* ActivityBarButton — icon button for the left activity bar.
+ * Shows left accent border when active, hover highlight always. */
 import type { LucideIcon } from 'lucide-react';
 
 interface ActivityBarButtonProps {
@@ -21,13 +22,21 @@ export function ActivityBarButton({ icon: Icon, label, active, onClick }: Activi
         alignItems: 'center',
         justifyContent: 'center',
         width: '40px',
-        height: '36px',
+        height: '40px',
         border: 'none',
         backgroundColor: 'transparent',
-        color: active ? 'var(--color-text)' : 'var(--color-text-muted)',
+        color: active ? 'var(--color-text)' : 'var(--color-text-secondary)',
         cursor: 'pointer',
         position: 'relative',
         transition: 'var(--transition-fast)',
+      }}
+      onMouseEnter={(e) => {
+        if (!active) e.currentTarget.style.color = 'var(--color-text)';
+        e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)';
+      }}
+      onMouseLeave={(e) => {
+        if (!active) e.currentTarget.style.color = 'var(--color-text-secondary)';
+        e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
       {/* Active indicator — left accent border */}
@@ -35,14 +44,14 @@ export function ActivityBarButton({ icon: Icon, label, active, onClick }: Activi
         <span style={{
           position: 'absolute',
           left: 0,
-          top: '25%',
-          bottom: '25%',
+          top: '20%',
+          bottom: '20%',
           width: '2px',
           backgroundColor: 'var(--color-primary)',
           borderRadius: '0 1px 1px 0',
         }} />
       )}
-      <Icon size={18} />
+      <Icon size={20} />
     </button>
   );
 }

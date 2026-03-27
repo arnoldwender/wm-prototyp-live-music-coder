@@ -1,79 +1,88 @@
 /* ──────────────────────────────────────────────────────────
    DetailPanel — collapsible right sidebar with accordion sections.
-   Renders SampleBrowser, Reference, Console, Creatures, and Settings
-   in expandable sections with localStorage-persisted open/close state.
+   Auto-opens the section matching the activity bar selection.
    Features resize handle (200-400px) and mobile fullscreen overlay.
    ────────────────────────────────────────────────────────── */
 
-import { useState, useRef, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { CreaturesSidebar } from './CreaturesSidebar';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 
-/* ── Accordion section — persists open/close state to localStorage ── */
+/* ── Accordion section ── */
 interface AccordionProps {
   id: string;
   title: string;
   children: React.ReactNode;
-  defaultOpen?: boolean;
+  forceOpen?: boolean;
 }
 
-function AccordionSection({ id, title, children, defaultOpen = false }: AccordionProps) {
-  const [open, setOpen] = useState(() => {
-    const stored = localStorage.getItem(`lmc-detail-${id}`);
-    return stored !== null ? stored === 'true' : defaultOpen;
-  });
+function AccordionSection({ id, title, children, forceOpen }: AccordionProps) {
+  const [open, setOpen] = useState(forceOpen ?? false);
 
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    localStorage.setItem(`lmc-detail-${id}`, String(next));
-  };
+  /* Auto-open when activity bar selects this section */
+  useEffect(() => {
+    if (forceOpen) setOpen(true);
+  }, [forceOpen]);
+
+  const toggle = () => setOpen(!open);
 
   return (
     <div style={{ borderBottom: '1px solid var(--color-border)' }}>
       <button
         type="button"
         onClick={toggle}
+        aria-expanded={open ? "true" : "false"}
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           width: '100%',
           padding: 'var(--space-2) var(--space-3)',
-          backgroundColor: 'transparent',
+          backgroundColor: open ? 'var(--color-bg-alt)' : 'transparent',
           border: 'none',
           color: 'var(--color-text)',
           cursor: 'pointer',
-          fontSize: '13px',
+          fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
+          transition: 'var(--transition-fast)',
         }}
       >
-        {title}
-        <ChevronDown size={12} style={{
-          transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
-          transition: 'var(--transition-fast)',
-          color: 'var(--color-text-muted)',
-        }} />
+        <span className="flex items-center gap-2">
+          <ChevronDown size={10} style={{
+            transform: open ? 'rotate(0deg)' : 'rotate(-90deg)',
+            transition: 'var(--transition-fast)',
+            color: 'var(--color-text-muted)',
+          }} />
+          {title}
+        </span>
       </button>
       {open && <div>{children}</div>}
     </div>
   );
 }
 
-/* ── DetailPanel — right collapsible sidebar with resize handle ── */
+/* ── DetailPanel ── */
 export function DetailPanel() {
   const activeSection = useAppStore((s) => s.activeDetailSection);
+  const setActiveSection = useAppStore((s) => s.setActiveDetailSection);
   const panelWidth = useAppStore((s) => s.detailPanelWidth);
   const setWidth = useAppStore((s) => s.setDetailPanelWidth);
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  /* Resize handle drag — constrained to 200-400px range */
-  const handleRef = useRef<HTMLDivElement>(null);
+  /* Scroll to active section when it changes */
+  useEffect(() => {
+    if (!activeSection || !scrollRef.current) return;
+    const target = scrollRef.current.querySelector(`[data-section="${activeSection}"]`);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeSection]);
+
+  /* Resize handle */
   const startDrag = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     const startX = e.clientX;
@@ -94,8 +103,15 @@ export function DetailPanel() {
     document.addEventListener('mouseup', onUp);
   }, [panelWidth, setWidth]);
 
-  /* Collapse to 0px when no section active */
   if (!activeSection) return null;
+
+  const sections = [
+    { id: 'samples', title: 'Samples', content: <SampleBrowser /> },
+    { id: 'reference', title: 'Reference', content: <ReferencePanel /> },
+    { id: 'console', title: 'Console', content: <ConsolePanel /> },
+    { id: 'creatures', title: 'Creatures', content: <CreaturesSidebar /> },
+    { id: 'settings', title: 'Settings', content: <SettingsPanel /> },
+  ];
 
   return (
     <aside
@@ -106,10 +122,9 @@ export function DetailPanel() {
           : { width: `${panelWidth}px`, backgroundColor: 'var(--color-bg)' }),
       }}
     >
-      {/* Resize handle (desktop only) — highlights on hover */}
+      {/* Resize handle (desktop) */}
       {!isMobile && (
         <div
-          ref={handleRef}
           onMouseDown={startDrag}
           style={{
             width: '1px',
@@ -122,27 +137,34 @@ export function DetailPanel() {
         />
       )}
 
-      {/* Scrollable accordion content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <AccordionSection id="samples" title="Samples" defaultOpen={activeSection === 'samples'}>
-          <SampleBrowser />
-        </AccordionSection>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile close button */}
+        {isMobile && (
+          <div className="flex items-center justify-between shrink-0" style={{ padding: 'var(--space-2) var(--space-3)', borderBottom: '1px solid var(--color-border)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              {sections.find(s => s.id === activeSection)?.title}
+            </span>
+            <button
+              type="button"
+              onClick={() => setActiveSection(null)}
+              aria-label="Close panel"
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
 
-        <AccordionSection id="reference" title="Reference" defaultOpen={activeSection === 'reference'}>
-          <ReferencePanel />
-        </AccordionSection>
-
-        <AccordionSection id="console" title="Console" defaultOpen={activeSection === 'console'}>
-          <ConsolePanel />
-        </AccordionSection>
-
-        <AccordionSection id="creatures" title="Creatures" defaultOpen={activeSection === 'creatures'}>
-          <CreaturesSidebar />
-        </AccordionSection>
-
-        <AccordionSection id="settings" title="Settings" defaultOpen={activeSection === 'settings'}>
-          <SettingsPanel />
-        </AccordionSection>
+        {/* Scrollable accordion */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden">
+          {sections.map(({ id, title, content }) => (
+            <div key={id} data-section={id}>
+              <AccordionSection id={id} title={title} forceOpen={activeSection === id}>
+                {content}
+              </AccordionSection>
+            </div>
+          ))}
+        </div>
       </div>
     </aside>
   );
