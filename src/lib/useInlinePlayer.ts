@@ -73,7 +73,11 @@ export function useInlinePlayer() {
             return typeof val === 'function' ? val.bind(target) : val;
           }
         });
-        await Function('ctx', `"use strict"; return (async () => { ${code} })()`)(ctxProxy);
+        /* Strip user's new AudioContext() and pass masterGain as alias for ctx.destination */
+        const patchedCode = code
+          .replace(/(?:const|let|var)\s+ctx\s*=\s*new\s+AudioContext\s*\([^)]*\)\s*;?/g, '')
+          .replace(/new\s+AudioContext\s*\([^)]*\)/g, 'ctx');
+        await Function('ctx', 'masterGain', `"use strict"; return (async () => { ${patchedCode} })()`)(ctxProxy, mg);
       }
 
       setPlayingId(id);

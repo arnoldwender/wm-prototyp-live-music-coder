@@ -165,7 +165,7 @@ export function SidePanel() {
 
 /* Inline sample data — categories with top samples */
 const SAMPLE_CATEGORIES = [
-  { id: 'drums', label: 'Drum Machines', samples: ['bd', 'sd', 'hh', 'oh', 'cp', 'cr', 'cb', 'lt', 'mt', 'ht', 'rim'] },
+  { id: 'drums', label: 'Drum Machines', samples: ['bd', 'sd', 'hh', 'oh', 'cp', 'cr', 'cb', 'lt', 'mt', 'ht'] },
   { id: 'kits', label: '808 / 909', samples: ['808', '808bd', '808sd', '808hc', '808ht', '808lt', '808oh', '909'] },
   { id: 'synths', label: 'Synths', samples: ['sawtooth', 'sine', 'square', 'triangle', 'supersquare', 'supersaw'] },
   { id: 'bass', label: 'Bass', samples: ['bass', 'bass0', 'bass1', 'bass2', 'bass3', 'dbass'] },
