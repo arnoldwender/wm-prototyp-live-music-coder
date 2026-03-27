@@ -367,102 +367,148 @@ export function SampleBrowser() {
    REFERENCE PANEL — searchable API docs inline
    ══════════════════════════════════════════════════════════ */
 
-const REFERENCE_SECTIONS = [
-  {
-    title: 'Sounds',
-    items: [
-      { fn: 's("name")', desc: 'Select sound/sample' },
-      { fn: 'note("c3 e3 g3")', desc: 'Play pitched notes' },
-      { fn: 'sound("bd sd")', desc: 'Alias for s()' },
-      { fn: 'samples("url")', desc: 'Load sample pack' },
-    ],
-  },
-  {
-    title: 'Pattern',
-    items: [
-      { fn: 'stack(a, b)', desc: 'Layer patterns' },
-      { fn: 'cat(a, b)', desc: 'Concatenate patterns' },
-      { fn: '.fast(2)', desc: 'Speed up N times' },
-      { fn: '.slow(2)', desc: 'Slow down N times' },
-      { fn: '.rev()', desc: 'Reverse pattern' },
-      { fn: '.every(4, fn)', desc: 'Apply every N cycles' },
-      { fn: '.sometimes(fn)', desc: '50% random apply' },
-      { fn: '.off(t, fn)', desc: 'Offset layer' },
-      { fn: '.jux(fn)', desc: 'Stereo split' },
-      { fn: '.ply(n)', desc: 'Repeat events N times' },
-      { fn: '.euclid(k, n)', desc: 'Euclidean rhythm' },
-    ],
-  },
-  {
-    title: 'Effects',
-    items: [
-      { fn: '.gain(0.8)', desc: 'Volume (0-1)' },
-      { fn: '.lpf(800)', desc: 'Low-pass filter Hz' },
-      { fn: '.hpf(200)', desc: 'High-pass filter Hz' },
-      { fn: '.delay(0.5)', desc: 'Delay amount' },
-      { fn: '.room(0.5)', desc: 'Reverb amount' },
-      { fn: '.pan(0.5)', desc: 'Stereo position' },
-      { fn: '.speed(1)', desc: 'Playback speed' },
-      { fn: '.crush(4)', desc: 'Bit crush' },
-      { fn: '.shape(0.5)', desc: 'Waveshaper' },
-      { fn: '.vowel("a")', desc: 'Formant filter' },
-    ],
-  },
-  {
-    title: 'Controls',
-    items: [
-      { fn: 'slider(v, min, max)', desc: 'Inline slider widget' },
-      { fn: 'mouseX', desc: 'Mouse X position' },
-      { fn: 'mouseY', desc: 'Mouse Y position' },
-      { fn: '.range(lo, hi)', desc: 'Map value range' },
-    ],
-  },
-  {
-    title: 'Tonal',
-    items: [
-      { fn: '.scale("C:minor")', desc: 'Map to scale' },
-      { fn: '.transpose(7)', desc: 'Transpose semitones' },
-      { fn: '.voicings("left")', desc: 'Chord voicings' },
-      { fn: 'chord("Cm7")', desc: 'Chord pattern' },
-    ],
-  },
-  {
-    title: 'Sample Manip',
-    items: [
-      { fn: '.chop(n)', desc: 'Cut into N slices' },
-      { fn: '.striate(n)', desc: 'Layer slices' },
-      { fn: '.loopAt(n)', desc: 'Loop to fit N cycles' },
-      { fn: '.legato(0.5)', desc: 'Note duration' },
-      { fn: '.attack(0.01)', desc: 'Envelope attack' },
-      { fn: '.release(0.1)', desc: 'Envelope release' },
-    ],
-  },
-  {
-    title: 'Mini-Notation',
-    items: [
-      { fn: '"a b c d"', desc: 'Sequence events' },
-      { fn: '"[a b] c"', desc: 'Subdivide group' },
-      { fn: '"<a b>"', desc: 'Alternate per cycle' },
-      { fn: '"a ~ b"', desc: 'Rest / silence' },
-      { fn: '"a*4"', desc: 'Repeat N times' },
-      { fn: '"a(3,8)"', desc: 'Euclidean rhythm' },
-      { fn: '"a,b"', desc: 'Play together' },
-      { fn: '"a?"', desc: 'Random 50%' },
-    ],
-  },
+/* Engine-specific API references */
+const STRUDEL_REFERENCE = [
+  { title: 'Sounds', items: [
+    { fn: 's("name")', desc: 'Select sound/sample' },
+    { fn: 'note("c3 e3 g3")', desc: 'Play pitched notes' },
+    { fn: 'sound("bd sd")', desc: 'Alias for s()' },
+    { fn: 'samples("url")', desc: 'Load sample pack' },
+  ]},
+  { title: 'Pattern', items: [
+    { fn: 'stack(a, b)', desc: 'Layer patterns' },
+    { fn: 'cat(a, b)', desc: 'Concatenate patterns' },
+    { fn: '.fast(2)', desc: 'Speed up N times' },
+    { fn: '.slow(2)', desc: 'Slow down N times' },
+    { fn: '.rev()', desc: 'Reverse pattern' },
+    { fn: '.every(4, fn)', desc: 'Apply every N cycles' },
+    { fn: '.sometimes(fn)', desc: '50% random apply' },
+    { fn: '.off(t, fn)', desc: 'Offset layer' },
+    { fn: '.jux(fn)', desc: 'Stereo split' },
+    { fn: '.euclid(k, n)', desc: 'Euclidean rhythm' },
+  ]},
+  { title: 'Effects', items: [
+    { fn: '.gain(0.8)', desc: 'Volume (0-1)' },
+    { fn: '.lpf(800)', desc: 'Low-pass filter Hz' },
+    { fn: '.hpf(200)', desc: 'High-pass filter Hz' },
+    { fn: '.delay(0.5)', desc: 'Delay amount' },
+    { fn: '.room(0.5)', desc: 'Reverb amount' },
+    { fn: '.pan(0.5)', desc: 'Stereo position' },
+    { fn: '.crush(4)', desc: 'Bit crush' },
+    { fn: '.vowel("a")', desc: 'Formant filter' },
+  ]},
+  { title: 'Controls', items: [
+    { fn: 'slider(v, min, max)', desc: 'Inline slider widget' },
+    { fn: 'mouseX', desc: 'Mouse X position' },
+    { fn: '.range(lo, hi)', desc: 'Map value range' },
+  ]},
+  { title: 'Mini-Notation', items: [
+    { fn: '"a b c d"', desc: 'Sequence events' },
+    { fn: '"[a b] c"', desc: 'Subdivide group' },
+    { fn: '"<a b>"', desc: 'Alternate per cycle' },
+    { fn: '"a ~ b"', desc: 'Rest / silence' },
+    { fn: '"a*4"', desc: 'Repeat N times' },
+    { fn: '"a(3,8)"', desc: 'Euclidean rhythm' },
+  ]},
 ];
+
+const TONEJS_REFERENCE = [
+  { title: 'Synths', items: [
+    { fn: 'new Tone.Synth()', desc: 'Basic synth' },
+    { fn: 'new Tone.FMSynth()', desc: 'FM synthesis' },
+    { fn: 'new Tone.AMSynth()', desc: 'AM synthesis' },
+    { fn: 'new Tone.MonoSynth()', desc: 'Mono synth with filter' },
+    { fn: 'new Tone.PolySynth()', desc: 'Polyphonic synth' },
+    { fn: 'new Tone.MembraneSynth()', desc: 'Drum membrane' },
+    { fn: 'new Tone.PluckSynth()', desc: 'Plucked string' },
+  ]},
+  { title: 'Playback', items: [
+    { fn: '.toDestination()', desc: 'Connect to speakers' },
+    { fn: '.triggerAttackRelease("C4","8n")', desc: 'Play a note' },
+    { fn: '.triggerAttack("C4")', desc: 'Start note' },
+    { fn: '.triggerRelease()', desc: 'Stop note' },
+    { fn: '.connect(effect)', desc: 'Chain to effect' },
+  ]},
+  { title: 'Effects', items: [
+    { fn: 'new Tone.Reverb()', desc: 'Reverb' },
+    { fn: 'new Tone.Delay()', desc: 'Delay' },
+    { fn: 'new Tone.Chorus()', desc: 'Chorus' },
+    { fn: 'new Tone.Distortion()', desc: 'Distortion' },
+    { fn: 'new Tone.AutoFilter()', desc: 'Auto filter LFO' },
+    { fn: 'new Tone.Phaser()', desc: 'Phaser' },
+  ]},
+  { title: 'Scheduling', items: [
+    { fn: 'new Tone.Sequence(cb, notes, "4n")', desc: 'Step sequencer' },
+    { fn: 'new Tone.Loop(cb, "4n")', desc: 'Repeating callback' },
+    { fn: 'new Tone.Part(cb, events)', desc: 'Scheduled events' },
+    { fn: 'Tone.getTransport().start()', desc: 'Start transport' },
+    { fn: 'Tone.getTransport().stop()', desc: 'Stop transport' },
+    { fn: 'Tone.getTransport().bpm.value = 120', desc: 'Set BPM' },
+  ]},
+  { title: 'Sources', items: [
+    { fn: 'new Tone.Player(url)', desc: 'Audio file player' },
+    { fn: 'new Tone.Noise("white")', desc: 'Noise generator' },
+    { fn: 'new Tone.Oscillator(440)', desc: 'Oscillator' },
+  ]},
+];
+
+const WEBAUDIO_REFERENCE = [
+  { title: 'Context', items: [
+    { fn: 'ctx', desc: 'AudioContext (provided)' },
+    { fn: 'ctx.currentTime', desc: 'Current time in seconds' },
+    { fn: 'ctx.sampleRate', desc: 'Sample rate (Hz)' },
+    { fn: 'ctx.destination', desc: 'Output (→ masterGain)' },
+  ]},
+  { title: 'Sources', items: [
+    { fn: 'ctx.createOscillator()', desc: 'Create oscillator' },
+    { fn: 'ctx.createBufferSource()', desc: 'Play audio buffer' },
+    { fn: 'ctx.createConstantSource()', desc: 'DC offset source' },
+    { fn: 'osc.type = "sine"', desc: 'sine/square/sawtooth/triangle' },
+    { fn: 'osc.frequency.value = 440', desc: 'Set frequency Hz' },
+    { fn: 'osc.start(time)', desc: 'Start at time' },
+    { fn: 'osc.stop(time)', desc: 'Stop at time' },
+  ]},
+  { title: 'Processing', items: [
+    { fn: 'ctx.createGain()', desc: 'Volume control' },
+    { fn: 'ctx.createBiquadFilter()', desc: 'Filter node' },
+    { fn: 'ctx.createDelay()', desc: 'Delay line' },
+    { fn: 'ctx.createConvolver()', desc: 'Convolution reverb' },
+    { fn: 'ctx.createDynamicsCompressor()', desc: 'Compressor' },
+    { fn: 'ctx.createStereoPanner()', desc: 'Pan L/R' },
+    { fn: 'ctx.createWaveShaper()', desc: 'Distortion' },
+  ]},
+  { title: 'Connections', items: [
+    { fn: 'node.connect(dest)', desc: 'Connect nodes' },
+    { fn: 'node.disconnect()', desc: 'Disconnect all' },
+    { fn: 'gain.gain.setValueAtTime(v, t)', desc: 'Set at time' },
+    { fn: 'gain.gain.linearRampToValueAtTime(v, t)', desc: 'Linear ramp' },
+    { fn: 'gain.gain.exponentialRampToValueAtTime(v, t)', desc: 'Exp ramp' },
+  ]},
+];
+
+const REFERENCE_BY_ENGINE: Record<string, typeof STRUDEL_REFERENCE> = {
+  strudel: STRUDEL_REFERENCE,
+  tonejs: TONEJS_REFERENCE,
+  webaudio: WEBAUDIO_REFERENCE,
+  midi: [{ title: 'MIDI', items: [{ fn: 'MIDI output only', desc: 'Connect external device in Settings' }] }],
+};
 
 export function ReferencePanel() {
   const [search, setSearch] = useState('');
+  const activeEngine = useAppStore((s) => {
+    const file = s.files.find(f => f.active);
+    return file?.engine ?? 'strudel';
+  });
+  const sections = REFERENCE_BY_ENGINE[activeEngine] || STRUDEL_REFERENCE;
 
   const filtered = search.trim()
-    ? REFERENCE_SECTIONS.map((sec) => ({
+    ? sections.map((sec) => ({
         ...sec,
         items: sec.items.filter(
           (i) => i.fn.toLowerCase().includes(search.toLowerCase()) || i.desc.toLowerCase().includes(search.toLowerCase())
         ),
       })).filter((sec) => sec.items.length > 0)
-    : REFERENCE_SECTIONS;
+    : sections;
 
   return (
     <div style={{ padding: 'var(--space-2)' }}>

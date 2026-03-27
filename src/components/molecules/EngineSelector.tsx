@@ -29,9 +29,27 @@ function EngineSelector() {
 
   /* Starter patterns per engine — loaded when switching */
   const STARTER_CODE: Record<EngineType, string> = {
-    strudel: `s("bd sd [~ bd] sd")
-.speed("<1 1.5 1 0.5>")
-.sometimes(x => x.delay(.5))`,
+    strudel: `// Trance arpeggio — inspired by classic trance
+stack(
+  // Kick & bass
+  s("bd bd bd bd").gain(1.2),
+  s("~ ~ ~ oh").gain(0.3),
+  s("hh*8").gain(0.4).pan(sine.range(0.3, 0.7)),
+  // Trance lead — ascending arp
+  note("<[e4 g4 b4 e5] [d4 fs4 a4 d5] [c4 e4 g4 c5] [b3 d4 fs4 b4]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 2000).slow(8))
+    .gain(0.35)
+    .room(0.4)
+    .delay(0.3),
+  // Pad — slow chords
+  note("<[e3,g3,b3] [d3,fs3,a3] [c3,e3,g3] [b2,d3,fs3]>")
+    .s("sawtooth")
+    .lpf(600)
+    .gain(0.15)
+    .room(0.6)
+    .slow(2)
+)`,
     tonejs: `const synth = new Tone.Synth({
   oscillator: { type: "triangle" }
 }).toDestination();
