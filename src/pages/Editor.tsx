@@ -47,15 +47,23 @@ function Editor() {
 
     const shared = readShareFromUrl()
     if (shared) {
-      /* URL hash contains shared code — load it into the active file */
       const activeFile = files.find((f) => f.active)
       if (activeFile) {
         updateFileCode(activeFile.id, shared.code)
+        if (activeFile.engine !== shared.engine) {
+          useAppStore.getState().setFileEngine(activeFile.id, shared.engine)
+        }
       }
       setBpm(shared.bpm)
       setDefaultEngine(shared.engine)
-      /* Show security warning — code was loaded from an external URL */
-      setShowSharedWarning(true)
+
+      /* Check if this is an internal autoplay (from landing page examples) */
+      const isAutoplay = window.location.hash.includes('autoplay=1')
+      if (!isAutoplay) {
+        setShowSharedWarning(true)
+      }
+      /* Clean the hash after reading */
+      window.location.hash = ''
     } else if (!localStorage.getItem('lmc-onboarded')) {
       /* First visit — show the template selector */
       setShowTemplateSelector(true)

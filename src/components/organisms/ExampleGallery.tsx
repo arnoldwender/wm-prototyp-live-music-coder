@@ -31,7 +31,7 @@ export function ExampleGallery() {
     /* Stop any playing pattern first */
     stopPlaying()
     const hash = encodeToUrl({ code: template.code, bpm: 120, engine: template.engine })
-    navigate(`/editor#code=${hash}`)
+    navigate(`/editor#code=${hash}&autoplay=1`)
   }
 
   const stopPlaying = async () => {
