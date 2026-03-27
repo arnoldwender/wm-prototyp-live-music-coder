@@ -25,11 +25,47 @@ function EngineSelector() {
   const files = useAppStore((s) => s.files)
   const setFileEngine = useAppStore((s) => s.setFileEngine)
 
-  /* Change engine for both global default and active file */
+  const updateFileCode = useAppStore((s) => s.updateFileCode)
+
+  /* Starter patterns per engine — loaded when switching */
+  const STARTER_CODE: Record<EngineType, string> = {
+    strudel: `s("bd sd [~ bd] sd")
+.speed("<1 1.5 1 0.5>")
+.sometimes(x => x.delay(.5))`,
+    tonejs: `const synth = new Tone.Synth({
+  oscillator: { type: "triangle" }
+}).toDestination();
+
+const melody = ["C4","E4","G4","B4","G4","E4"];
+const seq = new Tone.Sequence((time, note) => {
+  synth.triggerAttackRelease(note, "8n", time);
+}, melody, "4n").start(0);
+
+Tone.getTransport().bpm.value = 120;
+Tone.getTransport().start();`,
+    webaudio: `const freqs = [261.63, 329.63, 392.00, 523.25];
+freqs.forEach((freq, i) => {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.4);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.4 + 0.35);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime + i * 0.4);
+  osc.stop(ctx.currentTime + i * 0.4 + 0.4);
+});`,
+    midi: `// MIDI output — connect an external device\n// Select a MIDI output in Settings`,
+  }
+
+  /* Change engine + load starter pattern */
   const handleEngineChange = (engine: EngineType) => {
     setDefaultEngine(engine)
     const activeFile = files.find((f) => f.active)
-    if (activeFile) setFileEngine(activeFile.id, engine)
+    if (activeFile) {
+      setFileEngine(activeFile.id, engine)
+      updateFileCode(activeFile.id, STARTER_CODE[engine])
+    }
   }
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
