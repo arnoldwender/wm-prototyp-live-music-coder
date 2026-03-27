@@ -12,6 +12,8 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
 import type { SampleEntry } from '../data/sample-library'
 import { encodeToUrl } from '../lib/persistence/url'
+import { useInlinePlayer } from '../lib/useInlinePlayer'
+import { Play, Square } from 'lucide-react'
 
 /** Category filter pill button */
 function CategoryPill({
@@ -46,7 +48,7 @@ function CategoryPill({
 }
 
 /** Single sample card in the grid */
-function SampleCard({ sample, t }: { sample: SampleEntry; t: (key: string) => string }) {
+function SampleCard({ sample, t, playingId, onPlay }: { sample: SampleEntry; t: (key: string) => string; playingId: string | null; onPlay: (id: string, code: string) => void }) {
   const navigate = useNavigate()
 
   return (
@@ -140,40 +142,64 @@ function SampleCard({ sample, t }: { sample: SampleEntry; t: (key: string) => st
         </div>
       )}
 
-      {/* Quick patterns — multiple ways to use this sample */}
+      {/* Quick patterns with inline play */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
         {[
           sample.example,
           `s("${sample.name}*4").gain(0.6)`,
           sample.variations > 1 ? `s("${sample.name}:${Math.floor(sample.variations / 2)}").speed(0.8)` : null,
-        ].filter(Boolean).map((code, i) => (
-          <button
-            key={i}
-            onClick={() => navigate(`/editor#code=${encodeToUrl({ code: code!, bpm: 120, engine: 'strudel' as const })}`)}
-            style={{
-              display: 'block',
-              width: '100%',
-              fontSize: '11px',
-              fontFamily: 'var(--font-family-mono)',
-              color: 'var(--color-text-secondary)',
-              backgroundColor: 'var(--color-bg)',
-              padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid transparent',
-              cursor: 'pointer',
-              textAlign: 'left',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = 'var(--color-text-secondary)' }}
-            title={`Open in editor: ${code}`}
-          >
-            {code}
-          </button>
-        ))}
+        ].filter(Boolean).map((code, i) => {
+          const patternId = `${sample.name}-${i}`;
+          const isPlaying = playingId === patternId;
+          return (
+            <div key={i} className="flex items-center gap-1">
+              {/* Play/Stop button */}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onPlay(patternId, code!); }}
+                aria-label={isPlaying ? 'Stop' : 'Play'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: 'var(--radius-full)',
+                  border: 'none',
+                  backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-bg)',
+                  color: isPlaying ? 'var(--color-bg)' : 'var(--color-primary)',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                {isPlaying ? <Square size={10} /> : <Play size={10} />}
+              </button>
+              {/* Code — click to open in editor */}
+              <button
+                onClick={() => navigate(`/editor#code=${encodeToUrl({ code: code!, bpm: 120, engine: 'strudel' as const })}&autoplay=1`)}
+                style={{
+                  flex: 1,
+                  fontSize: '11px',
+                  fontFamily: 'var(--font-family-mono)',
+                  color: isPlaying ? 'var(--color-text)' : 'var(--color-text-secondary)',
+                  backgroundColor: 'var(--color-bg)',
+                  padding: 'var(--space-2) var(--space-3)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1px solid ${isPlaying ? 'var(--color-primary)' : 'transparent'}`,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  transition: 'var(--transition-fast)',
+                }}
+                title={`Open in editor: ${code}`}
+              >
+                {code}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </article>
   )
@@ -185,6 +211,12 @@ function Samples() {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [showVariations, setShowVariations] = useState(false)
+  const { playingId, play, stop } = useInlinePlayer()
+
+  const handlePlay = async (id: string, code: string) => {
+    if (playingId === id) { await stop(); return; }
+    await play(id, code, 'strudel');
+  }
 
   /* Per-page SEO meta tags */
   usePageMeta({
@@ -444,7 +476,7 @@ function Samples() {
         }}
       >
         {filteredSamples.map((sample, idx) => (
-          <SampleCard key={`${sample.name}-${idx}`} sample={sample} t={t} />
+          <SampleCard key={`${sample.name}-${idx}`} sample={sample} t={t} playingId={playingId} onPlay={handlePlay} />
         ))}
 
         {filteredSamples.length === 0 && (

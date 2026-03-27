@@ -14,6 +14,8 @@ import type { ExampleEntry } from '../data/example-library'
 import { encodeToUrl } from '../lib/persistence/url'
 import { ENGINE_COLORS } from '../lib/constants'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useInlinePlayer } from '../lib/useInlinePlayer'
+import { Play, Square } from 'lucide-react'
 import type { EngineType } from '../types/engine'
 
 /** Difficulty badge color map */
@@ -81,9 +83,10 @@ function extractSounds(code: string): string[] {
 }
 
 /** Single example pattern card */
-function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) => string }) {
+function ExampleCard({ example, t, playingId, onPlay }: { example: ExampleEntry; t: (key: string) => string; playingId: string | null; onPlay: (id: string, code: string, engine: EngineType) => void }) {
   const navigate = useNavigate()
   const sounds = useMemo(() => extractSounds(example.code), [example.code])
+  const isPlaying = playingId === example.id
 
   return (
     <article
@@ -218,26 +221,46 @@ function ExampleCard({ example, t }: { example: ExampleEntry; t: (key: string) =
         {example.code.split('\n').length > 3 ? '\n...' : ''}
       </pre>
 
-      {/* Try button */}
-      <button
-        onClick={() => navigate(`/editor#code=${encodeToUrl({ code: example.code, bpm: 120, engine: example.engine })}`)}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          alignSelf: 'flex-start',
-          padding: 'var(--space-2) var(--space-4)',
-          backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-bg)',
-          fontSize: 'var(--font-size-xs)',
-          fontWeight: 'var(--font-weight-bold)',
-          borderRadius: 'var(--radius-md)',
-          border: 'none',
-          cursor: 'pointer',
-          transition: 'var(--transition-fast)',
-        }}
-      >
-        {t('examples.tryInEditor')}
-      </button>
+      {/* Play + Edit buttons */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onPlay(example.id, example.code, example.engine); }}
+          aria-label={isPlaying ? 'Stop' : 'Play'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
+            height: '32px',
+            borderRadius: 'var(--radius-full)',
+            border: 'none',
+            backgroundColor: isPlaying ? ENGINE_COLORS[example.engine] : 'var(--color-bg)',
+            color: isPlaying ? 'var(--color-bg)' : ENGINE_COLORS[example.engine],
+            cursor: 'pointer',
+            transition: 'var(--transition-fast)',
+          }}
+        >
+          {isPlaying ? <Square size={12} /> : <Play size={12} />}
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate(`/editor#code=${encodeToUrl({ code: example.code, bpm: 120, engine: example.engine })}&autoplay=1`)}
+          style={{
+            padding: 'var(--space-2) var(--space-4)',
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-bg)',
+            fontSize: 'var(--font-size-xs)',
+            fontWeight: 'var(--font-weight-bold)',
+            borderRadius: 'var(--radius-md)',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'var(--transition-fast)',
+          }}
+        >
+          {t('examples.tryInEditor')}
+        </button>
+      </div>
     </article>
   )
 }
@@ -249,6 +272,12 @@ function Examples() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<ExampleEntry['difficulty'] | null>(null)
   const [activeEngine, setActiveEngine] = useState<EngineType | null>(null)
+  const { playingId, play, stop } = useInlinePlayer()
+
+  const handlePlay = async (id: string, code: string, engine: EngineType) => {
+    if (playingId === id) { await stop(); return; }
+    await play(id, code, engine);
+  }
 
   /* Per-page SEO meta tags */
   usePageMeta({
@@ -540,7 +569,7 @@ function Examples() {
         }}
       >
         {filteredExamples.map((example) => (
-          <ExampleCard key={example.id} example={example} t={t} />
+          <ExampleCard key={example.id} example={example} t={t} playingId={playingId} onPlay={handlePlay} />
         ))}
 
         {filteredExamples.length === 0 && (
