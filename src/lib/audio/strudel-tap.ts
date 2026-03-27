@@ -1,39 +1,20 @@
 /* Universal audio tap for visualization — works for ALL engines.
  *
- * Returns whichever analyser has ACTUAL audio data:
- * - Strudel: superdough's destinationGain analyser (when Strudel is playing)
- * - Tone.js / WebAudio: shared context masterAnalyser (always has their audio)
- *
- * Key insight: Strudel's analyser connects successfully but only has data
- * when Strudel is playing. When other engines play, we must use masterAnalyser. */
+ * Priority: Strudel superdough (if connected) > shared masterAnalyser.
+ * Once Strudel connects, always returns it (Strudel audio is bursty —
+ * signal detection between beats would cause flickering). */
 
 import { getMasterAnalyser } from './context';
 
 let strudelAnalyser: AnalyserNode | null = null;
 let strudelConnected = false;
 
-/* Reusable buffer for signal detection */
-let checkBuffer: Float32Array | null = null;
-
-/** Check if an analyser has actual audio signal (not silence) */
-function hasSignal(analyser: AnalyserNode): boolean {
-  if (!checkBuffer || checkBuffer.length !== analyser.frequencyBinCount) {
-    checkBuffer = new Float32Array(analyser.frequencyBinCount);
-  }
-  analyser.getFloatTimeDomainData(checkBuffer as Float32Array<ArrayBuffer>);
-  /* Check if any sample exceeds the noise floor */
-  for (let i = 0; i < checkBuffer.length; i += 16) {
-    if (Math.abs(checkBuffer[i]) > 0.001) return true;
-  }
-  return false;
-}
-
 /**
  * Returns an AnalyserNode with live audio data.
- * Checks both Strudel and shared analysers, returns whichever has signal.
+ * Strudel tap if connected, otherwise shared masterAnalyser.
  */
 export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
-  /* Keep Strudel tap connected (even if not currently active) */
+  /* Try Strudel's superdough controller */
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
@@ -56,14 +37,13 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
         } catch { /* controller not ready */ }
       }
 
-      /* Return Strudel analyser ONLY if it has actual audio data */
-      if (strudelConnected && hasSignal(strudelAnalyser)) {
-        return strudelAnalyser;
-      }
+      /* Once connected, always return Strudel analyser — don't check signal
+       * (audio is bursty between beats, signal check causes flickering) */
+      if (strudelConnected) return strudelAnalyser;
     }
   } catch { /* Strudel not available */ }
 
-  /* Shared masterAnalyser — Tone.js and WebAudio route here */
+  /* Fallback: shared masterAnalyser (Tone.js + WebAudio route here) */
   try {
     return getMasterAnalyser();
   } catch { /* not ready */ }
@@ -71,7 +51,7 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   return null;
 }
 
-/** Reset connection state — call after evaluate. */
+/** Reset connection state — call after evaluate to force reconnect. */
 export function resetStrudelTap(): void {
   strudelConnected = false;
   strudelAnalyser = null;
