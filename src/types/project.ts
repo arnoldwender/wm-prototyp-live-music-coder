@@ -17,8 +17,6 @@ export interface PanelLayout {
     spectrum: boolean
     timeline: boolean
     pianoroll: boolean
-    beatlings: boolean
-    brain: boolean
   }
 }
 

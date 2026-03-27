@@ -31,9 +31,7 @@ export const DEFAULT_LAYOUT: PanelLayout = {
   visiblePanels: {
     waveform: true,
     spectrum: true,
-    timeline: true,
+    timeline: false,
     pianoroll: false,
-    beatlings: true,
-    brain: true,
   },
 }

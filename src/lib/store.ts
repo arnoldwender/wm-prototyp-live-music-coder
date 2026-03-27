@@ -116,8 +116,12 @@ interface AppState {
   creatureStats: CreatureStat[]
   selectedCreatureId: string | null
   showBrainPanel: boolean
-  showSidePanel: boolean
-  toggleSidePanel: () => void
+  /* Detail panel — right collapsible sidebar */
+  activeDetailSection: string | null
+  detailPanelWidth: number
+  setActiveDetailSection: (section: string | null) => void
+  setDetailPanelWidth: (width: number) => void
+  toggleDetailSection: (section: string) => void
   zenMode: boolean
   toggleZenMode: () => void
   setCreatureCount: (count: number) => void
@@ -199,8 +203,13 @@ export const useAppStore = create<AppState>()((set, get) => ({
   creatureStats: [],
   selectedCreatureId: null,
   showBrainPanel: false,
-  showSidePanel: false,
-  toggleSidePanel: () => set((s) => ({ showSidePanel: !s.showSidePanel })),
+  activeDetailSection: null,
+  detailPanelWidth: 280,
+  setActiveDetailSection: (section: string | null) => set({ activeDetailSection: section }),
+  setDetailPanelWidth: (width: number) => set({ detailPanelWidth: width }),
+  toggleDetailSection: (section: string) => set((s) => ({
+    activeDetailSection: s.activeDetailSection === section ? null : section,
+  })),
   zenMode: false,
   toggleZenMode: () => set((s) => ({ zenMode: !s.zenMode })),
 
