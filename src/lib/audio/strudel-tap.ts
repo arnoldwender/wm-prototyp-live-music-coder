@@ -20,7 +20,7 @@ function hasSignal(analyser: AnalyserNode): boolean {
   if (!checkBuffer || checkBuffer.length !== analyser.frequencyBinCount) {
     checkBuffer = new Float32Array(analyser.frequencyBinCount);
   }
-  analyser.getFloatTimeDomainData(checkBuffer);
+  analyser.getFloatTimeDomainData(checkBuffer as Float32Array<ArrayBuffer>);
   /* Check if any sample exceeds the noise floor */
   for (let i = 0; i < checkBuffer.length; i += 16) {
     if (Math.abs(checkBuffer[i]) > 0.001) return true;

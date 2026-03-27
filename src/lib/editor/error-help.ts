@@ -47,7 +47,7 @@ const ERROR_PATTERNS: { pattern: RegExp; handler: (match: RegExpMatchArray, raw:
   },
   {
     pattern: /is not a function/,
-    handler: (m) => ({
+    handler: (_m) => ({
       title: 'Not a function',
       explanation: `The code tries to call something as a function, but it isn't one. Check the spelling and the engine you're using.`,
       fix: 'Make sure you\'re using the right syntax for your selected engine (Strudel/Tone.js/WebAudio).',

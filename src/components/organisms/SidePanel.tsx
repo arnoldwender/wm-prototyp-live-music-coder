@@ -26,8 +26,10 @@ export function SidePanel() {
   const { t } = useTranslation();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [activeTab, setActiveTab] = useState<TabId | null>(null);
-  const showSidePanel = useAppStore((s) => s.showSidePanel);
-  const toggleSidePanel = useAppStore((s) => s.toggleSidePanel);
+  /* SidePanel is deprecated — replaced by ActivityBar + DetailPanel.
+     Kept only for sub-component exports (SampleBrowser, ReferencePanel, etc.) */
+  const showSidePanel = useAppStore((s) => s.activeDetailSection !== null);
+  const toggleSidePanel = useAppStore((s) => () => s.setActiveDetailSection(null));
 
   /* Close on Escape */
   useEffect(() => {
