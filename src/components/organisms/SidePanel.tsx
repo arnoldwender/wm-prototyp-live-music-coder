@@ -179,15 +179,21 @@ const SAMPLE_CATEGORIES = [
 
 /* Engine-specific sample categories */
 const TONEJS_CATEGORIES = [
-  { id: 'synths', label: 'Synthesizers', samples: ['Synth', 'FMSynth', 'AMSynth', 'MonoSynth', 'PolySynth', 'PluckSynth', 'MembraneSynth', 'MetalSynth'] },
-  { id: 'oscillators', label: 'Oscillators', samples: ['sine', 'square', 'sawtooth', 'triangle'] },
-  { id: 'effects', label: 'Effects', samples: ['Reverb', 'Delay', 'Chorus', 'Distortion', 'Phaser', 'Tremolo', 'AutoFilter', 'AutoPanner'] },
-  { id: 'sources', label: 'Sources', samples: ['Player', 'Noise', 'Oscillator', 'OmniOscillator'] },
+  { id: 'synths', label: 'Synthesizers', samples: ['Synth', 'FMSynth', 'AMSynth', 'MonoSynth', 'PolySynth', 'PluckSynth', 'MembraneSynth', 'MetalSynth', 'NoiseSynth', 'DuoSynth'] },
+  { id: 'oscillators', label: 'Oscillator Types', samples: ['sine', 'square', 'sawtooth', 'triangle', 'fatsine', 'fatsquare', 'fatsawtooth', 'fattriangle', 'pulse', 'pwm'] },
+  { id: 'effects', label: 'Effects', samples: ['Reverb', 'FeedbackDelay', 'PingPongDelay', 'Chorus', 'Distortion', 'Phaser', 'Tremolo', 'Vibrato', 'AutoFilter', 'AutoPanner', 'AutoWah', 'BitCrusher', 'Chebyshev', 'Compressor', 'EQ3', 'Freeverb', 'JCReverb', 'Limiter', 'PitchShift', 'StereoWidener'] },
+  { id: 'sources', label: 'Sources', samples: ['Player', 'GrainPlayer', 'Noise', 'Oscillator', 'OmniOscillator', 'FatOscillator', 'PWMOscillator', 'AMOscillator', 'FMOscillator'] },
+  { id: 'scheduling', label: 'Scheduling', samples: ['Sequence', 'Loop', 'Part', 'Pattern', 'Transport'] },
+  { id: 'analysis', label: 'Analysis', samples: ['Analyser', 'Meter', 'FFT', 'Waveform', 'DCMeter', 'Follower'] },
+  { id: 'songs-tone', label: 'Full Songs', samples: ['Trance Arp', 'Ambient Pad', 'Drum Machine', 'Bass Sequence', 'Chiptune Melody', 'Jazz Chords', 'Cinematic Rise'] },
 ];
 
 const WEBAUDIO_CATEGORIES = [
-  { id: 'oscillators', label: 'Oscillators', samples: ['sine', 'square', 'sawtooth', 'triangle'] },
-  { id: 'nodes', label: 'Audio Nodes', samples: ['GainNode', 'BiquadFilter', 'DelayNode', 'ConvolverNode', 'DynamicsCompressor', 'WaveShaper', 'StereoPanner'] },
+  { id: 'oscillators', label: 'Oscillator Types', samples: ['sine', 'square', 'sawtooth', 'triangle'] },
+  { id: 'nodes', label: 'Audio Nodes', samples: ['GainNode', 'BiquadFilter', 'DelayNode', 'ConvolverNode', 'DynamicsCompressor', 'WaveShaper', 'StereoPanner', 'AnalyserNode', 'ChannelSplitter', 'ChannelMerger'] },
+  { id: 'filter-types', label: 'Filter Types', samples: ['lowpass', 'highpass', 'bandpass', 'notch', 'allpass', 'lowshelf', 'highshelf', 'peaking'] },
+  { id: 'params', label: 'AudioParam Methods', samples: ['setValueAtTime', 'linearRampToValueAtTime', 'exponentialRampToValueAtTime', 'setTargetAtTime', 'cancelScheduledValues'] },
+  { id: 'songs-web', label: 'Full Songs', samples: ['Sine Melody', 'FM Synthesis', 'Drum Pattern', 'Ambient Drone', 'Glitch Beat'] },
 ];
 
 export function SampleBrowser() {
@@ -214,37 +220,243 @@ export function SampleBrowser() {
     const code = activeFile.code;
     let insertion = '';
 
+    /* Full song templates — replace entire code */
+    const TONE_SONGS: Record<string, string> = {
+      'Trance Arp': `const synth = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: "fatsawtooth", count: 3, spread: 30 },
+  envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 0.8 }
+}).toDestination();
+const filter = new Tone.AutoFilter("8n").toDestination().start();
+synth.connect(filter);
+const reverb = new Tone.Reverb(2).toDestination();
+synth.connect(reverb);
+
+const notes = [["E4","G4","B4"],["D4","F#4","A4"],["C4","E4","G4"],["B3","D4","F#4"]];
+const seq = new Tone.Sequence((time, chord) => {
+  synth.triggerAttackRelease(chord, "8n", time);
+}, notes, "4n").start(0);
+
+const kick = new Tone.MembraneSynth().toDestination();
+new Tone.Loop(time => kick.triggerAttackRelease("C1","8n",time), "4n").start(0);
+
+Tone.getTransport().bpm.value = 138;
+Tone.getTransport().start();`,
+      'Ambient Pad': `const synth = new Tone.PolySynth(Tone.FMSynth, {
+  harmonicity: 3, modulationIndex: 10,
+  envelope: { attack: 2, decay: 1, sustain: 0.8, release: 4 }
+}).toDestination();
+const reverb = new Tone.Reverb(5).toDestination();
+const delay = new Tone.FeedbackDelay("8n", 0.4).toDestination();
+synth.connect(reverb);
+synth.connect(delay);
+
+const chords = [["C3","E3","G3","B3"],["A2","C3","E3","G3"],["F2","A2","C3","E3"],["G2","B2","D3","F3"]];
+let i = 0;
+new Tone.Loop(time => {
+  synth.triggerAttackRelease(chords[i % chords.length], "2n", time);
+  i++;
+}, "1m").start(0);
+
+Tone.getTransport().bpm.value = 72;
+Tone.getTransport().start();`,
+      'Drum Machine': `const kick = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 6 }).toDestination();
+const snare = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { decay: 0.15 } }).toDestination();
+const hat = new Tone.MetalSynth({ frequency: 400, envelope: { decay: 0.05 }, harmonicity: 5.1, resonance: 4000 }).toDestination();
+hat.volume.value = -10;
+
+new Tone.Sequence((time, v) => { if(v) kick.triggerAttackRelease("C1","8n",time); },
+  [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], "16n").start(0);
+new Tone.Sequence((time, v) => { if(v) snare.triggerAttackRelease("8n",time); },
+  [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], "16n").start(0);
+new Tone.Sequence((time, v) => { if(v) hat.triggerAttackRelease("32n",time); },
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], "16n").start(0);
+
+Tone.getTransport().bpm.value = 126;
+Tone.getTransport().start();`,
+      'Bass Sequence': `const bass = new Tone.MonoSynth({
+  oscillator: { type: "square" },
+  filter: { Q: 6, type: "lowpass", rolloff: -24 },
+  envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.3 },
+  filterEnvelope: { attack: 0.05, decay: 0.2, sustain: 0.3, release: 0.5, baseFrequency: 200, octaves: 2 }
+}).toDestination();
+const dist = new Tone.Distortion(0.4).toDestination();
+bass.connect(dist);
+
+const notes = ["C2","C2","Eb2","F2","F2","Ab2","Bb2","G2"];
+new Tone.Sequence((time, note) => {
+  bass.triggerAttackRelease(note, "8n", time);
+}, notes, "8n").start(0);
+
+Tone.getTransport().bpm.value = 140;
+Tone.getTransport().start();`,
+      'Chiptune Melody': `const synth = new Tone.Synth({
+  oscillator: { type: "pulse", width: 0.3 },
+  envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.1 }
+}).toDestination();
+const melody = ["E5","D5","C5","D5","E5","E5","E5","D5","D5","D5","E5","G5","G5",
+  "E5","D5","C5","D5","E5","E5","E5","E5","D5","D5","E5","D5","C5"];
+new Tone.Sequence((time, note) => {
+  synth.triggerAttackRelease(note, "8n", time);
+}, melody, "4n").start(0);
+
+Tone.getTransport().bpm.value = 160;
+Tone.getTransport().start();`,
+      'Jazz Chords': `const piano = new Tone.PolySynth(Tone.Synth, {
+  oscillator: { type: "triangle" },
+  envelope: { attack: 0.02, decay: 0.5, sustain: 0.3, release: 1.5 }
+}).toDestination();
+const reverb = new Tone.Reverb(3).toDestination();
+piano.connect(reverb);
+
+const chords = [["Dm7","D3","F3","A3","C4"],["G7","G2","B2","D3","F3"],
+  ["Cmaj7","C3","E3","G3","B3"],["Am7","A2","C3","E3","G3"]];
+let i = 0;
+new Tone.Loop(time => {
+  piano.triggerAttackRelease(chords[i % chords.length].slice(1), "2n", time, 0.5);
+  i++;
+}, "2n").start(0);
+
+Tone.getTransport().bpm.value = 100;
+Tone.getTransport().start();`,
+      'Cinematic Rise': `const synth = new Tone.FMSynth({
+  harmonicity: 8, modulationIndex: 20,
+  envelope: { attack: 4, decay: 0.5, sustain: 1, release: 2 }
+}).toDestination();
+const reverb = new Tone.Reverb(6).toDestination();
+const delay = new Tone.PingPongDelay("8n", 0.3).toDestination();
+synth.connect(reverb);
+synth.connect(delay);
+
+synth.triggerAttackRelease("C2", 6);
+synth.frequency.rampTo("C5", 5);`,
+    };
+
+    const WEB_SONGS: Record<string, string> = {
+      'Sine Melody': `const notes = [261.63,293.66,329.63,349.23,392.00,440.00,493.88,523.25];
+notes.forEach((freq, i) => {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.3);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.3 + 0.25);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime + i * 0.3);
+  osc.stop(ctx.currentTime + i * 0.3 + 0.3);
+});`,
+      'FM Synthesis': `const carrier = ctx.createOscillator();
+const modulator = ctx.createOscillator();
+const modGain = ctx.createGain();
+const masterGain = ctx.createGain();
+carrier.frequency.value = 440;
+modulator.frequency.value = 880;
+modGain.gain.value = 200;
+masterGain.gain.value = 0.3;
+modulator.connect(modGain).connect(carrier.frequency);
+carrier.connect(masterGain).connect(ctx.destination);
+modulator.start();
+carrier.start();
+modGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);
+masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 3);`,
+      'Drum Pattern': `function kick(time) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.setValueAtTime(150, time);
+  osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
+  gain.gain.setValueAtTime(1, time);
+  gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(time); osc.stop(time + 0.5);
+}
+function hat(time) {
+  const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  src.buffer = buf;
+  gain.gain.setValueAtTime(0.3, time);
+  gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
+  src.connect(gain).connect(ctx.destination);
+  src.start(time);
+}
+for (let i = 0; i < 16; i++) {
+  const t = ctx.currentTime + i * 0.25;
+  if (i % 4 === 0) kick(t);
+  hat(t);
+}`,
+      'Ambient Drone': `const oscs = [110, 165, 220, 330].map(freq => {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  gain.gain.value = 0;
+  gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 3);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  return { osc, gain };
+});
+// Slow detune for movement
+oscs.forEach((o, i) => {
+  o.osc.detune.setValueAtTime(0, ctx.currentTime);
+  o.osc.detune.linearRampToValueAtTime(i * 5, ctx.currentTime + 6);
+});`,
+      'Glitch Beat': `for (let i = 0; i < 32; i++) {
+  const t = ctx.currentTime + i * 0.125;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = ["sine","square","sawtooth","triangle"][Math.floor(Math.random()*4)];
+  osc.frequency.value = 100 + Math.random() * 800;
+  gain.gain.setValueAtTime(Math.random() * 0.3, t);
+  gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05 + Math.random() * 0.1);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.15);
+}`,
+    };
+
     /* Generate code per engine */
     switch (engine) {
       case 'strudel':
         insertion = code.trim() ? `\ns("${sample}")` : `s("${sample}")`;
         break;
       case 'tonejs':
-        if (['sine', 'square', 'sawtooth', 'triangle'].includes(sample)) {
+        /* Full songs — replace entire code */
+        if (TONE_SONGS[sample]) {
+          store.updateFileCode(activeFile.id, TONE_SONGS[sample]);
+          return;
+        }
+        if (['sine','square','sawtooth','triangle','fatsine','fatsquare','fatsawtooth','fattriangle','pulse','pwm'].includes(sample)) {
           insertion = `\nconst synth = new Tone.Synth({oscillator:{type:"${sample}"}}).toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
         } else if (sample.endsWith('Synth')) {
           insertion = `\nconst synth = new Tone.${sample}().toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
-        } else if (['Reverb', 'Delay', 'Chorus', 'Distortion', 'Phaser', 'Tremolo', 'AutoFilter', 'AutoPanner'].includes(sample)) {
+        } else if (['Reverb','FeedbackDelay','PingPongDelay','Chorus','Distortion','Phaser','Tremolo','Vibrato','AutoFilter','AutoPanner','AutoWah','BitCrusher','Chebyshev','Compressor','EQ3','Freeverb','JCReverb','Limiter','PitchShift','StereoWidener'].includes(sample)) {
           insertion = `\nconst effect = new Tone.${sample}().toDestination();\nconst synth = new Tone.Synth().connect(effect);\nsynth.triggerAttackRelease("C4", "8n");`;
         } else if (sample === 'Noise') {
           insertion = `\nconst noise = new Tone.Noise("white").toDestination();\nnoise.start();\nsetTimeout(() => noise.stop(), 1000);`;
-        } else if (sample === 'Player') {
-          insertion = `\n// Tone.Player requires a URL to an audio file\nconst player = new Tone.Player().toDestination();`;
+        } else if (['Sequence','Loop','Part','Pattern','Transport'].includes(sample)) {
+          insertion = `\n// Tone.${sample} — see Full Songs category for examples`;
+        } else if (['Analyser','Meter','FFT','Waveform','DCMeter','Follower'].includes(sample)) {
+          insertion = `\nconst ${sample.toLowerCase()} = new Tone.${sample}();\n// Connect a source: source.connect(${sample.toLowerCase()});`;
         } else {
           insertion = `\nconst synth = new Tone.Synth().toDestination();\nsynth.triggerAttackRelease("C4", "8n");`;
         }
         break;
       case 'webaudio':
-        if (['sine', 'square', 'sawtooth', 'triangle'].includes(sample)) {
+        /* Full songs — replace entire code */
+        if (WEB_SONGS[sample]) {
+          store.updateFileCode(activeFile.id, WEB_SONGS[sample]);
+          return;
+        }
+        if (['sine','square','sawtooth','triangle'].includes(sample)) {
           insertion = `\nconst osc = ctx.createOscillator();\nosc.type = "${sample}";\nosc.frequency.value = 440;\nconst gain = ctx.createGain();\ngain.gain.value = 0.3;\nosc.connect(gain).connect(ctx.destination);\nosc.start();`;
+        } else if (['lowpass','highpass','bandpass','notch','allpass','lowshelf','highshelf','peaking'].includes(sample)) {
+          insertion = `\nconst filter = ctx.createBiquadFilter();\nfilter.type = "${sample}";\nfilter.frequency.value = 1000;\nfilter.connect(ctx.destination);`;
+        } else if (['setValueAtTime','linearRampToValueAtTime','exponentialRampToValueAtTime','setTargetAtTime','cancelScheduledValues'].includes(sample)) {
+          insertion = `\n// gain.gain.${sample}(value, time);`;
         } else if (sample === 'GainNode') {
           insertion = `\nconst gain = ctx.createGain();\ngain.gain.value = 0.5;\ngain.connect(ctx.destination);`;
         } else if (sample === 'BiquadFilter') {
           insertion = `\nconst filter = ctx.createBiquadFilter();\nfilter.type = "lowpass";\nfilter.frequency.value = 800;\nfilter.connect(ctx.destination);`;
-        } else if (sample === 'DelayNode') {
-          insertion = `\nconst delay = ctx.createDelay();\ndelay.delayTime.value = 0.3;\ndelay.connect(ctx.destination);`;
-        } else if (sample === 'StereoPanner') {
-          insertion = `\nconst panner = ctx.createStereoPanner();\npanner.pan.value = 0;\npanner.connect(ctx.destination);`;
         } else {
           insertion = `\n// ${sample}\nconst node = ctx.create${sample.replace('Node', '')}();\nnode.connect(ctx.destination);`;
         }
