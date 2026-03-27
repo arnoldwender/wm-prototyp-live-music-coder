@@ -4,9 +4,8 @@
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useRef } from 'react';
-import { useAppStore } from '../../lib/store';
+import { useAppStore, type CreatureStat } from '../../lib/store';
 import { SPECIES } from '../../lib/beatlings/species';
-import type { CreatureStat } from '../../types/beatling';
 
 export function CreaturesSidebar() {
   const selectedId = useAppStore((s) => s.selectedCreatureId);
