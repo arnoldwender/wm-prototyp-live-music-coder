@@ -51,30 +51,48 @@ export function ExampleGallery() {
     /* Stop previous */
     stopPlaying()
 
-    /* Only Strudel patterns can play inline (Tone.js/WebAudio need the editor engine) */
-    if (template.engine !== 'strudel') {
-      handleTryExample(template)
-      return
-    }
-
     try {
-      /* Lazy-init Strudel REPL */
-      if (!replRef.current) {
-        const { initStrudel } = await import('@strudel/web')
-        replRef.current = await initStrudel()
+      if (template.engine === 'strudel') {
+        /* Lazy-init Strudel REPL */
+        if (!replRef.current) {
+          const { initStrudel } = await import('@strudel/web')
+          replRef.current = await initStrudel()
+          try {
+            await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false)
+          } catch { /* samples may fail */ }
+        }
         try {
-          await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false)
-        } catch { /* samples may fail */ }
+          const { getAudioContext } = await import('@strudel/webaudio')
+          const ctx = getAudioContext()
+          if (ctx?.state === 'suspended') await ctx.resume()
+        } catch { /* ok */ }
+        await replRef.current.evaluate(template.code, true)
+
+      } else if (template.engine === 'tonejs') {
+        /* Lazy-init Tone.js */
+        const Tone = await import('tone')
+        const toneCtx = Tone.getContext().rawContext as AudioContext
+        if (toneCtx?.state === 'suspended') await (toneCtx as AudioContext).resume()
+        Tone.getTransport().stop()
+        Tone.getTransport().cancel()
+        await Function('Tone', `"use strict"; return (async () => { ${template.code} })()`)(Tone)
+
+      } else if (template.engine === 'webaudio') {
+        /* WebAudio — use shared context */
+        const { getSharedContext, getMasterGain, resumeContext } = await import('../../lib/audio/context')
+        await resumeContext()
+        const ctx = getSharedContext()
+        const mg = getMasterGain()
+        const ctxProxy = new Proxy(ctx, {
+          get(target: any, prop: string) {
+            if (prop === 'destination') return mg
+            const val = target[prop]
+            return typeof val === 'function' ? val.bind(target) : val
+          }
+        })
+        await Function('ctx', `"use strict"; return (async () => { ${template.code} })()`)(ctxProxy)
       }
 
-      /* Resume audio context */
-      try {
-        const { getAudioContext } = await import('@strudel/webaudio')
-        const ctx = getAudioContext()
-        if (ctx?.state === 'suspended') await ctx.resume()
-      } catch { /* ok */ }
-
-      await replRef.current.evaluate(template.code, true)
       setPlayingId(template.id)
     } catch (err) {
       console.error('[ExampleGallery] Play failed:', err)
