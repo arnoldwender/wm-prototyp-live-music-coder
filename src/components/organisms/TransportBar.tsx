@@ -1,33 +1,48 @@
 /* ──────────────────────────────────────────────────────────
-   TransportBar organism — full top toolbar for the music IDE.
-   Left: Play/Stop/Record, BPM, EngineSelector
-   Right: Undo/Redo/Share/Gist, Settings, LanguageSwitcher
+   TransportBar organism — top toolbar for the music IDE.
+   3 workflow groups separated by dividers:
+     Group 1 Transport: Play/Stop, BPM, Engine selector
+     Group 2 Edit: Undo, Redo, Graph toggle
+     Group 3 Share: Share, Gist, Collection, Language switcher
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useMediaQuery } from '../../lib/useMediaQuery'
-import { MoreHorizontal } from 'lucide-react'
 import {
+  MoreHorizontal,
   Play,
   Square,
-  Circle,
   Share2,
   FileCode2,
-  Settings,
   GitBranch,
   Trophy,
-  PanelRightOpen,
+  Undo2,
+  Redo2,
 } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
-import { getRecorder } from '../../lib/audio/recorder'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Logo, Tooltip } from '../atoms'
-import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog, HelpPanel } from '../molecules'
+import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog } from '../molecules'
 import { GistDialog } from './GistDialog'
 import { CollectionPanel } from './CollectionPanel'
+
+/* ── GroupDivider — visual separator between workflow groups ── */
+function GroupDivider() {
+  return (
+    <div
+      style={{
+        width: '1px',
+        height: '20px',
+        backgroundColor: 'var(--color-border)',
+        opacity: 0.5,
+        margin: '0 var(--space-2)',
+      }}
+    />
+  )
+}
 
 /** Main transport and toolbar header */
 function TransportBar() {
@@ -35,20 +50,18 @@ function TransportBar() {
 
   /* Transport state */
   const isPlaying = useAppStore((s) => s.isPlaying)
-  const isRecording = useAppStore((s) => s.isRecording)
   const bpm = useAppStore((s) => s.bpm)
 
   /* Transport actions */
   const togglePlay = useAppStore((s) => s.togglePlay)
   const stop = useAppStore((s) => s.stop)
-  const toggleRecord = useAppStore((s) => s.toggleRecord)
   const setBpm = useAppStore((s) => s.setBpm)
 
-  /* Graph toggle — reactive selectors instead of imperative getState() */
+  /* Graph toggle */
   const showGraph = useAppStore((s) => s.layout.showGraph)
   const toggleGraph = useAppStore((s) => s.toggleGraph)
 
-  /* Responsive — hide secondary actions on mobile behind overflow menu */
+  /* Responsive — hide Groups 2+3 on mobile behind overflow menu */
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [showOverflow, setShowOverflow] = useState(false)
 
@@ -74,10 +87,11 @@ function TransportBar() {
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
-  const [showHelp, setShowHelp] = useState(false)
   const [showCollection, setShowCollection] = useState(false)
 
-  /* Orchestrator-wired handlers — bridge UI state with audio engine */
+  /* ── Orchestrator-wired handlers ── */
+
+  /** Play/pause toggle — bridges UI state with audio engine */
   const handlePlay = async () => {
     const orch = getOrchestrator()
     if (isPlaying) {
@@ -86,8 +100,7 @@ function TransportBar() {
     } else {
       await orch.start()
 
-      /* Evaluate the active file's code so there is a pattern to play.
-       * Without this, pressing Play with no prior edit produces silence. */
+      /* Evaluate the active file so pressing Play produces sound */
       const activeFile = useAppStore.getState().files.find((f) => f.active)
       if (activeFile?.code) {
         try {
@@ -112,15 +125,18 @@ function TransportBar() {
     getOrchestrator().setBpm(newBpm)
   }
 
-  /* Record handler — toggles audio recording via MediaRecorder */
-  const handleRecord = async () => {
-    const recorder = getRecorder()
-    if (recorder.isRecording()) {
-      await recorder.stopAndDownload('live-music-coder')
-      toggleRecord()
-    } else {
-      recorder.start()
-      toggleRecord()
+  /* Undo/Redo — dispatch keyboard shortcuts to active CodeMirror editor */
+  const handleUndo = () => {
+    const el = document.querySelector('.cm-editor .cm-content') as HTMLElement | null
+    if (el) {
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true }))
+    }
+  }
+
+  const handleRedo = () => {
+    const el = document.querySelector('.cm-editor .cm-content') as HTMLElement | null
+    if (el) {
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, shiftKey: true, bubbles: true }))
     }
   }
 
@@ -131,11 +147,11 @@ function TransportBar() {
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderBottom: '1px solid var(--color-border)',
-        padding: isMobile ? 'var(--space-2) var(--space-3)' : 'var(--space-3) var(--space-6)',
-        height: '48px',
+        padding: '0 var(--space-3)',
+        height: '40px',
       }}
     >
-      {/* --- Left side: Logo + Transport controls --- */}
+      {/* ── Left side: Logo + Group 1 Transport ── */}
       <div className="flex items-center">
         {/* Logo — links back to landing page */}
         <Link
@@ -152,7 +168,7 @@ function TransportBar() {
           <Logo size="sm" />
         </Link>
 
-        {/* Play / Stop / Record */}
+        {/* Group 1 — Transport: Play / Stop */}
         <ToolbarGroup>
           <Tooltip content={t('transport.play')}>
             <Button
@@ -174,29 +190,9 @@ function TransportBar() {
               <Icon icon={Square} size={16} />
             </Button>
           </Tooltip>
-
-          <Tooltip content={t('transport.record')}>
-            <Button
-              variant="icon"
-              active={isRecording}
-              onClick={handleRecord}
-              aria-label={t('transport.record')}
-            >
-              {/* Record circle — filled red when recording */}
-              <Circle
-                size={16}
-                aria-hidden="true"
-                style={{
-                  fill: isRecording ? 'var(--color-error)' : 'none',
-                  color: isRecording ? 'var(--color-error)' : 'currentColor',
-                  transition: 'var(--transition-fast)',
-                }}
-              />
-            </Button>
-          </Tooltip>
         </ToolbarGroup>
 
-        {/* BPM input */}
+        {/* Group 1 — BPM input with subtle background */}
         <ToolbarGroup>
           <label className="flex items-center gap-2">
             <span
@@ -231,14 +227,37 @@ function TransportBar() {
           </label>
         </ToolbarGroup>
 
-        {/* Engine selector */}
+        {/* Group 1 — Engine selector */}
         <ToolbarGroup>
           <EngineSelector />
         </ToolbarGroup>
 
-        {/* Node Graph toggle — hidden on mobile (graph not available) */}
+        {/* Divider between Group 1 and Group 2 (desktop only) */}
+        {!isMobile && <GroupDivider />}
+
+        {/* Group 2 — Edit: Undo, Redo, Graph toggle (desktop only) */}
         {!isMobile && (
           <ToolbarGroup separator={false}>
+            <Tooltip content={t('toolbar.undo')}>
+              <Button
+                variant="icon"
+                onClick={handleUndo}
+                aria-label={t('toolbar.undo')}
+              >
+                <Icon icon={Undo2} size={16} />
+              </Button>
+            </Tooltip>
+
+            <Tooltip content={t('toolbar.redo')}>
+              <Button
+                variant="icon"
+                onClick={handleRedo}
+                aria-label={t('toolbar.redo')}
+              >
+                <Icon icon={Redo2} size={16} />
+              </Button>
+            </Tooltip>
+
             <Tooltip content={t('panels.graph')}>
               <Button
                 variant="icon"
@@ -253,11 +272,13 @@ function TransportBar() {
         )}
       </div>
 
-      {/* --- Right side: Actions and settings --- */}
+      {/* ── Right side: Group 3 Share ── */}
       <div className="flex items-center">
-        {/* Desktop: show all toolbar actions inline */}
+        {/* Desktop: Group 3 inline */}
         {!isMobile && (
           <>
+            <GroupDivider />
+
             {/* Share / Gist */}
             <ToolbarGroup>
               <Tooltip content={t('toolbar.share')}>
@@ -273,7 +294,7 @@ function TransportBar() {
               </Tooltip>
             </ToolbarGroup>
 
-            {/* Collection / Achievements toggle */}
+            {/* Collection / Achievements */}
             <ToolbarGroup>
               <Tooltip content={t('collection.title')}>
                 <Button
@@ -287,125 +308,112 @@ function TransportBar() {
               </Tooltip>
             </ToolbarGroup>
 
-            {/* Settings / Help toggle */}
-            <ToolbarGroup>
-              <Tooltip content={t('toolbar.settings')}>
-                <Button
-                  variant="icon"
-                  active={showHelp}
-                  onClick={() => setShowHelp(!showHelp)}
-                  aria-label={t('toolbar.settings')}
-                >
-                  <Icon icon={Settings} size={16} />
-                </Button>
-              </Tooltip>
-            </ToolbarGroup>
-
-            {/* Side panel toggle (Samples, Reference, Console, Settings) */}
-            <ToolbarGroup>
-              <Tooltip content={t('sidePanel.toggle')}>
-                <Button
-                  variant="icon"
-                  active={useAppStore.getState().showSidePanel}
-                  onClick={() => useAppStore.getState().toggleSidePanel()}
-                  aria-label={t('sidePanel.toggle')}
-                >
-                  <Icon icon={PanelRightOpen} size={16} />
-                </Button>
-              </Tooltip>
-            </ToolbarGroup>
-
-            {/* Language switcher (last, no separator) */}
+            {/* Language switcher (last element) */}
             <LanguageSwitcher />
           </>
         )}
 
-        {/* Mobile: settings + overflow menu for secondary actions */}
+        {/* Mobile: overflow menu for Groups 2+3 */}
         {isMobile && (
-          <>
-            {/* Settings — always visible on mobile */}
-            <Tooltip content={t('toolbar.settings')}>
+          <div ref={overflowRef} style={{ position: 'relative' }}>
+            <Tooltip content={t('toolbar.more', 'More')}>
               <Button
                 variant="icon"
-                active={showHelp}
-                onClick={() => setShowHelp(!showHelp)}
-                aria-label={t('toolbar.settings')}
+                active={showOverflow}
+                onClick={() => setShowOverflow(!showOverflow)}
+                aria-label={t('toolbar.more', 'More')}
               >
-                <Icon icon={Settings} size={16} />
+                <Icon icon={MoreHorizontal} size={16} />
               </Button>
             </Tooltip>
 
-            {/* Overflow menu toggle */}
-            <div ref={overflowRef} style={{ position: 'relative' }}>
-              <Tooltip content={t('toolbar.more', 'More')}>
+            {/* Overflow dropdown — Groups 2+3 actions */}
+            {showOverflow && (
+              <nav
+                aria-label="More actions"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: 'var(--space-2)',
+                  backgroundColor: 'var(--color-bg-elevated)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-2)',
+                  zIndex: 50,
+                  minWidth: '160px',
+                  boxShadow: 'var(--shadow-lg)',
+                }}
+              >
+                {/* Edit actions */}
                 <Button
                   variant="icon"
-                  active={showOverflow}
-                  onClick={() => setShowOverflow(!showOverflow)}
-                  aria-label={t('toolbar.more', 'More')}
+                  onClick={() => { handleUndo(); setShowOverflow(false) }}
+                  aria-label={t('toolbar.undo')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
                 >
-                  <Icon icon={MoreHorizontal} size={16} />
+                  <Icon icon={Undo2} size={16} /> {t('toolbar.undo')}
                 </Button>
-              </Tooltip>
-
-              {/* Overflow dropdown — secondary actions */}
-              {showOverflow && (
-                <nav
-                  aria-label="More actions"
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    marginTop: 'var(--space-2)',
-                    backgroundColor: 'var(--color-bg-elevated)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--space-2)',
-                    zIndex: 50,
-                    minWidth: '160px',
-                    boxShadow: 'var(--shadow-lg)',
-                  }}
+                <Button
+                  variant="icon"
+                  onClick={() => { handleRedo(); setShowOverflow(false) }}
+                  aria-label={t('toolbar.redo')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
                 >
-                  <Button
-                    variant="icon"
-                    onClick={() => { setShowShare(true); setShowOverflow(false) }}
-                    aria-label={t('toolbar.share')}
-                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
-                  >
-                    <Icon icon={Share2} size={16} /> {t('toolbar.share')}
-                  </Button>
-                  <Button
-                    variant="icon"
-                    onClick={() => { setShowGist(true); setShowOverflow(false) }}
-                    aria-label={t('toolbar.gist')}
-                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
-                  >
-                    <Icon icon={FileCode2} size={16} /> {t('toolbar.gist')}
-                  </Button>
-                  <Button
-                    variant="icon"
-                    onClick={() => { setShowCollection(!showCollection); setShowOverflow(false) }}
-                    aria-label={t('collection.title')}
-                    style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
-                  >
-                    <Icon icon={Trophy} size={16} /> {t('collection.title')}
-                  </Button>
-                  <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-2) 0' }} />
-                  <div style={{ padding: '0 var(--space-2)' }}>
-                    <LanguageSwitcher />
-                  </div>
-                </nav>
-              )}
-            </div>
-          </>
+                  <Icon icon={Redo2} size={16} /> {t('toolbar.redo')}
+                </Button>
+                <Button
+                  variant="icon"
+                  active={showGraph}
+                  onClick={() => { toggleGraph(); setShowOverflow(false) }}
+                  aria-label={t('panels.graph')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                >
+                  <Icon icon={GitBranch} size={16} /> {t('panels.graph')}
+                </Button>
+
+                {/* Divider between edit and share groups */}
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-2) 0' }} />
+
+                {/* Share actions */}
+                <Button
+                  variant="icon"
+                  onClick={() => { setShowShare(true); setShowOverflow(false) }}
+                  aria-label={t('toolbar.share')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                >
+                  <Icon icon={Share2} size={16} /> {t('toolbar.share')}
+                </Button>
+                <Button
+                  variant="icon"
+                  onClick={() => { setShowGist(true); setShowOverflow(false) }}
+                  aria-label={t('toolbar.gist')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                >
+                  <Icon icon={FileCode2} size={16} /> {t('toolbar.gist')}
+                </Button>
+                <Button
+                  variant="icon"
+                  onClick={() => { setShowCollection(!showCollection); setShowOverflow(false) }}
+                  aria-label={t('collection.title')}
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
+                >
+                  <Icon icon={Trophy} size={16} /> {t('collection.title')}
+                </Button>
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-2) 0' }} />
+                <div style={{ padding: '0 var(--space-2)' }}>
+                  <LanguageSwitcher />
+                </div>
+              </nav>
+            )}
+          </div>
         )}
       </div>
     </header>
 
-    {/* --- Modal dialogs and panels (rendered outside header flow) --- */}
+    {/* ── Modal dialogs and panels (rendered outside header flow) ── */}
     {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
     {showGist && <GistDialog onClose={() => setShowGist(false)} />}
-    {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
     {showCollection && <CollectionPanel onClose={() => setShowCollection(false)} />}
     </>
   )
