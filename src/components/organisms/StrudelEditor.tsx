@@ -12,7 +12,7 @@ import { getEngineExtensions } from '../../lib/editor/extensions';
 import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play, Square, Loader2 } from 'lucide-react';
+import { Play, Square, Loader2, Trash2 } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
@@ -312,6 +312,13 @@ export function StrudelEditor() {
     }
   }, [isPlaying, togglePlay]);
 
+  const handleClear = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: '' } });
+    if (activeFile) updateFileCode(activeFile.id, '');
+  }, [activeFile, updateFileCode]);
+
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="flex items-center gap-2 shrink-0" style={{ padding: 'var(--space-1) var(--space-3)', backgroundColor: 'var(--color-bg-alt)', borderBottom: '1px solid var(--color-border)' }}>
@@ -324,6 +331,11 @@ export function StrudelEditor() {
         <Tooltip content="Stop playback">
           <Button variant="ghost" onClick={handleStop} className="!py-0.5 !px-2 text-xs">
             <Square size={12} /> {t('editor.stop')}
+          </Button>
+        </Tooltip>
+        <Tooltip content="Clear code">
+          <Button variant="ghost" onClick={handleClear} className="!py-0.5 !px-2 text-xs">
+            <Trash2 size={12} />
           </Button>
         </Tooltip>
         {/* Live mode toggle */}

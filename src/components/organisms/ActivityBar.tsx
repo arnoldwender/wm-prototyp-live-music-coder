@@ -6,9 +6,9 @@ import { ActivityBarButton } from '../atoms';
 const SECTIONS = [
   { id: 'samples', icon: Music, label: 'Samples' },
   { id: 'reference', icon: BookOpen, label: 'Reference' },
-  { id: 'console', icon: Terminal, label: 'Console' },
   { id: 'creatures', icon: Bug, label: 'Creatures' },
   { id: 'settings', icon: Settings, label: 'Settings' },
+  { id: 'console', icon: Terminal, label: 'Console' },
 ] as const;
 
 export function ActivityBar() {

@@ -18,7 +18,7 @@ import { createEvaluator } from '../../lib/editor/evaluate';
 import { resumeContext } from '../../lib/audio/context';
 import { FileTabs } from '../molecules/FileTabs';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play } from 'lucide-react';
+import { Play, Trash2 } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
 
 /* Lazy-load StrudelEditor for code splitting */
@@ -78,6 +78,13 @@ export function CodeEditor() {
       setEvalError(msg);
     }
   }, [activeFile?.id, activeFile?.code, activeFile?.engine]);
+
+  const handleClear = useCallback(() => {
+    const view = viewRef.current;
+    if (!view || !activeFile) return;
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: '' } });
+    updateFileCode(activeFile.id, '');
+  }, [activeFile, updateFileCode]);
 
   /** Set up evaluator for live code changes */
   const setupEvaluator = useCallback(() => {
@@ -237,6 +244,12 @@ export function CodeEditor() {
           >
             <Play size={12} />
             {t('editor.run')}
+          </Button>
+        </Tooltip>
+
+        <Tooltip content="Clear code">
+          <Button variant="ghost" onClick={handleClear} className="!py-0.5 !px-2 text-xs">
+            <Trash2 size={12} />
           </Button>
         </Tooltip>
 
