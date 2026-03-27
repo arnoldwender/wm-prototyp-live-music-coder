@@ -8,8 +8,71 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
+import { useState, useEffect } from 'react';
 import { CreaturesSidebar } from './CreaturesSidebar';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
+import { loadFromGist } from '../../lib/persistence/gist';
+import { useAppStore } from '../../lib/store';
+
+/* Saved Gists list — reads from localStorage */
+function SavedGistsList() {
+  const [gists, setGists] = useState<{ id: string; url: string; date: string }[]>([]);
+  const [loading, setLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    try { setGists(JSON.parse(localStorage.getItem('lmc-saved-gists') || '[]')); } catch { /* empty */ }
+  }, []);
+
+  const handleLoad = async (gistId: string) => {
+    setLoading(gistId);
+    try {
+      const project = await loadFromGist(gistId);
+      useAppStore.setState({
+        bpm: project.bpm,
+        defaultEngine: project.defaultEngine,
+        files: project.files,
+        layout: project.layout,
+      });
+    } catch { /* load failed */ }
+    setLoading(null);
+  };
+
+  if (gists.length === 0) {
+    return (
+      <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: '11px', textAlign: 'center' }}>
+        No saved gists yet. Use the Gist button in the toolbar to save.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+      {gists.map((g) => (
+        <div key={g.id} className="flex items-center" style={{ fontSize: '11px', padding: 'var(--space-2)', backgroundColor: 'var(--color-bg)', borderRadius: 'var(--radius-sm)', gap: 'var(--space-2)' }}>
+          <a
+            href={g.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--color-primary)', fontFamily: 'var(--font-family-mono)', textDecoration: 'none', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {g.id.slice(0, 10)}...
+          </a>
+          <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', flexShrink: 0 }}>
+            {new Date(g.date).toLocaleDateString()}
+          </span>
+          <button
+            type="button"
+            onClick={() => handleLoad(g.id)}
+            disabled={loading === g.id}
+            style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '10px', padding: '1px var(--space-2)', flexShrink: 0 }}
+          >
+            {loading === g.id ? '...' : 'Load'}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /* ── Accordion section ── */
 interface AccordionProps {
@@ -110,6 +173,7 @@ export function DetailPanel() {
     { id: 'reference', title: 'Reference', content: <ReferencePanel /> },
     { id: 'creatures', title: 'Creatures', content: <CreaturesSidebar /> },
     { id: 'settings', title: 'Settings', content: <SettingsPanel /> },
+    { id: 'gists', title: 'Saved Gists', content: <SavedGistsList /> },
     { id: 'console', title: 'Console', content: <ConsolePanel /> },
   ];
 

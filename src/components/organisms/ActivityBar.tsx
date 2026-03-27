@@ -1,5 +1,5 @@
 // src/components/organisms/ActivityBar.tsx
-import { Music, BookOpen, Terminal, Settings, Bug } from 'lucide-react';
+import { Music, BookOpen, Terminal, Settings, Bug, FileCode2 } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { ActivityBarButton } from '../atoms';
 
@@ -7,6 +7,7 @@ const SECTIONS = [
   { id: 'samples', icon: Music, label: 'Samples' },
   { id: 'reference', icon: BookOpen, label: 'Reference' },
   { id: 'creatures', icon: Bug, label: 'Creatures' },
+  { id: 'gists', icon: FileCode2, label: 'Saved Gists' },
   { id: 'settings', icon: Settings, label: 'Settings' },
   { id: 'console', icon: Terminal, label: 'Console' },
 ] as const;
