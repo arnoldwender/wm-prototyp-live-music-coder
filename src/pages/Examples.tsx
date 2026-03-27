@@ -1,22 +1,25 @@
 /* ----------------------------------------------------------
-   Examples library page — browseable grid of curated Strudel
-   patterns with search, category/difficulty filters, and
-   "Try in Editor" links.
+   Examples library page — browseable grid of curated patterns
+   for Strudel, Tone.js, and Web Audio with engine-aware
+   category filters, difficulty pills, search, sort, and
+   inline playback with NowPlayingIndicator.
    ---------------------------------------------------------- */
 
 import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { Logo } from '../components/atoms'
-import { LanguageSwitcher } from '../components/molecules'
+import { LanguageSwitcher, FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
 import { encodeToUrl } from '../lib/persistence/url'
 import { ENGINE_COLORS } from '../lib/constants'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useInlinePlayer } from '../lib/useInlinePlayer'
-import { Play, Square } from 'lucide-react'
+import { Play, Square, X } from 'lucide-react'
 import type { EngineType } from '../types/engine'
+
+/* ── Static maps ─────────────────────────────────────────── */
 
 /** Difficulty badge color map */
 const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
@@ -25,46 +28,48 @@ const DIFFICULTY_COLORS: Record<ExampleEntry['difficulty'], string> = {
   advanced: 'var(--color-error)',
 }
 
-/** Engine labels for filter pills */
-const ENGINE_LABELS: { id: EngineType; label: string; icon: string }[] = [
-  { id: 'strudel', label: 'Strudel', icon: '♩' },
-  { id: 'tonejs', label: 'Tone.js', icon: '🎹' },
-  { id: 'webaudio', label: 'WebAudio', icon: '〰' },
-]
-
-/** Category filter pill */
-function CategoryPill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: 'var(--space-2) var(--space-4)',
-        fontSize: 'var(--font-size-xs)',
-        fontWeight: active ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)',
-        color: active ? 'var(--color-bg)' : 'var(--color-text-secondary)',
-        backgroundColor: active ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-        border: '1px solid',
-        borderColor: active ? 'var(--color-primary)' : 'var(--color-border)',
-        borderRadius: 'var(--radius-full)',
-        cursor: 'pointer',
-        transition: 'var(--transition-fast)',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {label}
-    </button>
-  )
+/** Engine-to-category mapping — only show relevant categories per engine */
+const ENGINE_CATEGORY_MAP: Record<string, string[]> = {
+  strudel: ['Beginner', 'Drums', 'Bass', 'Melody', 'Ambient', 'Cinematic', 'World', 'Experimental'],
+  tonejs: ['Tone.js Synths', 'Tone.js Effects', 'Tone.js Sequencing', 'Tone.js Routing', 'Tone.js Advanced'],
+  webaudio: ['Web Audio Basics', 'Web Audio Filters', 'Web Audio Effects', 'Web Audio Routing', 'Web Audio Synthesis'],
 }
 
-/** Extract sample/sound names from code */
+/** Category display name to i18n key mapping */
+const CATEGORY_I18N_MAP: Record<string, string> = {
+  'Beginner': 'examples.categoryBeginner',
+  'Drums': 'examples.categoryDrums',
+  'Bass': 'examples.categoryBass',
+  'Melody': 'examples.categoryMelody',
+  'Ambient': 'examples.categoryAmbient',
+  'Cinematic': 'examples.categoryCinematic',
+  'World': 'examples.categoryWorld',
+  'Experimental': 'examples.categoryExperimental',
+  'Tone.js Synths': 'examples.categoryTjSynths',
+  'Tone.js Effects': 'examples.categoryTjEffects',
+  'Tone.js Sequencing': 'examples.categoryTjSequencing',
+  'Tone.js Routing': 'examples.categoryTjRouting',
+  'Tone.js Advanced': 'examples.categoryTjAdvanced',
+  'Web Audio Basics': 'examples.categoryWaBasics',
+  'Web Audio Filters': 'examples.categoryWaFilters',
+  'Web Audio Effects': 'examples.categoryWaEffects',
+  'Web Audio Routing': 'examples.categoryWaRouting',
+  'Web Audio Synthesis': 'examples.categoryWaSynthesis',
+}
+
+/** Engine labels for filter pills — id, label, color */
+const ENGINE_LABELS: { id: EngineType; label: string }[] = [
+  { id: 'strudel', label: 'Strudel' },
+  { id: 'tonejs', label: 'Tone.js' },
+  { id: 'webaudio', label: 'WebAudio' },
+]
+
+/** Sort option identifiers */
+type SortKey = 'name-asc' | 'name-desc' | 'category' | 'difficulty'
+
+/* ── Helpers ──────────────────────────────────────────────── */
+
+/** Extract sample/sound names from code for tag display */
 function extractSounds(code: string): string[] {
   const sounds = new Set<string>()
   /* Match s("name"), sound("name"), .s("name") */
@@ -82,11 +87,28 @@ function extractSounds(code: string): string[] {
   return Array.from(sounds).filter(s => s.length > 0 && s.length < 20).slice(0, 8)
 }
 
-/** Single example pattern card */
-function ExampleCard({ example, t, playingId, onPlay }: { example: ExampleEntry; t: (key: string) => string; playingId: string | null; onPlay: (id: string, code: string, engine: EngineType) => void }) {
+/* ── ExampleCard ─────────────────────────────────────────── */
+
+/** Single example pattern card with play/edit actions */
+function ExampleCard({
+  example,
+  t,
+  playingId,
+  onPlay,
+}: {
+  example: ExampleEntry
+  t: (key: string) => string
+  playingId: string | null
+  onPlay: (id: string, code: string, engine: EngineType) => void
+}) {
   const navigate = useNavigate()
   const sounds = useMemo(() => extractSounds(example.code), [example.code])
   const isPlaying = playingId === example.id
+
+  /* Translated category display name */
+  const categoryLabel = CATEGORY_I18N_MAP[example.category]
+    ? t(CATEGORY_I18N_MAP[example.category])
+    : example.category
 
   return (
     <article
@@ -151,7 +173,7 @@ function ExampleCard({ example, t, playingId, onPlay }: { example: ExampleEntry;
         {example.description}
       </p>
 
-      {/* Meta row: category + difficulty badge */}
+      {/* Meta row: translated category + difficulty badge */}
       <div
         className="flex items-center justify-between"
         style={{ marginBottom: 'var(--space-3)' }}
@@ -165,7 +187,7 @@ function ExampleCard({ example, t, playingId, onPlay }: { example: ExampleEntry;
             borderRadius: 'var(--radius-full)',
           }}
         >
-          {example.category}
+          {categoryLabel}
         </span>
         <span
           style={{
@@ -265,18 +287,39 @@ function ExampleCard({ example, t, playingId, onPlay }: { example: ExampleEntry;
   )
 }
 
+/* ── Examples page ───────────────────────────────────────── */
+
 /** Examples library page */
 function Examples() {
   const { t } = useTranslation()
+
+  /* Filter state */
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [activeDifficulty, setActiveDifficulty] = useState<ExampleEntry['difficulty'] | null>(null)
   const [activeEngine, setActiveEngine] = useState<EngineType | null>(null)
+  const [sortBy, setSortBy] = useState<SortKey>('name-asc')
+
+  /* Inline player */
   const { playingId, play, stop } = useInlinePlayer()
 
+  /* NowPlaying state — track name/engine of currently playing example */
+  const [playingName, setPlayingName] = useState('')
+  const [playingEngine, setPlayingEngine] = useState<EngineType>('strudel')
+
+  /** Play handler — stores name/engine for NowPlayingIndicator */
   const handlePlay = async (id: string, code: string, engine: EngineType) => {
-    if (playingId === id) { await stop(); return; }
-    await play(id, code, engine);
+    if (playingId === id) {
+      await stop()
+      return
+    }
+    /* Find the example name for the indicator */
+    const example = EXAMPLE_LIBRARY.find((e) => e.id === id)
+    if (example) {
+      setPlayingName(example.name)
+      setPlayingEngine(example.engine as EngineType)
+    }
+    await play(id, code, engine)
   }
 
   /* Per-page SEO meta tags */
@@ -296,7 +339,25 @@ function Examples() {
     }
   }, [])
 
-  /* Filtered examples based on search, category, and difficulty */
+  /* ── Engine change resets invalid categories ────────── */
+  const handleEngineChange = (engine: EngineType | null) => {
+    setActiveEngine(engine)
+    /* Reset category if it doesn't exist for the new engine */
+    if (engine && activeCategory) {
+      const validCats = ENGINE_CATEGORY_MAP[engine] || []
+      if (!validCats.includes(activeCategory)) {
+        setActiveCategory(null)
+      }
+    }
+  }
+
+  /* ── Visible categories depend on selected engine ──── */
+  const visibleCategories = useMemo(() => {
+    if (!activeEngine) return EXAMPLE_CATEGORIES
+    return ENGINE_CATEGORY_MAP[activeEngine] || EXAMPLE_CATEGORIES
+  }, [activeEngine])
+
+  /* ── Filtered examples — includes ALL state deps ───── */
   const filteredExamples = useMemo(() => {
     const query = search.toLowerCase().trim()
     return EXAMPLE_LIBRARY.filter((example: ExampleEntry) => {
@@ -321,7 +382,77 @@ function Examples() {
 
       return true
     })
-  }, [search, activeCategory, activeDifficulty])
+  }, [search, activeCategory, activeDifficulty, activeEngine])
+
+  /* ── Sorted examples ───────────────────────────────── */
+  const sortedExamples = useMemo(() => {
+    const arr = [...filteredExamples]
+    switch (sortBy) {
+      case 'name-asc': return arr.sort((a, b) => a.name.localeCompare(b.name))
+      case 'name-desc': return arr.sort((a, b) => b.name.localeCompare(a.name))
+      case 'category': return arr.sort((a, b) => a.category.localeCompare(b.category))
+      case 'difficulty': {
+        const order = { beginner: 0, intermediate: 1, advanced: 2 }
+        return arr.sort((a, b) => order[a.difficulty] - order[b.difficulty])
+      }
+      default: return arr
+    }
+  }, [filteredExamples, sortBy])
+
+  /* ── Category counts — respects engine + difficulty + search, NOT category ── */
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    const query = search.toLowerCase().trim()
+
+    for (const example of EXAMPLE_LIBRARY) {
+      /* Engine filter */
+      if (activeEngine && example.engine !== activeEngine) continue
+
+      /* Difficulty filter */
+      if (activeDifficulty && example.difficulty !== activeDifficulty) continue
+
+      /* Search filter */
+      if (query) {
+        const matchesName = example.name.toLowerCase().includes(query)
+        const matchesDesc = example.description.toLowerCase().includes(query)
+        const matchesTags = example.tags.some(tag => tag.toLowerCase().includes(query))
+        const matchesCat = example.category.toLowerCase().includes(query)
+        const matchesCode = example.code.toLowerCase().includes(query)
+        if (!(matchesName || matchesDesc || matchesTags || matchesCat || matchesCode)) continue
+      }
+
+      counts[example.category] = (counts[example.category] || 0) + 1
+    }
+
+    return counts
+  }, [search, activeDifficulty, activeEngine])
+
+  /* ── Active filter count — for "Clear filters" badge ─ */
+  const activeFilterCount = useMemo(() => {
+    let count = 0
+    if (search.trim()) count++
+    if (activeEngine) count++
+    if (activeCategory) count++
+    if (activeDifficulty) count++
+    return count
+  }, [search, activeEngine, activeCategory, activeDifficulty])
+
+  /** Reset all filters to defaults */
+  const clearFilters = () => {
+    setSearch('')
+    setActiveEngine(null)
+    setActiveCategory(null)
+    setActiveDifficulty(null)
+    setSortBy('name-asc')
+  }
+
+  /* Sort options with translated labels */
+  const sortOptions = useMemo(() => [
+    { value: 'name-asc', label: t('examples.sortName') },
+    { value: 'name-desc', label: t('examples.sortNameDesc') },
+    { value: 'category', label: t('examples.sortCategory') },
+    { value: 'difficulty', label: t('examples.sortDifficulty') },
+  ], [t])
 
   const difficulties: ExampleEntry['difficulty'][] = ['beginner', 'intermediate', 'advanced']
 
@@ -456,8 +587,8 @@ function Examples() {
           padding: '0 var(--space-6) var(--space-6)',
         }}
       >
-        {/* Search bar */}
-        <div style={{ marginBottom: 'var(--space-4)' }}>
+        {/* Row 1: Search bar with clear button */}
+        <div style={{ marginBottom: 'var(--space-4)', position: 'relative' }}>
           <input
             type="search"
             placeholder={t('examples.search')}
@@ -467,6 +598,7 @@ function Examples() {
             style={{
               width: '100%',
               padding: 'var(--space-3) var(--space-4)',
+              paddingRight: search ? 'var(--space-10)' : 'var(--space-4)',
               fontSize: 'var(--font-size-sm)',
               color: 'var(--color-text)',
               backgroundColor: 'var(--color-bg-alt)',
@@ -478,81 +610,180 @@ function Examples() {
             onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
             onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
           />
+          {/* Clear X button — only visible when search has text */}
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+              style={{
+                position: 'absolute',
+                right: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                backgroundColor: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-muted)',
+                cursor: 'pointer',
+                transition: 'var(--transition-fast)',
+              }}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
-        {/* Category pills */}
+        {/* Row 2: Engine filter pills with colored dots */}
+        <div
+          className="flex flex-wrap items-center"
+          style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
+        >
+          <span
+            style={{
+              fontSize: 'var(--font-size-xs)',
+              color: 'var(--color-text-muted)',
+              marginRight: 'var(--space-2)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {t('examples.engine')}:
+          </span>
+          <FilterPill
+            label={t('examples.allEngines')}
+            active={activeEngine === null}
+            onClick={() => handleEngineChange(null)}
+          />
+          {ENGINE_LABELS.map(({ id, label }) => (
+            <FilterPill
+              key={id}
+              label={label}
+              color={ENGINE_COLORS[id]}
+              active={activeEngine === id}
+              onClick={() => handleEngineChange(activeEngine === id ? null : id)}
+            />
+          ))}
+        </div>
+
+        {/* Row 3: Category pills with count badges — engine-aware */}
         <div
           className="flex flex-wrap"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
         >
-          <CategoryPill
+          <FilterPill
             label={t('examples.allCategories')}
             active={activeCategory === null}
             onClick={() => setActiveCategory(null)}
           />
-          {EXAMPLE_CATEGORIES.map((cat) => (
-            <CategoryPill
+          {visibleCategories.map((cat) => (
+            <FilterPill
               key={cat}
-              label={cat}
+              label={CATEGORY_I18N_MAP[cat] ? t(CATEGORY_I18N_MAP[cat]) : cat}
               active={activeCategory === cat}
+              count={categoryCounts[cat] || 0}
               onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
             />
           ))}
         </div>
 
-        {/* Engine filter pills */}
-        <div
-          className="flex flex-wrap items-center"
-          style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
-        >
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginRight: 'var(--space-2)' }}>
-            Engine:
-          </span>
-          <CategoryPill
-            label="All"
-            active={activeEngine === null}
-            onClick={() => setActiveEngine(null)}
-          />
-          {ENGINE_LABELS.map(({ id, label, icon }) => (
-            <CategoryPill
-              key={id}
-              label={`${icon} ${label}`}
-              active={activeEngine === id}
-              onClick={() => setActiveEngine(activeEngine === id ? null : id)}
-            />
-          ))}
-        </div>
-
-        {/* Difficulty pills */}
+        {/* Row 4: Difficulty pills with colored dots */}
         <div
           className="flex flex-wrap items-center"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}
         >
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginRight: 'var(--space-2)' }}>
+          <span
+            style={{
+              fontSize: 'var(--font-size-xs)',
+              color: 'var(--color-text-muted)',
+              marginRight: 'var(--space-2)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
             {t('examples.difficulty')}:
           </span>
-          <CategoryPill
+          <FilterPill
             label={t('examples.allLevels')}
             active={activeDifficulty === null}
             onClick={() => setActiveDifficulty(null)}
           />
           {difficulties.map((diff) => (
-            <CategoryPill
+            <FilterPill
               key={diff}
               label={t(`examples.${diff}`)}
+              color={DIFFICULTY_COLORS[diff]}
               active={activeDifficulty === diff}
               onClick={() => setActiveDifficulty(activeDifficulty === diff ? null : diff)}
             />
           ))}
+        </div>
+
+        {/* Row 5: Controls — active filters + clear | result count | sort */}
+        <div
+          className="flex items-center justify-between flex-wrap"
+          style={{
+            gap: 'var(--space-3)',
+            marginBottom: 'var(--space-4)',
+            paddingBottom: 'var(--space-4)',
+            borderBottom: '1px solid var(--color-border)',
+          }}
+        >
+          {/* Left: active filter count + clear */}
+          <div className="flex items-center" style={{ gap: 'var(--space-3)' }}>
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  padding: 'var(--space-1) var(--space-3)',
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-muted)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  transition: 'var(--transition-fast)',
+                }}
+              >
+                <X size={12} />
+                {t('examples.clearFilters')} ({activeFilterCount})
+              </button>
+            )}
+          </div>
+
+          {/* Center: result count */}
           <span
             style={{
               fontSize: 'var(--font-size-xs)',
               color: 'var(--color-text-muted)',
-              marginLeft: 'var(--space-2)',
             }}
           >
-            ({filteredExamples.length} {t('examples.results')})
+            {sortedExamples.length} {t('examples.results')}
           </span>
+
+          {/* Right: sort dropdown */}
+          <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
+            <span
+              style={{
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              {t('examples.sortBy')}:
+            </span>
+            <SortSelect
+              value={sortBy}
+              onChange={(val) => setSortBy(val as SortKey)}
+              options={sortOptions}
+            />
+          </div>
         </div>
       </section>
 
@@ -568,11 +799,11 @@ function Examples() {
           gap: 'var(--space-4)',
         }}
       >
-        {filteredExamples.map((example) => (
+        {sortedExamples.map((example) => (
           <ExampleCard key={example.id} example={example} t={t} playingId={playingId} onPlay={handlePlay} />
         ))}
 
-        {filteredExamples.length === 0 && (
+        {sortedExamples.length === 0 && (
           <p
             style={{
               gridColumn: '1 / -1',
@@ -596,6 +827,14 @@ function Examples() {
           {t('footer.license')}
         </p>
       </footer>
+
+      {/* NowPlayingIndicator — floating bottom-right */}
+      <NowPlayingIndicator
+        isPlaying={playingId !== null}
+        label={playingName}
+        engineType={playingEngine}
+        onStop={stop}
+      />
     </main>
   )
 }
