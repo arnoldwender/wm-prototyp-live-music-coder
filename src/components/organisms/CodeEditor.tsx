@@ -57,6 +57,7 @@ export function CodeEditor() {
 
   /* Error state — shows the last evaluation error below the editor */
   const [evalError, setEvalError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
   /* Auto-update: when on, code evaluates on every change while playing */
   const [autoUpdate, setAutoUpdate] = useState(true);
 
@@ -81,6 +82,7 @@ export function CodeEditor() {
        * that could lose the user gesture context in some browsers */
       await resumeContext();
       await orch.evaluate(activeFile.code, activeFile.engine);
+      setIsRunning(true);
       /* Flash highlight on successful evaluate */
       if (viewRef.current) {
         viewRef.current.dispatch({ effects: setFlash.of(true) });
@@ -304,6 +306,11 @@ export function CodeEditor() {
           {navigator.platform?.includes('Mac') ? '\u2318\u21B5 to run' : 'Ctrl+Enter to run'}
         </span>
       </div>
+
+      {/* Playing indicator bar — animated gradient line when audio is active */}
+      {(isPlaying || isRunning) && (
+        <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label="Playing" />
+      )}
 
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />
 
