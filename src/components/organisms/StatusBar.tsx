@@ -1,14 +1,22 @@
 /* ──────────────────────────────────────────────────────────
-   StatusBar organism — bottom bar showing engine status,
-   CPU usage, creature count, XP level, streak, and ready state.
+   StatusBar organism — 3-zone bottom bar:
+   Left: engine badge (colored dot + short name)
+   Center: BPM + playback status dot
+   Right: compact XP bar with level
    ────────────────────────────────────────────────────────── */
 
-import { useTranslation } from 'react-i18next'
 import { useAppStore, xpForLevel } from '../../lib/store'
 import { ENGINE_COLORS } from '../../lib/constants'
-import { Badge } from '../atoms'
 
-/** Inline XP progress bar — shows level + filled bar + XP numbers */
+/* Short display names for each engine */
+const ENGINE_SHORT: Record<string, string> = {
+  strudel: 'Strudel',
+  tonejs: 'Tone.js',
+  webaudio: 'WebAudio',
+  midi: 'MIDI',
+}
+
+/** Compact XP progress bar — level badge + filled bar */
 function XpBar() {
   const userXp = useAppStore((s) => s.userXp)
   const userLevel = useAppStore((s) => s.userLevel)
@@ -20,104 +28,126 @@ function XpBar() {
   const xpNeeded = nextLevelXp - currentLevelXp
   const progress = xpNeeded > 0 ? Math.max(0, Math.min(xpInLevel / xpNeeded, 1)) : 0
 
-  /* Bar width in characters (6 chars total) — clamp to prevent negative .repeat() */
-  const filledChars = Math.max(0, Math.min(6, Math.round(progress * 6)))
-  const emptyChars = 6 - filledChars
-  const barText = '\u2588'.repeat(filledChars) + '\u2591'.repeat(emptyChars)
-
   return (
     <span
       style={{
         fontFamily: 'var(--font-family-mono)',
-        fontSize: 'var(--font-size-xs)',
+        fontSize: '10px',
         color: 'var(--color-text-muted)',
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 'var(--space-1)',
+        gap: '4px',
       }}
-      title={`Level ${userLevel} — ${userXp} XP`}
+      title={`Level ${userLevel} — ${xpInLevel}/${xpNeeded} XP`}
     >
+      {/* Level label */}
       <span style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-weight-bold)' }}>
         Lv.{userLevel}
       </span>
-      <span style={{ color: 'var(--color-primary)', opacity: 0.7 }}>{barText}</span>
-      <span>{xpInLevel}/{xpNeeded} XP</span>
+
+      {/* Progress bar track */}
+      <span
+        style={{
+          display: 'inline-block',
+          width: '48px',
+          height: '4px',
+          backgroundColor: 'var(--color-border)',
+          borderRadius: '2px',
+          overflow: 'hidden',
+          verticalAlign: 'middle',
+        }}
+      >
+        {/* Progress bar fill */}
+        <span
+          style={{
+            display: 'block',
+            width: `${Math.round(progress * 100)}%`,
+            height: '100%',
+            backgroundColor: 'var(--color-primary)',
+            borderRadius: '2px',
+            transition: 'width 300ms ease',
+          }}
+        />
+      </span>
     </span>
   )
 }
 
-/** Bottom status bar with runtime information */
+/** 3-zone status bar: engine | BPM + status | XP */
 function StatusBar() {
-  const { t } = useTranslation()
   const defaultEngine = useAppStore((s) => s.defaultEngine)
-  const fileCount = useAppStore((s) => s.files.length)
-  const creatureCount = useAppStore((s) => s.creatureCount)
-  const toggleBrainPanel = useAppStore((s) => s.toggleBrainPanel)
-  const showBrainPanel = useAppStore((s) => s.showBrainPanel)
-  const streak = useAppStore((s) => s.streak)
+  const bpm = useAppStore((s) => s.bpm)
+  const isPlaying = useAppStore((s) => s.isPlaying)
+
+  /* Resolve engine color token to use for the dot */
+  const engineColor = ENGINE_COLORS[defaultEngine]
+  const engineName = ENGINE_SHORT[defaultEngine] ?? defaultEngine
 
   return (
     <footer
-      className="flex items-center justify-between shrink-0"
+      className="flex items-center shrink-0"
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderTop: '1px solid var(--color-border)',
-        padding: 'var(--space-2) var(--space-3)',
-        height: '28px',
-        fontSize: 'var(--font-size-xs)',
+        padding: '0 12px',
+        height: '24px',
+        fontSize: '10px',
         color: 'var(--color-text-muted)',
+        fontFamily: 'var(--font-family-mono)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
       }}
     >
-      {/* Left: engine badge + XP bar */}
-      <div className="flex items-center gap-3">
-        <span>{t('status.engine')}:</span>
-        <Badge color={ENGINE_COLORS[defaultEngine]}>
-          {t(`engines.${defaultEngine}`)}
-        </Badge>
-        <XpBar />
+      {/* ── Left zone: engine badge ── */}
+      <div
+        className="flex items-center"
+        style={{ gap: '6px', minWidth: 0, flex: '0 0 auto' }}
+      >
+        {/* Colored dot indicating active engine */}
+        <span
+          style={{
+            display: 'inline-block',
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: engineColor,
+            flexShrink: 0,
+          }}
+          aria-hidden="true"
+        />
+        <span>{engineName}</span>
       </div>
 
-      {/* Right: streak, file count, creatures, status */}
-      <div className="flex items-center gap-4">
-        {/* Streak counter — only visible when streak > 0 */}
-        {streak.current > 0 && (
-          <span
-            title={t('gamification.streakDays', { count: streak.current })}
-            style={{ fontSize: 'var(--font-size-xs)' }}
-          >
-            {'\uD83D\uDD25'} {streak.current}
-          </span>
-        )}
-
-        {/* File count from store */}
-        <span>
-          {t('status.files')}: {fileCount}
+      {/* ── Center zone: BPM + playback status ── */}
+      <div
+        className="flex items-center justify-center"
+        style={{ gap: '6px', flex: '1 1 auto', minWidth: 0 }}
+      >
+        <span style={{ color: 'var(--color-text)' }}>
+          {bpm}
         </span>
-
-        {/* Live creature count — clickable to toggle Brain Panel */}
-        <button
-          type="button"
-          onClick={toggleBrainPanel}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: showBrainPanel ? 'var(--color-primary)' : 'inherit',
-            cursor: 'pointer',
-            fontSize: 'inherit',
-            fontFamily: 'inherit',
-            padding: 0,
-          }}
-          aria-label={t('status.toggleBrain', 'Toggle brain panel')}
-        >
-          {t('status.creatures')}: {creatureCount}/12
-        </button>
-
-        {/* Ready indicator */}
+        <span>BPM</span>
+        {/* Status dot — green when playing, muted when stopped */}
         <span
-          style={{ color: 'var(--color-success)' }}
-        >
-          {t('status.ready')}
-        </span>
+          style={{
+            display: 'inline-block',
+            width: '5px',
+            height: '5px',
+            borderRadius: '50%',
+            backgroundColor: isPlaying ? 'var(--color-success)' : 'var(--color-text-muted)',
+            flexShrink: 0,
+          }}
+          aria-label={isPlaying ? 'Playing' : 'Stopped'}
+          role="status"
+        />
+      </div>
+
+      {/* ── Right zone: compact XP bar ── */}
+      <div
+        className="flex items-center"
+        style={{ flex: '0 0 auto', minWidth: 0 }}
+      >
+        <XpBar />
       </div>
     </footer>
   )
