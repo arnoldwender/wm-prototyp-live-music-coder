@@ -8,8 +8,8 @@
 
 import { useEffect, useRef, useCallback, useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EditorState, EditorSelection } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorState, EditorSelection, StateEffect, StateField } from '@codemirror/state';
+import { EditorView, Decoration, type DecorationSet, keymap } from '@codemirror/view';
 import { useAppStore } from '../../lib/store';
 import { getOrchestrator } from '../../lib/orchestrator';
 import { getBaseExtensions } from '../../lib/editor/setup';
@@ -20,6 +20,28 @@ import { FileTabs } from '../molecules/FileTabs';
 import { ErrorBar } from '../molecules/ErrorBar';
 import { Play, Trash2 } from 'lucide-react';
 import { Button, Tooltip } from '../atoms';
+
+/* Flash effect — briefly highlights all code green on successful evaluate */
+const setFlash = StateEffect.define<boolean>();
+const flashField = StateField.define<DecorationSet>({
+  create() { return Decoration.none; },
+  update(deco, tr) {
+    for (const effect of tr.effects) {
+      if (effect.is(setFlash)) {
+        if (effect.value && tr.newDoc.length > 0) {
+          return Decoration.set([
+            Decoration.mark({
+              attributes: { style: 'background-color: rgba(34, 197, 94, 0.15); transition: background-color 0.5s ease;' },
+            }).range(0, tr.newDoc.length),
+          ]);
+        }
+        return Decoration.none;
+      }
+    }
+    return deco;
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
 
 /* Lazy-load StrudelEditor for code splitting */
 const StrudelEditor = lazy(() =>
@@ -59,6 +81,13 @@ export function CodeEditor() {
        * that could lose the user gesture context in some browsers */
       await resumeContext();
       await orch.evaluate(activeFile.code, activeFile.engine);
+      /* Flash highlight on successful evaluate */
+      if (viewRef.current) {
+        viewRef.current.dispatch({ effects: setFlash.of(true) });
+        setTimeout(() => {
+          viewRef.current?.dispatch({ effects: setFlash.of(false) });
+        }, 400);
+      }
       /* Track evaluation for session stats + unlock achievements */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
@@ -142,6 +171,7 @@ export function CodeEditor() {
       extensions: [
         ...getBaseExtensions(),
         ...getEngineExtensions(activeFile.engine),
+        flashField,
         updateListener,
         evalKeymap,
       ],
