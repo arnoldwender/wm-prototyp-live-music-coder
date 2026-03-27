@@ -416,9 +416,16 @@ oscs.forEach((o, i) => {
 
     /* Generate code per engine */
     switch (engine) {
-      case 'strudel':
-        insertion = code.trim() ? `\ns("${sample}")` : `s("${sample}")`;
+      case 'strudel': {
+        /* Oscillator types need note().s(), not standalone s() */
+        const oscTypes = ['sawtooth','sine','square','triangle','supersquare','supersaw','fatsawtooth','fatsquare','fattriangle','fatsine'];
+        if (oscTypes.includes(sample)) {
+          insertion = code.trim() ? `\nnote("c3 e3 g3 b3").s("${sample}")` : `note("c3 e3 g3 b3").s("${sample}")`;
+        } else {
+          insertion = code.trim() ? `\ns("${sample}")` : `s("${sample}")`;
+        }
         break;
+      }
       case 'tonejs':
         /* Full songs — replace entire code */
         if (TONE_SONGS[sample]) {
