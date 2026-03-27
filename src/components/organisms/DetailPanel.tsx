@@ -5,7 +5,6 @@
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
