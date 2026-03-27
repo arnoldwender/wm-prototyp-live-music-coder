@@ -108,9 +108,9 @@ export function DetailPanel() {
   const sections = [
     { id: 'samples', title: 'Samples', content: <SampleBrowser /> },
     { id: 'reference', title: 'Reference', content: <ReferencePanel /> },
-    { id: 'console', title: 'Console', content: <ConsolePanel /> },
     { id: 'creatures', title: 'Creatures', content: <CreaturesSidebar /> },
     { id: 'settings', title: 'Settings', content: <SettingsPanel /> },
+    { id: 'console', title: 'Console', content: <ConsolePanel /> },
   ];
 
   return (

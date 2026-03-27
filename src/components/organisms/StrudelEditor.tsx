@@ -180,7 +180,11 @@ export function StrudelEditor() {
     });
 
     viewRef.current = new EditorView({ state, parent: editorRef.current });
-    return () => { viewRef.current?.destroy(); viewRef.current = null; };
+    return () => {
+      viewRef.current?.destroy();
+      viewRef.current = null;
+      if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
+    };
   }, [activeFile?.id, activeFile?.engine, ready]);
 
   /* Sync external store code changes into CM6 */
