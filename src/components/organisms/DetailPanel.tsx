@@ -19,7 +19,7 @@ interface AccordionProps {
   forceOpen?: boolean;
 }
 
-function AccordionSection({ id, title, children, forceOpen }: AccordionProps) {
+function AccordionSection({ id: _id, title, children, forceOpen }: AccordionProps) {
   const [open, setOpen] = useState(forceOpen ?? false);
 
   /* Auto-open when activity bar selects this section */
