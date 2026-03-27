@@ -188,7 +188,7 @@ const WEBAUDIO_CATEGORIES = [
   { id: 'nodes', label: 'Audio Nodes', samples: ['GainNode', 'BiquadFilter', 'DelayNode', 'ConvolverNode', 'DynamicsCompressor', 'WaveShaper', 'StereoPanner'] },
 ];
 
-function SampleBrowser() {
+export function SampleBrowser() {
   const [search, setSearch] = useState('');
   const [expandedCat, setExpandedCat] = useState<string | null>('drums');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -450,7 +450,7 @@ const REFERENCE_SECTIONS = [
   },
 ];
 
-function ReferencePanel() {
+export function ReferencePanel() {
   const [search, setSearch] = useState('');
 
   const filtered = search.trim()
@@ -557,7 +557,7 @@ if (typeof window !== 'undefined' && !(window as any).__lmcConsolePatched) {
   console.warn = (...args: unknown[]) => { origWarn(...args); push('warn', args); };
 }
 
-function ConsolePanel() {
+export function ConsolePanel() {
   const [, forceUpdate] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -621,7 +621,7 @@ function ConsolePanel() {
    SETTINGS PANEL — audio device, font, keybindings, toggles
    ══════════════════════════════════════════════════════════ */
 
-function SettingsPanel() {
+export function SettingsPanel() {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDevice, setSelectedDevice] = useState('');
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem('lmc-font-size') || '14'));

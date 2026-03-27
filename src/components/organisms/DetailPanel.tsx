@@ -10,9 +10,7 @@ import { ChevronDown } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { CreaturesSidebar } from './CreaturesSidebar';
-
-/* Import section components extracted from old SidePanel */
-/* These will be extracted into separate files in Task 6 */
+import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 
 /* ── Accordion section — persists open/close state to localStorage ── */
 interface AccordionProps {
@@ -127,22 +125,15 @@ export function DetailPanel() {
       {/* Scrollable accordion content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <AccordionSection id="samples" title="Samples" defaultOpen={activeSection === 'samples'}>
-          {/* SampleBrowser content — migrated in Task 6 */}
-          <div style={{ padding: 'var(--space-2)', color: 'var(--color-text-muted)', fontSize: '11px' }}>
-            Sample browser (migrated in Task 6)
-          </div>
+          <SampleBrowser />
         </AccordionSection>
 
         <AccordionSection id="reference" title="Reference" defaultOpen={activeSection === 'reference'}>
-          <div style={{ padding: 'var(--space-2)', color: 'var(--color-text-muted)', fontSize: '11px' }}>
-            Reference panel (migrated in Task 6)
-          </div>
+          <ReferencePanel />
         </AccordionSection>
 
         <AccordionSection id="console" title="Console" defaultOpen={activeSection === 'console'}>
-          <div style={{ padding: 'var(--space-2)', color: 'var(--color-text-muted)', fontSize: '11px' }}>
-            Console panel (migrated in Task 6)
-          </div>
+          <ConsolePanel />
         </AccordionSection>
 
         <AccordionSection id="creatures" title="Creatures" defaultOpen={activeSection === 'creatures'}>
@@ -150,9 +141,7 @@ export function DetailPanel() {
         </AccordionSection>
 
         <AccordionSection id="settings" title="Settings" defaultOpen={activeSection === 'settings'}>
-          <div style={{ padding: 'var(--space-2)', color: 'var(--color-text-muted)', fontSize: '11px' }}>
-            Settings panel (migrated in Task 6)
-          </div>
+          <SettingsPanel />
         </AccordionSection>
       </div>
     </aside>
