@@ -8,7 +8,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
-import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel } from '../components/organisms'
+import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel, BeatlingPanel } from '../components/organisms'
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
@@ -162,6 +162,12 @@ function Editor() {
         detailPanel={<DetailPanel />}
         statusBar={<StatusBar />}
       />
+
+      {/* Hidden BeatlingWorld simulation — runs creature spawning, brains, evolution.
+       * Moved from visualizer zone but must keep running for CreaturesSidebar data. */}
+      <div style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+        <BeatlingPanel />
+      </div>
       {showTemplateSelector && (
         <TemplateSelector onSelect={() => {
           setShowTemplateSelector(false)
