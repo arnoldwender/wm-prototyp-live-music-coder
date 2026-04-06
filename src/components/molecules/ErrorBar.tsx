@@ -23,7 +23,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
       aria-live="polite"
       className="shrink-0"
       style={{
-        backgroundColor: 'rgba(15, 0, 0, 0.95)',
+        backgroundColor: 'var(--color-bg)', /* error panel dark bg */
         borderTop: '1px solid var(--color-error)',
         fontSize: 'var(--font-size-xs)',
         fontFamily: 'var(--font-family-mono)',
@@ -35,7 +35,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px)',
+        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px)', /* overlay — no token equivalent */
         pointerEvents: 'none',
         zIndex: 1,
       }} />
@@ -57,7 +57,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
           fontSize: '10px',
-          textShadow: '0 0 8px rgba(239,68,68,0.6), 2px 0 rgba(239,68,68,0.3), -2px 0 rgba(59,130,246,0.3)',
+          textShadow: '0 0 8px rgba(239,68,68,0.6), 2px 0 rgba(239,68,68,0.3), -2px 0 rgba(59,130,246,0.3)', /* overlay — no token equivalent */
           flexShrink: 0,
         }}>
           ERR
@@ -88,7 +88,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             type="button"
             onClick={() => setShowHelp(!showHelp)}
             style={{
-              background: showHelp ? 'rgba(168,85,247,0.15)' : 'transparent',
+              background: showHelp ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)' : 'transparent',
               border: '1px solid',
               borderColor: showHelp ? 'var(--color-primary)' : 'var(--color-border)',
               borderRadius: 'var(--radius-sm)',
@@ -155,13 +155,13 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             color: 'var(--color-success)',
             fontFamily: 'var(--font-family-mono)',
             fontSize: '11px',
-            backgroundColor: 'rgba(34, 197, 94, 0.08)',
+            backgroundColor: 'color-mix(in srgb, var(--color-success) 8%, transparent)',
             padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
             borderLeft: '2px solid var(--color-success)',
             lineHeight: '1.6',
           }}>
-            <span style={{ color: 'rgba(34,197,94,0.5)', userSelect: 'none' }}>{'$ '}</span>
+            <span style={{ color: 'color-mix(in srgb, var(--color-success) 50%, transparent)', userSelect: 'none' }}>{'$ '}</span>
             {friendly.fix}
           </div>
 

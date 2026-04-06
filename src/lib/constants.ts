@@ -18,10 +18,10 @@ export const DEFAULT_ENGINE: EngineType = 'strudel'
 
 /* Map each engine to its CSS custom property color token */
 export const ENGINE_COLORS: Record<EngineType, string> = {
-  strudel: 'var(--color-engine-strudel)',
-  tonejs: 'var(--color-engine-tonejs)',
-  webaudio: 'var(--color-engine-webaudio)',
-  midi: 'var(--color-engine-midi)',
+  strudel: 'var(--color-strudel)',
+  tonejs: 'var(--color-tonejs)',
+  webaudio: 'var(--color-webaudio)',
+  midi: 'var(--color-midi)',
 }
 
 /* Default panel layout — full-width editor, graph hidden by default */
