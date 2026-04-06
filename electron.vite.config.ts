@@ -9,20 +9,30 @@ import tailwindcss from '@tailwindcss/vite'
  */
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({ exclude: [] })],
     build: {
-      outDir: 'dist-electron',
+      outDir: 'out/main',
+      lib: {
+        entry: 'electron/main.ts',
+        formats: ['cjs'],
+        fileName: () => 'main.js',
+      },
       rollupOptions: {
-        input: 'electron/main.ts',
+        external: ['electron', 'electron-updater', 'electron-log'],
       },
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({ exclude: [] })],
     build: {
-      outDir: 'dist-electron',
+      outDir: 'out/preload',
+      lib: {
+        entry: 'electron/preload.ts',
+        formats: ['cjs'],
+        fileName: () => 'preload.js',
+      },
       rollupOptions: {
-        input: 'electron/preload.ts',
+        external: ['electron'],
       },
     },
   },

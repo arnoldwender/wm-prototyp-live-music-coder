@@ -197,3 +197,7 @@ Every source file contains an `SPDX-License-Identifier` header indicating its li
 See [LICENSING.md](LICENSING.md) for full details on which components are MIT vs AGPL.
 
 **Copyright (c) 2026 [Arnold Wender](https://wendermedia.com) / Wender Media**
+
+---
+
+> If you are a racist, fascist, or have another kind of mental disability that makes you discriminate against other human beings — please don't use my software.

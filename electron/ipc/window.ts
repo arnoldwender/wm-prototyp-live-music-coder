@@ -36,7 +36,7 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
       title: `Live Music Coder — ${panelId}`,
       backgroundColor: '#09090b',
       webPreferences: {
-        preload: join(__dirname, 'preload.js'),
+        preload: join(__dirname, '../preload/preload.cjs'),
         contextIsolation: true,
         nodeIntegration: false,
         sandbox: true,
@@ -47,7 +47,7 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
     if (isDev() && process.env['ELECTRON_RENDERER_URL']) {
       child.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/popout/${panelId}`)
     } else {
-      child.loadFile(join(__dirname, '../dist/index.html'), {
+      child.loadFile(join(__dirname, '../../dist/index.html'), {
         hash: '/popout/' + panelId,
       })
     }

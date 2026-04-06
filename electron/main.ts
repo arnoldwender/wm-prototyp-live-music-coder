@@ -43,7 +43,7 @@ function createWindow(): BrowserWindow {
         }
       : {}),
     webPreferences: {
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, '../preload/preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -78,7 +78,7 @@ function createWindow(): BrowserWindow {
     // Open DevTools detached in development
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   } else {
-    mainWindow.loadFile(join(__dirname, '../dist/index.html'))
+    mainWindow.loadFile(join(__dirname, '../../dist/index.html'))
   }
 
   return mainWindow

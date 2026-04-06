@@ -45,3 +45,4 @@ release/
 
 # TypeScript build info cache
 *.tsbuildinfo
+out/
