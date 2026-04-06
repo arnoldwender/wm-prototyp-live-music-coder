@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Badge atom — small colored label for status indicators.
    ────────────────────────────────────────────────────────── */
 

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    ShareDialog molecule — modal overlay to share the active
    file's code via a compressed URL. Copy-to-clipboard with
    visual checkmark feedback.
@@ -33,8 +35,6 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
-      /* Unlock first_share achievement when URL is successfully copied */
-      useAppStore.getState().unlockAchievement('first_share')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       /* Clipboard API may fail in insecure contexts or denied permissions */

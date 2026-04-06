@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    AudioGraph — directed acyclic graph of EngineBlocks.
    Manages blocks and connections with cycle prevention,
    BFS traversal, and full serialization support.

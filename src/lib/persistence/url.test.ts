@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ────────────────────────────────────────────────────────── */
 import { describe, it, expect } from 'vitest';
 import { encodeToUrl, decodeFromUrl, type UrlShareData } from './url';
 

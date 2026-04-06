@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Orchestrator types — re-exports engine types and adds
    orchestrator-specific state and event definitions.
    ────────────────────────────────────────────────────────── */

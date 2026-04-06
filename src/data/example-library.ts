@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Example pattern library — 165+ curated patterns across
    Strudel, Tone.js, and Web Audio engines.
    Organized by category and difficulty level.

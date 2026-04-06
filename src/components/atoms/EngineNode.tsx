@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    EngineNode — custom React Flow node for audio engine blocks.
    Displays engine type, block category, and truncated code
    preview with color-coded borders matching the engine.

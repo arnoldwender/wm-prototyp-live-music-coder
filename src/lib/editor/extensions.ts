@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Arnold Wender / Wender Media
+
 /* ──────────────────────────────────────────────────────────
    Per-engine CodeMirror extensions — language modes and
    engine-specific autocomplete/highlighting. V1 uses

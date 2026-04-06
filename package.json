@@ -1,7 +1,9 @@
 {
   "name": "wm-prototyp-live-music-coder",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "license": "AGPL-3.0-or-later",
+  "author": "Arnold Wender <arnold.wender@gmail.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",

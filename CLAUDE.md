@@ -1,9 +1,9 @@
 # wm-prototyp-live-music-coder
 
-Browser-based live coding music IDE with code editor, visual node graph, 4 audio engines, visualizers, and audio-reactive Beatling mascot ecosystem.
+Browser-based live coding music IDE with code editor, visual node graph, 4 audio engines, real-time visualizers, and instant code sharing.
 
 **Live:** <https://live-music-coder.pro>
-**Repo:** <https://github.com/arnoldwender/wm-prototyp-live-music-coder> (private)
+**Repo:** <https://github.com/arnoldwender/wm-prototyp-live-music-coder>
 
 ## Tech Stack
 
@@ -33,7 +33,7 @@ Browser-based live coding music IDE with code editor, visual node graph, 4 audio
 ```bash
 npm run dev        # Vite dev server (localhost:5173)
 npm run build      # tsc -b + vite build → dist/
-npm run test       # Vitest (104 tests, 19 files)
+npm run test       # Vitest
 npm run test:watch # Vitest watch mode
 npm run lint       # ESLint
 npm run preview    # Preview production build
@@ -57,7 +57,7 @@ src/
 ├── components/
 │   ├── atoms/           # Button, Icon, Toggle, Badge, Tooltip, TabButton, CanvasVisualizer, EngineNode, Logo, WaveformBackground
 │   ├── molecules/       # ToolbarGroup, EngineSelector, LanguageSwitcher, FileTabs, VisualizerToggle, FeatureCard, ShareDialog, HelpPanel
-│   └── organisms/       # TransportBar, StatusBar, CodeEditor, StrudelEditor, NodeGraph, WaveformVisualizer, SpectrumVisualizer, PatternTimeline, VisualizerDashboard, BeatlingPanel, CollectionPanel, GistDialog, HeroSection, FeatureGrid, ExampleGallery, TemplateSelector, TutorialOverlay
+│   └── organisms/       # TransportBar, StatusBar, CodeEditor, StrudelEditor, NodeGraph, WaveformVisualizer, SpectrumVisualizer, PatternTimeline, VisualizerDashboard, CollectionPanel, GistDialog, HeroSection, FeatureGrid, ExampleGallery, TemplateSelector, TutorialOverlay
 ├── layouts/
 │   └── EditorLayout.tsx # Resizable 3-zone: top (editor+graph), middle (visualizers), bottom (status)
 ├── pages/
@@ -66,7 +66,7 @@ src/
 │   ├── Docs.tsx         # Documentation hub (/docs, /docs/:sectionId)
 │   ├── Samples.tsx      # Sample library browser (/samples)
 │   ├── Examples.tsx     # Curated code examples per engine (/examples)
-│   └── Legal.tsx        # Impressum, Datenschutz, Lizenzen (/legal)
+│   └── Legal.tsx        # Impressum, Datenschutz (/legal)
 ├── lib/
 │   ├── store.ts         # Zustand: transport, engine, layout, file management
 │   ├── history.ts       # Undo/redo (100-entry cap)
@@ -76,17 +76,16 @@ src/
 │   ├── editor/          # CM6 theme, setup, extensions, debounced evaluator
 │   ├── parser/          # Code → graph extraction (regex-based, per engine)
 │   ├── codegen/         # Graph → code generation (per engine templates)
-│   ├── audio/           # Shared AudioContext, AudioAnalyzer, AudioRecorder, strudel-tap (superdough audio tap)
+│   ├── audio/           # Shared AudioContext, AudioAnalyzer, AudioRecorder, strudel-tap
 │   ├── persistence/     # IndexedDB, URL sharing (lz-string), GitHub Gist (octokit)
 │   ├── visualizers/     # Waveform, spectrum, timeline drawing (Canvas 2D)
-│   ├── beatlings/       # Mascot ecosystem (brain, GoL, species, evolution, renderer, audio-bridge)
 │   └── useMediaQuery.ts # Responsive media query hook
 ├── data/
 │   ├── templates.ts     # Starter code templates per engine
 │   ├── docs.ts          # Documentation content
 │   ├── sample-library.ts # Audio sample catalog by category
 │   ├── example-library.ts # Curated code examples per engine
-│   └── legal.ts         # Legal page content (Impressum, Datenschutz, Lizenzen)
+│   └── legal.ts         # Legal page content (Impressum, Datenschutz)
 ├── i18n/
 │   └── locales/         # de.json, en.json, es.json
 ├── styles/
@@ -95,11 +94,8 @@ src/
 ├── types/
 │   ├── engine.ts        # EngineType, EngineBlock, Connection, EngineAdapter
 │   ├── project.ts       # Project, ProjectFile, PanelLayout
-│   ├── beatling.ts      # Species, Stage, BeatlingState, Achievement
 │   └── strudel.d.ts     # Type declarations for superdough and @strudel/* modules
-├── workers/
-│   └── beatling-worker.ts # Web Worker for Beatling brain computation
-├── App.tsx              # Router: 8 routes (/, /editor, /docs, /docs/:id, /samples, /examples, /legal)
+├── App.tsx              # Router: 7 routes (/, /editor, /docs, /docs/:id, /samples, /examples, /legal)
 └── main.tsx             # Entry: i18n init, global CSS, React render
 ```
 
@@ -120,22 +116,6 @@ src/
 | Web Audio | Green #22c55e | Native API | Low-level audio nodes |
 | MIDI | Orange #f97316 | webmidi | External device output (output-only in v1) |
 
-### Beatling Ecosystem
-
-6 audio-reactive creature species with dual-brain (neural network + Conway's Game of Life):
-
-| Species | Spawns When | Movement |
-|---------|-------------|----------|
-| Beatling | Beat detected + RMS > 0.2 | Bounce |
-| Looplet | Complexity > 0.4 | Orbit |
-| Synthling | Dominant freq > 300Hz | Flow |
-| Glitchbit | Peak > 0.7 | Glitch |
-| Wavelet | Dominant freq < 200Hz | Wave |
-| Codefly | User typing | Swarm |
-
-Evolution: Egg → Baby → Adult → Elder → Ascended (XP from audio/complexity/interaction).
-Brain code adapted from `/Users/arnold/Development/wm-lifegame` (copied, not imported).
-
 ## Key Rules
 
 - **Design tokens:** NEVER hardcode colors, spacing, shadows, or transitions — always use `var(--token)` or VIZ_COLORS for Canvas 2D
@@ -151,9 +131,13 @@ Brain code adapted from `/Users/arnold/Development/wm-lifegame` (copied, not imp
 
 - Commits: `[Action] Brief description` — NO co-author tags, NO AI branding
 - Git author: Arnold Wender <arnold.wender@gmail.com>
-- Repository: ALWAYS private
 - Deploy: Netlify (manual via `npm run build && netlify deploy --prod --dir=dist`)
 
 ## License
 
-AGPL-3.0 (required by @strudel/* dependency)
+Dual-licensed. See [LICENSING.md](LICENSING.md) for details.
+
+- **Combined application:** AGPL-3.0-or-later (required by @strudel/* dependency)
+- **Original components:** MIT (files marked with `SPDX-License-Identifier: MIT`)
+
+Copyright (c) 2026 Arnold Wender / Wender Media

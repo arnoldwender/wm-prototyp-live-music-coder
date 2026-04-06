@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    CodeEditor organism — CodeMirror 6 editor with multi-tab
    file support and live code evaluation. Creates a new CM6
    EditorView per active file, with per-engine syntax
@@ -90,19 +92,10 @@ export function CodeEditor() {
           viewRef.current?.dispatch({ effects: setFlash.of(false) });
         }, 400);
       }
-      /* Track evaluation for session stats + unlock achievements */
+      /* Track evaluation for session stats */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
-      evalStore.unlockAchievement('first_play');
       evalStore.trackEngine(activeFile.engine);
-      /* Check complex_pattern — 5+ non-empty lines of code */
-      if (activeFile.code.split('\n').filter((l: string) => l.trim()).length >= 5) {
-        evalStore.unlockAchievement('complex_pattern');
-      }
-      /* Check speed_demon — evaluate within 5 seconds of session start */
-      if (Date.now() - evalStore.sessionStats.startTime < 5000) {
-        evalStore.unlockAchievement('speed_demon');
-      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[CodeEditor] Manual eval error:', msg);

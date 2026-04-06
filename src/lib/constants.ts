@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Application constants — BPM limits, default engine,
    engine color tokens, and default panel layout.
    ────────────────────────────────────────────────────────── */
@@ -33,6 +35,5 @@ export const DEFAULT_LAYOUT: PanelLayout = {
     spectrum: true,
     timeline: false,
     pianoroll: false,
-    beatlings: false,
   },
 }

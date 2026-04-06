@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Tooltip atom — hover + focus accessible tooltip.
    Shows on mouse hover AND keyboard focus for a11y.
    ────────────────────────────────────────────────────────── */

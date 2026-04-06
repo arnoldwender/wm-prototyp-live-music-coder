@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    SidePanel — tabbed sidebar for Samples, Reference, Console,
    and Settings. Slides in from the right side of the editor.
    Surpasses Strudel's panel with richer features and better UX.

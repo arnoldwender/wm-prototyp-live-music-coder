@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    AchievementToast molecule — small, subtle notification that
    slides in from bottom-right corner. Click to dismiss.
    Auto-dismisses after 2 seconds.

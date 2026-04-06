@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Debounced code evaluator — bridges the editor to the
    audio orchestrator. Prevents rapid re-evaluation during
    typing. Reports errors for UI display via callbacks.

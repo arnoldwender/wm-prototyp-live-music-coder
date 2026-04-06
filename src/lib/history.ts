@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    History manager — generic undo/redo stack.
    Used to track code editor state changes for undo/redo.
    ────────────────────────────────────────────────────────── */

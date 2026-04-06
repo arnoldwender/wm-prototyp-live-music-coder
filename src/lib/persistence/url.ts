@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    URL sharing — encode/decode project snippets into
    URL-safe compressed hashes via lz-string.
    ────────────────────────────────────────────────────────── */

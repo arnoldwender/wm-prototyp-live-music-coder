@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    CodeMirror 6 base setup — shared extensions for all
    engine modes. Includes visual chrome, editing helpers,
    keybindings, dark theme, and tab configuration.

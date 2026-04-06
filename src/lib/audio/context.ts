@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Shared AudioContext singleton — single master context for
    the entire app with gain control and FFT analysis.
    Routing: masterGain → masterAnalyser → destination

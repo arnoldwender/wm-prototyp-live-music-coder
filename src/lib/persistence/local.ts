@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    IndexedDB local persistence via idb — autosave projects,
    serialize/deserialize with defaults for missing fields.
    ────────────────────────────────────────────────────────── */
@@ -90,9 +92,8 @@ export function deserializeProject(json: string): Project {
     graph: parsed.graph ?? { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
     layout: parsed.layout ?? {
       editorWidth: 50, graphWidth: 50, visualizerHeight: 30, showGraph: false,
-      visiblePanels: { waveform: true, spectrum: true, timeline: true, beatlings: true },
+      visiblePanels: { waveform: true, spectrum: true, timeline: true, pianoroll: false },
     },
-    ecosystem: parsed.ecosystem ?? { creatures: [], golGrid: { width: 64, height: 64, liveCells: [] }, collection: [] },
   };
 }
 

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    FilterPill — reusable filter pill button for category,
    engine, and difficulty filters. Replaces duplicated
    CategoryPill implementations in Samples and Examples pages.

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    useMediaQuery — reactive CSS media query hook.
    Returns true when the given media query string matches.
    ────────────────────────────────────────────────────────── */

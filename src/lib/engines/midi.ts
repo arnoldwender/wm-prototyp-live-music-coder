@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    MIDI engine adapter — external MIDI device output.
    Sends note/CC data to external MIDI devices via WebMIDI.
    Does NOT produce audio — output-only in v1.

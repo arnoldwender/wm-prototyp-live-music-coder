@@ -1,4 +1,7 @@
-/* Legal page — Impressum + Datenschutz with tab navigation */
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Legal page — Impressum + Datenschutz with tab navigation */
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

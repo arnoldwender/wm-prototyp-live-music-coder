@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    HelpPanel molecule — slide-out panel with getting started
    guide, copyable example patterns, sample/bank reference,
    mini-notation cheat sheet, functions, shortcuts, and

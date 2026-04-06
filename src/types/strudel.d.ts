@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Arnold Wender / Wender Media
+
 /* ──────────────────────────────────────────────────────────
    Type declarations for @strudel/* packages.
    These packages ship JS-only — no .d.ts included.

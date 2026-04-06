@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    DetailPanel — collapsible right sidebar with accordion sections.
    Auto-opens the section matching the activity bar selection.
    Features resize handle (200-400px) and mobile fullscreen overlay.
@@ -8,7 +10,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
-import { CreaturesSidebar } from './CreaturesSidebar';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 import { loadFromGist } from '../../lib/persistence/gist';
 
@@ -169,7 +170,6 @@ export function DetailPanel() {
   const sections = [
     { id: 'samples', title: 'Samples', content: <SampleBrowser /> },
     { id: 'reference', title: 'Reference', content: <ReferencePanel /> },
-    { id: 'creatures', title: 'Creatures', content: <CreaturesSidebar /> },
     { id: 'settings', title: 'Settings', content: <SettingsPanel /> },
     { id: 'gists', title: 'Saved Gists', content: <SavedGistsList /> },
     { id: 'console', title: 'Console', content: <ConsolePanel /> },

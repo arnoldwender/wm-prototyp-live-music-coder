@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    AudioRecorder — captures master gain output via MediaRecorder
    and exports as WebM (opus) for download.
    Uses MediaStreamAudioDestinationNode to tap the signal chain.

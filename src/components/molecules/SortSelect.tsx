@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    SortSelect — compact inline sort dropdown matching the
    dark cyberpunk theme. Used on library and gallery pages
    for sorting results by different criteria.

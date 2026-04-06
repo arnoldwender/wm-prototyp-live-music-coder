@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    LanguageSwitcher molecule — DE/EN/ES toggle buttons
    with Globe icon. Active language is highlighted.
    ────────────────────────────────────────────────────────── */

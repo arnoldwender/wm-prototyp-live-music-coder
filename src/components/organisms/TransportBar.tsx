@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    TransportBar organism — top toolbar for the music IDE.
    3 workflow groups separated by dividers:
      Group 1 Transport: Play/Stop, BPM, Engine selector
@@ -17,7 +19,6 @@ import {
   Share2,
   FileCode2,
   GitBranch,
-  Trophy,
   Undo2,
   Redo2,
 } from 'lucide-react'
@@ -27,7 +28,6 @@ import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Logo, Tooltip } from '../atoms'
 import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog } from '../molecules'
 import { GistDialog } from './GistDialog'
-import { CollectionPanel } from './CollectionPanel'
 
 /* ── GroupDivider — visual separator between workflow groups ── */
 function GroupDivider() {
@@ -87,7 +87,6 @@ function TransportBar() {
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
-  const [showCollection, setShowCollection] = useState(false)
 
   /* ── Orchestrator-wired handlers ── */
 
@@ -295,20 +294,6 @@ function TransportBar() {
               </Tooltip>
             </ToolbarGroup>
 
-            {/* Collection / Achievements */}
-            <ToolbarGroup>
-              <Tooltip content={t('collection.title')}>
-                <Button
-                  variant="icon"
-                  active={showCollection}
-                  onClick={() => setShowCollection(!showCollection)}
-                  aria-label={t('collection.title')}
-                >
-                  <Icon icon={Trophy} size={16} />
-                </Button>
-              </Tooltip>
-            </ToolbarGroup>
-
             {/* Language switcher (last element) */}
             <LanguageSwitcher />
           </>
@@ -393,14 +378,6 @@ function TransportBar() {
                 >
                   <Icon icon={FileCode2} size={16} /> {t('toolbar.gist')}
                 </Button>
-                <Button
-                  variant="icon"
-                  onClick={() => { setShowCollection(!showCollection); setShowOverflow(false) }}
-                  aria-label={t('collection.title')}
-                  style={{ width: '100%', justifyContent: 'flex-start', gap: 'var(--space-3)' }}
-                >
-                  <Icon icon={Trophy} size={16} /> {t('collection.title')}
-                </Button>
                 <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-2) 0' }} />
                 <div style={{ padding: '0 var(--space-2)' }}>
                   <LanguageSwitcher />
@@ -415,7 +392,6 @@ function TransportBar() {
     {/* ── Modal dialogs and panels (rendered outside header flow) ── */}
     {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
     {showGist && <GistDialog onClose={() => setShowGist(false)} />}
-    {showCollection && <CollectionPanel onClose={() => setShowCollection(false)} />}
     </>
   )
 }

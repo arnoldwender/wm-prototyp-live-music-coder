@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    TemplateSelector organism — first-visit modal that lets
    users pick a starter template to populate the editor.
    Sets 'lmc-onboarded' in localStorage to prevent re-show.
@@ -64,8 +66,6 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
     }
     /* Also update the global default engine to match the template */
     setDefaultEngine(template.engine)
-    /* Unlock template_used achievement */
-    useAppStore.getState().unlockAchievement('template_used')
     localStorage.setItem('lmc-onboarded', 'true')
     onSelect()
   }

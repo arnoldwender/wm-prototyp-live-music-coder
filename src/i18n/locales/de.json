@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Live Music Coder",
-    "tagline": "Musik programmieren. Klang sehen. Kreaturen züchten."
+    "tagline": "Musik programmieren. Klang sehen. Beats teilen."
   },
   "nav": {
     "openEditor": "Editor öffnen",
@@ -47,23 +47,16 @@
     "spectrum": "Spektrum",
     "timeline": "Zeitleiste",
     "pianoroll": "Pianorolle",
-    "beatlings": "Beatlings",
-    "brain": "Gehirn",
     "noVisualizers": "Keine Visualizer aktiv"
-  },
-  "brain": {
-    "title": "Neurale Aktivität",
-    "empty": "Spiele Musik, um Kreaturen zu spawnen und ihre neurale Aktivität zu sehen"
   },
   "status": {
     "engine": "Engine",
     "files": "Dateien",
-    "creatures": "Kreaturen",
     "ready": "Bereit"
   },
   "landing": {
     "hero": "Programmiere deine Musik live",
-    "subtitle": "Eine visuelle Entwicklungsumgebung für Live-Coding mit mehreren Audio-Engines und digitalen Kreaturen, die mit deinem Sound wachsen.",
+    "subtitle": "Eine visuelle Entwicklungsumgebung für Live-Coding mit 4 Audio-Engines, Echtzeit-Visualizern und sofortigem Code-Sharing.",
     "cta": "Jetzt loslegen",
     "examples": "Beispiel ausprobieren",
     "poweredBy": "Angetrieben von",
@@ -80,9 +73,9 @@
         "title": "Live-Visualizer",
         "desc": "Wellenform, Spektrum-Analysator und Pattern-Timeline reagieren in Echtzeit auf deine Musik."
       },
-      "beatlings": {
-        "title": "Beatling-Kreaturen",
-        "desc": "6 audio-reaktive Spezies mit neuronalem Gehirn und Game-of-Life-Evolution."
+      "codeshare": {
+        "title": "Code-Sharing",
+        "desc": "Patterns per komprimierter URL teilen, als GitHub Gist exportieren oder deine Session als Audio aufnehmen."
       },
       "share": {
         "title": "Teilen & Zusammenarbeiten",
@@ -374,7 +367,7 @@
       "step2": "Tippe ein Pattern mit Mini-Notation oder Funktionsaufrufen",
       "step3": "Drücke Strg+Enter zum Auswerten und Anhören",
       "step4": "Bearbeite den Code live — Änderungen greifen im nächsten Zyklus",
-      "tip": "Nutze die Visualizer unten, um Wellenform, Spektrum und Pattern-Timeline in Echtzeit zu sehen. Beatling-Kreaturen spawnen und entwickeln sich basierend auf deiner Musik."
+      "tip": "Nutze die Visualizer unten, um Wellenform, Spektrum und Pattern-Timeline in Echtzeit zu sehen."
     },
     "strudelBasics": {
       "title": "Strudel-Grundlagen",
@@ -515,6 +508,6 @@
     "streakDays": "{{count}} Tag Serie",
     "streakDays_plural": "{{count}} Tage Serie",
     "sessionSummary": "Sitzung beendet",
-    "sessionDetails": "Sitzung: {{minutes}} Min | {{evaluations}} Auswertungen | {{creatures}} Kreaturen"
+    "sessionDetails": "Sitzung: {{minutes}} Min | {{evaluations}} Auswertungen"
   }
 }

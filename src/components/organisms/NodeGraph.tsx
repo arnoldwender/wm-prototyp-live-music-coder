@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    NodeGraph — React Flow canvas that visualizes parsed audio
    code as a node graph. Blocks become nodes, connections
    become animated edges. Updates when the active file changes.

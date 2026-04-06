@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Editor page — assembles the IDE shell with EditorLayout.
    On mount: loads shared code from URL hash, checks streak,
    initializes session stats. Shows template selector for
@@ -8,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import EditorLayout from '../layouts/EditorLayout'
-import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel, BeatlingPanel } from '../components/organisms'
+import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel } from '../components/organisms'
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
@@ -38,12 +40,6 @@ function Editor() {
   useEffect(() => {
     /* Check and update daily streak */
     checkStreak()
-
-    /* Check night_owl achievement — coding after midnight (0:00 - 4:59) */
-    const hour = new Date().getHours()
-    if (hour >= 0 && hour < 5) {
-      useAppStore.getState().unlockAchievement('night_owl')
-    }
 
     const shared = readShareFromUrl()
     if (shared) {
@@ -93,7 +89,6 @@ function Editor() {
           description: t('gamification.sessionDetails', {
             minutes,
             evaluations: stats.evaluations,
-            creatures: stats.creaturesSpawned,
           }),
         })
       }
@@ -171,12 +166,6 @@ function Editor() {
         statusBar={<StatusBar />}
       />
 
-      {/* Hidden BeatlingWorld — always runs for creature spawning.
-       * When beatlings pill is ON, VisualizerDashboard also renders a visible one,
-       * but BeatlingWorld handles deduplication internally via singleton pattern. */}
-      <div style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
-        <BeatlingPanel />
-      </div>
       {showTemplateSelector && (
         <TemplateSelector onSelect={() => {
           setShowTemplateSelector(false)

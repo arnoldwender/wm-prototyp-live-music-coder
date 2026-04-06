@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* Example gallery — cards with inline play button.
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Example gallery — cards with inline play button.
  * Click play icon to hear the pattern instantly.
  * Click card body to open in editor. */
 

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    NowPlayingIndicator — floating "Now Playing" indicator
    that appears at the bottom-right of the viewport. Shows
    engine name, playing item label, animated pulse dot,

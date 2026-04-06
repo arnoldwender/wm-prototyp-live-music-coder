@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    ErrorBar — cyberpunk-styled error diagnostics panel.
    Glitch header, scanline animation, terminal-style help.
    ────────────────────────────────────────────────────────── */

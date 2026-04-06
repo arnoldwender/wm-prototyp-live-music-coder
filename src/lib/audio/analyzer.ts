@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    AudioAnalyzer — convenience wrapper around AnalyserNode
    for frequency data, time domain, RMS/peak levels,
    beat detection, and dominant frequency extraction.

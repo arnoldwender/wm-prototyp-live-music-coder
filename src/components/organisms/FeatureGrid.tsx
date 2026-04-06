@@ -1,10 +1,12 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    FeatureGrid — 3-column grid of feature highlight cards
    on the landing page. Uses Lucide icons and i18n translations.
    ---------------------------------------------------------- */
 
 import { useTranslation } from 'react-i18next'
-import { Music, GitBranch, Activity, Bug, Share2, Globe } from 'lucide-react'
+import { Music, GitBranch, Activity, Code, Share2, Globe } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Icon } from '../atoms'
 import { FeatureCard } from '../molecules/FeatureCard'
@@ -22,7 +24,7 @@ const features: FeatureDef[] = [
   { iconComponent: Music,     accentColor: 'var(--color-strudel)',  titleKey: 'landing.features.engines.title',     descKey: 'landing.features.engines.desc' },
   { iconComponent: GitBranch, accentColor: 'var(--color-tonejs)',   titleKey: 'landing.features.graph.title',       descKey: 'landing.features.graph.desc' },
   { iconComponent: Activity,  accentColor: 'var(--color-webaudio)', titleKey: 'landing.features.visualizers.title', descKey: 'landing.features.visualizers.desc' },
-  { iconComponent: Bug,       accentColor: 'var(--color-midi)',     titleKey: 'landing.features.beatlings.title',   descKey: 'landing.features.beatlings.desc' },
+  { iconComponent: Code,      accentColor: 'var(--color-midi)',     titleKey: 'landing.features.codeshare.title',   descKey: 'landing.features.codeshare.desc' },
   { iconComponent: Share2,    accentColor: 'var(--color-strudel)',  titleKey: 'landing.features.share.title',       descKey: 'landing.features.share.desc' },
   { iconComponent: Globe,     accentColor: 'var(--color-tonejs)',   titleKey: 'landing.features.i18n.title',        descKey: 'landing.features.i18n.desc' },
 ]
