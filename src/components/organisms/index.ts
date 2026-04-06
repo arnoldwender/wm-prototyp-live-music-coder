@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
+/* Barrel export — all organism components */
+export { default as TransportBar } from './TransportBar'
+export { default as StatusBar } from './StatusBar'
+export { CodeEditor } from './CodeEditor'
+export { default as NodeGraph } from './NodeGraph'
+export { WaveformVisualizer } from './WaveformVisualizer'
+export { SpectrumVisualizer } from './SpectrumVisualizer'
+export { PatternTimeline } from './PatternTimeline'
+export { VisualizerDashboard } from './VisualizerDashboard'
+export { PianorollVisualizer } from './PianorollVisualizer'
+export { GistDialog } from './GistDialog'
+export { HeroSection } from './HeroSection'
+export { FeatureGrid } from './FeatureGrid'
+export { ExampleGallery } from './ExampleGallery'
+export { TemplateSelector } from './TemplateSelector'
+export { TutorialOverlay } from './TutorialOverlay'
+export { ActivityBar } from './ActivityBar'
+export { DetailPanel } from './DetailPanel'

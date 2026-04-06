@@ -1,0 +1,4 @@
+/* Design token barrel — import all token files */
+@import './colors.css';
+@import './typography.css';
+@import './spacing.css';

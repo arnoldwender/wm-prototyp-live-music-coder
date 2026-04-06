@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
+/* Barrel export — all molecule components */
+export { default as ToolbarGroup } from './ToolbarGroup'
+export { default as EngineSelector } from './EngineSelector'
+export { default as LanguageSwitcher } from './LanguageSwitcher'
+export { FileTabs } from './FileTabs'
+export { ShareDialog } from './ShareDialog'
+export { FeatureCard } from './FeatureCard'
+export { HelpPanel } from './HelpPanel'
+export { AchievementToast } from './AchievementToast'
+export { ErrorBar } from './ErrorBar'
+export { VisualizerPills } from './VisualizerPills'
+export { FilterPill } from './FilterPill'
+export { NowPlayingIndicator } from './NowPlayingIndicator'
+export { SortSelect } from './SortSelect'
