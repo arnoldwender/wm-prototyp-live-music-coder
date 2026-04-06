@@ -53,11 +53,8 @@ function Editor() {
       setBpm(shared.bpm)
       setDefaultEngine(shared.engine)
 
-      /* Check if this is an internal autoplay (from landing page examples) */
-      const isAutoplay = window.location.hash.includes('autoplay=1')
-      if (!isAutoplay) {
-        setShowSharedWarning(true)
-      }
+      /* SECURITY: Always show warning for shared/external code — never skip */
+      setShowSharedWarning(true)
       /* Clean the hash after reading */
       window.location.hash = ''
     } else if (!localStorage.getItem('lmc-onboarded')) {
@@ -110,7 +107,7 @@ function Editor() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'var(--color-backdrop)',
             backdropFilter: 'blur(4px)',
             padding: 'var(--space-4)',
           }}

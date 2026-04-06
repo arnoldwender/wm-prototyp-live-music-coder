@@ -119,7 +119,18 @@ function Legal() {
       `}</style>
 
       <footer className="text-center py-8" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
-        {t('footer.license')}
+        <p>{t('footer.license')}</p>
+        {/* AGPL compliance — source code link required for network services */}
+        <p style={{ marginTop: 'var(--space-2)' }}>
+          <a
+            href="https://github.com/arnoldwender/wm-prototyp-live-music-coder"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
+          >
+            Source Code (AGPL-3.0)
+          </a>
+        </p>
       </footer>
     </main>
   );
