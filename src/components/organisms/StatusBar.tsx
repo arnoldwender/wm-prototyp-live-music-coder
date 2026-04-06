@@ -7,6 +7,7 @@
    Right: compact XP bar with level
    ────────────────────────────────────────────────────────── */
 
+import { Link } from 'react-router-dom'
 import { useAppStore, xpForLevel } from '../../lib/store'
 import { ENGINE_COLORS } from '../../lib/constants'
 
@@ -144,12 +145,16 @@ function StatusBar() {
         />
       </div>
 
-      {/* ── Right zone: compact XP bar ── */}
+      {/* ── Right zone: XP bar + legal links ── */}
       <div
         className="flex items-center"
-        style={{ flex: '0 0 auto', minWidth: 0 }}
+        style={{ flex: '0 0 auto', minWidth: 0, gap: '8px' }}
       >
         <XpBar />
+        {/* Legal links — TMG requires Impressum reachable from every page */}
+        <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '10px' }}>Impressum</Link>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>|</span>
+        <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '10px' }}>Datenschutz</Link>
       </div>
     </footer>
   )

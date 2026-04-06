@@ -362,6 +362,13 @@ function Docs() {
               <span />
             )}
           </nav>
+
+          {/* Legal links — TMG requires Impressum reachable from every page */}
+          <footer className="text-center" style={{ marginTop: 'var(--space-10)', paddingTop: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
+            <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
+            {' | '}
+            <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
+          </footer>
         </main>
       </div>
     </div>

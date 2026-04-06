@@ -765,13 +765,18 @@ function Samples() {
         )}
       </section>
 
-      {/* Footer */}
+      {/* Footer with legal links — TMG requires Impressum reachable from every page */}
       <footer
         className="text-center py-12"
         style={{ color: 'var(--color-text-muted)' }}
       >
-        <p style={{ fontSize: 'var(--font-size-xs)' }}>
+        <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: 'var(--space-2)' }}>
           {t('footer.license')}
+        </p>
+        <p style={{ fontSize: 'var(--font-size-xs)' }}>
+          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
+          {' | '}
+          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
         </p>
       </footer>
 
