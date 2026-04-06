@@ -3,6 +3,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  NPM_FLAGS = "--legacy-peer-deps"
+
 # Security headers — CSP, clickjacking, MIME sniffing protection
 [[headers]]
   for = "/*"
