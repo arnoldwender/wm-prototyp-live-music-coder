@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    AudioWorklet placeholder — infrastructure for custom audio
    processing. In v1, standard Web Audio nodes are used. This
    file provides the foundation for adding custom AudioWorklet

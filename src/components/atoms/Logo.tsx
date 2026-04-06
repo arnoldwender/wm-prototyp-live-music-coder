@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Logo atom — audio waveform icon + app name + optional tagline.
    Used in landing page header and editor transport bar.
    ---------------------------------------------------------- */

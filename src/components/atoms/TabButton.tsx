@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    TabButton atom — single file tab with engine color indicator,
    truncated file name, and hover-visible close button.
    Used in the FileTabs molecule for multi-file editor tabs.

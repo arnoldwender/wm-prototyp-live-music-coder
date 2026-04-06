@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    TutorialOverlay organism — first-run modal with 4 steps
    highlighting different areas of the IDE. Persists
    completion state to localStorage so it only shows once.

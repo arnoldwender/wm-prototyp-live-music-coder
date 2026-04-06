@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ────────────────────────────────────────────────────────── */
 import { describe, it, expect, vi } from 'vitest';
 import { drawWaveform } from './waveform';
 

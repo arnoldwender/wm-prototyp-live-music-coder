@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Pianoroll visualizer — uses @strudel/draw's native pianoroll
    to render a scrolling musical score view of active patterns.
    Falls back to a custom canvas implementation if @strudel/draw

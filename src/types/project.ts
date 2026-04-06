@@ -1,10 +1,10 @@
-/* ──────────────────────────────────────────────────────────
-   Project types — file management, graph state, layout,
-   and the Beatling ecosystem container.
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Project types — file management, graph state, and layout.
    ────────────────────────────────────────────────────────── */
 
 import type { EngineType, EngineBlock, Connection } from './engine'
-import type { BeatlingState } from './beatling'
 
 /** Panel layout configuration for the resizable IDE panels */
 export interface PanelLayout {
@@ -17,7 +17,6 @@ export interface PanelLayout {
     spectrum: boolean
     timeline: boolean
     pianoroll: boolean
-    beatlings: boolean
   }
 }
 
@@ -46,13 +45,4 @@ export interface Project {
     viewport: { x: number; y: number; zoom: number }
   }
   layout: PanelLayout
-  ecosystem: {
-    creatures: BeatlingState[]
-    golGrid: {
-      width: number
-      height: number
-      liveCells: [number, number][]
-    }
-    collection: string[]
-  }
 }

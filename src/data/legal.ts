@@ -1,4 +1,7 @@
-/* Legal page content — Impressum and Datenschutz HTML from Knowledge/Legales templates */
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Legal page content — Impressum and Datenschutz HTML from Knowledge/Legales templates */
 
 export const IMPRESSUM_HTML = `
 <h1>Impressum</h1>

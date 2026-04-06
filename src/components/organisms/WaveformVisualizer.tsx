@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ────────────────────────────────────────────────────────── */
 import { useCallback, useRef } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawWaveform } from '../../lib/visualizers/waveform';

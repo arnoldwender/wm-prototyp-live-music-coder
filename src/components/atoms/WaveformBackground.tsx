@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    WaveformBackground — pure CSS animated waveform bars.
    Renders behind the hero section to convey a "music" identity.
    Uses staggered keyframe delays on 40 vertical bars.

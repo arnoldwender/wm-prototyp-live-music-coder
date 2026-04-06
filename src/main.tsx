@@ -1,4 +1,7 @@
-/* Application entry point */
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Application entry point */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './i18n'

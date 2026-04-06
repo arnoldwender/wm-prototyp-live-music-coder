@@ -288,17 +288,10 @@ export function StrudelEditor() {
       setTimeout(() => resetStrudelTap(), 1000);
       setTimeout(() => resetStrudelTap(), 2000);
 
-      /* Track evaluation for session stats + unlock achievements */
+      /* Track evaluation for session stats */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
-      evalStore.unlockAchievement('first_play');
       evalStore.trackEngine('strudel');
-      if (code.split('\n').filter((l: string) => l.trim()).length >= 5) {
-        evalStore.unlockAchievement('complex_pattern');
-      }
-      if (Date.now() - evalStore.sessionStats.startTime < 5000) {
-        evalStore.unlockAchievement('speed_demon');
-      }
       if (!isPlaying) {
         togglePlay();
       }

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    EditorLayout — 3-column IDE layout (VS Code style).
    Left: activity bar (40px icon strip).
    Center: editor zone (top, flex) + visualizer zone (bottom, resizable 15–60%).

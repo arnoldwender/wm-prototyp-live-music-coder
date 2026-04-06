@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    ToolbarGroup molecule — groups toolbar buttons with an
    optional trailing separator for visual segmentation.
    ────────────────────────────────────────────────────────── */

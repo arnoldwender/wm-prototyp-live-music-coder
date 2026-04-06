@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    FeatureGrid — 3-column grid of feature highlight cards
    on the landing page. Uses Lucide icons and i18n translations.
    ---------------------------------------------------------- */

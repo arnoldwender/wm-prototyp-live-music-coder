@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    NotFound — 404 page for unmatched routes.
    Uses design tokens for consistent dark theme styling.
    ────────────────────────────────────────────────────────── */

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Icon atom — Lucide icon wrapper with consistent sizing.
    ────────────────────────────────────────────────────────── */
 

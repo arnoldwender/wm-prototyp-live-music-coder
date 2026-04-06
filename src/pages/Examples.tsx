@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Examples library page — browseable grid of curated patterns
    for Strudel, Tone.js, and Web Audio with engine-aware
    category filters, difficulty pills, search, sort, and

@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    FeatureCard — feature highlight card for the landing page.
    Displays a ReactNode icon in a colored circle, title, and
    description. Hover effect: scale + border glow.

@@ -1,4 +1,7 @@
-/* Starter code templates — pre-built snippets organized by category.
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Starter code templates — pre-built snippets organized by category.
  * Used on landing page, template selector, and help panel. */
 
 import type { EngineType } from '../types/engine';

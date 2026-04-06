@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    HeroSection — landing page hero with animated waveform
    background, gradient headline, app badge, and pulsing CTA.
    Navigates to /editor on button click.

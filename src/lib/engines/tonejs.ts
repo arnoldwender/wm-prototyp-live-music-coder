@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Tone.js engine adapter — high-level synths and effects.
    Uses shared AudioContext + connects Tone's Destination to
    masterAnalyser for visualization. setContext() called in

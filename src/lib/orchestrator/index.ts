@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Orchestrator — central manager for engines, audio graph,
    and playback state. Evaluates code from the editor and
    routes it to the appropriate engine. Singleton pattern.

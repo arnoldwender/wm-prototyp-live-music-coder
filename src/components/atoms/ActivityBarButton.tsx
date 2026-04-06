@@ -1,4 +1,7 @@
-/* ActivityBarButton — icon button for the left activity bar.
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   ActivityBarButton — icon button for the left activity bar.
  * Shows left accent border when active, hover highlight always. */
 import type { LucideIcon } from 'lucide-react';
 

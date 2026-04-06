@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    GitHub Gist integration — save/load projects via PAT.
    Token stored in sessionStorage by default, localStorage
    opt-in for persistent remember-me.

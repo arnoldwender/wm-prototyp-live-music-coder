@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    App root — BrowserRouter with ErrorBoundary, all routes,
    and a catch-all 404 fallback.
    ────────────────────────────────────────────────────────── */

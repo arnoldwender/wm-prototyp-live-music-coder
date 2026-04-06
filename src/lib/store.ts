@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    App store — global state for transport, engine, layout,
    gamification (XP, streaks, toasts, session stats).
    Uses Zustand for lightweight reactive state management.
@@ -7,26 +9,6 @@
 import { create } from 'zustand'
 import type { EngineType } from '../types/engine'
 import type { PanelLayout, ProjectFile } from '../types/project'
-import type { Species, Stage, Achievement } from '../types/beatling'
-import { ACHIEVEMENTS, TIER_XP, isUnlocked } from './beatlings/collection'
-
-/** Brain stats for a single creature — synced to store for UI display */
-export interface CreatureStat {
-  id: string
-  species: Species
-  stage: Stage
-  neuronCount: number
-  synapseCount: number
-  intelligence: number
-  emotionalState: number
-  phi: number
-  totalFirings: number
-  isSleeping: boolean
-  xpTotal: number
-  /* Normalized 0-1 position for canvas hit-testing */
-  x: number
-  y: number
-}
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
 
 /** Toast data for achievement notifications */
@@ -46,7 +28,6 @@ export interface StreakState {
 export interface SessionStats {
   startTime: number
   evaluations: number
-  creaturesSpawned: number
 }
 
 /** Visible panel names that can be toggled */
@@ -111,11 +92,6 @@ interface AppState {
   /* Files */
   files: ProjectFile[]
 
-  /* Beatling ecosystem — synced from BeatlingPanel every frame */
-  creatureCount: number
-  creatureStats: CreatureStat[]
-  selectedCreatureId: string | null
-  showBrainPanel: boolean
   /* Detail panel — right collapsible sidebar */
   activeDetailSection: string | null
   detailPanelWidth: number
@@ -124,22 +100,13 @@ interface AppState {
   toggleDetailSection: (section: string) => void
   zenMode: boolean
   toggleZenMode: () => void
-  setCreatureCount: (count: number) => void
-  setCreatureStats: (stats: CreatureStat[]) => void
-  selectCreature: (id: string | null) => void
-  toggleBrainPanel: () => void
 
   /* Gamification: Achievement toast */
   pendingToast: ToastData | null
   showToast: (toast: ToastData) => void
   dismissToast: () => void
 
-  /* Gamification: Achievements — synced from BeatlingWorld + unlocked from UI */
-  achievements: Achievement[]
-  setAchievements: (achievements: Achievement[]) => void
-  unlockAchievement: (id: string) => void
-
-  /* Gamification: Engine usage tracking for 'all_engines' achievement */
+  /* Gamification: Engine usage tracking */
   usedEngines: Set<string>
   trackEngine: (engine: string) => void
 
@@ -155,7 +122,6 @@ interface AppState {
   /* Gamification: Session stats */
   sessionStats: SessionStats
   incrementEval: () => void
-  trackCreatureSpawn: () => void
 
   /* Transport actions */
   togglePlay: () => void
@@ -199,10 +165,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   defaultEngine: DEFAULT_ENGINE,
   layout: { ...DEFAULT_LAYOUT, visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels } },
   files: [{ ...DEFAULT_FILE }],
-  creatureCount: 0,
-  creatureStats: [],
-  selectedCreatureId: null,
-  showBrainPanel: false,
   activeDetailSection: 'samples',
   detailPanelWidth: 280,
   setActiveDetailSection: (section: string | null) => set({ activeDetailSection: section }),
@@ -215,48 +177,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   /* --- Gamification initial state --- */
   pendingToast: null,
-  achievements: ACHIEVEMENTS.map((a) => ({ ...a })),
   usedEngines: new Set<string>(),
   userXp: 0,
   userLevel: 1,
   streak: loadStreak(),
-  sessionStats: { startTime: Date.now(), evaluations: 0, creaturesSpawned: 0 },
-
-  /* --- Beatling ecosystem --- */
-  setCreatureCount: (count: number) => set({ creatureCount: count }),
-  setCreatureStats: (stats: CreatureStat[]) => set({ creatureStats: stats }),
-  selectCreature: (id: string | null) => set({ selectedCreatureId: id, showBrainPanel: id !== null }),
-  toggleBrainPanel: () => set((s) => ({ showBrainPanel: !s.showBrainPanel, selectedCreatureId: null })),
+  sessionStats: { startTime: Date.now(), evaluations: 0 },
 
   /* --- Gamification: Toast --- */
   showToast: (toast: ToastData) => set({ pendingToast: toast }),
   dismissToast: () => set({ pendingToast: null }),
-
-  /* --- Gamification: Achievements --- */
-  setAchievements: (achievements: Achievement[]) => set({ achievements }),
-
-  /** Unlock a single achievement by id — fires toast + grants XP.
-   * Called from UI components for gameplay-triggered achievements. */
-  unlockAchievement: (id: string) => {
-    const state = get()
-    if (isUnlocked(state.achievements, id)) return
-    const achievement = state.achievements.find((a) => a.id === id)
-    if (!achievement) return
-
-    const updated = state.achievements.map((a) =>
-      a.id === id ? { ...a, unlockedAt: Date.now().toString() } : a,
-    )
-    const xpReward = TIER_XP[achievement.tier]
-    const newXp = state.userXp + xpReward
-    const newLevel = calculateLevel(newXp)
-
-    set({
-      achievements: updated,
-      pendingToast: { icon: achievement.icon, title: achievement.name, description: achievement.description },
-      userXp: newXp,
-      userLevel: newLevel,
-    })
-  },
 
   /* --- Gamification: Engine tracking --- */
   trackEngine: (engine: string) => {
@@ -265,10 +194,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const newSet = new Set(state.usedEngines)
     newSet.add(engine)
     set({ usedEngines: newSet })
-    /* Check all_engines achievement — 4 engines total */
-    if (newSet.size >= 4) {
-      get().unlockAchievement('all_engines')
-    }
   },
 
   /* --- Gamification: XP & Level --- */
@@ -304,14 +229,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const s = get()
     const newEvals = s.sessionStats.evaluations + 1
     set({ sessionStats: { ...s.sessionStats, evaluations: newEvals } })
-    /* Check ten_evaluations achievement */
-    if (newEvals >= 10) {
-      get().unlockAchievement('ten_evaluations')
-    }
   },
-  trackCreatureSpawn: () => set((s) => ({
-    sessionStats: { ...s.sessionStats, creaturesSpawned: s.sessionStats.creaturesSpawned + 1 },
-  })),
 
   /* --- Transport actions --- */
 

@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ────────────────────────────────────────────────────────── */
 import { describe, it, expect } from 'vitest';
 import { serializeProject, deserializeProject } from './local';
 import type { Project } from '../../types/project';
@@ -27,12 +30,7 @@ function createMockProject(): Project {
       graphWidth: 0,
       visualizerHeight: 30,
       showGraph: false,
-      visiblePanels: { waveform: true, spectrum: true, timeline: true, pianoroll: false, beatlings: false },
-    },
-    ecosystem: {
-      creatures: [],
-      golGrid: { width: 64, height: 64, liveCells: [] },
-      collection: [],
+      visiblePanels: { waveform: true, spectrum: true, timeline: true, pianoroll: false },
     },
   };
 }

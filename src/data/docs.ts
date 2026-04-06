@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Documentation silo — structured content for the /docs page.
    Text content uses i18n keys; code examples are language-agnostic.
    ────────────────────────────────────────────────────────── */

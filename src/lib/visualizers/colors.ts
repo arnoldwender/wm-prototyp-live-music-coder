@@ -1,6 +1,10 @@
-/** Visualizer color constants — derived from design tokens but as literal values
- * because Canvas 2D cannot use CSS custom properties directly.
- * Professional palette with gradient stops for polished rendering. */
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
+   Visualizer color constants — derived from design tokens but as literal values
+   because Canvas 2D cannot use CSS custom properties directly.
+   Professional palette with gradient stops for polished rendering.
+   ────────────────────────────────────────────────────────── */
 export const VIZ_COLORS = {
   /* Backgrounds */
   bg: '#09090b',

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Engine types — audio engine blocks, connections, adapters
    Each engine (Strudel, Tone.js, WebAudio, MIDI) implements
    the EngineAdapter interface for unified control.

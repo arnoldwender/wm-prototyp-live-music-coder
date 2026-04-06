@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    StatusBar organism — 3-zone bottom bar:
    Left: engine badge (colored dot + short name)
    Center: BPM + playback status dot

@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    CodeMirror 6 dark theme — matches our design tokens.
    Background zinc-950, purple accents for caret/brackets,
    syntax colors tuned for music coding readability.

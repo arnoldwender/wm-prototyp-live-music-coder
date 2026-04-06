@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Tests for AudioGraph — directed graph of EngineBlocks
    with cycle detection, serialization, and BFS traversal.
    Written first (TDD) before implementation.

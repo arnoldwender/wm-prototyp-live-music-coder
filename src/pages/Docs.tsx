@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Documentation hub — sidebar navigation with 7 content
    sections about live coding music and using the editor.
    ---------------------------------------------------------- */

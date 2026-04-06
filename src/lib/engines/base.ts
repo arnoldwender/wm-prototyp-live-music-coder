@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Base engine adapter — abstract foundation for all engines.
    Provides shared AudioContext access, master gain routing,
    per-block analyser creation, and common connect/disconnect.

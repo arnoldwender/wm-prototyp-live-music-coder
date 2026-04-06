@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Toggle atom — accessible switch component.
    Uses role="switch" and aria-checked for screen readers.
    ────────────────────────────────────────────────────────── */

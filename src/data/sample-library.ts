@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Sample library — all 218 Dirt-Samples with metadata,
    descriptions, tags, and individual variation entries.
    Used by the /samples browseable library page.

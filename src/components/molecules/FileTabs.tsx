@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    FileTabs molecule — tab bar showing all open project files
    with a "+" button to create new files. Each tab shows the
    engine color dot, file name, and close button on hover.

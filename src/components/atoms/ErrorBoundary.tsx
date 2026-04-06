@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    ErrorBoundary — catches unhandled React render errors.
    Displays a dark-themed fallback with reload button.
    ────────────────────────────────────────────────────────── */

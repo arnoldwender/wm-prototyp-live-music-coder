@@ -1,4 +1,6 @@
-/* ----------------------------------------------------------
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Samples library page — browseable grid of all Dirt-Samples
    with search, engine/category filters, sort controls,
    NowPlaying indicator, and "Try in Editor" links.

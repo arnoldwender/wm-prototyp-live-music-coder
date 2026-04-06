@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    Button atom — forwardRef button with variant support.
    Variants: primary, secondary, ghost, icon.
    Uses CSS custom properties for token-based theming.

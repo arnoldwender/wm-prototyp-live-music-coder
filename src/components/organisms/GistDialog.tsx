@@ -1,4 +1,6 @@
-/* ──────────────────────────────────────────────────────────
+/* SPDX-License-Identifier: MIT
+   Copyright (c) 2026 Arnold Wender / Wender Media
+   ──────────────────────────────────────────────────────────
    GistDialog organism — modal for GitHub Gist integration.
    Sections: PAT token management, save project to Gist,
    load project from Gist URL/ID.
@@ -109,7 +111,6 @@ export function GistDialog({ onClose }: GistDialogProps) {
         },
       }
       const result = await saveToGist(project)
-      useAppStore.getState().unlockAchievement('first_save')
       const url = `https://gist.github.com/${result.id}`
       setGistUrl(url)
       setStatus('Saved!')
