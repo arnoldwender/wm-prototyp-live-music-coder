@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain, BrowserWindow, app } from 'electron'
 import { join } from 'node:path'
-import { is } from '@electron-toolkit/utils'
+
+/** Lazy dev check — safe to call after app init */
+function isDev(): boolean { return !app.isPackaged }
 
 // --- Track pop-out windows, max 4 ---
 const popoutWindows = new Map<string, BrowserWindow>()
@@ -42,7 +44,7 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
     })
 
     // Load the app at the pop-out route
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    if (isDev() && process.env['ELECTRON_RENDERER_URL']) {
       child.loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/popout/${panelId}`)
     } else {
       child.loadFile(join(__dirname, '../dist/index.html'), {

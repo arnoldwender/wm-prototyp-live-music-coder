@@ -3,15 +3,14 @@
 
 import { app, BrowserWindow } from 'electron'
 import { join } from 'node:path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { appStore } from './store.js'
-import { registerFileHandlers } from './ipc/file.js'
-import { registerAudioHandlers } from './ipc/audio.js'
-import { registerWindowHandlers, closeAllPopouts } from './ipc/window.js'
-import { registerAppHandlers } from './ipc/app.js'
-import { createMenu } from './menu.js'
-import { createTray, destroyTray } from './tray.js'
-import { initUpdater } from './updater.js'
+import { appStore } from './store'
+import { registerFileHandlers } from './ipc/file'
+import { registerAudioHandlers } from './ipc/audio'
+import { registerWindowHandlers, closeAllPopouts } from './ipc/window'
+import { registerAppHandlers } from './ipc/app'
+import { createMenu } from './menu'
+import { createTray, destroyTray } from './tray'
+import { initUpdater } from './updater'
 
 // --- Track whether the app is truly quitting vs minimize-to-tray ---
 let isQuitting = false
@@ -74,7 +73,7 @@ function createWindow(): BrowserWindow {
   })
 
   // --- Load renderer: dev server or production files ---
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
     // Open DevTools detached in development
     mainWindow.webContents.openDevTools({ mode: 'detach' })
@@ -88,10 +87,7 @@ function createWindow(): BrowserWindow {
 // --- App initialization ---
 app.whenReady().then(() => {
   // Set app user model ID for Windows
-  electronApp.setAppUserModelId('com.wendermedia.live-music-coder')
-
-  // Watch for window shortcut optimization (DevTools, reload)
-  optimizer.watchWindowShortcuts(undefined as unknown as BrowserWindow)
+  app.setAppUserModelId('com.wendermedia.live-music-coder')
 
   const mainWindow = createWindow()
 
@@ -108,7 +104,7 @@ app.whenReady().then(() => {
   createTray(mainWindow)
 
   // Init auto-updater in production only
-  if (!is.dev) {
+  if (app.isPackaged) {
     initUpdater(mainWindow)
   }
 

@@ -2,10 +2,10 @@
   "name": "wm-prototyp-live-music-coder",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "main": "dist-electron/main.js",
   "license": "AGPL-3.0-or-later",
   "author": "Arnold Wender <arnold.wender@gmail.com>",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,11 +13,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder",
-    "electron:build:mac": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder --mac",
-    "electron:build:win": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder --win",
-    "electron:build:linux": "tsc -b && vite build && tsc -p tsconfig.electron.json && electron-builder --linux"
+    "electron:dev": "electron-vite dev",
+    "electron:build": "electron-vite build && electron-builder",
+    "electron:build:mac": "electron-vite build && electron-builder --mac",
+    "electron:build:win": "electron-vite build && electron-builder --win",
+    "electron:build:linux": "electron-vite build && electron-builder --linux"
   },
   "build": {
     "appId": "com.wendermedia.live-music-coder",
@@ -33,21 +33,31 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         }
       ],
       "category": "public.app-category.music"
     },
     "win": {
       "target": [
-        { "target": "nsis" },
-        { "target": "portable" }
+        {
+          "target": "nsis"
+        },
+        {
+          "target": "portable"
+        }
       ]
     },
     "linux": {
       "target": [
-        { "target": "AppImage" },
-        { "target": "deb" }
+        {
+          "target": "AppImage"
+        },
+        {
+          "target": "deb"
+        }
       ],
       "category": "Audio"
     },
@@ -85,7 +95,6 @@
     "@tailwindcss/vite": "^4.2.2",
     "@xyflow/react": "^12.10.1",
     "electron-log": "^5.4.3",
-    "electron-store": "^10.1.0",
     "electron-updater": "^6.8.3",
     "framer-motion": "^12.38.0",
     "i18next": "^25.10.9",
@@ -102,8 +111,6 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
-    "@electron-toolkit/preload": "^3.0.2",
-    "@electron-toolkit/utils": "^4.0.0",
     "@eslint/js": "^9.39.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -113,8 +120,9 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "concurrently": "^9.2.1",
-    "electron": "^41.1.1",
+    "electron": "^33.4.11",
     "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",

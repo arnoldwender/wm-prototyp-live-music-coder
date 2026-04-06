@@ -4,7 +4,7 @@
 import { ipcMain, dialog, shell, BrowserWindow } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { basename } from 'node:path'
-import { appStore, addRecentFile } from '../store.js'
+import { appStore, addRecentFile } from '../store'
 
 /**
  * Register all file-related IPC handlers.

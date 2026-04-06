@@ -3,7 +3,7 @@
 
 import { ipcMain, dialog, BrowserWindow } from 'electron'
 import { writeFile } from 'node:fs/promises'
-import { encodeWav } from '../wav-encoder.js'
+import { encodeWav } from '../wav-encoder'
 
 /**
  * Register audio export IPC handlers.
