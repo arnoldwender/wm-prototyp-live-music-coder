@@ -54,7 +54,7 @@ These files import from `@strudel/*` packages and are licensed under AGPL-3.0-or
 
 ## Copyright
 
-Copyright (c) 2026 Arnold Wender / Wender Media
+Copyright (c) 2026 [Arnold Wender](https://arnoldwender.com) / [Wender Media](https://www.wendermedia.com)
 
 All original source code in this repository is the intellectual property of Arnold Wender. The MIT license on individual files permits free use, modification, and distribution of those files independently, with attribution.
 

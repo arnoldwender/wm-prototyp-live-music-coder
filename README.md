@@ -209,7 +209,7 @@ Every source file contains an `SPDX-License-Identifier` header indicating its li
 
 See [LICENSING.md](LICENSING.md) for full details on which components are MIT vs AGPL.
 
-**Copyright (c) 2026 [Arnold Wender](https://wendermedia.com) / Wender Media**
+**Copyright (c) 2026 [Arnold Wender](https://arnoldwender.com) / [Wender Media](https://www.wendermedia.com)**
 
 ---
 
