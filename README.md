@@ -24,6 +24,7 @@
   <img src="https://img.shields.io/badge/vite-8-purple?logo=vite" alt="Vite 8">
   <img src="https://img.shields.io/badge/license-AGPL--3.0-green" alt="License AGPL-3.0">
   <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES-orange" alt="i18n DE EN ES">
+  <a href="https://github.com/sponsors/arnoldwender"><img src="https://img.shields.io/badge/sponsor-arnoldwender-ea4aaa?logo=github-sponsors" alt="Sponsor"></a>
 </p>
 
 ---
