@@ -3,8 +3,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-/* Vite config — React + Tailwind CSS v4 + Vitest */
+/* Vite config — React + Tailwind CSS v4 + Vitest
+ * base: './' is required for Electron file:// protocol loading */
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     tailwindcss(),

@@ -22,6 +22,8 @@ import {
   Undo2,
   Redo2,
 } from 'lucide-react'
+import { isElectron, electronAPI } from '../../lib/electron'
+import { Save, Download } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { getOrchestrator } from '../../lib/orchestrator'
 import { MIN_BPM, MAX_BPM } from '../../lib/constants'
@@ -63,6 +65,9 @@ function TransportBar() {
 
   /* Responsive — hide Groups 2+3 on mobile behind overflow menu */
   const isMobile = useMediaQuery('(max-width: 768px)')
+
+  /* Platform detection for keyboard shortcut labels */
+  const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform)
   const [showOverflow, setShowOverflow] = useState(false)
 
   /* Ref for click-outside detection on overflow menu */
@@ -293,6 +298,42 @@ function TransportBar() {
                 </Button>
               </Tooltip>
             </ToolbarGroup>
+
+            {/* Group 4 — Desktop-only: Save and Export Audio (Electron only, tree-shaken in web build) */}
+            {isElectron && (
+              <>
+                <GroupDivider />
+                <ToolbarGroup>
+                  <Tooltip content={`Save Project (${isMac ? '⌘S' : 'Ctrl+S'})`}>
+                    <Button variant="ghost" onClick={() => {
+                      const store = useAppStore.getState()
+                      const project = {
+                        id: `project_${Date.now()}`,
+                        name: 'Live Music Coder Project',
+                        version: 1 as const,
+                        created: new Date().toISOString(),
+                        updated: new Date().toISOString(),
+                        bpm: store.bpm,
+                        defaultEngine: store.defaultEngine,
+                        files: store.files,
+                        graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
+                        layout: store.layout,
+                      }
+                      electronAPI?.saveProject(JSON.stringify(project))
+                    }}>
+                      <Save size={16} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content={`Export Audio (${isMac ? '⌘E' : 'Ctrl+E'})`}>
+                    <Button variant="ghost" onClick={() => {
+                      electronAPI?.notify('Export', 'Use the recording feature first, then export.')
+                    }}>
+                      <Download size={16} />
+                    </Button>
+                  </Tooltip>
+                </ToolbarGroup>
+              </>
+            )}
 
             {/* Language switcher (last element) */}
             <LanguageSwitcher />

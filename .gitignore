@@ -33,3 +33,16 @@ Thumbs.db
 
 # Local Netlify folder
 .netlify
+
+# Electron build output
+dist-electron/
+release/
+*.dmg
+*.exe
+*.AppImage
+*.deb
+*.snap
+
+# TypeScript build info cache
+*.tsbuildinfo
+out/

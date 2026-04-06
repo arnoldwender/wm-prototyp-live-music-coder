@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://live-music-coder.pro/favicon.svg" alt="Live Music Coder" width="80" height="80">
+  <img src="public/favicon.svg" alt="Live Music Coder" width="80" height="80">
 </p>
 
 <h1 align="center">Live Music Coder</h1>
@@ -197,3 +197,7 @@ Every source file contains an `SPDX-License-Identifier` header indicating its li
 See [LICENSING.md](LICENSING.md) for full details on which components are MIT vs AGPL.
 
 **Copyright (c) 2026 [Arnold Wender](https://wendermedia.com) / Wender Media**
+
+---
+
+> If you are a racist, fascist, or have another kind of mental disability that makes you discriminate against other human beings — please don't use my software.
