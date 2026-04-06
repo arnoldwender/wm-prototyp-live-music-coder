@@ -1,0 +1,59 @@
+/* ──────────────────────────────────────────────────────────
+   Global styles — Tailwind CSS v4 + design token imports
+   Dark-mode-only music production aesthetic.
+   ────────────────────────────────────────────────────────── */
+@import "tailwindcss";
+@import './tokens/index.css';
+
+/* --- Base element styles --- */
+html {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  margin: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100%;
+}
+
+/* --- Monospace elements — code editor and terminal --- */
+code,
+pre,
+.cm-editor {
+  font-family: var(--font-family-mono);
+}
+
+/* --- Scrollbar styling (webkit) --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* --- Playing indicator animation for StrudelEditor --- */
+@keyframes playing-indicator {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

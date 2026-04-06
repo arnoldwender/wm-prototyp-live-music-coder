@@ -1,0 +1,120 @@
+# Development Instructions
+
+## Setup
+
+```bash
+git clone https://github.com/arnoldwender/wm-prototyp-live-music-coder.git
+cd wm-prototyp-live-music-coder
+npm install
+npm run dev
+```
+
+## Development Workflow (Web)
+
+1. Make changes in `src/`
+2. Dev server hot-reloads automatically
+3. Run `npm run test` to verify (82 tests, 16 files)
+4. Run `npx tsc --noEmit` to type-check
+5. Commit: `git commit -m "[Action] Brief description"`
+6. Deploy: `npm run build && netlify deploy --prod --dir=dist`
+
+## Development Workflow (Electron)
+
+1. Run `npm run electron:dev` — starts electron-vite with hot-reload
+2. Main process code lives in `electron/`, renderer is the same `src/` SPA
+3. IPC handlers are in `electron/ipc/` (app, audio, file, window)
+4. Preload bridge at `electron/preload.ts` exposes `window.electronAPI`
+5. Build for distribution: `npm run electron:build:mac` (or `:win`, `:linux`)
+6. Output goes to `release/` (gitignored)
+
+## Adding a New Component
+
+Follow Atomic Design hierarchy:
+
+- **Atom** (basic element): `src/components/atoms/MyAtom.tsx` — imports nothing from other components
+- **Molecule** (group of atoms): `src/components/molecules/MyMolecule.tsx` — imports only atoms
+- **Organism** (complex section): `src/components/organisms/MyOrganism.tsx` — imports molecules and atoms
+
+Add to the corresponding `index.ts` barrel export.
+
+## Adding a New Audio Engine
+
+1. Create adapter in `src/lib/engines/myengine.ts` extending `BaseEngine`
+2. Implement: `init()`, `createNode()`, `evaluate()`, `start()`, `stop()`
+3. Register in `src/lib/engines/index.ts` → `createEngine()` switch + `ENGINE_META`
+4. Add engine type to `src/types/engine.ts` → `EngineType` union
+5. Add parser support in `src/lib/parser/index.ts`
+6. Add codegen support in `src/lib/codegen/index.ts`
+7. Add color to `src/styles/tokens/colors.css` and `src/lib/constants.ts`
+8. Add i18n keys in all 3 locale files
+
+## Adding a New Visualizer
+
+1. Create drawing function in `src/lib/visualizers/myvis.ts` (pure function: ctx, width, height, data → void)
+2. Create organism in `src/components/organisms/MyVisualizer.tsx` using `CanvasVisualizer` atom
+3. Add to `VisualizerDashboard.tsx` in the active panels array
+4. Add toggle key to `PanelLayout.visiblePanels` in `src/types/project.ts`
+5. Add toggle button in `VisualizerToggle.tsx`
+6. Add i18n key in `panels.*`
+
+## Adding a New IPC Channel (Electron)
+
+1. Create or extend handler in `electron/ipc/` (app, audio, file, or window)
+2. Register handler in `electron/main.ts` via `ipcMain.handle()` or `ipcMain.on()`
+3. Expose in `electron/preload.ts` via `contextBridge.exposeInMainWorld()`
+4. Use in renderer via `window.electronAPI.myMethod()` — guard with `if (window.electronAPI)`
+
+## Design Token Rules
+
+- All colors, spacing, typography, shadows, transitions, and border-radius must use CSS custom properties
+- Tokens defined in `src/styles/tokens/`
+- Canvas 2D cannot use CSS variables — use `VIZ_COLORS` from `src/lib/visualizers/colors.ts`
+- Exception: `0`, `none`, `inherit`, `currentColor`, `transparent`, percentage values
+
+## Testing
+
+- Framework: Vitest + @testing-library/react
+- Colocated: `foo.test.ts` next to `foo.ts`
+- Mock AnalyserNode for audio tests (no real AudioContext in jsdom)
+- Store tests: reset state in `beforeEach` with `useAppStore.setState(useAppStore.getInitialState())`
+
+## Pages
+
+| Page | Route | Source |
+| ---- | ----- | ------ |
+| Landing | `/` | `src/pages/Landing.tsx` |
+| Editor | `/editor` | `src/pages/Editor.tsx` |
+| Docs | `/docs`, `/docs/:sectionId` | `src/pages/Docs.tsx` + `src/data/docs.ts` |
+| Samples | `/samples` | `src/pages/Samples.tsx` + `src/data/sample-library.ts` |
+| Examples | `/examples` | `src/pages/Examples.tsx` + `src/data/example-library.ts` |
+| Legal | `/legal` | `src/pages/Legal.tsx` + `src/data/legal.ts` |
+
+## Superdough Audio Tap
+
+Strudel uses superdough for audio synthesis. The `src/lib/audio/strudel-tap.ts` module taps into superdough's audio output to feed the shared `AudioContext` analyser, enabling visualizers to react to Strudel patterns. Type declarations for superdough are in `src/types/strudel.d.ts`.
+
+## i18n
+
+- 3 languages: DE, EN, ES
+- Translation files: `src/i18n/locales/{de,en,es}.json`
+- Key format: `namespace.section.key` (e.g., `transport.play`)
+- Code syntax stays English; autocomplete tooltips should be translated
+- Language persisted in localStorage key `lmc-lang`
+
+## Deployment
+
+### Web (Netlify)
+
+- Platform: Netlify
+- Build: `npm run build` → `dist/`
+- SPA redirect configured in `netlify.toml`
+- Manual deploy: `netlify deploy --prod --dir=dist`
+- Site ID: `a03cf0e5-f018-4d4e-bc11-5c973fb071fc`
+
+### Desktop (Electron)
+
+- Bundler: electron-vite 5 + electron-builder
+- Config: `electron.vite.config.ts` (main, preload, renderer targets)
+- Build output: `out/` (electron-vite) → `release/` (electron-builder)
+- Targets: macOS (.dmg), Windows (.exe), Linux (.AppImage)
+- Node: v20 bundled with Electron 33

@@ -1,0 +1,43 @@
+/* ──────────────────────────────────────────────────────────
+   Color tokens — dark-mode-first palette for a music IDE
+   Engine accents map to audio engine identity colors.
+   ────────────────────────────────────────────────────────── */
+:root {
+  /* --- Engine accent colors --- */
+  --color-strudel: #a855f7;
+  --color-strudel-dim: #7c3aed;
+  --color-tonejs: #3b82f6;
+  --color-tonejs-dim: #2563eb;
+  --color-webaudio: #22c55e;
+  --color-webaudio-dim: #16a34a;
+  --color-midi: #f97316;
+  --color-midi-dim: #ea580c;
+
+  /* --- Base backgrounds --- */
+  --color-bg: #09090b;
+  --color-bg-alt: #18181b;
+  --color-bg-elevated: #27272a;
+  --color-bg-hover: #3f3f46;
+
+  /* --- Borders --- */
+  --color-border: #3f3f46;
+  --color-border-dim: #27272a;
+
+  /* --- Text --- */
+  --color-text: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+
+  /* --- Overlays --- */
+  --color-backdrop: rgba(0, 0, 0, 0.6);
+
+  /* --- Semantic --- */
+  --color-primary: #a855f7;
+  --color-error: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  /* --- Strudel highlight decorations (CodeMirror) --- */
+  --color-strudel-highlight-bg: rgba(168, 85, 247, 0.25);
+  --color-strudel-highlight-border: rgba(168, 85, 247, 0.5);
+}
