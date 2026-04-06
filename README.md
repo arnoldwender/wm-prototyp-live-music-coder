@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://live-music-coder.pro/favicon.svg" alt="Live Music Coder" width="80" height="80">
+  <img src="public/favicon.svg" alt="Live Music Coder" width="80" height="80">
 </p>
 
 <h1 align="center">Live Music Coder</h1>
