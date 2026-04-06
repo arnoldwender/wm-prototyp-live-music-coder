@@ -1,7 +1,7 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* SPDX-License-Identifier: MIT
-   Copyright (c) 2026 Arnold Wender / Wender Media
-   ──────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────
    Web Audio engine adapter — raw Web Audio API access.
    Tracks all created sources/nodes so they can be stopped
    on re-evaluate (prevents overlapping playback).

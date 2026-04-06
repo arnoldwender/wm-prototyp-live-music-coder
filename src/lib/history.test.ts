@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    History manager tests — TDD: written before implementation.
    Verifies undo/redo stack behavior, max size trimming.

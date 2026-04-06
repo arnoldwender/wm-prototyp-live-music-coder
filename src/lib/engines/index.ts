@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    Engine registry — barrel exports + lazy factory + metadata.
    Engines are loaded on demand to avoid bundling Tone.js (636KB)

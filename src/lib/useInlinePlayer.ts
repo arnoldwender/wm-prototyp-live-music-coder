@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    useInlinePlayer — shared hook for playing audio patterns

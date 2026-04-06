@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* SPDX-License-Identifier: MIT
+/* SPDX-License-Identifier: AGPL-3.0-or-later
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
    Example gallery — cards with inline play button.
@@ -250,10 +250,10 @@ export function ExampleGallery() {
           alignItems: 'center',
           gap: 'var(--space-2)',
           padding: 'var(--space-2) var(--space-4)',
-          backgroundColor: 'rgba(9, 9, 11, 0.95)',
+          backgroundColor: 'var(--color-bg)',
           border: '1px solid var(--color-primary)',
           borderRadius: 'var(--radius-md)',
-          boxShadow: '0 0 12px rgba(168,85,247,0.2)',
+          boxShadow: '0 0 12px color-mix(in srgb, var(--color-primary) 20%, transparent)',
           fontSize: '11px',
           color: 'var(--color-text)',
         }}>

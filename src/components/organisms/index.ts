@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* Barrel export — all organism components */
 export { default as TransportBar } from './TransportBar'
 export { default as StatusBar } from './StatusBar'

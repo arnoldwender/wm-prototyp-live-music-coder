@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    usePageMeta — sets document.title, meta description, and
    canonical URL per page. Cleans up meta tags on unmount.

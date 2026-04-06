@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    Tests for AudioAnalyzer — uses a mock AnalyserNode with
    controlled frequency and time-domain data.

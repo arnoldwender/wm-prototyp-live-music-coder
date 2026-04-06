@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    Beginner-friendly error messages — translates cryptic JS errors
    into actionable explanations with fix suggestions.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* Barrel export — all molecule components */
 export { default as ToolbarGroup } from './ToolbarGroup'
 export { default as EngineSelector } from './EngineSelector'

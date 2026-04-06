@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* Autocomplete completions for each audio engine.
  * Descriptions are i18n-ready — keyed by function name.
  * CM6 autocompletion triggers on typing or Ctrl+Space. */

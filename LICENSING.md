@@ -47,6 +47,10 @@ These files import from `@strudel/*` packages and are licensed under AGPL-3.0-or
 | `src/lib/editor/extensions.ts` | Strudel CodeMirror extensions |
 | `src/components/organisms/StrudelEditor.tsx` | Strudel-specific UI |
 | `src/types/strudel.d.ts` | Strudel type declarations |
+| `src/components/organisms/ExampleGallery.tsx` | Inline play via Strudel |
+| `src/components/organisms/SidePanel.tsx` | Sample preview via Strudel |
+| `src/components/organisms/PianorollVisualizer.tsx` | Strudel pattern visualization |
+| `src/lib/useInlinePlayer.ts` | Inline audio preview hook |
 
 ## Copyright
 

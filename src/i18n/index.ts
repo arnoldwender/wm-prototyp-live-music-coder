@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Arnold Wender / Wender Media
 /* ──────────────────────────────────────────────────────────
    i18n configuration — DE/EN/ES with auto-detection
    Priority: localStorage → browser language → English
