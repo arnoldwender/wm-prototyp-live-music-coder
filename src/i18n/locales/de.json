@@ -85,6 +85,11 @@
         "title": "DE / EN / ES",
         "desc": "Vollständige Oberfläche auf Deutsch, Englisch und Spanisch mit übersetzten Autocomplete-Tooltips."
       }
+    },
+    "download": {
+      "title": "Desktop App herunterladen",
+      "subtitle": "Nativer Dateispeicher, System-Tray, Audio-Export und Auto-Updates. Die gleiche Live-Coding-Power, offline.",
+      "cta": "Für macOS herunterladen"
     }
   },
   "help": {

@@ -85,6 +85,11 @@
         "title": "DE / EN / ES",
         "desc": "Interfaz completa en alemán, inglés y español con tooltips de autocompletado traducidos."
       }
+    },
+    "download": {
+      "title": "Descargar App de Escritorio",
+      "subtitle": "Guardado nativo de archivos, bandeja del sistema, exportación de audio y actualizaciones automáticas. El mismo poder de live coding, sin conexión.",
+      "cta": "Descargar para macOS"
     }
   },
   "help": {

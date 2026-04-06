@@ -28,6 +28,19 @@
 
 ---
 
+## Download Desktop App
+
+| Platform | Architecture | Download |
+|----------|-------------|----------|
+| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.0-arm64.dmg) |
+| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.0.dmg) |
+| Windows | x64 | Coming soon |
+| Linux | x64 | Coming soon |
+
+Or [try it in your browser](https://live-music-coder.pro) — no download required.
+
+---
+
 ## Features
 
 **Code Editor** — CodeMirror 6 with dark theme, multi-tab files, per-engine syntax highlighting, and live evaluation with 500ms debounce.

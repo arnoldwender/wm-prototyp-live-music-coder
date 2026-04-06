@@ -194,6 +194,55 @@ function Landing() {
 
       <SectionDivider />
 
+      {/* Desktop app download section */}
+      <section id="download" className="py-16 text-center" style={{ padding: '0 var(--space-6)' }}>
+        <h2 style={{
+          fontSize: 'var(--font-size-2xl)',
+          fontWeight: 'var(--font-weight-bold)',
+          color: 'var(--color-text)',
+          marginBottom: 'var(--space-2)',
+        }}>
+          {t('landing.download.title')}
+        </h2>
+        <p style={{
+          fontSize: 'var(--font-size-sm)',
+          color: 'var(--color-text-muted)',
+          marginBottom: 'var(--space-6)',
+          maxWidth: '500px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}>
+          {t('landing.download.subtitle')}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3) var(--space-6)',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-bg)',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-bold)',
+              borderRadius: 'var(--radius-md)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('landing.download.cta')}
+          </a>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+            macOS (Apple Silicon + Intel) — Windows & Linux coming soon
+          </span>
+        </div>
+      </section>
+
+      <SectionDivider />
+
       {/* Footer with powered-by engines and license */}
       <footer
         className="text-center py-12"

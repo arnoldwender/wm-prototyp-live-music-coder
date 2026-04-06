@@ -85,6 +85,11 @@
         "title": "DE / EN / ES",
         "desc": "Full interface in German, English, and Spanish with translated autocomplete tooltips."
       }
+    },
+    "download": {
+      "title": "Download Desktop App",
+      "subtitle": "Native file save/load, system tray, audio export, and auto-updates. Same live coding power, offline.",
+      "cta": "Download for macOS"
     }
   },
   "help": {
