@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Arnold Wender / Wender Media
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* Strudel editor — integrates @strudel/codemirror for slider widgets,
  * pattern highlighting, and full REPL features alongside custom CM6. */

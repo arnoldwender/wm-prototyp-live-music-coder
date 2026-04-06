@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (c) 2026 Arnold Wender / Wender Media
+
 /* Universal audio tap for visualization — works for ALL engines.
  *
  * Priority: Strudel superdough (if connected) > shared masterAnalyser.
