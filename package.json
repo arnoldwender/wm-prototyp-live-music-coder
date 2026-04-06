@@ -128,7 +128,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "concurrently": "^9.2.1",
-    "electron": "^33.4.11",
+    "electron": "^39.8.5",
     "electron-builder": "^26.8.1",
     "electron-builder-notarize": "^1.5.2",
     "electron-vite": "^5.0.0",
@@ -139,7 +139,7 @@
     "jsdom": "^29.0.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.2",
-    "vite": "^8.0.2",
+    "vite": "^8.0.5",
     "vitest": "^4.1.1",
     "wait-on": "^9.0.4"
   }
