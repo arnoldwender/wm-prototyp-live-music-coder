@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Live Music Coder",
-    "tagline": "Programa música. Visualiza el sonido. Cría criaturas."
+    "tagline": "Programa música. Visualiza el sonido. Comparte beats."
   },
   "nav": {
     "openEditor": "Abrir editor",
@@ -47,23 +47,16 @@
     "spectrum": "Espectro",
     "timeline": "Línea de tiempo",
     "pianoroll": "Piano Roll",
-    "beatlings": "Beatlings",
-    "brain": "Cerebro",
     "noVisualizers": "Sin visualizadores activos"
-  },
-  "brain": {
-    "title": "Actividad Neural",
-    "empty": "Reproduce música para generar criaturas y ver su actividad neural"
   },
   "status": {
     "engine": "Motor",
     "files": "Archivos",
-    "creatures": "Criaturas",
     "ready": "Listo"
   },
   "landing": {
     "hero": "Programa tu música en vivo",
-    "subtitle": "Un IDE visual para programar música en vivo con múltiples motores de audio y criaturas digitales que evolucionan con tu sonido.",
+    "subtitle": "Un IDE visual para programar música en vivo con 4 motores de audio, visualizadores en tiempo real y uso compartido de código instantáneo.",
     "cta": "Empezar a programar",
     "examples": "Probar un ejemplo",
     "poweredBy": "Impulsado por",
@@ -80,9 +73,9 @@
         "title": "Visualizadores en vivo",
         "desc": "Forma de onda, analizador de espectro y línea de tiempo reaccionan a tu música en tiempo real."
       },
-      "beatlings": {
-        "title": "Criaturas Beatling",
-        "desc": "6 especies audio-reactivas con cerebros neuronales y evolución Game of Life."
+      "codeshare": {
+        "title": "Compartir código",
+        "desc": "Comparte patrones por URL comprimida, exporta a GitHub Gist o graba tu sesión como audio."
       },
       "share": {
         "title": "Compartir y colaborar",
@@ -374,7 +367,7 @@
       "step2": "Escribe un patrón usando mini-notación o llamadas a funciones",
       "step3": "Presiona Ctrl+Enter para evaluar y escuchar tu código",
       "step4": "Edita el código en vivo — los cambios se aplican en el siguiente ciclo",
-      "tip": "Usa los visualizadores de abajo para ver la forma de onda, el espectro y la línea de tiempo del patrón en tiempo real. Las criaturas Beatling aparecerán y evolucionarán según tu música."
+      "tip": "Usa los visualizadores de abajo para ver la forma de onda, el espectro y la línea de tiempo del patrón en tiempo real."
     },
     "strudelBasics": {
       "title": "Fundamentos de Strudel",
@@ -515,6 +508,6 @@
     "streakDays": "{{count}} día de racha",
     "streakDays_plural": "{{count}} días de racha",
     "sessionSummary": "Sesión completada",
-    "sessionDetails": "Sesión: {{minutes}} min | {{evaluations}} evaluaciones | {{creatures}} criaturas"
+    "sessionDetails": "Sesión: {{minutes}} min | {{evaluations}} evaluaciones"
   }
 }

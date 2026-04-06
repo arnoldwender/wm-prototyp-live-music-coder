@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Live Music Coder",
-    "tagline": "Code music. See sound. Grow creatures."
+    "tagline": "Code music. See sound. Share beats."
   },
   "nav": {
     "openEditor": "Open Editor",
@@ -47,23 +47,16 @@
     "spectrum": "Spectrum",
     "timeline": "Timeline",
     "pianoroll": "Piano Roll",
-    "beatlings": "Beatlings",
-    "brain": "Brain",
     "noVisualizers": "No visualizers active"
-  },
-  "brain": {
-    "title": "Neural Activity",
-    "empty": "Play music to spawn creatures and see their neural activity"
   },
   "status": {
     "engine": "Engine",
     "files": "Files",
-    "creatures": "Creatures",
     "ready": "Ready"
   },
   "landing": {
     "hero": "Live code your music",
-    "subtitle": "A visual IDE for live coding music with multiple audio engines and digital creatures that evolve with your sound.",
+    "subtitle": "A visual IDE for live coding music with 4 audio engines, real-time visualizers, and instant code sharing.",
     "cta": "Start Coding",
     "examples": "Try an Example",
     "poweredBy": "Powered by",
@@ -80,9 +73,9 @@
         "title": "Live Visualizers",
         "desc": "Waveform, spectrum analyzer, and pattern timeline react to your music in real time."
       },
-      "beatlings": {
-        "title": "Beatling Creatures",
-        "desc": "6 species of audio-reactive creatures with neural brains and Game of Life evolution."
+      "codeshare": {
+        "title": "Code Sharing",
+        "desc": "Share patterns via compressed URLs, export to GitHub Gist, or record your session as audio."
       },
       "share": {
         "title": "Share & Collaborate",
@@ -374,7 +367,7 @@
       "step2": "Type a pattern using mini-notation or function calls",
       "step3": "Press Ctrl+Enter to evaluate and hear your code",
       "step4": "Edit the code live — changes take effect on the next cycle",
-      "tip": "Use the visualizers at the bottom to see your waveform, spectrum, and pattern timeline in real time. Beatling creatures will spawn and evolve based on your music."
+      "tip": "Use the visualizers at the bottom to see your waveform, spectrum, and pattern timeline in real time."
     },
     "strudelBasics": {
       "title": "Strudel Basics",
@@ -515,6 +508,6 @@
     "streakDays": "{{count}} day streak",
     "streakDays_plural": "{{count}} day streak",
     "sessionSummary": "Session Complete",
-    "sessionDetails": "Session: {{minutes}} min | {{evaluations}} evaluations | {{creatures}} creatures"
+    "sessionDetails": "Session: {{minutes}} min | {{evaluations}} evaluations"
   }
 }

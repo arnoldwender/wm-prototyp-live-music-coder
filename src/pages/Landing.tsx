@@ -51,7 +51,7 @@ function Landing() {
   /* Per-page SEO meta tags */
   usePageMeta({
     title: 'Live Music Coder — Browser-Based Live Coding Music IDE',
-    description: 'Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and audio-reactive Beatling creatures.',
+    description: 'Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and instant code sharing.',
     path: '/',
   })
 
