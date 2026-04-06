@@ -104,11 +104,6 @@ export function GistDialog({ onClose }: GistDialogProps) {
         files: store.files,
         graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
         layout: store.layout,
-        ecosystem: {
-          creatures: [],
-          golGrid: { width: 64, height: 64, liveCells: [] },
-          collection: [],
-        },
       }
       const result = await saveToGist(project)
       const url = `https://gist.github.com/${result.id}`
