@@ -27,7 +27,8 @@ Browser-based and desktop live coding music IDE with code editor, visual node gr
 | Icons | Lucide React |
 | Testing | Vitest 4 + @testing-library/react |
 | Desktop | Electron 33 via electron-vite 5 + electron-builder |
-| Deployment | Netlify (SPA, static) |
+| Code Signing | Developer ID Application (REDACTED) + notarization via electron-builder-notarize |
+| Deployment | Netlify (SPA, static) + GitHub Releases (desktop) |
 
 ## Commands
 
