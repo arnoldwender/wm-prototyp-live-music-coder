@@ -40,7 +40,6 @@
         }
       ],
       "category": "public.app-category.music",
-      "identity": "Arnold Wender (REDACTED)",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
