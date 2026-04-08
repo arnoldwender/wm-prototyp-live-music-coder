@@ -276,11 +276,20 @@ function Landing() {
           Web Audio
         </p>
 
-        {/* Legal links + License */}
+        {/* Legal links + GitHub + License */}
         <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
           <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
           <span>|</span>
           <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
+          <span>|</span>
+          <a
+            href="https://github.com/arnoldwender/wm-prototyp-live-music-coder"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}
+          >
+            GitHub
+          </a>
         </p>
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
           {t('footer.license')}
