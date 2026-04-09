@@ -15,6 +15,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
 import Landing from './pages/Landing'
 import { NotFound, ErrorBoundary } from './components/atoms'
+import { isElectron, isElectronMac, TITLEBAR_HEIGHT } from './lib/platform'
 
 /* Lazy-load non-landing pages — reduces initial bundle for first-visit perf */
 const Editor = lazy(() => import('./pages/Editor'))
@@ -25,10 +26,41 @@ const Legal = lazy(() => import('./pages/Legal'))
 const Sessions = lazy(() => import('./pages/Sessions'))
 const SessionPiece = lazy(() => import('./pages/SessionPiece'))
 
-/* Target detection — electronAPI is only present in packaged Electron
-   via contextBridge in electron/preload.ts. */
-const isElectron = typeof window !== 'undefined' && !!window.electronAPI
+/* Electron needs HashRouter under file:// because HTML5 history
+   can't distinguish file:// paths. `isElectron` is imported from
+   src/lib/platform.ts, which detects window.electronAPI. */
 const Router = isElectron ? HashRouter : BrowserRouter
+
+/* Custom title-bar drag strip for Electron on macOS. The main window
+   is created with `titleBarStyle: 'hiddenInset'` so there is no native
+   title bar — which also means no default draggable region. Without
+   this strip the window can't be moved, and the macOS traffic lights
+   (rendered at x=12, y=12 by electron/main.ts) end up floating over
+   whatever is at the top-left of the current page. The strip is
+   invisible (transparent), sits above the app content, and has
+   `-webkit-app-region: drag` so macOS treats it as a title bar while
+   the traffic lights keep working natively inside it. Body padding
+   provided by `.electron-mac body` in global.css reserves matching
+   space below so nothing is covered. */
+function TitleBar() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: `${TITLEBAR_HEIGHT}px`,
+        /* Cast to any — React typings don't include the vendor
+           -webkit-app-region property even though Electron relies
+           on it. */
+        WebkitAppRegion: 'drag',
+        zIndex: 9999,
+      } as React.CSSProperties}
+    />
+  )
+}
 
 /* Loading fallback for lazy routes. Uses HARDCODED colors (not tokens)
    for the same reason as ErrorBoundary: if a chunk fails or stalls before
@@ -73,12 +105,14 @@ function RouteLoader() {
 function App() {
   return (
     <ErrorBoundary>
+      {isElectronMac && <TitleBar />}
       <Router>
         <Suspense fallback={<RouteLoader />}>
         <Routes>
-          {/* In Electron, / renders the Editor directly (no landing page);
-              on the web, / renders the marketing Landing. */}
-          <Route path="/" element={isElectron ? <Editor /> : <Landing />} />
+          {/* Root route renders the Landing (hero) on both web and
+              Electron. The hero's "Start Coding" CTA links to /editor,
+              which is where the actual IDE lives. */}
+          <Route path="/" element={<Landing />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/editor" element={<Editor />} />
           <Route path="/docs" element={<Docs />} />

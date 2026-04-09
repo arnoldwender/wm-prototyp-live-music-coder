@@ -7,6 +7,15 @@ import { createRoot } from 'react-dom/client'
 import './i18n'
 import './styles/global.css'
 import App from './App.tsx'
+import { isElectronMac } from './lib/platform'
+
+/* Tag <html> with `electron-mac` when running the packaged app on
+   macOS so global.css can reserve space at the top for the custom
+   title-bar drag strip (see <TitleBar /> in App.tsx). Never fires
+   on the web or on Linux/Windows. */
+if (isElectronMac) {
+  document.documentElement.classList.add('electron-mac')
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

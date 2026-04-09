@@ -25,6 +25,17 @@ body {
   height: 100%;
 }
 
+/* --- Electron on macOS: reserve 28px at the top of the viewport for
+       the custom title-bar drag strip (see src/lib/platform.ts and the
+       <TitleBar /> rendered from App.tsx). This prevents traffic lights
+       from covering page headers and provides a draggable region since
+       BrowserWindow uses titleBarStyle: 'hiddenInset'. Applied via a
+       class set on <html> from main.tsx so it never activates on web. */
+html.electron-mac body {
+  padding-top: 28px;
+  box-sizing: border-box;
+}
+
 /* --- Monospace elements — code editor and terminal --- */
 code,
 pre,

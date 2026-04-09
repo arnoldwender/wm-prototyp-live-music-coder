@@ -65,7 +65,11 @@ export function initUpdater(mainWindow: BrowserWindow): void {
 
   // --- Periodic check every 4 hours.
   // Result is intentionally discarded — process lifetime keeps the
-  // interval alive, so there is nothing to clear. */
+  // interval alive, so there is nothing to clear. The explicit
+  // leading semicolon on the next statement is REQUIRED: without
+  // it ASI parses `setInterval(...)\n(app).on(...)` as a single
+  // expression calling the timer return value as a function, which
+  // blows up at runtime as `setInterval(...) is not a function`. */
   setInterval(() => {
     void autoUpdater.checkForUpdates().catch((err: Error) => {
       log.error('Periodic update check failed:', err)
@@ -74,7 +78,7 @@ export function initUpdater(mainWindow: BrowserWindow): void {
 
   // --- Manual check trigger from menu/IPC ---
   // Custom event name requires type assertion
-  (app as NodeJS.EventEmitter).on('check-for-updates', () => {
+  ;(app as NodeJS.EventEmitter).on('check-for-updates', () => {
     autoUpdater.checkForUpdates().catch((err) => {
       log.error('Manual update check failed:', err)
     })
