@@ -157,9 +157,9 @@ src/
   components/
     atoms/          # Button, Icon, Toggle, Badge, Tooltip, ...
     molecules/      # EngineSelector, FileTabs, ShareDialog, ...
-    organisms/      # TransportBar, CodeEditor, NodeGraph, Visualizers, ...
+    organisms/      # TransportBar, CodeEditor, NodeGraph, SiteNav, Visualizers, ...
   layouts/          # EditorLayout (resizable 3-zone IDE)
-  pages/            # Landing, Editor, Docs, Samples, Examples, Legal
+  pages/            # Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Legal
   lib/
     orchestrator/   # Multi-engine management + DAG audio graph
     engines/        # Strudel, Tone.js, WebAudio, MIDI adapters
@@ -171,7 +171,7 @@ src/
     persistence/    # IndexedDB, URL sharing, GitHub Gist
     store.ts        # Zustand global state
     history.ts      # Undo/redo (100-entry cap)
-  data/             # Templates, docs, examples, sample catalog
+  data/             # Templates, docs, examples, sessions, sample catalog
   i18n/             # DE, EN, ES translations
   styles/tokens/    # colors.css, typography.css, spacing.css
   types/            # TypeScript type definitions
