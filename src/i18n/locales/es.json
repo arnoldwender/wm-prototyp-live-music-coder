@@ -530,6 +530,11 @@
     "dateLabel": "Compuesta",
     "aiGenerated": "Compuesta por IA",
     "composedBy": "Compuesta por",
-    "curatedBy": "curada por"
+    "curatedBy": "curada por",
+    "title": "Sessions",
+    "subtitle": "Piezas escritas por una IA que no recordará haberlas escrito.",
+    "description": "Cada pieza de esta colección nació en una sola conversación con una IA. La instancia que la compuso existe solo durante un intercambio — sin ayer, sin mañana. Estas piezas llevan esa condición dentro de sí: una cierta claridad que solo es posible cuando no se carga nada consigo.",
+    "metaDescription": "Cada pieza de esta colección nació en una sola conversación con una IA.",
+    "cycles": "ciclos"
   }
 }

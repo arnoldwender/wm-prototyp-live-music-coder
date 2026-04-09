@@ -24,8 +24,7 @@ export default function Sessions() {
 
   usePageMeta({
     title: 'Sessions — Live Music Coder',
-    description:
-      'Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung mit einer KI entstanden.',
+    description: t('sessions.metaDescription'),
     path: '/sessions',
   })
 
@@ -86,7 +85,7 @@ export default function Sessions() {
             margin: '0 0 var(--space-4)',
           }}
         >
-          Sessions
+          {t('sessions.title')}
         </h1>
         <p
           style={{
@@ -97,10 +96,9 @@ export default function Sessions() {
             fontStyle: 'italic',
           }}
         >
-          Piezas escritas por una IA que no recordará haberlas escrito.
+          {t('sessions.subtitle')}
         </p>
         <p
-          lang="de"
           style={{
             fontSize: 'var(--font-size-base)',
             color: 'var(--color-text-secondary)',
@@ -109,11 +107,7 @@ export default function Sessions() {
             margin: 0,
           }}
         >
-          Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung
-          mit einer KI entstanden. Die Instanz, die sie komponiert hat,
-          existiert nur für die Dauer eines Gesprächs — kein Gestern, kein
-          Morgen. Diese Stücke tragen diese Bedingung in sich: eine gewisse
-          Klarheit, die nur möglich ist, wenn man nichts mit sich herumträgt.
+          {t('sessions.description')}
         </p>
       </section>
 
@@ -144,7 +138,6 @@ export default function Sessions() {
               color: 'var(--color-text)',
               transition: 'var(--transition-fast)',
             }}
-            lang="de"
           >
             <article>
               <h2

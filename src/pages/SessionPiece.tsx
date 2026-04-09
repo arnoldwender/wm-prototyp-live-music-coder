@@ -93,7 +93,6 @@ export default function SessionPiece() {
       {/* --- Content --- */}
       <article
         id="piece-main"
-        lang="de"
         style={{
           maxWidth: '840px',
           margin: '0 auto',
@@ -123,7 +122,7 @@ export default function SessionPiece() {
             margin: '0 0 var(--space-2)',
           }}
         >
-          Sessions
+          {t('sessions.title')}
         </p>
 
         <h1
@@ -327,7 +326,7 @@ export default function SessionPiece() {
                     }}
                   >
                     {mv.key}
-                    {typeof mv.bars === 'number' && ` — ${mv.bars} Zyklen`}
+                    {typeof mv.bars === 'number' && ` — ${mv.bars} ${t('sessions.cycles')}`}
                   </div>
                 </li>
               ))}

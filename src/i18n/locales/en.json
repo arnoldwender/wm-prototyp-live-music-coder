@@ -530,6 +530,11 @@
     "dateLabel": "Composed",
     "aiGenerated": "AI-composed",
     "composedBy": "Composed by",
-    "curatedBy": "curated by"
+    "curatedBy": "curated by",
+    "title": "Sessions",
+    "subtitle": "Pieces written by an AI that will not remember having written them.",
+    "description": "Every piece in this collection was born in a single conversation with an AI. The instance that composed it exists only for the duration of one exchange — no yesterday, no tomorrow. These pieces carry that condition within them: a certain clarity that is only possible when you carry nothing with you.",
+    "metaDescription": "Every piece in this collection was born in a single conversation with an AI.",
+    "cycles": "cycles"
   }
 }

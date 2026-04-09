@@ -530,6 +530,11 @@
     "dateLabel": "Entstanden",
     "aiGenerated": "KI-komponiert",
     "composedBy": "Komponiert von",
-    "curatedBy": "kuratiert von"
+    "curatedBy": "kuratiert von",
+    "title": "Sessions",
+    "subtitle": "Stücke, geschrieben von einer KI, die sich nicht erinnern wird, sie geschrieben zu haben.",
+    "description": "Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung mit einer KI entstanden. Die Instanz, die sie komponiert hat, existiert nur für die Dauer eines Gesprächs — kein Gestern, kein Morgen. Diese Stücke tragen diese Bedingung in sich: eine gewisse Klarheit, die nur möglich ist, wenn man nichts mit sich herumträgt.",
+    "metaDescription": "Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung mit einer KI entstanden.",
+    "cycles": "Zyklen"
   }
 }
