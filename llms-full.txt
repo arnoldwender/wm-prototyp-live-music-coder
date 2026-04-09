@@ -4,7 +4,7 @@
 
 Live Music Coder is a browser-based and Electron desktop live coding music IDE. Users write code to create music in real time using 4 audio engines. The app features a CodeMirror 6 code editor, a React Flow visual node graph, Canvas 2D audio visualizers (waveform, spectrum, timeline, pianoroll), and full i18n (DE/EN/ES). It ships as both a Netlify-hosted SPA and a native desktop app via Electron.
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Live:** https://live-music-coder.pro
 **Repo:** https://github.com/arnoldwender/wm-prototyp-live-music-coder
 
@@ -56,7 +56,7 @@ Hierarchy rules: atoms import nothing, molecules import only atoms, organisms im
 
 ### Runtime
 
-Electron 33.4.11 (Node v20 bundled), built with electron-vite 5 and electron-builder.
+Electron 41.2.0 (Node v22 bundled), built with electron-vite 5 and electron-builder 26. macOS builds are signed with Developer ID Application and notarized via Apple's native `@electron/notarize` (not the deprecated `electron-builder-notarize` afterSign hook). Auto-updater metadata (`latest-mac.yml`, `-mac.zip` + blockmaps, `.dmg` + blockmaps) is published to GitHub Releases.
 
 ### Directory Structure
 
@@ -99,9 +99,9 @@ electron/
 ### Build Configuration
 
 electron.vite.config.ts defines three build targets:
-- **main:** electron/main.ts → out/main/main.js (CJS)
-- **preload:** electron/preload.ts → out/preload/preload.js (CJS)
-- **renderer:** index.html + src/ → dist/ (standard Vite build with React + Tailwind)
+- **main:** electron/main.ts → out/main/main.cjs (CJS — allows native `__dirname` usage post-bundle)
+- **preload:** electron/preload.ts → out/preload/preload.cjs (CJS)
+- **renderer:** index.html + src/ → dist/ with `base: './'` (standard Vite build with React + Tailwind; relative base is required for file:// loading in packaged app)
 
 ### Build Targets
 
@@ -174,4 +174,6 @@ Copyright (c) 2026 Arnold Wender / Wender Media
 - This is Vite + React SPA — NOT Next.js, no server components, no "use client"
 - Colocated tests: foo.test.ts next to foo.ts
 - Barrel exports: index.ts per component directory
-- Node v22 for Netlify builds, Node v20 bundled with Electron
+- Node v22 for Netlify builds; Node v22 bundled with Electron 41
+- Router: conditional (HashRouter in Electron, BrowserRouter on web) — `/` renders Editor in desktop, Landing on web
+- CSP with `'unsafe-eval'` is required for Strudel pattern evaluation (set via session.webRequest.onHeadersReceived in electron/main.ts)

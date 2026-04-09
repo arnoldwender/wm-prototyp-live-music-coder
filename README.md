@@ -33,8 +33,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.0-arm64.dmg) |
-| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.0.dmg) |
+| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.1-arm64.dmg) |
+| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.1.dmg) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
