@@ -4,17 +4,17 @@
 
 Live Music Coder is a browser-based and Electron desktop live coding music IDE. Users write code to create music in real time using 4 audio engines. The app features a CodeMirror 6 code editor, a React Flow visual node graph, Canvas 2D audio visualizers (waveform, spectrum, timeline, pianoroll), and full i18n (DE/EN/ES). It ships as both a Netlify-hosted SPA and a native desktop app via Electron.
 
-**Version:** 1.0.1
+**Version:** 1.0.2
 **Live:** https://live-music-coder.pro
 **Repo:** https://github.com/arnoldwender/wm-prototyp-live-music-coder
 
 ## Metrics
 
-- Source files: 105 (TS/TSX)
 - Test files: 16
 - Tests: 82
-- Components: 46 (13 atoms, 14 molecules, 19 organisms)
-- Routes: 7
+- Components: 46+ (13 atoms, 14 molecules, 19 organisms)
+- Routes: 9
+- Pages: 8 (Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Legal)
 - Languages: 3 (DE, EN, ES)
 
 ## Architecture
@@ -144,17 +144,19 @@ electron.vite.config.ts defines three build targets:
 - vite, vitest
 - wait-on
 
-## Routes (7)
+## Routes (9)
 
-| Route            | Page      | Description                        |
-|------------------|-----------|------------------------------------|
-| /                | Landing   | Hero, features, examples           |
-| /editor          | Editor    | Main IDE: code, graph, visualizers |
-| /docs            | Docs      | Documentation hub                  |
-| /docs/:sectionId | Docs      | Individual doc section             |
-| /samples         | Samples   | Audio sample library browser       |
-| /examples        | Examples  | Curated code examples per engine   |
-| /legal           | Legal     | Impressum, Datenschutz, Lizenzen   |
+| Route             | Page          | Description                                |
+|-------------------|---------------|--------------------------------------------|
+| /                 | Landing       | Hero, features, examples (also Electron splash) |
+| /editor           | Editor        | Main IDE: code, graph, visualizers         |
+| /docs             | Docs          | Documentation hub                          |
+| /docs/:sectionId  | Docs          | Individual doc section                     |
+| /samples          | Samples       | Audio sample library browser               |
+| /examples         | Examples      | Curated code examples per engine           |
+| /sessions         | Sessions      | Curated AI-composed pieces — listing       |
+| /sessions/:slug   | SessionPiece  | Individual piece (code, movements, notes)  |
+| /legal            | Legal         | Impressum, Datenschutz, Lizenzen           |
 
 ## License Structure
 
@@ -175,5 +177,11 @@ Copyright (c) 2026 Arnold Wender / Wender Media
 - Colocated tests: foo.test.ts next to foo.ts
 - Barrel exports: index.ts per component directory
 - Node v22 for Netlify builds; Node v22 bundled with Electron 41
-- Router: conditional (HashRouter in Electron, BrowserRouter on web) — `/` renders Editor in desktop, Landing on web
+- Router: conditional (HashRouter in Electron, BrowserRouter on web) — `/` renders the Landing hero on both targets; the hero "Start Coding" CTA links to /editor
 - CSP with `'unsafe-eval'` is required for Strudel pattern evaluation (set via session.webRequest.onHeadersReceived in electron/main.ts)
+- Renderer Helper entitlements MUST include `com.apple.security.cs.allow-jit` in build/entitlements.mac.inherit.plist — without it V8 SIGTRAPs during Isolate initialization (v1.0.1 black-screen regression)
+- Electron macOS window uses `titleBarStyle: 'hiddenInset'`. A custom <TitleBar /> drag strip is rendered when `isElectronMac` (src/lib/platform.ts), reserving 28px at the top of the window with `-webkit-app-region: drag` and matching body padding via the `.electron-mac` class set on <html> from main.tsx.
+
+## Sessions category
+
+`/sessions` is a curated collection of live-coding pieces authored inside a single conversation with an AI model. Each piece has a stable slug (e.g. `/sessions/jede-session-neu-geboren`) and its own detail route because the long-form narrative context (composer notes, movements, key signatures) doesn't fit the flat Examples grid. Entries are defined in `src/data/sessions-library.ts` via the `SessionEntry` schema (slug, title, subtitle, author with `kind: 'ai' | 'human'` and optional model, date, bpm, durationSec, short description, composer notes, movements, engine, code). The primary action on a piece is "Open in Editor", which compresses the code via lz-string and routes into the built-in CodeMirror editor at `/editor#code=<hash>` — the same flow Examples uses. There is no external strudel.cc link. Sessions pages reuse the shared site nav and design tokens so the category feels like a sibling of /samples and /examples rather than a standalone sub-site. Content (the piece itself, composer notes) is authored in German; chrome labels are translated under the `sessions.*` i18n namespace.

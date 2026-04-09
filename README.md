@@ -33,8 +33,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.1-arm64.dmg) |
-| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.1.dmg) |
+| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.2-arm64.dmg) |
+| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.2.dmg) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
@@ -104,6 +104,8 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `/docs/:id` | Individual doc section |
 | `/samples` | Sample library browser |
 | `/examples` | Curated code examples per engine |
+| `/sessions` | Curated AI-composed pieces — listing |
+| `/sessions/:slug` | Individual session piece (code, movements, composer notes) |
 | `/legal` | Impressum, Datenschutz |
 
 ---

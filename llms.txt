@@ -34,20 +34,25 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - NEVER hardcode colors/spacing — use design tokens
 - This is Vite + React SPA, NOT Next.js
 - AGPL-3.0-or-later license (combined app, Strudel dependency); MIT for original components
-- 105 source files, 82 tests across 16 test files, 46 components, 7 routes
+- 82 tests across 16 test files, 9 routes
 - Colocated tests (foo.test.ts next to foo.ts)
 
-## Routes (7)
-- `/` → Landing page (hero, features, examples)
+## Routes (9)
+- `/` → Landing page (hero, features, examples) — also the Electron splash
 - `/editor` → Main IDE (code editor, node graph, visualizers)
 - `/docs` → Documentation hub
 - `/docs/:sectionId` → Individual doc section
 - `/samples` → Sample library browser
 - `/examples` → Curated code examples per engine
+- `/sessions` → Curated AI-composed pieces — listing
+- `/sessions/:slug` → Individual session piece (code, movements, composer notes)
 - `/legal` → Impressum, Datenschutz, Lizenzen
 
 ## Version
-1.0.1
+1.0.2
 
 ## Router
-Conditional router: HashRouter in Electron (file:// compatible), BrowserRouter on the web. `/` renders Editor in Electron and Landing on the web. See src/App.tsx.
+Conditional router: HashRouter in Electron (file:// compatible), BrowserRouter on the web. `/` renders the Landing hero on both targets; the hero's "Start Coding" CTA links to `/editor`. See src/App.tsx.
+
+## Electron Window Chrome
+macOS builds use `titleBarStyle: 'hiddenInset'`, which removes the native title bar. A custom <TitleBar /> drag strip (rendered when `isElectronMac` from src/lib/platform.ts) reserves 28px at the top of the window with `-webkit-app-region: drag`, matched by `padding-top: 28px` on the body via `.electron-mac` in global.css. Renderer Helper entitlements MUST include `com.apple.security.cs.allow-jit` in `build/entitlements.mac.inherit.plist` — without it V8 SIGTRAPs during Isolate initialization and the window stays on the background color (the v1.0.1 "black screen" regression).
