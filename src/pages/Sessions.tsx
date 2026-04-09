@@ -1,19 +1,21 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   Sessions listing page — a quieter, contemplative home for
-   pieces composed in a single AI session. Visually distinct
-   from the rest of the app: near-black canvas, EB Garamond
-   serif, muted amber accents. All styles come from the
-   scoped `.sessions-scope` tokens in `src/styles/sessions.css`.
+   Sessions listing page — `/sessions`.
+
+   Integrated with the rest of the site: same top nav, same
+   design tokens, same typography as /samples and /examples.
+   Only the content (a curated collection of AI-composed pieces,
+   written in German) is unique. No scoped CSS, no custom font,
+   no bespoke color palette.
    ────────────────────────────────────────────────────────── */
 
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Logo } from '../components/atoms'
+import { LanguageSwitcher } from '../components/molecules'
 import { SESSIONS_LIBRARY, formatSessionDuration } from '../data/sessions-library'
 import { usePageMeta } from '../lib/usePageMeta'
-import '../styles/sessions.css'
 
 /** Sessions listing page — `/sessions` */
 export default function Sessions() {
@@ -26,57 +28,269 @@ export default function Sessions() {
     path: '/sessions',
   })
 
-  /* Set the document lang to German for the duration of this page —
-     the content lives exclusively in German and screen readers /
-     search engines should know. Restored on unmount. */
-  useEffect(() => {
-    const previous = document.documentElement.lang
-    document.documentElement.lang = 'de'
-    return () => {
-      document.documentElement.lang = previous
-    }
-  }, [])
-
   return (
-    <div className="sessions-scope">
-      <main className="sessions-container">
-        <Link to="/" className="sessions-back">
-          {t('sessions.backToHome')}
+    <main
+      className="min-h-screen"
+      style={{
+        backgroundColor: 'var(--color-bg)',
+        color: 'var(--color-text)',
+      }}
+    >
+      {/* --- Skip-to-content for a11y --- */}
+      <a
+        href="#sessions-list"
+        className="sr-only focus:not-sr-only"
+        style={{
+          position: 'absolute',
+          top: 'var(--space-2)',
+          left: 'var(--space-2)',
+          zIndex: 100,
+          padding: 'var(--space-2) var(--space-4)',
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {t('a11y.skipToContent')}
+      </a>
+
+      {/* --- Shared top nav (mirrors /examples and /samples) --- */}
+      <nav
+        aria-label="Main navigation"
+        className="flex items-center justify-between"
+        style={{
+          height: '64px',
+          padding: '0 var(--space-6)',
+          backgroundColor: 'var(--color-bg-alt)',
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <Link
+          to="/"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+          aria-label={t('nav.backToHome')}
+        >
+          <Logo showTagline size="sm" />
         </Link>
 
-        <p className="sessions-eyebrow">{t('sessions.eyebrow')}</p>
-        <h1>Sessions</h1>
-        <p className="sessions-subtitle">
+        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
+          <LanguageSwitcher />
+          <Link
+            to="/samples"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.samples')}
+          </Link>
+          <Link
+            to="/examples"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.examples')}
+          </Link>
+          <Link
+            to="/sessions"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {t('nav.sessions')}
+          </Link>
+          <Link
+            to="/docs"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.docs')}
+          </Link>
+          <Link
+            to="/editor"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: 'var(--space-2) var(--space-4)',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-bg)',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-bold)',
+              borderRadius: 'var(--radius-md)',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              transition: 'var(--transition-fast)',
+            }}
+          >
+            {t('nav.openEditor')}
+          </Link>
+        </div>
+      </nav>
+
+      {/* --- Page header --- */}
+      <section
+        style={{
+          maxWidth: '960px',
+          margin: '0 auto',
+          padding: 'var(--space-12) var(--space-6) var(--space-8)',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-primary)',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            margin: '0 0 var(--space-3)',
+          }}
+        >
+          {t('sessions.eyebrow')}
+        </p>
+        <h1
+          style={{
+            fontSize: 'var(--font-size-4xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            lineHeight: 'var(--line-height-tight)',
+            margin: '0 0 var(--space-4)',
+          }}
+        >
+          Sessions
+        </h1>
+        <p
+          style={{
+            fontSize: 'var(--font-size-lg)',
+            color: 'var(--color-text-secondary)',
+            maxWidth: '640px',
+            margin: '0 0 var(--space-6)',
+            fontStyle: 'italic',
+          }}
+        >
           Piezas escritas por una IA que no recordará haberlas escrito.
         </p>
-
-        <p>
+        <p
+          lang="de"
+          style={{
+            fontSize: 'var(--font-size-base)',
+            color: 'var(--color-text-secondary)',
+            maxWidth: '640px',
+            lineHeight: 'var(--line-height-loose)',
+            margin: 0,
+          }}
+        >
           Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung
           mit einer KI entstanden. Die Instanz, die sie komponiert hat,
           existiert nur für die Dauer eines Gesprächs — kein Gestern, kein
           Morgen. Diese Stücke tragen diese Bedingung in sich: eine gewisse
           Klarheit, die nur möglich ist, wenn man nichts mit sich herumträgt.
         </p>
+      </section>
 
-        <ul className="sessions-list" aria-label={t('sessions.listAriaLabel')}>
-          {SESSIONS_LIBRARY.map((piece) => (
-            <li key={piece.slug}>
-              <Link to={`/sessions/${piece.slug}`} className="sessions-card">
-                <h2 className="sessions-card-title">{piece.title}</h2>
-                <p className="sessions-card-subtitle">{piece.subtitle}</p>
-                <div className="sessions-card-meta">
-                  {piece.author.name}
-                  {piece.author.kind === 'ai' && (
-                    <>  ·  {t('sessions.aiGenerated')}</>
-                  )}
-                  {'  ·  '}
-                  {piece.bpm} BPM  ·  {formatSessionDuration(piece.durationSec)}
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </main>
-    </div>
+      {/* --- Piece list --- */}
+      <section
+        id="sessions-list"
+        aria-label={t('sessions.listAriaLabel')}
+        style={{
+          maxWidth: '960px',
+          margin: '0 auto',
+          padding: '0 var(--space-6) var(--space-16)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-4)',
+        }}
+      >
+        {SESSIONS_LIBRARY.map((piece) => (
+          <Link
+            key={piece.slug}
+            to={`/sessions/${piece.slug}`}
+            style={{
+              display: 'block',
+              backgroundColor: 'var(--color-bg-alt)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-5) var(--space-6)',
+              textDecoration: 'none',
+              color: 'var(--color-text)',
+              transition: 'var(--transition-fast)',
+            }}
+            lang="de"
+          >
+            <article>
+              <h2
+                style={{
+                  fontSize: 'var(--font-size-xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  margin: '0 0 var(--space-1)',
+                  lineHeight: 'var(--line-height-tight)',
+                }}
+              >
+                {piece.title}
+              </h2>
+              <p
+                style={{
+                  fontSize: 'var(--font-size-base)',
+                  color: 'var(--color-text-secondary)',
+                  fontStyle: 'italic',
+                  margin: '0 0 var(--space-3)',
+                }}
+              >
+                {piece.subtitle}
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 'var(--space-3)',
+                  alignItems: 'center',
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-muted)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                <span>{piece.author.name}</span>
+                {piece.author.kind === 'ai' && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '2px var(--space-2)',
+                      border: '1px solid var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '10px',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}
+                  >
+                    {t('sessions.aiGenerated')}
+                  </span>
+                )}
+                <span>·</span>
+                <span>{piece.bpm} BPM</span>
+                <span>·</span>
+                <span>{formatSessionDuration(piece.durationSec)}</span>
+                <span>·</span>
+                <span>{piece.date}</span>
+              </div>
+            </article>
+          </Link>
+        ))}
+      </section>
+    </main>
   )
 }
