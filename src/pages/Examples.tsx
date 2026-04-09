@@ -76,7 +76,7 @@ function extractSounds(code: string): string[] {
   const sounds = new Set<string>()
   /* Match s("name"), sound("name"), .s("name") */
   const sMatches = code.matchAll(/(?:^|\.)s(?:ound)?\s*\(\s*["']([^"']+)["']/g)
-  for (const m of sMatches) m[1].split(/\s+/).forEach(s => sounds.add(s.replace(/[*/?<>\[\](),:]+.*/, '')))
+  for (const m of sMatches) m[1].split(/\s+/).forEach(s => sounds.add(s.replace(/[*/?<>[\](),:]+.*/, '')))
   /* Match note("...").s("name") */
   const noteS = code.matchAll(/\.s\s*\(\s*["']([^"']+)["']/g)
   for (const m of noteS) sounds.add(m[1])

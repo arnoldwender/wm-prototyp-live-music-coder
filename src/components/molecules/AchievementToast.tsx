@@ -9,46 +9,56 @@
 import { useEffect, useState } from 'react'
 import { useAppStore } from '../../lib/store'
 
-/** Subtle toast for unlocked achievements */
+/** Subtle toast for unlocked achievements.
+ *  Outer component conditionally renders the inner Toast — when
+ *  `pendingToast` becomes null, Toast unmounts and its `fading` state
+ *  is discarded. When a new toast appears, Toast remounts with a fresh
+ *  `fading=false`. This avoids React 19's set-state-in-effect lint
+ *  (and the extra render) that the previous useEffect-mirror approach
+ *  triggered. */
 export function AchievementToast() {
   const pendingToast = useAppStore((s) => s.pendingToast)
   const dismissToast = useAppStore((s) => s.dismissToast)
 
-  const [visible, setVisible] = useState(false)
+  if (!pendingToast) return null
+
+  return (
+    <Toast
+      icon={pendingToast.icon}
+      title={pendingToast.title}
+      onDismiss={dismissToast}
+    />
+  )
+}
+
+interface ToastProps {
+  icon: string
+  title: string
+  onDismiss: () => void
+}
+
+function Toast({ icon, title, onDismiss }: ToastProps) {
   const [fading, setFading] = useState(false)
 
   useEffect(() => {
-    if (!pendingToast) {
-      setVisible(false)
-      setFading(false)
-      return
-    }
-
-    setVisible(true)
-    setFading(false)
-
     /* Start fade after 1.5s, dismiss at 2s */
     const fadeTimer = setTimeout(() => setFading(true), 1500)
     const dismissTimer = setTimeout(() => {
-      dismissToast()
-      setVisible(false)
-      setFading(false)
+      onDismiss()
     }, 2000)
 
     return () => {
       clearTimeout(fadeTimer)
       clearTimeout(dismissTimer)
     }
-  }, [pendingToast, dismissToast])
-
-  if (!pendingToast || !visible) return null
+  }, [onDismiss])
 
   return (
     <button
       type="button"
       role="status"
       aria-live="polite"
-      onClick={() => { dismissToast(); setVisible(false) }}
+      onClick={onDismiss}
       aria-label="Dismiss achievement"
       style={{
         position: 'fixed',
@@ -65,7 +75,7 @@ export function AchievementToast() {
         padding: 'var(--space-2) var(--space-3)',
         boxShadow: 'var(--shadow-md)',
         opacity: fading ? 0 : 0.95,
-        transform: visible && !fading ? 'translateY(0)' : 'translateY(8px)',
+        transform: fading ? 'translateY(8px)' : 'translateY(0)',
         transition: 'opacity 400ms ease, transform 200ms ease',
         cursor: 'pointer',
         color: 'var(--color-text)',
@@ -74,10 +84,10 @@ export function AchievementToast() {
       }}
     >
       <span style={{ fontSize: '14px', lineHeight: 1, flexShrink: 0 }} aria-hidden="true">
-        {pendingToast.icon}
+        {icon}
       </span>
       <span style={{ fontSize: '11px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {pendingToast.title}
+        {title}
       </span>
     </button>
   )

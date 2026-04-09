@@ -63,13 +63,14 @@ export function initUpdater(mainWindow: BrowserWindow): void {
     })
   }, INITIAL_DELAY_MS)
 
-  // --- Periodic check every 4 hours ---
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const _interval = setInterval(() => {
+  // --- Periodic check every 4 hours.
+  // Result is intentionally discarded — process lifetime keeps the
+  // interval alive, so there is nothing to clear. */
+  setInterval(() => {
     void autoUpdater.checkForUpdates().catch((err: Error) => {
       log.error('Periodic update check failed:', err)
     })
-  }, CHECK_INTERVAL_MS) as unknown
+  }, CHECK_INTERVAL_MS)
 
   // --- Manual check trigger from menu/IPC ---
   // Custom event name requires type assertion

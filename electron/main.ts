@@ -3,6 +3,7 @@
 
 import { app, BrowserWindow, session, shell } from 'electron'
 import { join } from 'node:path'
+import log from 'electron-log'
 import { appStore } from './store'
 import { registerFileHandlers } from './ipc/file'
 import { registerAudioHandlers } from './ipc/audio'
@@ -14,6 +15,25 @@ import { initUpdater } from './updater'
 
 // --- Track whether the app is truly quitting vs minimize-to-tray ---
 let isQuitting = false
+
+/* --- Debug mode --------------------------------------------------------
+   Users can relaunch the packaged app with `open -a "Live Music Coder"
+   --args --lmc-debug` (or set LMC_DEBUG=1) to force DevTools open and
+   verbose logging. This is the only way to capture renderer errors after
+   a black-screen incident in production where DevTools is otherwise
+   closed.
+
+   NOTE on flag name: we deliberately namespace as `--lmc-debug` instead
+   of `--debug` because Node.js intercepts the bare `--debug` flag (it
+   is a deprecated alias for --inspect, DEP0062) and prints a warning to
+   stdout before Electron's argv parser even runs, so the flag never
+   reaches our code. */
+const isDebug =
+  process.argv.includes('--lmc-debug') || !!process.env['LMC_DEBUG']
+
+// Route all electron-log output to main.log file (and stdout in debug)
+log.transports.file.level = 'info'
+log.transports.console.level = isDebug ? 'debug' : 'warn'
 
 /**
  * Create the main application window.
@@ -81,6 +101,29 @@ function createWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
+  /* --- Renderer crash & load failure diagnostics ----------------------
+     Without these, a renderer that throws synchronously during module
+     evaluation (e.g. a failed lazy chunk under file://) leaves the user
+     staring at the BrowserWindow background color with no clue why.
+     Logging to electron-log writes to:
+       macOS:   ~/Library/Logs/Live Music Coder/main.log
+       Windows: %USERPROFILE%\AppData\Roaming\Live Music Coder\logs\main.log
+       Linux:   ~/.config/Live Music Coder/logs/main.log */
+  mainWindow.webContents.on(
+    'did-fail-load',
+    (_event, errorCode, errorDescription, validatedURL) => {
+      log.error(
+        `[renderer] did-fail-load ${errorCode} ${errorDescription} url=${validatedURL}`,
+      )
+    },
+  )
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    log.error(`[renderer] render-process-gone reason=${details.reason}`)
+  })
+  mainWindow.webContents.on('preload-error', (_event, preloadPath, error) => {
+    log.error(`[renderer] preload-error path=${preloadPath} error=${error.message}`)
+  })
+
   // --- Load renderer: dev server or production files ---
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -88,6 +131,12 @@ function createWindow(): BrowserWindow {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   } else {
     mainWindow.loadFile(join(__dirname, '../../dist/index.html'))
+    // In packaged builds, --debug forces DevTools so users can capture
+    // production-only errors (CSP violations, lazy-chunk failures, etc.)
+    if (isDebug) {
+      mainWindow.webContents.openDevTools({ mode: 'detach' })
+      log.info('[main] debug mode enabled — DevTools opened')
+    }
   }
 
   return mainWindow

@@ -2,11 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Helper processes entitlements — MUST NOT include allow-jit.
-         Only the main app needs JIT for V8. Helpers get a reduced set. -->
-    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-    <false/>
+    <!-- Helper processes entitlements.
+
+         IMPORTANT — allow-jit MUST be present here.
+         In Electron's multi-process architecture, V8 runs inside each
+         "Live Music Coder Helper (Renderer)" process, NOT in the main
+         browser process. Without allow-jit, the renderer SIGTRAPs during
+         v8::Isolate::Initialize → cppgc::PersistentRegionLock → and the
+         window stays blank ("black screen" symptom). This was the v1.0.1
+         regression: a previous CLAUDE.md note incorrectly claimed only
+         the main app needs JIT, so the helper plist was created without
+         it. See the renderer crash report:
+         ~/Library/Logs/DiagnosticReports/Live Music Coder Helper (Renderer)*.ips
+         for the matching v8 crash trace. -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
     <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <key>com.apple.security.device.microphone</key>
     <true/>
     <key>com.apple.security.inherit</key>
     <true/>

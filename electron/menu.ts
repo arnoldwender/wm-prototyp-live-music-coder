@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { app, Menu, BrowserWindow, MenuItemConstructorOptions } from 'electron'
+import {
+  app,
+  Menu,
+  BrowserWindow,
+  MenuItemConstructorOptions,
+  shell,
+} from 'electron'
 
 // --- GitHub issues URL for bug reports ---
 const ISSUES_URL = 'https://github.com/arnoldwender/wm-prototyp-live-music-coder/issues'
@@ -186,8 +192,7 @@ export function createMenu(mainWindow: BrowserWindow): void {
         {
           label: 'Report Issue...',
           click: () => {
-            const { shell } = require('electron')
-            shell.openExternal(ISSUES_URL)
+            void shell.openExternal(ISSUES_URL)
           },
         },
         { type: 'separator' },

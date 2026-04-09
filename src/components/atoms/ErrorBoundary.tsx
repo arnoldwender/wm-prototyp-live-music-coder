@@ -3,6 +3,17 @@
    ──────────────────────────────────────────────────────────
    ErrorBoundary — catches unhandled React render errors.
    Displays a dark-themed fallback with reload button.
+
+   IMPORTANT: This file intentionally violates the design-token rule.
+   It uses HARDCODED colors and sizes because its job is to render
+   correctly even when the app's CSS (and therefore CSS custom
+   properties on :root) failed to load. If the main bundle or token
+   stylesheet crashes, var(--color-bg) is undefined and the fallback
+   would render black-on-black, leaving the user with an invisible
+   error UI on top of BrowserWindow.backgroundColor — i.e. the exact
+   "black screen" symptom v1.0.1 shipped with.
+   Token values mirror src/styles/tokens/colors.css (zinc-950, zinc-50,
+   red-500, purple-500) so the look stays on-brand.
    ────────────────────────────────────────────────────────── */
 
 import { Component } from 'react'
@@ -41,7 +52,7 @@ class ErrorBoundary extends Component<Props, State> {
       return this.props.children
     }
 
-    /* Error fallback UI — dark theme using design tokens */
+    /* Error fallback UI — hardcoded values, see file header comment */
     return (
       <main
         role="alert"
@@ -51,21 +62,22 @@ class ErrorBoundary extends Component<Props, State> {
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '100vh',
-          background: 'var(--color-bg)',
-          color: 'var(--color-text)',
-          padding: 'var(--space-xl)',
+          background: '#09090b',
+          color: '#fafafa',
+          padding: '32px',
           textAlign: 'center',
-          fontFamily: 'var(--font-family-body)',
+          fontFamily:
+            'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
         }}
       >
         {/* Error heading */}
         <h1
           style={{
-            fontSize: 'var(--font-size-3xl)',
-            fontWeight: 'var(--font-weight-bold)',
-            color: 'var(--color-error)',
-            marginBottom: 'var(--space-sm)',
-            lineHeight: 'var(--line-height-tight)',
+            fontSize: '40px',
+            fontWeight: 700,
+            color: '#ef4444',
+            marginBottom: '8px',
+            lineHeight: 1.2,
           }}
         >
           Something went wrong
@@ -74,9 +86,9 @@ class ErrorBoundary extends Component<Props, State> {
         {/* Error message */}
         <p
           style={{
-            fontSize: 'var(--font-size-base)',
-            color: 'var(--color-text-secondary)',
-            marginBottom: 'var(--space-xl)',
+            fontSize: '16px',
+            color: '#a1a1aa',
+            marginBottom: '32px',
             maxWidth: '28rem',
           }}
         >
@@ -88,19 +100,42 @@ class ErrorBoundary extends Component<Props, State> {
           type="button"
           onClick={this.handleReload}
           style={{
-            padding: 'var(--space-sm) var(--space-lg)',
-            background: 'var(--color-primary)',
-            color: 'var(--color-text)',
+            padding: '8px 24px',
+            background: '#a855f7',
+            color: '#fafafa',
             border: 'none',
-            borderRadius: 'var(--radius-md)',
+            borderRadius: '8px',
             cursor: 'pointer',
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-base)',
-            transition: 'var(--transition-fast)',
+            fontWeight: 500,
+            fontSize: '16px',
+            transition: 'opacity 150ms ease',
           }}
         >
           Reload
         </button>
+
+        {/* Hint for users — how to capture the actual error */}
+        <p
+          style={{
+            marginTop: '32px',
+            fontSize: '12px',
+            color: '#71717a',
+            maxWidth: '28rem',
+          }}
+        >
+          If reloading does not help, relaunch with{' '}
+          <code
+            style={{
+              background: '#18181b',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            }}
+          >
+            open -a "Live Music Coder" --args --lmc-debug
+          </code>{' '}
+          to open DevTools.
+        </p>
       </main>
     )
   }

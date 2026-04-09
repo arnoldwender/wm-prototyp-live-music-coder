@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { Tray, Menu, nativeImage, BrowserWindow } from 'electron'
+import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron'
 
 // --- Module-level tray reference for cleanup ---
 let tray: Tray | null = null
@@ -43,7 +43,6 @@ export function createTray(mainWindow: BrowserWindow): Tray {
     {
       label: 'Quit',
       click: () => {
-        const { app } = require('electron')
         app.quit()
       },
     },

@@ -14,8 +14,14 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-/* Register service worker for PWA offline support */
-if ('serviceWorker' in navigator) {
+/* Register service worker for PWA offline support.
+   Skip under file:// (packaged Electron) — service workers are not
+   supported on file:// and the registration always rejects, polluting
+   the console and the renderer crash logs. */
+if (
+  'serviceWorker' in navigator &&
+  (location.protocol === 'http:' || location.protocol === 'https:')
+) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
       /* SW registration failed — app works fine without it */
