@@ -1,0 +1,177 @@
+# Live Music Coder — Full LLM Context
+
+## Overview
+
+Live Music Coder is a browser-based and Electron desktop live coding music IDE. Users write code to create music in real time using 4 audio engines. The app features a CodeMirror 6 code editor, a React Flow visual node graph, Canvas 2D audio visualizers (waveform, spectrum, timeline, pianoroll), and full i18n (DE/EN/ES). It ships as both a Netlify-hosted SPA and a native desktop app via Electron.
+
+**Version:** 1.0.0
+**Live:** https://live-music-coder.pro
+**Repo:** https://github.com/arnoldwender/wm-prototyp-live-music-coder
+
+## Metrics
+
+- Source files: 105 (TS/TSX)
+- Test files: 16
+- Tests: 82
+- Components: 46 (13 atoms, 14 molecules, 19 organisms)
+- Routes: 7
+- Languages: 3 (DE, EN, ES)
+
+## Architecture
+
+### Code Editor = Source of Truth
+
+The CodeMirror 6 editor is always authoritative. The React Flow node graph is a derived view, regenerated from code after every edit (500ms debounce). Graph interactions emit code mutations back to the editor.
+
+### Engine Orchestrator
+
+One shared AudioContext. Each engine adapter implements a common EngineAdapter interface. The Orchestrator class manages lazy engine initialization, code evaluation routing, and playback state.
+
+### Audio Engines
+
+| Engine    | Package            | Purpose                    |
+|-----------|--------------------|----------------------------|
+| Strudel   | @strudel/core      | Pattern-based live coding  |
+| Tone.js   | tone               | High-level synths, effects |
+| Web Audio | Native API         | Low-level audio nodes      |
+| MIDI      | webmidi            | External device output     |
+
+### Atomic Design Hierarchy
+
+- Atoms (13): ActivityBarButton, Badge, Button, CanvasVisualizer, EngineNode, ErrorBoundary, Icon, Logo, NotFound, TabButton, Toggle, Tooltip, WaveformBackground
+- Molecules (14): AchievementToast, EngineSelector, ErrorBar, FeatureCard, FileTabs, FilterPill, HelpPanel, LanguageSwitcher, NowPlayingIndicator, ShareDialog, SortSelect, ToolbarGroup, VisualizerPills, VisualizerToggle
+- Organisms (19): ActivityBar, CodeEditor, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, NodeGraph, PatternTimeline, PianorollVisualizer, SidePanel, SpectrumVisualizer, StatusBar, StrudelEditor, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
+
+Hierarchy rules: atoms import nothing, molecules import only atoms, organisms import molecules and atoms, layouts compose organisms, pages use layouts.
+
+### Persistence
+
+- IndexedDB autosave via idb library
+- URL sharing via lz-string compression (#code=...)
+- GitHub Gist save/load via @octokit/rest with PAT
+- Audio recording via MediaRecorder → WebM
+- Native file save/open via Electron IPC (desktop only)
+
+## Electron Desktop App
+
+### Runtime
+
+Electron 33.4.11 (Node v20 bundled), built with electron-vite 5 and electron-builder.
+
+### Directory Structure
+
+```text
+electron/
+├── main.ts          # Main process: BrowserWindow creation, app lifecycle
+├── preload.ts       # contextBridge: exposes electronAPI to renderer
+├── menu.ts          # Native application menu (File, Edit, View, Help)
+├── tray.ts          # System tray icon and playback controls
+├── store.ts         # electron-store for persistent user settings
+├── updater.ts       # electron-updater for auto-updates
+├── wav-encoder.ts   # PCM-to-WAV encoder for native file export
+└── ipc/
+    ├── app.ts       # App info, notifications, quit, update checks
+    ├── audio.ts     # WAV file export via native save dialog
+    ├── file.ts      # Project save/open/recent files
+    └── window.ts    # Panel pop-out, fullscreen toggle
+```
+
+### IPC Channels
+
+| Channel                     | Direction       | Purpose                           |
+|-----------------------------|-----------------|-----------------------------------|
+| app:info                    | invoke → result | Get app name, version, platform   |
+| app:notify                  | send            | Show native OS notification       |
+| app:quit                    | send            | Quit the application              |
+| app:check-update            | send            | Trigger auto-update check         |
+| file:save                   | invoke → result | Save project JSON (Save As dialog)|
+| file:save-path              | invoke → result | Save to specific file path        |
+| file:open                   | invoke → result | Open project file (Open dialog)   |
+| file:recent                 | invoke → result | Get recent files list              |
+| file:reveal                 | send            | Reveal file in Finder/Explorer    |
+| audio:export-wav            | invoke → result | Export audio buffer as WAV file   |
+| window:popout               | send            | Pop out a panel to new window     |
+| window:fullscreen           | send            | Toggle fullscreen mode            |
+| window:fullscreen-changed   | on (listener)   | Fullscreen state changed          |
+| window:popout-closed        | on (listener)   | Pop-out window was closed         |
+| menu:action                 | on (listener)   | Native menu action dispatched     |
+
+### Build Configuration
+
+electron.vite.config.ts defines three build targets:
+- **main:** electron/main.ts → out/main/main.js (CJS)
+- **preload:** electron/preload.ts → out/preload/preload.js (CJS)
+- **renderer:** index.html + src/ → dist/ (standard Vite build with React + Tailwind)
+
+### Build Targets
+
+- macOS: .dmg (universal + arm64), via `npm run electron:build:mac`
+- Windows: .exe installer, via `npm run electron:build:win`
+- Linux: .AppImage, via `npm run electron:build:linux`
+
+## Dependencies
+
+### Runtime
+
+- @codemirror/autocomplete, @codemirror/commands, @codemirror/lang-javascript, @codemirror/language, @codemirror/search, @codemirror/state, @codemirror/view
+- @lezer/highlight
+- @octokit/rest
+- @strudel/codemirror, @strudel/core, @strudel/mini, @strudel/tonal, @strudel/transpiler, @strudel/web, @strudel/webaudio
+- @tailwindcss/vite, tailwindcss
+- @xyflow/react
+- electron-log, electron-updater
+- framer-motion
+- i18next, react-i18next
+- idb
+- lucide-react
+- lz-string
+- react, react-dom, react-router-dom
+- tone
+- webmidi
+- zustand
+
+### Dev
+
+- @eslint/js, eslint, eslint-plugin-react-hooks, eslint-plugin-react-refresh
+- @testing-library/dom, @testing-library/jest-dom, @testing-library/react
+- @types/lz-string, @types/node, @types/react, @types/react-dom
+- @vitejs/plugin-react
+- concurrently
+- electron, electron-builder, electron-vite
+- globals
+- jsdom
+- typescript, typescript-eslint
+- vite, vitest
+- wait-on
+
+## Routes (7)
+
+| Route            | Page      | Description                        |
+|------------------|-----------|------------------------------------|
+| /                | Landing   | Hero, features, examples           |
+| /editor          | Editor    | Main IDE: code, graph, visualizers |
+| /docs            | Docs      | Documentation hub                  |
+| /docs/:sectionId | Docs      | Individual doc section             |
+| /samples         | Samples   | Audio sample library browser       |
+| /examples        | Examples  | Curated code examples per engine   |
+| /legal           | Legal     | Impressum, Datenschutz, Lizenzen   |
+
+## License Structure
+
+The project uses a dual-license model:
+
+- **Combined application (AGPL-3.0-or-later):** The @strudel/* packages are AGPL-licensed. Because they are runtime dependencies, the combined application inherits the AGPL-3.0-or-later license. This means the full source must be available when the app is served over a network.
+- **Original components (MIT):** Files authored by Arnold Wender that do not depend on AGPL code are marked with `SPDX-License-Identifier: MIT` and can be reused under MIT terms.
+- **Details:** See LICENSING.md in the repository root.
+
+Copyright (c) 2026 Arnold Wender / Wender Media
+
+## Key Constraints
+
+- Dark mode only (music production aesthetic)
+- NEVER hardcode colors/spacing — use CSS custom property design tokens
+- Canvas 2D cannot use CSS variables — use VIZ_COLORS from src/lib/visualizers/colors.ts
+- This is Vite + React SPA — NOT Next.js, no server components, no "use client"
+- Colocated tests: foo.test.ts next to foo.ts
+- Barrel exports: index.ts per component directory
+- Node v22 for Netlify builds, Node v20 bundled with Electron
