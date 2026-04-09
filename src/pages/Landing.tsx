@@ -197,10 +197,7 @@ function Landing() {
       {/* Desktop app download section */}
       <section
         id="download"
-        className="flex flex-col items-center text-center"
-        style={{
-          padding: 'var(--space-3xl) var(--space-6)',
-        }}
+        className="flex flex-col items-center text-center px-4 py-16 max-w-6xl mx-auto"
       >
         <h2 style={{
           fontSize: 'var(--font-size-3xl)',
