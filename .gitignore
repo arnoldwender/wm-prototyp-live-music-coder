@@ -46,3 +46,4 @@ release/
 # TypeScript build info cache
 *.tsbuildinfo
 out/
+.wm-electron-audit.md

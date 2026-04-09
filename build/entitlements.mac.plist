@@ -2,11 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Main app entitlements. allow-jit is required for V8's JIT compiler.
+         allow-unsigned-executable-memory was removed — only needed on
+         Electron ≤11, we are on 41. See .wm-electron-audit.md S3. -->
     <key>com.apple.security.cs.allow-jit</key>
     <true/>
-    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
     <true/>
-    <key>com.apple.security.audio.record</key>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <key>com.apple.security.device.microphone</key>
     <true/>
 </dict>
 </plist>

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, session, shell } from 'electron'
 import { join } from 'node:path'
 import { appStore } from './store'
 import { registerFileHandlers } from './ipc/file'
@@ -72,6 +72,15 @@ function createWindow(): BrowserWindow {
     }
   })
 
+  // --- External links: open in default browser instead of hijacking window ---
+  // See .wm-electron-audit.md P3.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) {
+      void shell.openExternal(url)
+    }
+    return { action: 'deny' }
+  })
+
   // --- Load renderer: dev server or production files ---
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -88,6 +97,29 @@ function createWindow(): BrowserWindow {
 app.whenReady().then(() => {
   // Set app user model ID for Windows
   app.setAppUserModelId('com.wendermedia.live-music-coder')
+
+  // --- Content Security Policy header ---
+  // Strudel evaluates user patterns via new Function → needs 'unsafe-eval'.
+  // 'unsafe-inline' for Tailwind runtime and inline styles in components.
+  // connect-src covers GitHub API (Gist sharing) and localhost dev server.
+  // See .wm-electron-audit.md C1.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: file:; " +
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data: blob: https:; " +
+            "font-src 'self' data:; " +
+            "media-src 'self' blob: data:; " +
+            "worker-src 'self' blob:; " +
+            "connect-src 'self' https://api.github.com https://*.strudel.cc ws: wss:;",
+        ],
+      },
+    })
+  })
 
   const mainWindow = createWindow()
 

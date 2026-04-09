@@ -22,6 +22,17 @@
   --space-15: 4rem;      /* 64px */
   --space-16: 5rem;      /* 80px */
 
+  /* --- Semantic aliases (map t-shirt sizes to numeric scale) ---
+     Added to fix 6 missing-token references across TutorialOverlay,
+     EngineNode, NotFound, ErrorBoundary. See .wm-electron-audit.md T1. */
+  --space-xs: var(--space-2);   /* 4px */
+  --space-sm: var(--space-4);   /* 8px */
+  --space-md: var(--space-8);   /* 16px */
+  --space-lg: var(--space-10);  /* 24px */
+  --space-xl: var(--space-12);  /* 32px */
+  --space-2xl: var(--space-14); /* 48px */
+  --space-3xl: var(--space-16); /* 80px */
+
   /* --- Border radius --- */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
