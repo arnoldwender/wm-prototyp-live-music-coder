@@ -12,8 +12,7 @@
 
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Logo } from '../components/atoms'
-import { LanguageSwitcher } from '../components/molecules'
+import { SiteNav } from '../components/organisms/SiteNav'
 import { SESSIONS_LIBRARY, formatSessionDuration } from '../data/sessions-library'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
@@ -57,92 +56,8 @@ export default function Sessions() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Shared top nav (mirrors /examples and /samples) --- */}
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-        }}
-      >
-        <Link
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={t('nav.backToHome')}
-        >
-          <Logo showTagline size="sm" />
-        </Link>
-
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-          <Link
-            to="/samples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.samples')}
-          </Link>
-          <Link
-            to="/examples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.examples')}
-          </Link>
-          <Link
-            to="/sessions"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-              fontWeight: 'var(--font-weight-medium)',
-            }}
-          >
-            {t('nav.sessions')}
-          </Link>
-          <Link
-            to="/docs"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.docs')}
-          </Link>
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* Shared top nav (single source of truth in SiteNav) */}
+      <SiteNav />
 
       {/* --- Page header --- */}
       <section

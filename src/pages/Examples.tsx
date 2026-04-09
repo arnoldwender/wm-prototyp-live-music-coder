@@ -10,11 +10,10 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
-import { Logo } from '../components/atoms'
-import { LanguageSwitcher, FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
+import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
+import { SiteNav } from '../components/organisms/SiteNav'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
-import { encodeToUrl } from '../lib/persistence/url'
 import { ENGINE_COLORS } from '../lib/constants'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useInlinePlayer } from '../lib/useInlinePlayer'
@@ -269,7 +268,17 @@ function ExampleCard({
         </button>
         <button
           type="button"
-          onClick={() => navigate(`/editor#code=${encodeToUrl({ code: example.code, bpm: 120, engine: example.engine })}&autoplay=1`)}
+          onClick={() =>
+            navigate('/editor', {
+              state: {
+                share: {
+                  code: example.code,
+                  bpm: 120,
+                  engine: example.engine,
+                },
+              },
+            })
+          }
           style={{
             padding: 'var(--space-2) var(--space-4)',
             backgroundColor: 'var(--color-primary)',
@@ -482,80 +491,8 @@ function Examples() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Header navbar --- */}
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-        }}
-      >
-        <Link
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={t('nav.backToHome')}
-        >
-          <Logo showTagline size="sm" />
-        </Link>
-
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-          <Link
-            to="/samples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.samples')}
-          </Link>
-          <Link
-            to="/examples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text)',
-              fontWeight: 'var(--font-weight-bold)',
-              textDecoration: 'none',
-            }}
-          >
-            {t('nav.examples')}
-          </Link>
-          <Link
-            to="/docs"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.docs')}
-          </Link>
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* Shared top nav (single source of truth in SiteNav) */}
+      <SiteNav />
 
       {/* --- Page header --- */}
       <header

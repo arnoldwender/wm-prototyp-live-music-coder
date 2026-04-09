@@ -8,11 +8,10 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Logo } from '../components/atoms'
-import { LanguageSwitcher } from '../components/molecules'
 import { HeroSection } from '../components/organisms/HeroSection'
 import { FeatureGrid } from '../components/organisms/FeatureGrid'
 import { ExampleGallery } from '../components/organisms/ExampleGallery'
+import { SiteNav } from '../components/organisms/SiteNav'
 import { usePageMeta } from '../lib/usePageMeta'
 import { isElectron } from '../lib/platform'
 
@@ -93,99 +92,8 @@ function Landing() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Header navbar --- */}
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-        }}
-      >
-        {/* Left: Logo linked to home */}
-        <Link
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={t('nav.backToHome')}
-        >
-          <Logo showTagline size="sm" />
-        </Link>
-
-        {/* Right: Language switcher + Docs link + CTA button */}
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-
-          <Link
-            to="/samples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.samples')}
-          </Link>
-
-          <Link
-            to="/examples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.examples')}
-          </Link>
-
-          <Link
-            to="/sessions"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-              fontStyle: 'italic',
-            }}
-          >
-            {t('nav.sessions')}
-          </Link>
-
-          <Link
-            to="/docs"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.docs')}
-          </Link>
-
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* --- Shared top navbar (single source of truth) --- */}
+      <SiteNav />
 
       {/* Hero with animated waveform, gradient text, and CTA */}
       <section id="hero">

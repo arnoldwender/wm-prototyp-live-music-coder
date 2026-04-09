@@ -13,13 +13,11 @@
 
 import { Link, useNavigate, useParams, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Logo } from '../components/atoms'
-import { LanguageSwitcher } from '../components/molecules'
+import { SiteNav } from '../components/organisms/SiteNav'
 import {
   getSessionBySlug,
   formatSessionDuration,
 } from '../data/sessions-library'
-import { encodeToUrl } from '../lib/persistence/url'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
 
@@ -45,15 +43,21 @@ export default function SessionPiece() {
     return <Navigate to="/sessions" replace />
   }
 
-  /* Load code into the built-in editor via the same lz-string hash
-     flow /examples uses. No external strudel.cc redirect. */
+  /* Load code into the built-in editor. Passes the payload through
+     react-router's `location.state` instead of a URL hash because
+     HashRouter (Electron) reserves the URL fragment for routing and
+     clobbers any `#code=` appended to `/editor`. State survives both
+     routers cleanly. */
   const handleOpenInEditor = () => {
-    const hash = encodeToUrl({
-      code: piece.code,
-      bpm: piece.bpm,
-      engine: piece.engine,
+    navigate('/editor', {
+      state: {
+        share: {
+          code: piece.code,
+          bpm: piece.bpm,
+          engine: piece.engine,
+        },
+      },
     })
-    navigate(`/editor#code=${hash}&autoplay=1`)
   }
 
   return (
@@ -83,92 +87,8 @@ export default function SessionPiece() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Shared top nav --- */}
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-        }}
-      >
-        <Link
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={t('nav.backToHome')}
-        >
-          <Logo showTagline size="sm" />
-        </Link>
-
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-          <Link
-            to="/samples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.samples')}
-          </Link>
-          <Link
-            to="/examples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.examples')}
-          </Link>
-          <Link
-            to="/sessions"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-              fontWeight: 'var(--font-weight-medium)',
-            }}
-          >
-            {t('nav.sessions')}
-          </Link>
-          <Link
-            to="/docs"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.docs')}
-          </Link>
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* Shared top nav (single source of truth in SiteNav) */}
+      <SiteNav />
 
       {/* --- Content --- */}
       <article

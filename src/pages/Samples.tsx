@@ -9,12 +9,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
-import { Logo } from '../components/atoms'
-import { FilterPill, SortSelect, NowPlayingIndicator, LanguageSwitcher } from '../components/molecules'
+import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
+import { SiteNav } from '../components/organisms/SiteNav'
 import { usePageMeta } from '../lib/usePageMeta'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
 import type { SampleEntry } from '../data/sample-library'
-import { encodeToUrl } from '../lib/persistence/url'
 import { ENGINE_COLORS } from '../lib/constants'
 import { useInlinePlayer } from '../lib/useInlinePlayer'
 import { Play, Square } from 'lucide-react'
@@ -199,7 +198,17 @@ function SampleCard({
               {/* Code — click to open in editor */}
               <button
                 type="button"
-                onClick={() => navigate(`/editor#code=${encodeToUrl({ code: code!, bpm: 120, engine: 'strudel' as const })}&autoplay=1`)}
+                onClick={() =>
+                  navigate('/editor', {
+                    state: {
+                      share: {
+                        code: code!,
+                        bpm: 120,
+                        engine: 'strudel' as const,
+                      },
+                    },
+                  })
+                }
                 style={{
                   flex: 1,
                   fontSize: 'var(--font-size-xs)',
@@ -415,80 +424,8 @@ function Samples() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Header navbar --- */}
-      <nav
-        aria-label="Main navigation"
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-        }}
-      >
-        <Link
-          to="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={t('nav.backToHome')}
-        >
-          <Logo showTagline size="sm" />
-        </Link>
-
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-          <Link
-            to="/samples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text)',
-              fontWeight: 'var(--font-weight-bold)',
-              textDecoration: 'none',
-            }}
-          >
-            {t('nav.samples')}
-          </Link>
-          <Link
-            to="/examples"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.examples')}
-          </Link>
-          <Link
-            to="/docs"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.docs')}
-          </Link>
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* Shared top nav (single source of truth in SiteNav) */}
+      <SiteNav />
 
       {/* --- Page header with title and stats --- */}
       <header
