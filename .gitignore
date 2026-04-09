@@ -47,3 +47,11 @@ release/
 *.tsbuildinfo
 out/
 .wm-electron-audit.md
+
+# AI/internal docs — NEVER commit
+CLAUDE.md
+.claude/
+agents.md
+instructions.md
+docs/superpowers/
+docs/development/
