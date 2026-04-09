@@ -141,6 +141,19 @@ function Landing() {
           </Link>
 
           <Link
+            to="/sessions"
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              transition: 'var(--transition-fast)',
+              fontStyle: 'italic',
+            }}
+          >
+            {t('nav.sessions')}
+          </Link>
+
+          <Link
             to="/docs"
             style={{
               fontSize: 'var(--font-size-sm)',

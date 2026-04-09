@@ -22,6 +22,8 @@ const Docs = lazy(() => import('./pages/Docs'))
 const Samples = lazy(() => import('./pages/Samples'))
 const Examples = lazy(() => import('./pages/Examples'))
 const Legal = lazy(() => import('./pages/Legal'))
+const Sessions = lazy(() => import('./pages/Sessions'))
+const SessionPiece = lazy(() => import('./pages/SessionPiece'))
 
 /* Target detection — electronAPI is only present in packaged Electron
    via contextBridge in electron/preload.ts. */
@@ -83,6 +85,8 @@ function App() {
           <Route path="/docs/:sectionId" element={<Docs />} />
           <Route path="/samples" element={<Samples />} />
           <Route path="/examples" element={<Examples />} />
+          <Route path="/sessions" element={<Sessions />} />
+          <Route path="/sessions/:slug" element={<SessionPiece />} />
           <Route path="/legal" element={<Legal />} />
           {/* Catch-all — any unmatched path renders the 404 page */}
           <Route path="*" element={<NotFound />} />

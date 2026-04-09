@@ -9,6 +9,7 @@
     "docs": "Documentation",
     "samples": "Samples",
     "examples": "Examples",
+    "sessions": "Sessions",
     "legal": "Legal"
   },
   "transport": {
@@ -514,5 +515,21 @@
     "streakDays_plural": "{{count}} day streak",
     "sessionSummary": "Session Complete",
     "sessionDetails": "Session: {{minutes}} min | {{evaluations}} evaluations"
+  },
+  "sessions": {
+    "eyebrow": "A collection",
+    "backToHome": "← Back to home",
+    "backToList": "← All sessions",
+    "listAriaLabel": "Session pieces",
+    "openInEditor": "Open in Editor",
+    "code": "Source code",
+    "movementsHeading": "Movements",
+    "composerNotesHeading": "Composer notes",
+    "bpmLabel": "BPM",
+    "durationLabel": "Duration",
+    "dateLabel": "Composed",
+    "aiGenerated": "AI-composed",
+    "composedBy": "Composed by",
+    "curatedBy": "curated by"
   }
 }
