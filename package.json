@@ -1,7 +1,7 @@
 {
   "name": "wm-prototyp-live-music-coder",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "out/main/main.cjs",
   "license": "AGPL-3.0-or-later",
