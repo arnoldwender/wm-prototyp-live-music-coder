@@ -38,6 +38,10 @@ export default defineConfig({
   },
   renderer: {
     root: '.',
+    /* Relative base — required under file:// in packaged Electron so
+     * assets resolve to the bundle instead of the filesystem root.
+     * Vite 8 default is `/`. See .wm-electron-audit.md V2. */
+    base: './',
     plugins: [react(), tailwindcss()],
     resolve: {
       /* Force a single superdough instance — Vite may pre-bundle two copies
