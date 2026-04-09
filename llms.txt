@@ -1,0 +1,50 @@
+# Live Music Coder — LLM Context
+
+## What is this?
+A browser-based and Electron desktop live coding music IDE. Users write code to make music in real time. Features a CodeMirror 6 editor, React Flow node graph, 4 audio engines, Canvas 2D visualizers, and native desktop support via Electron.
+
+## Live URL
+https://live-music-coder.pro
+
+## Tech Stack
+React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React Flow, @strudel/core, Tone.js, Web Audio API, WebMidi.js, Canvas 2D, i18next (DE/EN/ES), idb, lz-string, @octokit/rest, Framer Motion 12, Electron 33 (electron-vite 5), Vitest.
+
+## Architecture
+- Code editor is source of truth; node graph is derived view
+- Engine orchestrator with shared AudioContext routes to 4 engine adapters
+- Atomic Design: atoms → molecules → organisms → layouts → pages
+- Design tokens via CSS custom properties (Canvas uses VIZ_COLORS literals)
+- Electron wraps the same SPA with IPC bridge for native file I/O, WAV export, auto-updates
+
+## Audio Engines
+- Strudel: pattern-based live coding (@strudel/core + @strudel/webaudio)
+- Tone.js: high-level synths and effects
+- Web Audio: raw browser API (oscillators, filters, gain nodes)
+- MIDI: external device output only (WebMidi.js)
+
+## Persistence
+- IndexedDB autosave (idb)
+- URL sharing via lz-string compression (#code=...)
+- GitHub Gist save/load (@octokit/rest) with PAT in sessionStorage/localStorage
+- Audio recording via MediaRecorder → WebM
+- Native file save/open via Electron IPC (when running as desktop app)
+
+## Key Constraints
+- Dark mode only (music production aesthetic)
+- NEVER hardcode colors/spacing — use design tokens
+- This is Vite + React SPA, NOT Next.js
+- AGPL-3.0-or-later license (combined app, Strudel dependency); MIT for original components
+- 105 source files, 82 tests across 16 test files, 46 components, 7 routes
+- Colocated tests (foo.test.ts next to foo.ts)
+
+## Routes (7)
+- `/` → Landing page (hero, features, examples)
+- `/editor` → Main IDE (code editor, node graph, visualizers)
+- `/docs` → Documentation hub
+- `/docs/:sectionId` → Individual doc section
+- `/samples` → Sample library browser
+- `/examples` → Curated code examples per engine
+- `/legal` → Impressum, Datenschutz, Lizenzen
+
+## Version
+1.0.0
