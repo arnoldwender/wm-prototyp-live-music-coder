@@ -21,6 +21,7 @@ import {
 } from '../data/sessions-library'
 import { encodeToUrl } from '../lib/persistence/url'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 
 /** Single session piece detail page. */
 export default function SessionPiece() {
@@ -28,6 +29,7 @@ export default function SessionPiece() {
   const navigate = useNavigate()
   const { slug } = useParams<{ slug: string }>()
   const piece = slug ? getSessionBySlug(slug) : undefined
+  useScrollablePage()
 
   usePageMeta({
     title: piece

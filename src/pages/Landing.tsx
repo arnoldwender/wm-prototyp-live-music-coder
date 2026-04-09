@@ -14,6 +14,7 @@ import { HeroSection } from '../components/organisms/HeroSection'
 import { FeatureGrid } from '../components/organisms/FeatureGrid'
 import { ExampleGallery } from '../components/organisms/ExampleGallery'
 import { usePageMeta } from '../lib/usePageMeta'
+import { isElectron } from '../lib/platform'
 
 /** Subtle horizontal divider with center fade */
 function SectionDivider() {
@@ -207,7 +208,11 @@ function Landing() {
 
       <SectionDivider />
 
-      {/* Desktop app download section */}
+      {/* Desktop app download section — web only.
+          Hidden inside the packaged Electron app because the user is
+          already running the desktop build; a "Download .dmg" CTA
+          would be confusing there. */}
+      {!isElectron && (
       <section
         id="download"
         className="flex flex-col items-center text-center px-4 py-16 max-w-6xl mx-auto"
@@ -264,8 +269,9 @@ function Landing() {
           macOS (Apple Silicon + Intel) — Windows &amp; Linux coming soon
         </p>
       </section>
+      )}
 
-      <SectionDivider />
+      {!isElectron && <SectionDivider />}
 
       {/* Footer with powered-by engines and license */}
       <footer

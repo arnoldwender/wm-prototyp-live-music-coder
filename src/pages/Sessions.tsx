@@ -16,10 +16,12 @@ import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
 import { SESSIONS_LIBRARY, formatSessionDuration } from '../data/sessions-library'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 
 /** Sessions listing page — `/sessions` */
 export default function Sessions() {
   const { t } = useTranslation()
+  useScrollablePage()
 
   usePageMeta({
     title: 'Sessions — Live Music Coder',
