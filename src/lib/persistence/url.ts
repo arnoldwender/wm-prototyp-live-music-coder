@@ -51,10 +51,28 @@ export function generateShareUrl(data: UrlShareData): string {
   return `${window.location.origin}${window.location.pathname}#code=${hash}`;
 }
 
-/** Read share data from current URL hash */
+/** Read share data from the current URL hash.
+ *
+ *  Works under both routers:
+ *  - BrowserRouter (web): `window.location.hash` is whatever we set,
+ *    so `#code=xxx` is read directly.
+ *  - HashRouter (Electron): `window.location.hash` starts with `#/route`
+ *    followed by an optional `?code=xxx` query segment that HashRouter
+ *    leaves in place. We search the raw hash string for `code=` and
+ *    extract everything after it up to the next `&` or `#` boundary.
+ *
+ *  Returns null when no share payload is present or decoding fails.
+ *
+ *  NOTE: prefer passing share data via router `location.state` where
+ *  possible (see `encodeShareToState` in Examples / SessionPiece) —
+ *  state survives HashRouter correctly and does not leak the code into
+ *  the URL. This reader stays as a fallback for external share links
+ *  that legitimately arrive via the URL.
+ */
 export function readShareFromUrl(): UrlShareData | null {
   const hash = window.location.hash;
-  if (!hash.startsWith('#code=')) return null;
-  const encoded = hash.slice(6);
-  return decodeFromUrl(encoded);
+  if (!hash) return null;
+  const match = /[#&?]code=([^&#]+)/.exec(hash);
+  if (!match) return null;
+  return decodeFromUrl(match[1]);
 }

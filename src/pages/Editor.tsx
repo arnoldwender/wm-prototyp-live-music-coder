@@ -9,16 +9,19 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 import EditorLayout from '../layouts/EditorLayout'
 import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, TemplateSelector, TutorialOverlay, ActivityBar, DetailPanel } from '../components/organisms'
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
+import type { UrlShareData } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
 import { usePageMeta } from '../lib/usePageMeta'
 
 function Editor() {
   const { t } = useTranslation()
+  const location = useLocation()
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const [showSharedWarning, setShowSharedWarning] = useState(false)
@@ -36,12 +39,23 @@ function Editor() {
     path: '/editor',
   })
 
-  /* On mount: check streak, load shared code, or show template selector */
+  /* On mount: check streak, load shared code, or show template selector.
+   *
+   *  Shared code can arrive from two channels:
+   *    1. `location.state.share` — set by in-app navigation from
+   *       Examples, SessionPiece, etc. Preferred because it survives
+   *       HashRouter under Electron (the URL hash is reserved for
+   *       routing there, so a `#code=` fragment gets clobbered).
+   *    2. `window.location.hash` — the legacy channel, still used by
+   *       external share links on the web (both hand-crafted and
+   *       generated via `generateShareUrl`).
+   */
   useEffect(() => {
     /* Check and update daily streak */
     checkStreak()
 
-    const shared = readShareFromUrl()
+    const stateShare = (location.state as { share?: UrlShareData } | null)?.share
+    const shared = stateShare ?? readShareFromUrl()
     if (shared) {
       const activeFile = files.find((f) => f.active)
       if (activeFile) {
@@ -55,8 +69,9 @@ function Editor() {
 
       /* SECURITY: Always show warning for shared/external code — never skip */
       setShowSharedWarning(true)
-      /* Clean the hash after reading */
-      window.location.hash = ''
+      /* Clean the hash after reading (only meaningful under BrowserRouter;
+         harmless under HashRouter because the share came from state). */
+      if (!stateShare) window.location.hash = ''
     } else if (!localStorage.getItem('lmc-onboarded')) {
       /* First visit — show the template selector */
       setShowTemplateSelector(true)
