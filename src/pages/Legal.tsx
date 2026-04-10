@@ -131,6 +131,11 @@ function Legal() {
             Source Code (AGPL-3.0)
           </a>
         </p>
+        <p className="flex items-center justify-center gap-2 mt-3">
+          <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
+          <span style={{ color: 'var(--color-border)' }}>|</span>
+          <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
+        </p>
       </footer>
     </main>
   );
