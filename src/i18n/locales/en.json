@@ -16,7 +16,8 @@
     "play": "Play",
     "stop": "Stop",
     "record": "Record",
-    "bpm": "BPM"
+    "bpm": "BPM",
+    "stopRecord": "Stop recording"
   },
   "toolbar": {
     "undo": "Undo",
@@ -48,7 +49,8 @@
     "spectrum": "Spectrum",
     "timeline": "Timeline",
     "pianoroll": "Piano Roll",
-    "noVisualizers": "No visualizers active"
+    "noVisualizers": "No visualizers active",
+    "punchcard": "Punchcard"
   },
   "status": {
     "engine": "Engine",
