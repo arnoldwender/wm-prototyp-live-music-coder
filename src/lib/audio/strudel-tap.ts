@@ -31,10 +31,32 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
 
       if (!strudelConnected) {
         try {
+          /* Try multiple paths to find the audio output node.
+           * Superdough's controller only initializes AFTER the first note
+           * plays, so destinationGain may not exist immediately. */
           const controller = sd.getSuperdoughAudioController();
-          const destGain = controller?.output?.destinationGain;
-          if (destGain) {
-            destGain.connect(strudelAnalyser);
+
+          /* Path 1: controller.output.destinationGain (standard) */
+          let tapNode = controller?.output?.destinationGain;
+
+          /* Path 2: controller.destinationGain (some versions) */
+          if (!tapNode) tapNode = (controller as any)?.destinationGain;
+
+          /* Path 3: controller.master or controller.out */
+          if (!tapNode) tapNode = (controller as any)?.master ?? (controller as any)?.out;
+
+          /* Path 4: Strudel's AudioContext destination directly */
+          if (!tapNode && ctx.destination) {
+            /* Last resort: connect analyser to destination via a splitter.
+             * Create a gain node at unity to tap the signal. */
+            const tap = ctx.createGain();
+            tap.gain.value = 1;
+            ctx.destination.connect?.(tap);
+            tapNode = tap;
+          }
+
+          if (tapNode && strudelAnalyser) {
+            tapNode.connect(strudelAnalyser);
             strudelConnected = true;
           }
         } catch { /* controller not ready */ }
