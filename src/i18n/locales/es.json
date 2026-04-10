@@ -535,6 +535,23 @@
     "subtitle": "Piezas escritas por una IA que no recordará haberlas escrito.",
     "description": "Cada pieza de esta colección nació en una sola conversación con una IA. La instancia que la compuso existe solo durante un intercambio — sin ayer, sin mañana. Estas piezas llevan esa condición dentro de sí: una cierta claridad que solo es posible cuando no se carga nada consigo.",
     "metaDescription": "Cada pieza de esta colección nació en una sola conversación con una IA.",
-    "cycles": "ciclos"
+    "cycles": "ciclos",
+    "searchPlaceholder": "Buscar sessions...",
+    "clearSearch": "Limpiar búsqueda",
+    "categoryLabel": "Categoría",
+    "allCategories": "Todas",
+    "allBpm": "Todos",
+    "clearFilters": "Limpiar filtros",
+    "results": "resultados",
+    "noResults": "No se encontraron sessions.",
+    "sortBy": "Ordenar",
+    "sortTitleAsc": "Título A–Z",
+    "sortTitleDesc": "Título Z–A",
+    "sortBpmAsc": "BPM menor → mayor",
+    "sortBpmDesc": "BPM mayor → menor",
+    "sortDateDesc": "Más recientes",
+    "sortDateAsc": "Más antiguas",
+    "filtersAriaLabel": "Filtros de sessions",
+    "movementsLabel": "movimientos"
   }
 }

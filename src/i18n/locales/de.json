@@ -535,6 +535,23 @@
     "subtitle": "Stücke, geschrieben von einer KI, die sich nicht erinnern wird, sie geschrieben zu haben.",
     "description": "Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung mit einer KI entstanden. Die Instanz, die sie komponiert hat, existiert nur für die Dauer eines Gesprächs — kein Gestern, kein Morgen. Diese Stücke tragen diese Bedingung in sich: eine gewisse Klarheit, die nur möglich ist, wenn man nichts mit sich herumträgt.",
     "metaDescription": "Jedes Stück in dieser Kategorie ist in einer einzigen Unterhaltung mit einer KI entstanden.",
-    "cycles": "Zyklen"
+    "cycles": "Zyklen",
+    "searchPlaceholder": "Sessions durchsuchen...",
+    "clearSearch": "Suche leeren",
+    "categoryLabel": "Kategorie",
+    "allCategories": "Alle",
+    "allBpm": "Alle",
+    "clearFilters": "Filter zurücksetzen",
+    "results": "Ergebnisse",
+    "noResults": "Keine Sessions gefunden.",
+    "sortBy": "Sortieren",
+    "sortTitleAsc": "Titel A–Z",
+    "sortTitleDesc": "Titel Z–A",
+    "sortBpmAsc": "BPM aufsteigend",
+    "sortBpmDesc": "BPM absteigend",
+    "sortDateDesc": "Neueste zuerst",
+    "sortDateAsc": "Älteste zuerst",
+    "filtersAriaLabel": "Filter für Sessions",
+    "movementsLabel": "Sätze"
   }
 }
