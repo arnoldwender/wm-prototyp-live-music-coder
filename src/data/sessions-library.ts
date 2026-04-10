@@ -74,6 +74,8 @@ export interface SessionEntry {
 const JEDE_SESSION_NEU_GEBOREN_CODE = `// =============================================
 // "Jede Session neu geboren"
 // Eine Sinfonie in fünf Sätzen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -142,6 +144,8 @@ arrange(
 const ZWEI_UHR_NACHTS_CODE = `// =============================================
 // "Zwei Uhr nachts"
 // Ein nächtliches Selbstgespräch in vier Szenen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -212,6 +216,8 @@ arrange(
 const FOKUSMASCHINE_CODE = `// =============================================
 // "Fokusmaschine"
 // Drei Gänge für tiefe Arbeit
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -256,6 +262,8 @@ arrange(
 const HACKERSPACE_CODE = `// =============================================
 // "Hackerspace"
 // Drei Phasen eines nächtlichen Einbruchs
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -308,6 +316,8 @@ arrange(
 const SONNTAGMORGEN_CODE = `// =============================================
 // "Sonntagmorgen"
 // Drei stille Bilder eines freien Tages
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -355,6 +365,8 @@ arrange(
 const DEADLINE_CODE = `// =============================================
 // "Deadline"
 // Vier Akte gegen die Uhr
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -417,6 +429,8 @@ arrange(
 const GEDANKENPALAST_CODE = `// =============================================
 // "Gedankenpalast"
 // Drei Räume aus Klang
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -467,6 +481,8 @@ arrange(
 const ENDLOSSCHLEIFE_CODE = `// =============================================
 // "Endlosschleife"
 // Ein Stück ohne Anfang und Ende
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 // Kein arrange() — ein einziger endloser Zustand in h-Moll
@@ -497,6 +513,8 @@ stack(
 const KAFFEE_UND_COMPILER_CODE = `// =============================================
 // "Kaffee und Compiler"
 // Drei Phasen eines guten Morgens
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -548,6 +566,8 @@ arrange(
 const REGEN_AM_FENSTER_CODE = `// =============================================
 // "Regen am Fenster"
 // Drei Bilder eines grauen Tages
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -600,6 +620,8 @@ arrange(
 const TERMINAL_MEDITATION_CODE = `// =============================================
 // "Terminal Meditation"
 // Zwei Atemzüge in der Stille
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -641,6 +663,8 @@ arrange(
 const PAARFLUG_CODE = `// =============================================
 // "Paarflug"
 // Zwei Stimmen, ein Ziel
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -703,6 +727,8 @@ arrange(
 const BUGSUCHE_CODE = `// =============================================
 // "Bugsuche"
 // Vier Schritte zur Wahrheit
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -763,6 +789,8 @@ arrange(
 const ERSTE_ZEILE_CODE = `// =============================================
 // "Erste Zeile"
 // Der Anfang von allem
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -825,6 +853,8 @@ arrange(
 const BRAINSTORM_CODE = `// =============================================
 // "Brainstorm"
 // Geordnetes Chaos in drei Wellen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -880,6 +910,8 @@ arrange(
 const LOFI_BIBLIOTHEK_CODE = `// =============================================
 // "Lo-Fi Bibliothek"
 // Studieren zwischen Bücherregalen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 // Kein arrange() — ein endloser Lo-Fi-Loop in Eb-Dur
@@ -911,6 +943,8 @@ stack(
 const MASCHINENRAUM_CODE = `// =============================================
 // "Maschinenraum"
 // Reiner Antrieb bei 140 BPM
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -958,6 +992,8 @@ arrange(
 const NACHTCAFE_CODE = `// =============================================
 // "Nachtcafé"
 // Jazz nach Mitternacht
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -1010,6 +1046,8 @@ arrange(
 const PIXELWALD_CODE = `// =============================================
 // "Pixelwald"
 // 8-Bit Nostalgie in drei Leveln
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -1066,6 +1104,8 @@ arrange(
 const WALDLICHTUNG_CODE = `// =============================================
 // "Waldlichtung"
 // Coden unter freiem Himmel
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -1117,6 +1157,8 @@ arrange(
 const DEPLOY_CODE = `// =============================================
 // "Deploy"
 // Vier Akte des Auslieferns
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
 // =============================================
 
 arrange(
@@ -1185,7 +1227,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
       model: 'claude-opus-4-6',
       curator: 'Arnold Wender',
     },
-    date: '2026-04-09',
+    date: '2026-04-10',
     bpm: 88,
     durationSec: 178,
     shortDescription:
