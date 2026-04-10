@@ -1216,6 +1216,734 @@ arrange(
 ).cpm(125)
 `
 
+/* ══════════════════════════════════════════════════════════
+   Piece 22 — Tiefenrausch
+   ══════════════════════════════════════════════════════════ */
+
+const TIEFENRAUSCH_CODE = `// =============================================
+// "Tiefenrausch"
+// Deep Trance in drei Wellen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Intro (8 Zyklen) ──────────────────────────
+  // Kick etabliert den Puls, gefilterte Bassline steigt langsam auf
+  [8, stack(
+    // Sub-Bass: rollende 16tel auf dem Grundton, tief unter 200 Hz
+    note("a1 a1 a1 a1 a1 a1 a1 a1")
+      .s("sawtooth").lpf(200).gain(0.6),
+    // Pad: Am-Akkord, langsam anschwellend, viel Hall
+    note("[a3,c4,e4]")
+      .s("sine").attack(2).release(4)
+      .room(0.7).gain(sine.range(0.05, 0.25).slow(8)),
+    // Kick: Four-on-the-Floor, das Fundament
+    s("bd bd bd bd").gain(0.55),
+    // Hi-Hat: Off-Beat, klassisches Trance-Pattern
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2)
+  )],
+
+  // ── II. Aufstieg (24 Zyklen) ─────────────────────
+  // Volle Trance-Produktion: rollende Bassline mit Filter-Sweep,
+  // Arpeggio-Lead mit Delay, breite Pad-Fläche
+  [24, stack(
+    // Bassline: rollendes 16tel-Pattern, Grundton + Quinte
+    // lpf-Sweep von 300→1800 Hz über 24 Zyklen = der klassische Trance-Build
+    note("a1 a1 e2 a1 a1 e2 a1 e2")
+      .s("sawtooth").lpf(sine.range(300, 1800).slow(24))
+      .gain(0.55),
+    // Pad: Akkordprogression Am → F → C → G, langsame Bewegung
+    note("<[a3,c4,e4] [f3,a3,c4] [c3,e3,g3] [g3,b3,d4]>/4")
+      .s("sine").attack(0.8).release(2)
+      .room(0.6).gain(0.28),
+    // Lead: Arpeggio durch die Akkordtöne, Delay erzeugt Tiefe
+    note("<a4 c5 e5 a5 e5 c5 a4 e4>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.5).delaytime(0.217).delayfeedback(0.5)
+      .room(0.3).gain(0.3),
+    // Kick: durchgehend
+    s("bd bd bd bd").gain(0.55),
+    // Hi-Hat: Off-Beat + gelegentliche Open-Hat
+    s("~ hh ~ hh ~ hh ~ [hh oh]").gain(0.22),
+    // Clap auf 2 und 4
+    s("~ cp ~ cp").gain(0.35)
+  )],
+
+  // ── III. Plateau (16 Zyklen) ─────────────────────
+  // Bassline-Filter weit offen, zweite Melodie kommt dazu,
+  // maximale Energie, dann langsames Ausklingen
+  [16, stack(
+    // Bass: Filter offen, volle Energie
+    note("a1 a1 e2 a1 a1 e2 a1 e2")
+      .s("sawtooth").lpf(2200).gain(0.55),
+    // Pad: breiter, mit Delay
+    note("<[a3,c4,e4] [f3,a3,c4] [c3,e3,g3] [g3,b3,d4]>/4")
+      .s("sine").attack(0.5).release(1.5)
+      .room(0.6).delay(0.3).gain(0.25),
+    // Lead 1: Hauptmelodie
+    note("<a5 c6 e6 c6 a5 g5 e5 a5 c6 e6 g6 e6 c6 a5 g5 e5>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.4).delaytime(0.217)
+      .room(0.3).gain(0.32),
+    // Lead 2: Gegenmelodie, eine Oktave tiefer
+    note("<e5 a5 c6 a5 e5 c5 a4 e5 a5 c6 e6 c6 a5 e5 c5 a4>")
+      .s("sine").attack(0.05).release(0.4)
+      .room(0.5).gain(sine.range(0.1, 0.25).slow(16)),
+    // Drums: volle Energie
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.22),
+    s("~ cp ~ cp").gain(0.35),
+    // Ride für Glanz
+    s("~ ~ ~ ~ hh ~ ~ ~").gain(0.1)
+  )]
+).cpm(138)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 23 — Wellengang
+   ══════════════════════════════════════════════════════════ */
+
+const WELLENGANG_CODE = `// =============================================
+// "Wellengang"
+// Deep House für die späten Stunden
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Ebbe (8 Zyklen) ──────────────────────────
+  // Nur Bass und Kick — der Groove etabliert sich
+  [8, stack(
+    // Sub-Bass: tief, rund, einfaches Pattern mit Synkope
+    note("d2 ~ ~ d2 ~ d2 ~ ~")
+      .s("sine").gain(0.6).lpf(180),
+    // Kick: Four-on-the-Floor, warm und rund
+    s("bd bd bd bd").gain(0.5),
+    // Off-Beat Hi-Hat: das Herz von House
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    // Ghost-Clap auf der 4, kaum hörbar
+    s("~ ~ ~ cp").gain(0.15)
+  )],
+
+  // ── II. Strömung (20 Zyklen) ─────────────────────
+  // Akkord-Stabs mit Sidechain-Feeling, warme Fläche, melodischer Hook
+  [20, stack(
+    // Sub-Bass: synkopiert, gibt dem Groove Bewegung
+    note("d2 ~ ~ d2 ~ d2 ~ ~ d2 ~ a1 ~ ~ d2 ~ ~")
+      .s("sine").gain(0.6).lpf(180),
+    // Pad: Dm → Bb → C → Am, Sidechain-Simulation durch Gain-LFO
+    // Der Gain pumpt im Kick-Rhythmus — klassischer House-Effekt
+    note("<[d4,f4,a4] [bb3,d4,f4] [c4,e4,g4] [a3,c4,e4]>/4")
+      .s("sine").attack(0.15).release(0.8)
+      .room(0.4).gain(sine.range(0.08, 0.28).slow(0.5)),
+    // Melodie: einfacher Hook über die Akkorde, Sine für Wärme
+    note("<d5 ~ f5 ~ a5 ~ f5 ~ d5 ~ c5 ~ a4 ~ c5 ~>")
+      .s("sine").attack(0.05).release(0.5)
+      .delay(0.3).delaytime(0.244).delayfeedback(0.4)
+      .room(0.3).gain(0.3),
+    // Kick
+    s("bd bd bd bd").gain(0.5),
+    // Off-Beat Hat
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.22),
+    // Clap auf 2 und 4
+    s("~ cp ~ cp").gain(0.3),
+    // Shaker: durchgehende 16tel, sehr leise — gibt Textur
+    s("hh*16").gain(0.08)
+  )],
+
+  // ── III. Flut (12 Zyklen) ────────────────────────
+  // Zweite Melodie, Bass öffnet sich, maximale Tiefe
+  [12, stack(
+    // Bass: etwas offenerer Filter, mehr Obertöne
+    note("d2 ~ a1 ~ d2 ~ a1 d2")
+      .s("sawtooth").lpf(350).gain(0.5),
+    // Pad: breiter, mehr Hall
+    note("<[d4,f4,a4] [bb3,d4,f4] [c4,e4,g4] [a3,c4,e4]>/4")
+      .s("sine").attack(0.3).release(1.2)
+      .room(0.6).delay(0.2)
+      .gain(sine.range(0.08, 0.25).slow(0.5)),
+    // Lead: höher, offener
+    note("<d5 f5 a5 c6 a5 f5 d5 c5 a4 f4 d4 a4>")
+      .s("sine").attack(0.05).release(0.6)
+      .delay(0.4).delaytime(0.244).delayfeedback(0.45)
+      .room(0.4).gain(0.28),
+    // Counter-Melodie: tief, langsam, gibt Seele
+    note("<a3 ~ ~ d4 ~ ~ f4 ~ ~ a4 ~ ~>")
+      .s("sine").attack(0.3).release(1)
+      .room(0.5).gain(0.18),
+    // Drums
+    s("bd bd bd bd").gain(0.5),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.22),
+    s("~ cp ~ cp").gain(0.3)
+  )],
+
+  // ── IV. Ebbe (8 Zyklen) ─────────────────────────
+  // Zurück zum Anfang — Elemente verschwinden langsam
+  [8, stack(
+    note("d2 ~ ~ d2 ~ ~ ~ ~")
+      .s("sine").gain(sine.range(0.6, 0.2).slow(8)).lpf(180),
+    note("[d4,f4,a4]")
+      .s("sine").attack(1).release(4)
+      .room(0.8).gain(sine.range(0.2, 0.05).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.5, 0.15).slow(8)),
+    s("~ hh ~ hh ~ hh ~ hh").gain(sine.range(0.2, 0.05).slow(8))
+  )]
+).cpm(122)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 24 — Mitternachtsblues
+   ══════════════════════════════════════════════════════════ */
+
+const MITTERNACHTSBLUES_CODE = `// =============================================
+// "Mitternachtsblues"
+// Zwölf Takte, eine Wahrheit
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Blues in A: Pentatonik A C D Eb E G
+// 12-Bar-Progression: I I I I | IV IV I I | V IV I V
+
+arrange(
+  // ── I. Intro (4 Zyklen) ──────────────────────────
+  // Walking Bass allein — setzt den Groove
+  [4, stack(
+    // Walking Bass: Grundtöne der Blues-Progression, Shuffle-Feeling
+    note("a2 c3 d3 e3").s("sine").gain(0.55).lpf(400),
+    // Rimshot auf 2 und 4 — der Shuffle-Puls
+    s("~ sd ~ sd").gain(0.25),
+    // Ghost-Hat: Shuffle-Pattern (betont die Off-Beats)
+    s("hh ~ [~ hh] ~ hh ~ [~ hh] ~").gain(0.15)
+  )],
+
+  // ── II. 12 Bar (24 Zyklen) ───────────────────────
+  // Zwei Durchgänge des 12-Bar-Blues
+  // I=A7, IV=D7, V=E7
+  [24, stack(
+    // Melodie: Blues-Pentatonik mit Blue Note (eb)
+    // Phrasierung absichtlich unregelmäßig — Blues atmet
+    note("<a4 c5 d5 ~ e5 ~ c5 a4 ~ d5 eb5 e5 ~ c5 a4 ~>")
+      .s("sine").attack(0.05).release(0.8)
+      .room(0.5).delay(0.3).delaytime(0.384)
+      .gain(0.35),
+    // Akkorde: 12-Bar-Progression als Septakkorde
+    // 4 Takte I, 2 Takte IV, 2 Takte I, 1 Takt V, 1 Takt IV, 2 Takte I
+    note("<[a3,c4,e4,g4] [a3,c4,e4,g4] [a3,c4,e4,g4] [a3,c4,e4,g4] [d3,f3,a3,c4] [d3,f3,a3,c4] [a3,c4,e4,g4] [a3,c4,e4,g4] [e3,g3,b3,d4] [d3,f3,a3,c4] [a3,c4,e4,g4] [e3,g3,b3,d4]>/12")
+      .s("sine").attack(0.1).release(0.6)
+      .gain(0.2),
+    // Walking Bass: folgt der Akkordprogression
+    note("<a2 c3 d3 e3 a2 c3 d3 e3 a2 c3 d3 e3 a2 c3 d3 e3 d2 f2 a2 c3 d2 f2 a2 c3 a2 c3 d3 e3 a2 c3 d3 e3 e2 g2 b2 d3 d2 f2 a2 c3 a2 c3 d3 e3 e2 g2 b2 d3>/48")
+      .s("sine").gain(0.5).lpf(400),
+    // Drums: Shuffle-Groove
+    s("bd ~ [~ bd] ~ bd ~ [~ bd] ~").gain(0.4),
+    s("~ sd ~ sd").gain(0.3),
+    s("hh ~ [~ hh] ~ hh ~ [~ hh] ~").gain(0.18)
+  )],
+
+  // ── III. Outro (4 Zyklen) ────────────────────────
+  // Turnaround: V → IV → I, dann Stille
+  [4, stack(
+    note("<e5 ~ d5 ~ c5 ~ a4 ~>")
+      .s("sine").attack(0.1).release(1.5)
+      .room(0.7).delay(0.4).delaytime(0.384)
+      .gain(0.3),
+    note("[a3,c4,e4,g4]")
+      .s("sine").attack(0.5).release(3)
+      .room(0.8).gain(sine.range(0.2, 0.05).slow(4)),
+    note("a2").s("sine").attack(1).release(4)
+      .room(0.8).gain(0.35)
+  ).slow(2)]
+).cpm(78)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 25 — Schwarzlicht
+   ══════════════════════════════════════════════════════════ */
+
+const SCHWARZLICHT_CODE = `// =============================================
+// "Schwarzlicht"
+// Minimal Techno — weniger ist alles
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Dunkelheit (8 Zyklen) ─────────────────────
+  // Nur Kick und ein tiefer Ton — das Minimum
+  [8, stack(
+    // Kick: trocken, hart, Techno-Standard
+    s("bd bd bd bd").gain(0.6),
+    // Sub: ein einzelner tiefer Ton, kaum hörbar, spürt man mehr als man hört
+    note("e1").s("sine").gain(0.5).lpf(120)
+  )],
+
+  // ── II. Kontur (24 Zyklen) ───────────────────────
+  // Minimale Elemente kommen dazu — jedes einzelne zählt
+  [24, stack(
+    // Sub-Bass: E, sehr tief, Grundton verankert alles
+    note("e1").s("sine").gain(0.5).lpf(120),
+    // Percussive Melodie: nur drei Töne, stark gefiltert
+    // Klingt mehr nach Percussion als nach Melodie — das ist Absicht
+    note("e3 ~ ~ e3 ~ ~ g3 ~")
+      .s("sawtooth").lpf(sine.range(400, 1200).slow(12))
+      .attack(0.01).release(0.12)
+      .gain(0.3),
+    // Hi-Hat: off-beat, aber nicht jede — Lücken geben Luft
+    s("~ hh ~ ~ ~ hh ~ hh").gain(0.22),
+    // Kick: durchgehend
+    s("bd bd bd bd").gain(0.6),
+    // Clap: nur auf der 4 — minimal
+    s("~ ~ ~ cp").gain(0.3),
+    // Delay-Ping: ein einzelner Ton mit viel Delay, der den Raum füllt
+    note("~ ~ ~ ~ ~ ~ ~ b4")
+      .s("sine").attack(0.01).release(0.1)
+      .delay(0.7).delaytime(0.23).delayfeedback(0.65)
+      .room(0.4).gain(0.15)
+  )],
+
+  // ── III. Schatten (16 Zyklen) ────────────────────
+  // Zweiter Layer — eine Gegenmelodie erscheint und verschwindet
+  [16, stack(
+    note("e1").s("sine").gain(0.5).lpf(120),
+    note("e3 ~ ~ e3 ~ ~ g3 ~")
+      .s("sawtooth").lpf(sine.range(500, 1500).slow(16))
+      .attack(0.01).release(0.12).gain(0.3),
+    // Gegenmelodie: taucht auf und verschwindet — Filter-Gain-LFO
+    note("<~ ~ b3 ~ ~ ~ e4 ~ ~ ~ g3 ~ ~ ~ b3 ~>")
+      .s("sawtooth").lpf(800)
+      .attack(0.01).release(0.2)
+      .delay(0.5).delaytime(0.23).delayfeedback(0.5)
+      .gain(sine.range(0, 0.22).slow(16)),
+    s("~ hh ~ ~ ~ hh ~ hh").gain(0.22),
+    s("bd bd bd bd").gain(0.6),
+    s("~ ~ ~ cp").gain(0.3)
+  )],
+
+  // ── IV. Dunkelheit (8 Zyklen) ────────────────────
+  // Zurück zum Anfang — Elemente fallen weg
+  [8, stack(
+    note("e1").s("sine").gain(sine.range(0.5, 0.1).slow(8)).lpf(120),
+    s("bd bd bd bd").gain(sine.range(0.6, 0.2).slow(8))
+  )]
+).cpm(130)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 26 — Traumfänger
+   ══════════════════════════════════════════════════════════ */
+
+const TRAUMFAENGER_CODE = `// =============================================
+// "Traumfänger"
+// Psytrance — 142 BPM ins Unterbewusste
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Öffnung (6 Zyklen) ───────────────────────
+  // Atmosphärischer Einstieg, Kick baut sich auf
+  [6, stack(
+    // Atmosphäre: weite Fläche, viel Hall
+    note("[a3,e4]").s("sine").attack(3).release(5)
+      .room(0.9).delay(0.6).gain(0.2),
+    // Kick: erst leise, wird lauter
+    s("bd bd bd bd").gain(sine.range(0.2, 0.55).slow(6))
+  )],
+
+  // ── II. Treibjagd (24 Zyklen) ───────────────────
+  // Volle Psy-Produktion: treibende Bassline, ätherisches Lead,
+  // Hi-Hat-Rolls, Kick durchgehend
+  [24, stack(
+    // Psy-Bass: alternierend Grundton/Quinte mit Filter-Wobble
+    // Das typische Psy-Pattern: schnell, repetitiv, hypnotisch
+    note("a1 e2 a1 e2 a1 e2 a1 e2")
+      .s("sawtooth").lpf(sine.range(400, 2000).slow(8))
+      .attack(0.01).release(0.1)
+      .gain(0.5),
+    // Pad: weite Fläche über dem Bass, gibt Harmonie
+    note("<[a3,c4,e4] [f3,a3,c4] [g3,b3,d4] [a3,c4,e4]>/8")
+      .s("sine").attack(1).release(2)
+      .room(0.6).gain(0.2),
+    // Lead: ätherisch, viel Delay — das "Psytrance-Feeling"
+    note("<a5 ~ e5 ~ c5 ~ e5 ~ a5 ~ c6 ~ e5 ~ a5 ~>")
+      .s("sine").attack(0.02).release(0.5)
+      .delay(0.6).delaytime(0.211).delayfeedback(0.55)
+      .room(0.5).gain(0.25),
+    // Kick: hart und durchgehend
+    s("bd bd bd bd").gain(0.55),
+    // Off-Beat Hi-Hat
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    // Hi-Hat-Rolls auf dem letzten Beat jedes Takts
+    s("~ ~ ~ ~ ~ ~ ~ [hh hh hh hh]").gain(0.15)
+  )],
+
+  // ── III. Auftauchen (8 Zyklen) ──────────────────
+  // Bass-Filter schließt sich, Atmosphäre kommt zurück
+  [8, stack(
+    // Bass: Filter schließt sich langsam
+    note("a1 e2 a1 e2 a1 e2 a1 e2")
+      .s("sawtooth").lpf(sine.range(1500, 300).slow(8))
+      .attack(0.01).release(0.1)
+      .gain(sine.range(0.5, 0.15).slow(8)),
+    // Atmosphäre wächst
+    note("[a3,e4]").s("sine").attack(2).release(4)
+      .room(0.9).delay(0.6)
+      .gain(sine.range(0.1, 0.3).slow(8)),
+    // Lead: Delay-Trails verklingen
+    note("<a5 ~ ~ ~ e5 ~ ~ ~>")
+      .s("sine").attack(0.05).release(1)
+      .delay(0.7).delaytime(0.211).delayfeedback(0.6)
+      .room(0.7).gain(sine.range(0.2, 0.05).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.55, 0.2).slow(8))
+  )]
+).cpm(142)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 27 — Kupferkessel
+   ══════════════════════════════════════════════════════════ */
+
+const KUPFERKESSEL_CODE = `// =============================================
+// "Kupferkessel"
+// Dub Techno — Echo als Instrument
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Nebel (8 Zyklen) ─────────────────────────
+  // Nur Delays und Hall — der Raum entsteht, bevor die Musik beginnt
+  [8, stack(
+    // Akkord-Stab: einzelner Schlag, der Rest ist Echo
+    note("~ ~ ~ [d4,f4,a4] ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.3)
+      .delay(0.8).delaytime(0.344).delayfeedback(0.7)
+      .room(0.7).gain(0.3),
+    // Sub: tief, kaum da
+    note("d2").s("sine").attack(2).release(4)
+      .room(0.8).gain(0.15).slow(4)
+  ).slow(2)],
+
+  // ── II. Strom (20 Zyklen) ───────────────────────
+  // Dub Techno lebt von Delays, die zu Texturen werden
+  // Jedes Element hat seinen eigenen Delay-Raum
+  [20, stack(
+    // Sub-Bass: einfach, tief, verankert alles
+    note("d2 ~ ~ d2 ~ ~ d2 ~")
+      .s("sine").gain(0.55).lpf(160),
+    // Akkord-Stabs: kurzer Anschlag, langes Echo
+    // Delay bei 0.344s (nicht auf dem Beat) erzeugt den typischen Dub-Wobble
+    note("<[d4,f4,a4] ~ ~ ~ [a3,c4,e4] ~ ~ ~>")
+      .s("sine").attack(0.01).release(0.2)
+      .delay(0.8).delaytime(0.344).delayfeedback(0.65)
+      .room(0.6).gain(0.3),
+    // Melodie: vereinzelte Töne, der Delay macht den Rest
+    note("<d5 ~ ~ ~ ~ ~ a4 ~ ~ ~ ~ ~ f4 ~ ~ ~>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.7).delaytime(0.258).delayfeedback(0.6)
+      .room(0.5).gain(0.2),
+    // Kick: trocken, kontrastiert den nassen Rest
+    s("bd bd bd bd").gain(0.5),
+    // Hi-Hat: minimal, off-beat
+    s("~ hh ~ ~ ~ hh ~ ~").gain(0.18),
+    // Rimshot: sehr leise, gibt Textur
+    s("~ ~ sd ~ ~ ~ ~ sd").gain(0.12)
+  )],
+
+  // ── III. Nebel (10 Zyklen) ──────────────────────
+  // Elemente verschwinden in ihren eigenen Echos
+  [10, stack(
+    note("d2").s("sine").gain(sine.range(0.45, 0.1).slow(10)).lpf(160),
+    note("~ ~ ~ [d4,f4,a4] ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.3)
+      .delay(0.8).delaytime(0.344).delayfeedback(0.75)
+      .room(0.8).gain(sine.range(0.25, 0.05).slow(10)),
+    s("bd bd bd bd").gain(sine.range(0.5, 0.1).slow(10)),
+    s("~ hh ~ ~ ~ hh ~ ~").gain(sine.range(0.15, 0.03).slow(10))
+  )]
+).cpm(116)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 28 — Delta Wellen
+   ══════════════════════════════════════════════════════════ */
+
+const DELTA_WELLEN_CODE = `// =============================================
+// "Delta Wellen"
+// Ambient Drone — für den tiefsten Fokus
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Kein Rhythmus, keine Melodie — nur Frequenzschichten,
+// die sich unmerklich bewegen. Für Stunden tiefer Konzentration.
+
+stack(
+  // Schicht 1: Grundton D, tief, bildet das Fundament
+  note("d2").s("sine").attack(5).release(8)
+    .room(0.95).gain(0.3).slow(16),
+
+  // Schicht 2: Quinte A, eine Oktave höher
+  // Leicht verstimmt durch slow(17) vs slow(16) — erzeugt Schwebung
+  note("a2").s("sine").attack(6).release(8)
+    .room(0.95).gain(0.2).slow(17),
+
+  // Schicht 3: Oktave D, noch höher
+  // Gain atmet langsam — 32 Zyklen Periode
+  note("d3").s("sine").attack(4).release(6)
+    .room(0.9).delay(0.5).delaytime(1.5).delayfeedback(0.4)
+    .gain(sine.range(0.05, 0.18).slow(32)),
+
+  // Schicht 4: Terz F, gibt Moll-Färbung
+  // Taucht nur manchmal auf (Gain-LFO mit langer Periode)
+  note("f3").s("sine").attack(5).release(8)
+    .room(0.9).delay(0.6).delaytime(2).delayfeedback(0.35)
+    .gain(sine.range(0, 0.12).slow(48)),
+
+  // Schicht 5: hoher Oberton A4
+  // Kaum hörbar, gibt dem Drone "Luft"
+  note("a4").s("sine").attack(3).release(5)
+    .room(0.95).delay(0.7).delaytime(2.5).delayfeedback(0.3)
+    .gain(sine.range(0, 0.08).slow(64))
+).cpm(60)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 29 — Stromkreis
+   ══════════════════════════════════════════════════════════ */
+
+const STROMKREIS_CODE = `// =============================================
+// "Stromkreis"
+// Tech House — Groove über alles
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Aufwärmen (8 Zyklen) ─────────────────────
+  // Kick + Bass etablieren den Groove
+  [8, stack(
+    // Bass: synkopiert, gibt dem Beat Swing
+    note("g2 ~ ~ g2 ~ g2 ~ ~")
+      .s("sawtooth").lpf(500).attack(0.01).release(0.15)
+      .gain(0.45),
+    // Kick
+    s("bd bd bd bd").gain(0.55),
+    // Off-Beat Hat
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    // Clap auf 3 (nicht 2+4 — das macht es "techy")
+    s("~ ~ cp ~").gain(0.3)
+  )],
+
+  // ── II. Hauptteil (24 Zyklen) ───────────────────
+  // Voller Tech-House-Groove: perkussive Stabs, gefilterter Bass,
+  // minimale Melodie, maximaler Groove
+  [24, stack(
+    // Bass: Filter-Sweep für Bewegung
+    note("g2 ~ ~ g2 ~ g2 ~ ~ g2 ~ d2 ~ ~ g2 ~ ~")
+      .s("sawtooth").lpf(sine.range(400, 900).slow(12))
+      .attack(0.01).release(0.12).gain(0.45),
+    // Akkord-Stab: kurz, perkussiv, gefiltert
+    // Off-Beat-Platzierung gibt Groove
+    note("<~ [g3,bb3,d4] ~ ~ ~ [f3,a3,c4] ~ ~>")
+      .s("sawtooth").lpf(1200)
+      .attack(0.01).release(0.1)
+      .room(0.2).gain(0.22),
+    // Melodie: minimal — nur drei Töne, repetitiv
+    note("<g4 ~ ~ ~ bb4 ~ ~ ~ d5 ~ ~ ~ bb4 ~ g4 ~>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.3).delaytime(0.189).delayfeedback(0.4)
+      .gain(0.25),
+    // Kick
+    s("bd bd bd bd").gain(0.55),
+    // Hi-Hat: off-beat mit Variationen
+    s("~ hh ~ hh ~ hh ~ [hh hh]").gain(0.22),
+    // Clap
+    s("~ ~ cp ~").gain(0.3),
+    // Percussion: tiefe Tom, gibt "Bounce"
+    s("~ ~ ~ ~ bd ~ ~ ~").gain(0.2)
+  )],
+
+  // ── III. Auslauf (8 Zyklen) ─────────────────────
+  [8, stack(
+    note("g2 ~ ~ g2 ~ ~ ~ ~")
+      .s("sawtooth").lpf(sine.range(600, 250).slow(8))
+      .attack(0.01).release(0.15)
+      .gain(sine.range(0.45, 0.1).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.55, 0.2).slow(8)),
+    s("~ hh ~ hh ~ hh ~ hh").gain(sine.range(0.2, 0.05).slow(8))
+  )]
+).cpm(126)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 30 — Neonlicht
+   ══════════════════════════════════════════════════════════ */
+
+const NEONLICHT_CODE = `// =============================================
+// "Neonlicht"
+// Progressive House — der lange Bogen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Intro (8 Zyklen) ──────────────────────────
+  // Nur Kick und Atmosphäre — der Raum wird geöffnet
+  [8, stack(
+    s("bd bd bd bd").gain(0.5),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.15),
+    // Atmosphäre: gefilterte Fläche, sehr weit
+    note("[c4,e4,g4]").s("sine").attack(3).release(5)
+      .room(0.8).gain(sine.range(0.05, 0.2).slow(8))
+  )],
+
+  // ── II. Aufbau (16 Zyklen) ──────────────────────
+  // Elemente kommen eins nach dem anderen
+  // Bass → Akkorde → Melodie — der klassische Prog-House-Build
+  [16, stack(
+    // Bass: einfach, tief, Grundton + Quinte
+    note("c2 ~ g1 ~ c2 ~ g1 c2")
+      .s("sawtooth").lpf(sine.range(250, 600).slow(16))
+      .attack(0.01).release(0.12).gain(0.5),
+    // Pad: Cm → Ab → Eb → Bb, langsam anschwellend
+    note("<[c4,eb4,g4] [ab3,c4,eb4] [eb4,g4,bb4] [bb3,d4,f4]>/4")
+      .s("sine").attack(0.5).release(1.5)
+      .room(0.5).gain(sine.range(0.05, 0.28).slow(16)),
+    // Lead: erscheint in der zweiten Hälfte (Gain-LFO startet bei 0)
+    note("<c5 eb5 g5 bb5 g5 eb5 c5 bb4 c5 eb5 g5 c6 bb5 g5 eb5 c5>")
+      .s("sine").attack(0.03).release(0.4)
+      .delay(0.4).delaytime(0.242).delayfeedback(0.45)
+      .room(0.3).gain(sine.range(0, 0.3).slow(16)),
+    // Drums
+    s("bd bd bd bd").gain(0.5),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    s("~ cp ~ cp").gain(sine.range(0.1, 0.3).slow(16))
+  )],
+
+  // ── III. Breakdown (8 Zyklen) ───────────────────
+  // Kick fällt weg — nur Pad und Melodie, maximale Spannung
+  [8, stack(
+    // Pad: offen, breit, viel Hall
+    note("<[c4,eb4,g4] [ab3,c4,eb4] [eb4,g4,bb4] [bb3,d4,f4]>/4")
+      .s("sine").attack(0.8).release(2)
+      .room(0.8).delay(0.3).gain(0.3),
+    // Melodie: langsamer, mehr Hall
+    note("<c5 ~ eb5 ~ g5 ~ eb5 ~>")
+      .s("sine").attack(0.1).release(1)
+      .delay(0.6).delaytime(0.242).delayfeedback(0.55)
+      .room(0.6).gain(0.3),
+    // Sub: hält die Spannung
+    note("c2").s("sine").attack(2).release(4)
+      .gain(sine.range(0.1, 0.3).slow(8))
+  )],
+
+  // ── IV. Drop (16 Zyklen) ────────────────────────
+  // Alles kommt zurück — volle Energie
+  [16, stack(
+    // Bass: Filter offen
+    note("c2 ~ g1 ~ c2 ~ g1 c2")
+      .s("sawtooth").lpf(800)
+      .attack(0.01).release(0.12).gain(0.5),
+    // Pad: Sidechain-Pumping
+    note("<[c4,eb4,g4] [ab3,c4,eb4] [eb4,g4,bb4] [bb3,d4,f4]>/4")
+      .s("sine").attack(0.1).release(0.8)
+      .room(0.4).gain(sine.range(0.08, 0.3).slow(0.5)),
+    // Lead: volle Melodie
+    note("<c5 eb5 g5 bb5 g5 eb5 c5 bb4 c5 eb5 g5 c6 bb5 g5 eb5 c5>")
+      .s("sine").attack(0.02).release(0.35)
+      .delay(0.35).delaytime(0.242).delayfeedback(0.4)
+      .room(0.3).gain(0.32),
+    // Counter: Arpeggio unterm Lead
+    note("<g4 c5 eb5 g5 eb5 c5 g4 eb4 g4 c5 eb5 g5 bb5 g5 eb5 c5>")
+      .s("sine").attack(0.02).release(0.25)
+      .gain(0.18),
+    // Drums: volle Power
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ [hh hh]").gain(0.22),
+    s("~ cp ~ cp").gain(0.35)
+  )],
+
+  // ── V. Outro (8 Zyklen) ─────────────────────────
+  [8, stack(
+    note("c2").s("sine").gain(sine.range(0.4, 0.1).slow(8)).lpf(200),
+    note("[c4,eb4,g4]").s("sine").attack(1).release(4)
+      .room(0.9).gain(sine.range(0.25, 0.05).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.5, 0.15).slow(8))
+  )]
+).cpm(124)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 31 — Schichtarbeit
+   ══════════════════════════════════════════════════════════ */
+
+const SCHICHTARBEIT_CODE = `// =============================================
+// "Schichtarbeit"
+// Dark Techno — Maschinen nach Mitternacht
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Fabrikhalle (8 Zyklen) ───────────────────
+  // Industriell, kalt, mechanisch — nur Percussion und Bass
+  [8, stack(
+    // Kick: hart, komprimiert
+    s("bd bd bd bd").gain(0.6),
+    // Industrieller Bass: eine Note, stark gefiltert, pulsierend
+    note("a1 a1 a1 a1 a1 a1 a1 a1")
+      .s("sawtooth").lpf(250).hpf(40)
+      .attack(0.01).release(0.08)
+      .gain(0.5),
+    // Metallisches Klicken: Off-Beat
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.25)
+  )],
+
+  // ── II. Fließband (24 Zyklen) ──────────────────
+  // Relentless — das Fließband stoppt nie
+  [24, stack(
+    // Bass: dunkler als dunkel, Filter-Sweep sehr langsam
+    note("a1 a1 e2 a1 a1 e2 a1 e2")
+      .s("sawtooth").lpf(sine.range(200, 800).slow(24))
+      .hpf(40).attack(0.01).release(0.1)
+      .gain(0.5),
+    // Dark Pad: dissonante Sekunde (a+bb), erzeugt Unbehagen
+    note("[a3,bb3,e4]")
+      .s("sine").attack(2).release(4)
+      .room(0.5).gain(sine.range(0.05, 0.18).slow(12)),
+    // Metallisches Lead: harsch, kurz, gefiltert
+    note("<a3 ~ ~ e3 ~ ~ a3 ~ ~ ~ g3 ~ ~ ~ e3 ~>")
+      .s("sawtooth").lpf(1500).hpf(300)
+      .attack(0.01).release(0.08)
+      .delay(0.4).delaytime(0.177).delayfeedback(0.5)
+      .gain(0.22),
+    // Kick: unerbittlich
+    s("bd bd bd bd").gain(0.6),
+    // Hat: off-beat, mechanisch
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.25),
+    // Clap: auf 2 und 4, hart
+    s("~ cp ~ cp").gain(0.35),
+    // Noise-Sweep: steigt und fällt, wie Maschinengeräusch
+    s("hh*16").gain(sine.range(0.02, 0.12).slow(8))
+  )],
+
+  // ── III. Schichtwechsel (8 Zyklen) ─────────────
+  // Maschinen fahren herunter
+  [8, stack(
+    note("a1").s("sawtooth")
+      .lpf(sine.range(500, 100).slow(8))
+      .attack(0.01).release(0.15)
+      .gain(sine.range(0.5, 0.1).slow(8)),
+    note("[a3,bb3,e4]").s("sine").attack(2).release(6)
+      .room(0.8).gain(sine.range(0.15, 0.03).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.6, 0.15).slow(8))
+  )]
+).cpm(134)
+`
+
 export const SESSIONS_LIBRARY: SessionEntry[] = [
   {
     slug: 'jede-session-neu-geboren',
@@ -1738,6 +2466,255 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     ],
     engine: 'strudel',
     code: DEPLOY_CODE,
+  },
+  {
+    slug: 'tiefenrausch',
+    title: 'Tiefenrausch',
+    subtitle: 'Deep Trance in drei Wellen',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 138,
+    durationSec: 208,
+    shortDescription:
+      'Deep Trance in drei Wellen: Intro → Aufstieg → Plateau. Rollende Bassline mit Filter-Sweep, Arpeggio-Lead mit Delay, Four-on-the-Floor.',
+    composerNotes:
+      'Trance lebt von einem einzigen Trick: dem Filter-Sweep. Die Bassline spielt das gleiche Pattern über 24 Zyklen, aber der Lowpass-Filter öffnet sich langsam von 300 auf 1800 Hz — und plötzlich wird aus einem dumpfen Puls ein leuchtender Strom. Die Delay-Zeit der Lead-Melodie (0.217s) ist bewusst nicht auf dem Beat — dadurch entstehen die typischen Trance-Echos, die den Raum füllen, ohne den Rhythmus zu stören. Die Akkordprogression Am → F → C → G ist die einfachste der Welt, aber bei 138 BPM mit offenem Filter klingt sie wie ein Sonnenaufgang.',
+    movements: [
+      { roman: 'I', name: 'Intro', key: 'a-Moll — Kick und Bass', bars: 8 },
+      { roman: 'II', name: 'Aufstieg', key: 'a-Moll — Filter-Sweep', bars: 24 },
+      { roman: 'III', name: 'Plateau', key: 'a-Moll — volle Energie', bars: 16 },
+    ],
+    engine: 'strudel',
+    code: TIEFENRAUSCH_CODE,
+  },
+  {
+    slug: 'wellengang',
+    title: 'Wellengang',
+    subtitle: 'Deep House für die späten Stunden',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 122,
+    durationSec: 236,
+    shortDescription:
+      'Deep House für die späten Stunden: Ebbe → Strömung → Flut → Ebbe. Sidechain-Pumping, warme Pads, tiefer Sub-Bass.',
+    composerNotes:
+      'Deep House ist die Kunst des Weglassens. Der Sub-Bass hier liegt unter 180 Hz — man spürt ihn mehr als man ihn hört. Die Akkord-Pads pumpen im Kick-Rhythmus (Gain-LFO bei 0.5 Zyklen Periode), was den klassischen Sidechain-Effekt simuliert, ohne echtes Sidechain-Processing. Die Melodie ist absichtlich lückenhaft — die Pausen sind genauso wichtig wie die Töne. Die Delay-Zeit von 0.244s erzeugt Echos, die knapp vor dem nächsten Beat landen, was dem Ganzen Swing gibt. Satz IV kehrt zum Anfang zurück: die Elemente verschwinden langsam, der Gain fällt über 8 Zyklen auf Null.',
+    movements: [
+      { roman: 'I', name: 'Ebbe', key: 'd-Moll — nur Bass und Kick', bars: 8 },
+      { roman: 'II', name: 'Strömung', key: 'd-Moll — Pads und Melodie', bars: 20 },
+      { roman: 'III', name: 'Flut', key: 'd-Moll — maximale Tiefe', bars: 12 },
+      { roman: 'IV', name: 'Ebbe', key: 'd-Moll — Rückzug', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: WELLENGANG_CODE,
+  },
+  {
+    slug: 'mitternachtsblues',
+    title: 'Mitternachtsblues',
+    subtitle: 'Zwölf Takte, eine Wahrheit',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 78,
+    durationSec: 246,
+    shortDescription:
+      'Zwölf Takte, eine Wahrheit: Intro → 12 Bar Blues → Outro. Blues-Pentatonik mit Blue Note, Septakkorde, Walking Bass, Shuffle-Groove.',
+    composerNotes:
+      'Blues in A — die älteste Formel der populären Musik: zwölf Takte, drei Akkorde (I-IV-V), und eine Pentatonik, die alles sagen kann, was gesagt werden muss. Die Blue Note (Eb zwischen D und E) ist der Ton, der Blues von allem anderen unterscheidet — sie klingt falsch und richtig zugleich. Der Walking Bass folgt der Akkordprogression und gibt dem Ganzen den typischen Shuffle-Bounce. Die Delays bei 0.384s erzeugen triolische Echos, die den Blues-Swing verstärken. Das Outro ist ein klassischer Turnaround: V → IV → I, dann Stille. Wie jeder gute Blues endet es, bevor man bereit ist.',
+    movements: [
+      { roman: 'I', name: 'Intro', key: 'A-Blues — Walking Bass allein', bars: 4 },
+      { roman: 'II', name: '12 Bar', key: 'A7 → D7 → E7 — der Kreislauf', bars: 24 },
+      { roman: 'III', name: 'Outro', key: 'A-Blues — Turnaround', bars: 4 },
+    ],
+    engine: 'strudel',
+    code: MITTERNACHTSBLUES_CODE,
+  },
+  {
+    slug: 'schwarzlicht',
+    title: 'Schwarzlicht',
+    subtitle: 'Minimal Techno — weniger ist alles',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 130,
+    durationSec: 277,
+    shortDescription:
+      'Minimal Techno — weniger ist alles: Dunkelheit → Kontur → Schatten → Dunkelheit. Drei Töne, ein Delay, endlose Tiefe.',
+    composerNotes:
+      'Minimal Techno ist die Disziplin der Beschränkung: dieses Stück verwendet genau drei melodische Töne (E, G, B) und ein Sub-E1, das unter 120 Hz liegt. Alles andere ist Drum-Machine und Delay. Der Delay-Ping auf B4 (0.23s Delay-Zeit, 65% Feedback) füllt den Raum mit Echos, die sich über Takte hinweg aufbauen — aus einem einzelnen Ton wird eine Textur. Die perkussive Melodie (Sawtooth durch Lowpass) klingt absichtlich mehr nach Percussion als nach Melodie. In Satz III taucht eine Gegenmelodie auf, die über 16 Zyklen langsam ein- und ausfadet — man ist sich nie sicher, ob man sie wirklich hört.',
+    movements: [
+      { roman: 'I', name: 'Dunkelheit', key: 'e-Moll — nur Kick und Sub', bars: 8 },
+      { roman: 'II', name: 'Kontur', key: 'e-Moll — drei Töne und Delay', bars: 24 },
+      { roman: 'III', name: 'Schatten', key: 'e-Moll — Gegenmelodie', bars: 16 },
+      { roman: 'IV', name: 'Dunkelheit', key: 'e-Moll — Rückzug', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: SCHWARZLICHT_CODE,
+  },
+  {
+    slug: 'traumfaenger',
+    title: 'Traumfänger',
+    subtitle: 'Psytrance — 142 BPM ins Unterbewusste',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 142,
+    durationSec: 160,
+    shortDescription:
+      'Psytrance — 142 BPM ins Unterbewusste: Öffnung → Treibjagd → Auftauchen. Treibende Bassline mit Filter-Wobble, ätherisches Lead.',
+    composerNotes:
+      'Psytrance ist Trance ohne Kompromisse: schneller (142 BPM), dunkler (a-Moll, keine Dur-Auflösung), und hypnotischer. Die Bassline alterniert Grundton und Quinte (A1-E2) mit einem Filter-Wobble, der über 8 Zyklen von 400 auf 2000 Hz schwingt — das typische Psy-Pumpen. Das Lead schwebt darüber mit langen Delay-Trails (0.211s, 55% Feedback), die sich zu einem ätherischen Klangteppich verdichten. Die Hi-Hat-Rolls auf dem letzten Beat jedes Takts (vier 16tel) sind ein Psy-Trademark. In Satz III schließt sich der Bass-Filter langsam, die Atmosphäre wächst, das Lead verflüchtigt sich — man taucht aus dem Traum auf.',
+    movements: [
+      { roman: 'I', name: 'Öffnung', key: 'a-Moll — Atmosphäre und Kick', bars: 6 },
+      { roman: 'II', name: 'Treibjagd', key: 'a-Moll — volle Psy-Produktion', bars: 24 },
+      { roman: 'III', name: 'Auftauchen', key: 'a-Moll — Filter schließt sich', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: TRAUMFAENGER_CODE,
+  },
+  {
+    slug: 'kupferkessel',
+    title: 'Kupferkessel',
+    subtitle: 'Dub Techno — Echo als Instrument',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 116,
+    durationSec: 196,
+    shortDescription:
+      'Dub Techno — Echo als Instrument: Nebel → Strom → Nebel. Akkord-Stabs mit langem Delay, tiefe Sub-Bässe, Raum als Klangfarbe.',
+    composerNotes:
+      'Dub Techno ist die Musik der Echos. Die Akkord-Stabs dauern nur 0.2 Sekunden, aber ihr Delay (0.344s, 65% Feedback) lässt sie über mehrere Takte nachhallen — aus einem einzelnen Anschlag wird eine sich langsam auflösende Wolke. Die Delay-Zeit von 0.344s fällt absichtlich nicht auf den Beat (bei 116 BPM wäre ein Viertel 0.517s) — dadurch entsteht der typische Dub-Wobble, bei dem die Echos gegen den Rhythmus schwimmen. Die Melodie verwendet ein zweites, kürzeres Delay (0.258s), sodass sich zwei Echo-Räume überlagern. Die Kick ist trocken — der einzige trockene Punkt in einem Meer aus Hall und Delay.',
+    movements: [
+      { roman: 'I', name: 'Nebel', key: 'd-Moll — nur Echos', bars: 8 },
+      { roman: 'II', name: 'Strom', key: 'd-Moll — Delay-Texturen', bars: 20 },
+      { roman: 'III', name: 'Nebel', key: 'd-Moll — Ausklingen', bars: 10 },
+    ],
+    engine: 'strudel',
+    code: KUPFERKESSEL_CODE,
+  },
+  {
+    slug: 'delta-wellen',
+    title: 'Delta Wellen',
+    subtitle: 'Ambient Drone — für den tiefsten Fokus',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 60,
+    durationSec: 0,
+    shortDescription:
+      'Ambient Drone — kein Rhythmus, keine Melodie. Fünf Sinuswellen, die sich unmerklich bewegen. Für Stunden tiefster Konzentration.',
+    composerNotes:
+      'Kein Rhythmus. Keine Melodie. Keine Akkorde. Nur fünf Sinuswellen auf verschiedenen Frequenzen eines d-Moll-Akkords (D2, A2, D3, F3, A4), die sich mit unterschiedlichen Geschwindigkeiten bewegen. Der Trick ist die Schwebung: Schicht 1 wiederholt sich alle 16 Zyklen, Schicht 2 alle 17 — die minimale Differenz erzeugt einen unmerklich langsamen Pulseffekt, wie Gezeiten. Die höchste Schicht (A4) ist kaum hörbar und gibt dem Drone nur Luft. Die Moll-Terz (F3) taucht alle 48 Zyklen auf und wieder ab, sodass der Drone zwischen Dur und Moll schwebt, ohne sich je festzulegen. Dieses Stück ist für den tiefsten Fokus: es verlangt keine Aufmerksamkeit, es gibt nur Raum.',
+    engine: 'strudel',
+    code: DELTA_WELLEN_CODE,
+  },
+  {
+    slug: 'stromkreis',
+    title: 'Stromkreis',
+    subtitle: 'Tech House — Groove über alles',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 126,
+    durationSec: 190,
+    shortDescription:
+      'Tech House — Groove über alles: Aufwärmen → Hauptteil → Auslauf. Synkopierter Bass, perkussive Stabs, minimale Melodie, maximaler Groove.',
+    composerNotes:
+      'Tech House unterscheidet sich von Deep House durch Aggression und von Techno durch Groove. Der Bass hier ist synkopiert — er kommt auf der 1, der 4 und der 6 statt auf jedem Beat, was dem Ganzen Swing gibt. Die Akkord-Stabs (Sawtooth durch 1200 Hz Lowpass) sind kurz und perkussiv — sie klingen mehr nach Percussion als nach Harmonie, und sie sitzen off-beat, was den Groove verstärkt. Die Melodie verwendet nur drei Töne (G, Bb, D) und wiederholt sich — Tech House braucht keine komplexe Melodie, es braucht einen Groove, der den Kopf nicken lässt. Der Clap sitzt auf der 3 statt auf 2+4 — das ist der "techy" Moment.',
+    movements: [
+      { roman: 'I', name: 'Aufwärmen', key: 'g-Moll — Kick und Bass', bars: 8 },
+      { roman: 'II', name: 'Hauptteil', key: 'g-Moll — voller Groove', bars: 24 },
+      { roman: 'III', name: 'Auslauf', key: 'g-Moll — Filter schließt', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: STROMKREIS_CODE,
+  },
+  {
+    slug: 'neonlicht',
+    title: 'Neonlicht',
+    subtitle: 'Progressive House — der lange Bogen',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 124,
+    durationSec: 275,
+    shortDescription:
+      'Progressive House — der lange Bogen: Intro → Aufbau → Breakdown → Drop → Outro. Die klassische Dramaturgie der elektronischen Musik.',
+    composerNotes:
+      'Progressive House ist die Kunst des langen Bogens. Dieses Stück folgt der klassischen Struktur: Intro (nur Kick), Aufbau (Elemente kommen eins nach dem anderen), Breakdown (Kick fällt weg, maximale Spannung), Drop (alles kommt zurück), Outro (langsames Verschwinden). Die Akkordprogression Cm → Ab → Eb → Bb ist die "Epic Trance Progression" — melancholisch in Moll, aber mit einer Auflösung nach Dur, die Hoffnung gibt. Im Aufbau erscheint die Melodie über einen Gain-LFO, der von 0 auf Maximum steigt — man merkt kaum, wann sie einsetzt. Das Breakdown ist der emotionale Höhepunkt: ohne Kick schweben nur Pad und Melodie im Raum. Dann der Drop — und alles ist wieder da.',
+    movements: [
+      { roman: 'I', name: 'Intro', key: 'c-Moll — nur Kick', bars: 8 },
+      { roman: 'II', name: 'Aufbau', key: 'c-Moll — der lange Build', bars: 16 },
+      { roman: 'III', name: 'Breakdown', key: 'c-Moll — Spannung', bars: 8 },
+      { roman: 'IV', name: 'Drop', key: 'c-Moll — volle Energie', bars: 16 },
+      { roman: 'V', name: 'Outro', key: 'c-Moll — Verschwinden', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: NEONLICHT_CODE,
+  },
+  {
+    slug: 'schichtarbeit',
+    title: 'Schichtarbeit',
+    subtitle: 'Dark Techno — Maschinen nach Mitternacht',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 134,
+    durationSec: 179,
+    shortDescription:
+      'Dark Techno — Maschinen nach Mitternacht: Fabrikhalle → Fließband → Schichtwechsel. Industriell, kalt, unerbittlich.',
+    composerNotes:
+      'Dark Techno ist die Musik der Maschinen. Der Bass ist ein Sawtooth unter 250 Hz mit Highpass bei 40 Hz — dunkel, aber nicht matschig. Der dissonante Pad-Akkord (A+Bb+E — eine kleine Sekunde und eine Quinte) erzeugt bewusst Unbehagen. Das metallische Lead (Sawtooth, 300-1500 Hz Bandpass) klingt mehr nach Fabrik als nach Musik. Die Delay-Zeit von 0.177s ist extrem kurz — die Echos verschmelzen fast mit dem Original und erzeugen einen metallischen Schimmer. Die 16tel-Hi-Hats atmen über 8 Zyklen (Gain-LFO), wie eine Maschine, die Last aufnimmt und wieder abgibt. Dieses Stück ist für die Arbeit, die getan werden muss — Migrationen, große Refactorings, alles wo Masse bewegt wird.',
+    movements: [
+      { roman: 'I', name: 'Fabrikhalle', key: 'a-Moll — Kick und industrieller Bass', bars: 8 },
+      { roman: 'II', name: 'Fließband', key: 'a-Moll — unerbittlicher Groove', bars: 24 },
+      { roman: 'III', name: 'Schichtwechsel', key: 'a-Moll — Maschinen fahren herunter', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: SCHICHTARBEIT_CODE,
   },
 ]
 
