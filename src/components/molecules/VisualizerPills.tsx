@@ -6,7 +6,7 @@
    at once; clicking a 4th deactivates the leftmost panel.
    ────────────────────────────────────────────────────────── */
 
-import { Activity, BarChart3, Clock, Piano, Grid3x3 } from 'lucide-react';
+import { Activity, BarChart3, Clock, Piano, Grid3x3, Orbit, CircleDot } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../lib/store';
@@ -18,6 +18,8 @@ const PANELS: { key: keyof PanelLayout['visiblePanels']; Icon: LucideIcon }[] = 
   { key: 'timeline', Icon: Clock },
   { key: 'pianoroll', Icon: Piano },
   { key: 'punchcard', Icon: Grid3x3 },
+  { key: 'spiral', Icon: Orbit },
+  { key: 'pitchwheel', Icon: CircleDot },
 ];
 
 /** Maximum number of simultaneously active visualizer panels */

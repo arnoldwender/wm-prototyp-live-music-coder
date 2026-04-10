@@ -50,7 +50,9 @@
     "timeline": "Timeline",
     "pianoroll": "Piano Roll",
     "noVisualizers": "No visualizers active",
-    "punchcard": "Punchcard"
+    "punchcard": "Punchcard",
+    "spiral": "Spiral",
+    "pitchwheel": "Pitchwheel"
   },
   "status": {
     "engine": "Engine",

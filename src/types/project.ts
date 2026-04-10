@@ -18,6 +18,8 @@ export interface PanelLayout {
     timeline: boolean
     pianoroll: boolean
     punchcard: boolean
+    spiral: boolean
+    pitchwheel: boolean
   }
 }
 
