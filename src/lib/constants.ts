@@ -36,5 +36,7 @@ export const DEFAULT_LAYOUT: PanelLayout = {
     timeline: false,
     pianoroll: false,
     punchcard: false,
+    spiral: false,
+    pitchwheel: false,
   },
 }
