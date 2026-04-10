@@ -12,6 +12,7 @@ import { Music, BookOpen, Terminal, Settings, X, Search, ChevronRight } from 'lu
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { Button } from '../atoms';
+import { SampleDropZone } from '../molecules/SampleDropZone';
 
 /* ── Tab definitions ── */
 type TabId = 'samples' | 'reference' | 'console' | 'settings';
@@ -580,6 +581,11 @@ oscs.forEach((o, i) => {
           )}
         </div>
       ))}
+
+      {/* Sample import drop zone — drag audio files to add custom samples */}
+      <div style={{ padding: 'var(--space-2) 0' }}>
+        <SampleDropZone onImport={(names) => console.log('[SampleBrowser] Imported:', names)} />
+      </div>
     </div>
   );
 }
