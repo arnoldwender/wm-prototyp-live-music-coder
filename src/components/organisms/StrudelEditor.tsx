@@ -102,11 +102,26 @@ export function StrudelEditor() {
         try {
           const strudelCM = await import('@strudel/codemirror');
           strudelExtRef.current = strudelCM;
-          /* Share module with inline-widgets system for afterEval updates */
           setStrudelCM(strudelCM);
         } catch (err) {
           console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
+
+        /* Load @strudel/draw for inline canvas visualizers (._pianoroll, ._scope, etc.) */
+        try {
+          await import('@strudel/draw');
+          console.log('[StrudelEditor] @strudel/draw loaded');
+        } catch { /* draw package not available — inline visualizers won't render canvases */ }
+
+        /* Initialize input devices (gamepad polling + MIDI input) */
+        try {
+          const { startGamepadPolling } = await import('../../lib/input/gamepad');
+          startGamepadPolling();
+        } catch { /* gamepad not available */ }
+        try {
+          const { initMidiInput } = await import('../../lib/midi/input');
+          await initMidiInput();
+        } catch { /* MIDI not available */ }
 
         setReady(true);
         console.log('[StrudelEditor] Ready');
@@ -152,16 +167,36 @@ export function StrudelEditor() {
     });
 
     /* Ctrl+Enter / Cmd+Enter keybinding to evaluate code */
-    const evalKeymap = keymap.of([{
-      key: 'Ctrl-Enter',
-      mac: 'Cmd-Enter',
-      run: () => {
-        handleEvaluate();
-        return true;
+    const evalKeymap = keymap.of([
+      {
+        key: 'Ctrl-Enter',
+        mac: 'Cmd-Enter',
+        run: () => { handleEvaluate(); return true; },
       },
-    }]);
+      /* Solo/Mute shortcuts — Alt+1..9 to solo, Shift+Alt+1..9 to mute */
+      ...Array.from({ length: 9 }, (_, i) => ({
+        key: `Alt-${i + 1}`,
+        run: () => {
+          import('../../lib/audio/solo-mute').then(({ toggleSolo }) => {
+            toggleSolo(`d${i + 1}`);
+            console.log(`[Solo] Toggle d${i + 1}`);
+          });
+          return true;
+        },
+      })),
+      ...Array.from({ length: 9 }, (_, i) => ({
+        key: `Shift-Alt-${i + 1}`,
+        run: () => {
+          import('../../lib/audio/solo-mute').then(({ toggleMute }) => {
+            toggleMute(`d${i + 1}`);
+            console.log(`[Mute] Toggle d${i + 1}`);
+          });
+          return true;
+        },
+      })),
+    ]);
 
-    /* Build extension list with custom highlight field */
+    /* Build extension list */
     const extensions = [
       ...getBaseExtensions(),
       ...getEngineExtensions(activeFile.engine),
@@ -170,16 +205,40 @@ export function StrudelEditor() {
       evalKeymap,
     ];
 
+    /* Vim mode — load conditionally from settings */
+    try {
+      const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
+      if (settings.vimMode) {
+        import('@replit/codemirror-vim').then(({ vim }) => {
+          /* Vim extension needs to be added to the editor — requires recreation.
+           * For now, log that it's enabled; full integration needs compartment reconfiguration. */
+          console.log('[StrudelEditor] Vim mode enabled');
+        }).catch(() => {});
+      }
+      /* Apply font size from settings */
+      if (settings.fontSize && settings.fontSize !== 14) {
+        extensions.push(EditorView.theme({
+          '.cm-content': { fontSize: `${settings.fontSize}px` },
+        }));
+      }
+      /* Word wrap */
+      if (settings.wordWrap) {
+        extensions.push(EditorView.lineWrapping);
+      }
+    } catch { /* settings not available */ }
+
     /* Add Strudel-specific CM6 extensions if loaded (optional) */
     const strudelCM = strudelExtRef.current;
     if (strudelCM) {
       try {
         /* Slider widget plugin — allows slider(value, min, max, step) in code */
         if (strudelCM.sliderPlugin) extensions.push(strudelCM.sliderPlugin);
-        /* Widget plugin — supports other inline widgets */
+        /* Widget plugin — supports other inline widgets (._pianoroll, ._scope, etc.) */
         if (strudelCM.widgetPlugin) extensions.push(strudelCM.widgetPlugin);
         /* Pattern highlighting extension — marks active haps in code */
         if (strudelCM.highlightExtension) extensions.push(strudelCM.highlightExtension);
+        /* Flash extension — visual feedback on eval */
+        if (strudelCM.flashField) extensions.push(strudelCM.flashField);
       } catch (err) {
         console.warn('[StrudelEditor] Failed to add Strudel CM extensions:', err);
       }
