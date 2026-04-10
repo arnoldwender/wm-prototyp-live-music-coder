@@ -1974,6 +1974,626 @@ arrange(
 ).cpm(134)
 `
 
+/* ══════════════════════════════════════════════════════════
+   Piece 32 — Bassgewitter
+   ══════════════════════════════════════════════════════════ */
+
+const BASSGEWITTER_CODE = `// =============================================
+// "Bassgewitter"
+// Dub — schwerer Bass, endlose Echos
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Donner (8 Zyklen) ─────────────────────────
+  // Sub-Bass und Kick allein — man spürt den Boden vibrieren
+  [8, stack(
+    // Sub: tief, rund, mit langem Release — der Donner rollt
+    note("g1 ~ ~ g1 ~ ~ g1 ~")
+      .s("sine").attack(0.05).release(0.8)
+      .gain(0.65).lpf(140),
+    // Kick: trocken, hart
+    s("bd ~ bd ~ bd ~ bd ~").gain(0.5),
+    // Rimshot: Dub-Offbeat
+    s("~ sd ~ ~ ~ sd ~ ~").gain(0.2)
+  )],
+
+  // ── II. Sturmfront (20 Zyklen) ──────────────────
+  // Voller Dub: Bass-Stabs mit langem Echo, Melodie-Fragmente,
+  // Drums im Halftime-Feeling
+  [20, stack(
+    // Bass: Stab-Pattern, kurzer Anschlag → langer Delay-Trail
+    note("g1 ~ ~ ~ d2 ~ ~ ~ g1 ~ ~ ~ c2 ~ g1 ~")
+      .s("sawtooth").lpf(350)
+      .attack(0.01).release(0.2)
+      .delay(0.7).delaytime(0.387).delayfeedback(0.6)
+      .gain(0.5),
+    // Akkord-Stab: Moll-Septakkord, nur Anschlag, Echo macht den Rest
+    note("<~ ~ [g3,bb3,d4,f4] ~ ~ ~ ~ ~ ~ ~ [c3,eb3,g3,bb3] ~ ~ ~ ~ ~>")
+      .s("sine").attack(0.01).release(0.15)
+      .delay(0.8).delaytime(0.387).delayfeedback(0.65)
+      .room(0.5).gain(0.28),
+    // Melodie-Fragment: vereinzelte Töne, Delay füllt die Lücken
+    note("<g4 ~ ~ ~ ~ ~ d5 ~ ~ ~ ~ ~ bb4 ~ ~ ~>")
+      .s("sine").attack(0.02).release(0.4)
+      .delay(0.7).delaytime(0.258).delayfeedback(0.6)
+      .room(0.4).gain(0.22),
+    // Drums: Halftime, spacig
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(0.5),
+    s("~ ~ ~ sd ~ ~ ~ ~").gain(0.35),
+    s("~ hh ~ ~ ~ hh ~ hh").gain(0.18)
+  )],
+
+  // ── III. Nachdonner (10 Zyklen) ─────────────────
+  // Bass und Echos verklingen langsam
+  [10, stack(
+    note("g1 ~ ~ ~ ~ ~ ~ ~")
+      .s("sine").attack(0.05).release(1.5)
+      .delay(0.8).delaytime(0.387).delayfeedback(0.7)
+      .gain(sine.range(0.55, 0.1).slow(10)).lpf(140),
+    note("~ ~ [g3,bb3,d4] ~ ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.15)
+      .delay(0.8).delaytime(0.387).delayfeedback(0.7)
+      .room(0.7).gain(sine.range(0.22, 0.03).slow(10)),
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(sine.range(0.45, 0.1).slow(10))
+  )]
+).cpm(110)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 33 — Hinterhof
+   ══════════════════════════════════════════════════════════ */
+
+const HINTERHOF_CODE = `// =============================================
+// "Hinterhof"
+// Lo-Fi Boom Bap — Kopfnicken im Schatten
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Endloser Loop — kein arrange(), nur Groove
+
+stack(
+  // Bass: tief und rund, synkopiertes Pattern
+  // Lowpass bei 250 Hz hält ihn warm und dumpf
+  note("c2 ~ ~ c2 ~ c2 ~ ~ c2 ~ ~ ~ g1 ~ c2 ~")
+    .s("sine").gain(0.55).lpf(250),
+
+  // Akkorde: Moll-7, Lowpass gefiltert für den Lo-Fi-Charakter
+  // Gain pumpt leicht im Kick-Rhythmus
+  note("<[c3,eb3,g3,bb3] [f2,ab2,c3,eb3] [g2,bb2,d3,f3] [ab2,c3,eb3,g3]>/4")
+    .s("sawtooth").lpf(1100)
+    .attack(0.08).release(0.4)
+    .room(0.3).gain(sine.range(0.1, 0.22).slow(0.5)),
+
+  // Melodie: Moll-Pentatonik, lückenhaft, mit Delay-Trails
+  note("<c4 ~ eb4 ~ ~ g4 ~ ~ c4 ~ ~ bb3 ~ ~ g3 ~>")
+    .s("sine").attack(0.03).release(0.5)
+    .delay(0.4).delaytime(0.341).delayfeedback(0.45)
+    .room(0.3).gain(0.25),
+
+  // Kick: Boom-Bap-Pattern — nicht Four-on-the-Floor
+  s("bd ~ ~ ~ bd ~ ~ ~ bd ~ ~ bd ~ ~ ~ ~").gain(0.5),
+
+  // Snare: auf 2 und 4, aber leicht verzögert — der "Laid-Back"-Effekt
+  s("~ ~ ~ ~ sd ~ ~ ~ ~ ~ ~ ~ sd ~ ~ ~").gain(0.4),
+
+  // Hi-Hat: 8tel mit Ghost-Notes, gibt Textur
+  s("hh ~ [~ hh] ~ hh ~ [~ hh] ~").gain(0.15)
+).cpm(86)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 34 — Arcade
+   ══════════════════════════════════════════════════════════ */
+
+const ARCADE_CODE = `// =============================================
+// "Arcade"
+// Retro — Neonlichter und Joysticks
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Insert Coin (4 Zyklen) ───────────────────
+  // Klassisches Arcade-Jingle: aufsteigende Arpeggio-Figur
+  [4, stack(
+    // Arpeggio: schnell aufsteigend, Square-Wave
+    note("<c4 e4 g4 c5 e5 g5 c6 g5>")
+      .s("square").lpf(3500)
+      .attack(0.01).release(0.15)
+      .gain(0.3),
+    // Bass: einfach, pulsierend
+    note("c3 c3 c3 c3").s("square").lpf(600)
+      .attack(0.01).release(0.08).gain(0.35)
+  )],
+
+  // ── II. Stage 1 (16 Zyklen) ────────────────────
+  // Schnelle Action-Musik: zwei Square-Melodien, treibender Beat
+  [16, stack(
+    // Lead: Hauptmelodie, filtert bei 4000 Hz für Brillanz
+    note("<g5 a5 b5 d6 b5 a5 g5 d5 g5 a5 b5 d6 e6 d6 b5 g5>")
+      .s("square").lpf(4000)
+      .attack(0.01).release(0.12)
+      .gain(0.28),
+    // Counter: Begleitmelodie, tieferer Filter
+    note("<d4 g4 b4 d5 b4 g4 d4 b3 d4 g4 b4 d5 e5 d5 b4 g4>")
+      .s("square").lpf(2500)
+      .attack(0.01).release(0.1)
+      .gain(0.18),
+    // Bass: Grundton + Quinte, klassisches NES-Pattern
+    note("g2 d2 g2 d2 c2 d2 g2 d2")
+      .s("square").lpf(700)
+      .attack(0.01).release(0.08)
+      .gain(0.38),
+    // Drums: treibend
+    s("bd ~ hh sd bd hh sd hh").gain(0.45),
+    s("hh*8").gain(0.12)
+  )],
+
+  // ── III. Boss Fight (12 Zyklen) ─────────────────
+  // Schneller, aggressiver, Moll statt Dur
+  [12, stack(
+    // Lead: e-Moll, schnelle Läufe
+    note("<e5 g5 b5 a5 g5 fs5 e5 b4 e5 fs5 g5 b5>")
+      .s("square").lpf(4500)
+      .attack(0.01).release(0.1)
+      .gain(0.3),
+    // Bass: treibend, schneller
+    note("e2 b1 e2 b1 a1 b1 e2 b1 e2 b1 g1 b1")
+      .s("square").lpf(600)
+      .attack(0.01).release(0.06)
+      .gain(0.4),
+    // Noise-Percussion: Spannung
+    s("bd hh sd hh bd [hh hh] sd hh").gain(0.5),
+    s("hh*16").gain(0.15)
+  )],
+
+  // ── IV. High Score (6 Zyklen) ──────────────────
+  // Triumphale Fanfare, zurück zu C-Dur
+  [6, stack(
+    note("<c6 e6 g6 c7 g6 e6>")
+      .s("square").lpf(5000)
+      .attack(0.01).release(0.3)
+      .room(0.3).gain(0.3),
+    note("<c5 e5 g5 c6 g5 e5>")
+      .s("square").lpf(3000)
+      .attack(0.01).release(0.2)
+      .gain(0.2),
+    note("c3 g2 c3 g2 c3 c3")
+      .s("square").lpf(800)
+      .attack(0.01).release(0.1)
+      .gain(0.38),
+    s("bd hh sd hh bd [hh hh] sd hh").gain(0.5)
+  )]
+).cpm(120)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 35 — Morgenrot
+   ══════════════════════════════════════════════════════════ */
+
+const MORGENROT_CODE = `// =============================================
+// "Morgenrot"
+// Uplifting Trance — Euphorie bei Sonnenaufgang
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Dämmerung (8 Zyklen) ────────────────────
+  // Pad allein, langsam anschwellend — der Himmel färbt sich
+  [8, stack(
+    note("<[d4,fs4,a4] [g3,b3,d4] [a3,cs4,e4] [d4,fs4,a4]>/4")
+      .s("sine").attack(2).release(4)
+      .room(0.7).gain(sine.range(0.05, 0.25).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.1, 0.5).slow(8))
+  )],
+
+  // ── II. Aufstieg (16 Zyklen) ───────────────────
+  // Klassischer Uplifting-Build: Bassline + Pad + Lead erscheint langsam
+  [16, stack(
+    // Bass: rollend, Grundton + Quinte, Filter steigt
+    note("d2 a1 d2 a1 d2 a1 d2 a1")
+      .s("sawtooth").lpf(sine.range(300, 1500).slow(16))
+      .attack(0.01).release(0.1).gain(0.5),
+    // Pad: D-Dur → G-Dur → A-Dur → D-Dur
+    note("<[d4,fs4,a4] [g3,b3,d4] [a3,cs4,e4] [d4,fs4,a4]>/4")
+      .s("sine").attack(0.5).release(1.5)
+      .room(0.5).gain(0.25),
+    // Lead: erscheint langsam über Gain-LFO
+    note("<d5 fs5 a5 d6 a5 fs5 d5 a4 d5 fs5 a5 d6 cs6 a5 fs5 d5>")
+      .s("sine").attack(0.02).release(0.4)
+      .delay(0.4).delaytime(0.216).delayfeedback(0.45)
+      .room(0.3).gain(sine.range(0, 0.32).slow(16)),
+    // Kick
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    s("~ cp ~ cp").gain(sine.range(0.1, 0.3).slow(16))
+  )],
+
+  // ── III. Breakdown (8 Zyklen) ──────────────────
+  // Kick weg — nur Pad und Melodie, Spannung
+  [8, stack(
+    note("<[d4,fs4,a4] [g3,b3,d4] [a3,cs4,e4] [d4,fs4,a4]>/4")
+      .s("sine").attack(1).release(3)
+      .room(0.8).delay(0.3).gain(0.3),
+    note("<d5 ~ fs5 ~ a5 ~ fs5 ~>")
+      .s("sine").attack(0.1).release(1.2)
+      .delay(0.6).delaytime(0.216).delayfeedback(0.55)
+      .room(0.6).gain(0.3),
+    // Sub hält die Spannung
+    note("d2").s("sine").attack(2).release(4)
+      .gain(sine.range(0.15, 0.35).slow(8))
+  )],
+
+  // ── IV. Sonnenaufgang (16 Zyklen) ──────────────
+  // Drop — volle Euphorie, alles offen
+  [16, stack(
+    note("d2 a1 d2 a1 d2 a1 d2 a1")
+      .s("sawtooth").lpf(2000)
+      .attack(0.01).release(0.1).gain(0.5),
+    note("<[d4,fs4,a4] [g3,b3,d4] [a3,cs4,e4] [d4,fs4,a4]>/4")
+      .s("sine").attack(0.1).release(0.8)
+      .room(0.4).gain(sine.range(0.08, 0.28).slow(0.5)),
+    note("<d5 fs5 a5 d6 a5 fs5 d5 a4 d5 fs5 a5 d6 cs6 a5 fs5 d5>")
+      .s("sine").attack(0.02).release(0.35)
+      .delay(0.35).delaytime(0.216).delayfeedback(0.4)
+      .room(0.3).gain(0.32),
+    // Counter-Arpeggio
+    note("<a4 d5 fs5 a5 fs5 d5 a4 fs4 a4 d5 fs5 a5 d6 a5 fs5 d5>")
+      .s("sine").attack(0.02).release(0.25).gain(0.18),
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ [hh hh]").gain(0.22),
+    s("~ cp ~ cp").gain(0.35)
+  )]
+).cpm(140)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 36 — Spätschicht
+   ══════════════════════════════════════════════════════════ */
+
+const SPAETSCHICHT_CODE = `// =============================================
+// "Spätschicht"
+// Slow Blues — schwer und ehrlich
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Slow Blues in E: Pentatonik E G A Bb B D
+// Shuffle-Groove, 12-Bar-Form
+
+arrange(
+  // ── I. Intro (4 Zyklen) ──────────────────────────
+  // Solo-Gitarre (Sine mit Delay), langsam, frei
+  [4, stack(
+    note("<e4 ~ g4 ~ a4 ~ bb4 b4 ~ ~ ~ ~ ~ ~ ~ ~>")
+      .s("sine").attack(0.08).release(1.2)
+      .delay(0.4).delaytime(0.429).delayfeedback(0.4)
+      .room(0.6).gain(0.35),
+    note("e2").s("sine").attack(1).release(3)
+      .room(0.7).gain(0.25).slow(4)
+  ).slow(2)],
+
+  // ── II. 12 Bar (24 Zyklen) ──────────────────────
+  // Voller Slow Blues — Shuffle-Drums, Walking Bass, Septakkorde
+  [24, stack(
+    // Melodie: E-Blues-Pentatonik mit Blue Notes
+    note("<e5 ~ g5 ~ ~ b5 ~ ~ a5 ~ g5 ~ e5 ~ bb4 ~>")
+      .s("sine").attack(0.06).release(0.9)
+      .delay(0.3).delaytime(0.429)
+      .room(0.5).gain(0.32),
+    // 12-Bar: I=E7, IV=A7, V=B7
+    note("<[e3,g3,b3,d4] [e3,g3,b3,d4] [e3,g3,b3,d4] [e3,g3,b3,d4] [a2,c3,e3,g3] [a2,c3,e3,g3] [e3,g3,b3,d4] [e3,g3,b3,d4] [b2,d3,fs3,a3] [a2,c3,e3,g3] [e3,g3,b3,d4] [b2,d3,fs3,a3]>/12")
+      .s("sine").attack(0.1).release(0.5)
+      .gain(0.18),
+    // Walking Bass
+    note("e2 g2 a2 b2").s("sine").gain(0.5).lpf(350),
+    // Shuffle Drums
+    s("bd ~ [~ bd] ~ bd ~ [~ bd] ~").gain(0.38),
+    s("~ sd ~ sd").gain(0.28),
+    s("hh ~ [~ hh] ~ hh ~ [~ hh] ~").gain(0.15)
+  )],
+
+  // ── III. Outro (6 Zyklen) ───────────────────────
+  // Langsames Turnaround, E7-Akkord klingt aus
+  [6, stack(
+    note("<b4 ~ a4 ~ g4 ~ e4 ~ ~ ~ ~ ~>")
+      .s("sine").attack(0.1).release(2)
+      .delay(0.5).delaytime(0.429).delayfeedback(0.5)
+      .room(0.7).gain(0.3),
+    note("[e3,g3,b3,d4]")
+      .s("sine").attack(0.5).release(4)
+      .room(0.8).gain(sine.range(0.18, 0.03).slow(6)),
+    note("e2").s("sine").attack(1).release(5)
+      .room(0.8).gain(0.3).slow(3)
+  ).slow(2)]
+).cpm(66)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 37 — Algorithmus
+   ══════════════════════════════════════════════════════════ */
+
+const ALGORITHMUS_CODE = `// =============================================
+// "Algorithmus"
+// Deep Work — mathematische Präzision
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Endloser Loop — mathematisch präzise Muster, die sich
+// in langen Zyklen langsam verändern
+
+stack(
+  // Schicht 1: Bassline — 7/8-Takt-Feeling durch ungeraden Pattern
+  // 7 Noten statt 8 erzeugt ein ständiges Verschieben gegen den Beat
+  note("c2 g2 c2 g2 c2 g2 c2")
+    .s("sawtooth").lpf(sine.range(250, 600).slow(28))
+    .attack(0.01).release(0.1)
+    .gain(0.5).slow(7/8),
+
+  // Schicht 2: Akkord-Pad — langsame Progression
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,bb2,d3]>/8")
+    .s("sine").attack(0.8).release(2)
+    .room(0.4).gain(0.22),
+
+  // Schicht 3: Melodie-Pattern — 5 Noten über 8 Beats
+  // Erzeugt polyrhythmische Verschiebung
+  note("c4 eb4 g4 bb4 c5")
+    .s("sine").attack(0.03).release(0.4)
+    .delay(0.3).delaytime(0.189).delayfeedback(0.4)
+    .gain(0.28).slow(5/8),
+
+  // Schicht 4: Kick — straight, der einzige fixe Referenzpunkt
+  s("bd bd bd bd").gain(0.5),
+
+  // Schicht 5: Hi-Hat — off-beat
+  s("~ hh ~ hh ~ hh ~ hh").gain(0.18),
+
+  // Schicht 6: Clap auf 3 (nicht 2+4)
+  s("~ ~ cp ~").gain(0.25)
+).cpm(108)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 38 — Nebelhorn
+   ══════════════════════════════════════════════════════════ */
+
+const NEBELHORN_CODE = `// =============================================
+// "Nebelhorn"
+// Dub Techno — tief im Nebel
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Sichtweite Null (10 Zyklen) ──────────────
+  // Nur Echos und ein tiefer Bass — man sieht nichts
+  [10, stack(
+    // Sub-Drone: tief, konstant, das Nebelhorn
+    note("bb1").s("sine").attack(3).release(5)
+      .room(0.9).gain(0.35).slow(5),
+    // Akkord-Echo: aus dem Nichts, lange Delay-Trails
+    note("~ ~ ~ ~ [bb3,db4,f4] ~ ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.2)
+      .delay(0.8).delaytime(0.388).delayfeedback(0.7)
+      .room(0.7).gain(0.22)
+  ).slow(2)],
+
+  // ── II. Fahrrinne (20 Zyklen) ──────────────────
+  // Kick gibt Orientierung, Bass-Stabs mit Echo, Melodie-Geister
+  [20, stack(
+    // Sub-Bass: Stab mit Echo
+    note("bb1 ~ ~ ~ f2 ~ ~ ~ bb1 ~ ~ ~ eb2 ~ bb1 ~")
+      .s("sawtooth").lpf(280)
+      .attack(0.01).release(0.15)
+      .delay(0.7).delaytime(0.388).delayfeedback(0.6)
+      .gain(0.48),
+    // Akkord-Stabs: kurz, lang nachhallend
+    note("<~ ~ ~ [bb3,db4,f4] ~ ~ ~ ~ ~ ~ ~ [eb3,gb3,bb3] ~ ~ ~ ~>")
+      .s("sine").attack(0.01).release(0.15)
+      .delay(0.8).delaytime(0.259).delayfeedback(0.65)
+      .room(0.6).gain(0.25),
+    // Melodie-Geist: kaum da, lebt nur im Delay
+    note("<bb4 ~ ~ ~ ~ ~ ~ ~ f4 ~ ~ ~ ~ ~ ~ ~>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.75).delaytime(0.388).delayfeedback(0.65)
+      .room(0.5).gain(0.18),
+    // Kick: Orientierung im Nebel
+    s("bd bd bd bd").gain(0.48),
+    // Hat: minimal
+    s("~ hh ~ ~ ~ hh ~ ~").gain(0.15),
+    s("~ ~ ~ sd ~ ~ ~ ~").gain(0.12)
+  )],
+
+  // ── III. Auflösung (8 Zyklen) ──────────────────
+  [8, stack(
+    note("bb1").s("sine").attack(2).release(5)
+      .room(0.95).gain(sine.range(0.35, 0.08).slow(8)),
+    note("~ ~ ~ [bb3,db4,f4] ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.2)
+      .delay(0.8).delaytime(0.388).delayfeedback(0.75)
+      .room(0.8).gain(sine.range(0.2, 0.03).slow(8)),
+    s("bd bd bd bd").gain(sine.range(0.45, 0.1).slow(8))
+  )]
+).cpm(112)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 39 — Lichtgeschwindigkeit
+   ══════════════════════════════════════════════════════════ */
+
+const LICHTGESCHWINDIGKEIT_CODE = `// =============================================
+// "Lichtgeschwindigkeit"
+// Uplifting Trance — 145 BPM, pure Energie
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+arrange(
+  // ── I. Countdown (6 Zyklen) ─────────────────────
+  [6, stack(
+    // Bass: rollt an, Filter öffnet sich
+    note("e1 b1 e1 b1 e1 b1 e1 b1")
+      .s("sawtooth").lpf(sine.range(200, 800).slow(6))
+      .attack(0.01).release(0.08).gain(0.5),
+    s("bd bd bd bd").gain(sine.range(0.3, 0.55).slow(6)),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.18)
+  )],
+
+  // ── II. Beschleunigung (20 Zyklen) ─────────────
+  [20, stack(
+    // Bass: voller Filter-Sweep
+    note("e1 b1 e1 b1 e1 b1 e1 b1")
+      .s("sawtooth").lpf(sine.range(400, 2200).slow(20))
+      .attack(0.01).release(0.08).gain(0.5),
+    // Pad: E-Dur, euphorisch
+    note("<[e4,gs4,b4] [a3,cs4,e4] [b3,ds4,fs4] [e4,gs4,b4]>/4")
+      .s("sine").attack(0.5).release(1.5)
+      .room(0.5).gain(0.25),
+    // Lead: schnelle Arpeggio-Figur
+    note("<e5 gs5 b5 e6 b5 gs5 e5 b4 e5 gs5 b5 e6 ds6 b5 gs5 e5>")
+      .s("sine").attack(0.02).release(0.25)
+      .delay(0.4).delaytime(0.207).delayfeedback(0.45)
+      .room(0.25).gain(sine.range(0.05, 0.32).slow(20)),
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    s("~ cp ~ cp").gain(sine.range(0.15, 0.35).slow(20))
+  )],
+
+  // ── III. Lichtmauer (16 Zyklen) ────────────────
+  // Volle Energie — Filter offen, alles da
+  [16, stack(
+    note("e1 b1 e1 b1 e1 b1 e1 b1")
+      .s("sawtooth").lpf(2500)
+      .attack(0.01).release(0.08).gain(0.5),
+    note("<[e4,gs4,b4] [a3,cs4,e4] [b3,ds4,fs4] [e4,gs4,b4]>/4")
+      .s("sine").attack(0.1).release(0.8)
+      .room(0.4).gain(sine.range(0.08, 0.28).slow(0.5)),
+    note("<e5 gs5 b5 e6 b5 gs5 e5 b4 e5 gs5 b5 e6 ds6 b5 gs5 e5>")
+      .s("sine").attack(0.02).release(0.3)
+      .delay(0.35).delaytime(0.207).delayfeedback(0.4)
+      .room(0.25).gain(0.32),
+    // Counter-Arpeggio
+    note("<b4 e5 gs5 b5 gs5 e5 b4 gs4 b4 e5 gs5 b5 e6 b5 gs5 e5>")
+      .s("sine").attack(0.02).release(0.2).gain(0.17),
+    s("bd bd bd bd").gain(0.55),
+    s("~ hh ~ hh ~ hh ~ [hh hh]").gain(0.22),
+    s("~ cp ~ cp").gain(0.35),
+    // Ride für extra Energie
+    s("hh ~ ~ ~ hh ~ ~ ~").gain(0.08)
+  )],
+
+  // ── IV. Nachglühen (6 Zyklen) ─────────────────
+  [6, stack(
+    note("e1 b1 e1 b1 e1 b1")
+      .s("sawtooth").lpf(sine.range(2000, 300).slow(6))
+      .attack(0.01).release(0.1)
+      .gain(sine.range(0.5, 0.1).slow(6)),
+    note("[e4,gs4,b4]").s("sine").attack(1).release(4)
+      .room(0.8).gain(sine.range(0.25, 0.05).slow(6)),
+    s("bd bd bd bd").gain(sine.range(0.5, 0.15).slow(6))
+  )]
+).cpm(145)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 40 — Schallplatte
+   ══════════════════════════════════════════════════════════ */
+
+const SCHALLPLATTE_CODE = `// =============================================
+// "Schallplatte"
+// Lo-Fi Jazz — Vinyl-Wärme und Septakkorde
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Endloser Loop — Jazz-Chords mit Lo-Fi-Charakter
+
+stack(
+  // Bass: Walking-Bass-Feeling, tief und warm
+  note("f2 a2 c3 a2 bb2 d3 f3 d3")
+    .s("sine").gain(0.45).lpf(300),
+
+  // Akkorde: Jazz-Voicings — Maj7, m7, dom7
+  // Lowpass bei 1400 Hz gibt den typischen Lo-Fi-"Vinyl"-Sound
+  note("<[f3,a3,c4,e4] [bb2,d3,f3,a3] [c3,e3,g3,bb3] [f3,a3,c4,e4]>/4")
+    .s("sawtooth").lpf(1400)
+    .attack(0.1).release(0.5)
+    .room(0.35).gain(sine.range(0.1, 0.2).slow(0.5)),
+
+  // Melodie: Fragments aus der Jazzskala, lückenhaft
+  note("<f4 ~ a4 ~ ~ c5 ~ ~ bb4 ~ a4 ~ ~ g4 ~ ~>")
+    .s("sine").attack(0.05).release(0.7)
+    .delay(0.3).delaytime(0.375).delayfeedback(0.4)
+    .room(0.4).gain(0.25),
+
+  // Counter: tiefe Antwort-Phrase
+  note("<~ c4 ~ ~ ~ ~ f4 ~ ~ ~ ~ ~ a3 ~ ~ ~>")
+    .s("sine").attack(0.08).release(0.6)
+    .room(0.3).gain(0.15),
+
+  // Drums: Lo-Fi-Groove
+  s("bd ~ [~ bd] ~ bd ~ [~ bd] ~").gain(0.38),
+  s("~ sd ~ sd").gain(0.25),
+  s("hh ~ [~ hh] ~ hh ~ [~ hh] ~").gain(0.12)
+).cpm(82)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 41 — Frequenztherapie
+   ══════════════════════════════════════════════════════════ */
+
+const FREQUENZTHERAPIE_CODE = `// =============================================
+// "Frequenztherapie"
+// Ambient — heilende Frequenzen
+// Composed by Claude (claude-opus-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+
+// Keine Drums, kein Beat — nur Sinuswellen in reinen Intervallen.
+// Verschiedene slow()-Werte erzeugen Schwebungen und Phasenverschiebungen.
+
+stack(
+  // Grundton: C2, das tiefste Fundament
+  note("c2").s("sine").attack(6).release(10)
+    .room(0.95).gain(0.25).slow(20),
+
+  // Quinte: G2, reines Intervall 3:2
+  note("g2").s("sine").attack(5).release(8)
+    .room(0.95).gain(0.2).slow(21),
+
+  // Oktave: C3
+  note("c3").s("sine").attack(4).release(7)
+    .room(0.9).delay(0.5).delaytime(2).delayfeedback(0.3)
+    .gain(sine.range(0.05, 0.15).slow(40)),
+
+  // Große Terz: E3, gibt Dur-Wärme
+  // Taucht alle 50 Zyklen auf und verschwindet wieder
+  note("e3").s("sine").attack(5).release(8)
+    .room(0.9).delay(0.4).delaytime(1.5).delayfeedback(0.25)
+    .gain(sine.range(0, 0.1).slow(50)),
+
+  // Oktave+Quinte: G3
+  note("g3").s("sine").attack(3).release(6)
+    .room(0.9)
+    .gain(sine.range(0, 0.08).slow(35)),
+
+  // Hoher Oberton: C4, kaum hörbar
+  note("c4").s("sine").attack(4).release(8)
+    .room(0.95).delay(0.6).delaytime(3).delayfeedback(0.2)
+    .gain(sine.range(0, 0.05).slow(60)),
+
+  // Schwebung: C2 leicht verstimmt (slow 20 vs 20.1)
+  // Erzeugt unmerklich langsame Amplitude-Modulation
+  note("c2").s("sine").attack(6).release(10)
+    .room(0.95).gain(0.12).slow(20.1)
+).cpm(55)
+`
+
 export const SESSIONS_LIBRARY: SessionEntry[] = [
   {
     slug: 'jede-session-neu-geboren',
@@ -2776,6 +3396,249 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     ],
     engine: 'strudel',
     code: SCHICHTARBEIT_CODE,
+  },
+  {
+    slug: 'bassgewitter',
+    title: 'Bassgewitter',
+    subtitle: 'Dub — schwerer Bass, endlose Echos',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 110,
+    durationSec: 207,
+    category: 'Dub',
+    shortDescription:
+      'Dub — schwerer Bass, endlose Echos: Donner → Sturmfront → Nachdonner. Moll-Septakkorde im Delay-Nebel, Halftime-Drums.',
+    composerNotes:
+      'Dub ist die Musik der Leerstellen. Die Akkord-Stabs dauern 0.15 Sekunden, aber ihre Echo-Trails (0.387s Delay, 60% Feedback) füllen ganze Takte. Der Bass in g-Moll liegt unter 140 Hz und vibriert mehr als er klingt. Die Drums laufen Halftime — die Snare kommt nur auf der 4, nicht auf 2+4, was alles schwerer und langsamer erscheinen lässt. Die Melodie-Fragmente sind vereinzelte Töne, die nur durch ihre Delay-Trails zu einer Linie werden. In Satz III verschwinden die Elemente in ihren eigenen Echos — der Delay-Feedback steigt auf 70%, die Echos überleben die Quelle.',
+    movements: [
+      { roman: 'I', name: 'Donner', key: 'g-Moll — Sub-Bass und Kick', bars: 8 },
+      { roman: 'II', name: 'Sturmfront', key: 'g-Moll — Bass-Stabs und Echos', bars: 20 },
+      { roman: 'III', name: 'Nachdonner', key: 'g-Moll — Echos verklingen', bars: 10 },
+    ],
+    engine: 'strudel',
+    code: BASSGEWITTER_CODE,
+  },
+  {
+    slug: 'hinterhof',
+    title: 'Hinterhof',
+    subtitle: 'Lo-Fi Boom Bap — Kopfnicken im Schatten',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 86,
+    durationSec: 0,
+    category: 'Lo-Fi',
+    shortDescription:
+      'Lo-Fi Boom Bap — Kopfnicken im Schatten. Synkopierter Bass, Moll-7-Chords durch Lowpass, Pentatonik-Melodie mit Delay.',
+    composerNotes:
+      'Boom Bap lebt vom Kick-Pattern: nicht Four-on-the-Floor wie House oder Techno, sondern synkopiert — die Kick kommt auf 1, 5 und 9 von 16 Steps, die Snare auf 5 und 13. Das gibt den typischen "Head-Nod"-Groove. Die Akkorde (Cm7, Fm7, Gm7, Abm7) laufen durch einen Sawtooth bei 1100 Hz Lowpass — warm und dumpf, wie durch Lautsprecher in einem Hinterhof. Die Melodie ist Moll-Pentatonik mit Delay-Trails, die ins Nichts ausklingen. Wie bei Lo-Fi Bibliothek gibt es kein arrange() — nur einen endlosen Loop, der sich nie ändert.',
+    engine: 'strudel',
+    code: HINTERHOF_CODE,
+  },
+  {
+    slug: 'arcade',
+    title: 'Arcade',
+    subtitle: 'Retro — Neonlichter und Joysticks',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 120,
+    durationSec: 190,
+    category: 'Retro',
+    shortDescription:
+      'Retro — Neonlichter und Joysticks: Insert Coin → Stage 1 → Boss Fight → High Score. Klassische Arcade-Sounds, nur Square-Waves.',
+    composerNotes:
+      'Wie bei Pixelwald: nur Square-Waves, verschiedene Lowpass-Frequenzen für Tiefe. Aber Arcade ist schneller, aggressiver, und erzählt eine Geschichte. Satz I ist das Insert-Coin-Jingle — aufsteigende Arpeggien in C-Dur, die sofort "Spielhalle" rufen. Satz II ist Stage 1: G-Dur, zwei Melodien in verschiedenen Oktaven, treibende Drums. Satz III ist der Boss Fight: plötzlich e-Moll, schnellerer Bass, 16tel-Hi-Hats, Spannung. Satz IV triumphiert zurück in C-Dur, höchste Oktave (C7!), die Fanfare des Highscores. 120 BPM — schnell genug für Action, nicht so schnell wie Techno.',
+    movements: [
+      { roman: 'I', name: 'Insert Coin', key: 'C-Dur — Arcade-Jingle', bars: 4 },
+      { roman: 'II', name: 'Stage 1', key: 'G-Dur — Action', bars: 16 },
+      { roman: 'III', name: 'Boss Fight', key: 'e-Moll — Spannung', bars: 12 },
+      { roman: 'IV', name: 'High Score', key: 'C-Dur — Triumph', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: ARCADE_CODE,
+  },
+  {
+    slug: 'morgenrot',
+    title: 'Morgenrot',
+    subtitle: 'Uplifting Trance — Euphorie bei Sonnenaufgang',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 140,
+    durationSec: 240,
+    category: 'Trance',
+    shortDescription:
+      'Uplifting Trance — Euphorie bei Sonnenaufgang: Dämmerung → Aufstieg → Breakdown → Sonnenaufgang. D-Dur, Filter-Sweep, Arpeggio-Lead.',
+    composerNotes:
+      'Uplifting Trance hat eine feste Dramaturgie: Intro, Build, Breakdown, Drop. Der Breakdown ist der emotionale Höhepunkt — der Moment, in dem die Kick wegfällt und nur Pad und Melodie schweben. Dann der Drop: alles kommt zurück, der Bass-Filter ist offen, die Pads pumpen. D-Dur gibt dem Ganzen eine warme, euphorische Färbung — heller als a-Moll (Tiefenrausch), optimistischer. Die Arpeggio-Delay-Zeit (0.216s) erzeugt bei 140 BPM triolische Echos, die sich zu Kaskaden aufbauen. Im Aufbau erscheint die Lead-Melodie über einen Gain-LFO, der von 0 auf Maximum steigt — man merkt kaum, wann sie einsetzt.',
+    movements: [
+      { roman: 'I', name: 'Dämmerung', key: 'D-Dur — Pad und Kick', bars: 8 },
+      { roman: 'II', name: 'Aufstieg', key: 'D-Dur — Filter-Build', bars: 16 },
+      { roman: 'III', name: 'Breakdown', key: 'D-Dur — Spannung', bars: 8 },
+      { roman: 'IV', name: 'Sonnenaufgang', key: 'D-Dur — volle Euphorie', bars: 16 },
+    ],
+    engine: 'strudel',
+    code: MORGENROT_CODE,
+  },
+  {
+    slug: 'spaetschicht',
+    title: 'Spätschicht',
+    subtitle: 'Slow Blues — schwer und ehrlich',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 66,
+    durationSec: 309,
+    category: 'Blues',
+    shortDescription:
+      'Slow Blues — schwer und ehrlich: Intro → 12 Bar → Outro. E-Blues-Pentatonik, Septakkorde, Walking Bass bei 66 BPM.',
+    composerNotes:
+      'Der langsamste Blues der Sammlung — 66 BPM, jeder Ton hat Gewicht. E-Blues ist rauer als A-Blues (Mitternachtsblues): die offenen Saiten E und B geben dem Ganzen einen dunkleren, erdigen Charakter. Die Delay-Zeit von 0.429s erzeugt triolische Echos, die dem Solo-Sine-Lead ein Echo geben, das an eine Hall-Feder erinnert. Der Walking Bass läuft durch E-G-A-B — vier Noten, die die ganze Harmonik tragen. Die Shuffle-Drums (Kick und Hi-Hat auf Off-Beats) geben den typischen Blues-Swing. Das Outro ist ein langsames Turnaround: die Melodie steigt ab von B4 nach E4, der Akkord klingt aus, der Bass bleibt allein.',
+    movements: [
+      { roman: 'I', name: 'Intro', key: 'E-Blues — Solo und Bass', bars: 4 },
+      { roman: 'II', name: '12 Bar', key: 'E7 → A7 → B7 — der Kreislauf', bars: 24 },
+      { roman: 'III', name: 'Outro', key: 'E-Blues — Turnaround', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: SPAETSCHICHT_CODE,
+  },
+  {
+    slug: 'algorithmus',
+    title: 'Algorithmus',
+    subtitle: 'Deep Work — mathematische Präzision',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 108,
+    durationSec: 0,
+    category: 'Deep Work',
+    shortDescription:
+      'Deep Work — mathematische Präzision. Polyrhythmen: 7/8-Bass gegen 5/8-Melodie über 4/4-Kick. Endloser Loop, ständige Verschiebung.',
+    composerNotes:
+      'Das mathematischste Stück der Sammlung. Die Bassline hat 7 Noten statt 8 (slow 7/8) — sie verschiebt sich ständig gegen den 4/4-Beat der Kick. Die Melodie hat 5 Noten (slow 5/8) — eine andere Verschiebungsrate. Das Ergebnis: ein Pattern, das sich erst nach 7×5×4 = 140 Zyklen exakt wiederholt, aber trotzdem nie chaotisch klingt, weil die Kick als Referenzpunkt dient. Der Clap sitzt auf der 3 statt auf 2+4, was das Ganze noch asymmetrischer macht. Die Akkordprogression wechselt alle 8 Zyklen (langsam genug, um Orientierung zu geben). Dieses Stück ist für die Arbeit, bei der man den Verstand braucht — Algorithmen, Datenstrukturen, Architektur.',
+    engine: 'strudel',
+    code: ALGORITHMUS_CODE,
+  },
+  {
+    slug: 'nebelhorn',
+    title: 'Nebelhorn',
+    subtitle: 'Dub Techno — tief im Nebel',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 112,
+    durationSec: 214,
+    category: 'Dub',
+    shortDescription:
+      'Dub Techno — tief im Nebel: Sichtweite Null → Fahrrinne → Auflösung. Bb-Moll, tiefe Drones, Echo-Akkorde, minimale Drums.',
+    composerNotes:
+      'Bb-Moll ist die dunkelste Tonart dieser Sammlung — fünf Vorzeichen, alles klingt tief und gedämpft. Das Stück beginnt ohne Kick — nur ein tiefer Drone (Bb1) und Akkord-Echos, die aus dem Nichts erscheinen. In Satz II gibt die Kick Orientierung, aber die Drums bleiben minimal: Kick, eine Off-Beat-Hi-Hat, ein kaum hörbarer Rimshot. Zwei verschiedene Delay-Zeiten (0.388s und 0.259s) erzeugen überlappende Echo-Räume — man hört Geister von Tönen, die längst vergangen sind. Die Melodie ist kaum mehr als ein einzelner Ton mit langem Delay-Trail. In Satz III steigt der Delay-Feedback auf 75% — die Echos überleben die Quelle.',
+    movements: [
+      { roman: 'I', name: 'Sichtweite Null', key: 'Bb-Moll — Drones und Echos', bars: 10 },
+      { roman: 'II', name: 'Fahrrinne', key: 'Bb-Moll — Kick gibt Orientierung', bars: 20 },
+      { roman: 'III', name: 'Auflösung', key: 'Bb-Moll — im Echo verschwinden', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: NEBELHORN_CODE,
+  },
+  {
+    slug: 'lichtgeschwindigkeit',
+    title: 'Lichtgeschwindigkeit',
+    subtitle: 'Uplifting Trance — 145 BPM, pure Energie',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 145,
+    durationSec: 198,
+    category: 'Trance',
+    shortDescription:
+      'Uplifting Trance — 145 BPM, pure Energie: Countdown → Beschleunigung → Lichtmauer → Nachglühen. Das schnellste Stück mit Melodie.',
+    composerNotes:
+      '145 BPM — das schnellste Stück der Sammlung mit melodischem Inhalt. E-Dur gibt dem Ganzen eine strahlende, fast aggressive Helligkeit. Die Bassline alterniert Grundton und Quinte (E1-B1) durch einen Sawtooth-Filter, der über 20 Zyklen von 400 auf 2200 Hz steigt — ein langer, unaufhaltsamer Build. Die Delay-Zeit (0.207s) ist auf die 16tel bei 145 BPM abgestimmt, sodass die Arpeggio-Echos sich rhythmisch einfügen. Im Drop (Lichtmauer) kommen zwei parallele Arpeggien dazu, die sich in Terzen bewegen — das gibt die typische Uplifting-Breite. Der Ride auf Off-Beats im Drop ist das i-Tüpfelchen: ein Detail, das man erst beim zweiten Hören bemerkt.',
+    movements: [
+      { roman: 'I', name: 'Countdown', key: 'E-Dur — Bass und Kick', bars: 6 },
+      { roman: 'II', name: 'Beschleunigung', key: 'E-Dur — der lange Build', bars: 20 },
+      { roman: 'III', name: 'Lichtmauer', key: 'E-Dur — volle Energie', bars: 16 },
+      { roman: 'IV', name: 'Nachglühen', key: 'E-Dur — Ausklingen', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: LICHTGESCHWINDIGKEIT_CODE,
+  },
+  {
+    slug: 'schallplatte',
+    title: 'Schallplatte',
+    subtitle: 'Lo-Fi Jazz — Vinyl-Wärme und Septakkorde',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 82,
+    durationSec: 0,
+    category: 'Lo-Fi',
+    shortDescription:
+      'Lo-Fi Jazz — Vinyl-Wärme und Septakkorde. Maj7/m7/dom7-Voicings durch Lowpass, Walking Bass, Shuffle-Groove. Endloser Loop.',
+    composerNotes:
+      'Jazz-Harmonik trifft Lo-Fi-Ästhetik. Die Akkorde (FMaj7, Bbm7, Cm7, FMaj7) verwenden Jazz-Voicings mit Septimen — sie klingen reicher als einfache Dreiklänge. Der Sawtooth durch 1400 Hz Lowpass gibt den typischen "Vinyl-durch-kleine-Lautsprecher"-Sound. Der Walking Bass läuft durch F-A-C-A dann Bb-D-F-D — er folgt der Harmonie, aber mit eigener Melodie. Die Shuffle-Drums (Hi-Hat auf Off-Beats mit Ghost-Notes) geben den Jazz-Swing. Wie alle Lo-Fi-Stücke ist dies ein endloser Loop ohne arrange() — die Musik endet nie, sie war schon immer da.',
+    engine: 'strudel',
+    code: SCHALLPLATTE_CODE,
+  },
+  {
+    slug: 'frequenztherapie',
+    title: 'Frequenztherapie',
+    subtitle: 'Ambient — heilende Frequenzen',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 55,
+    durationSec: 0,
+    category: 'Ambient',
+    shortDescription:
+      'Ambient — heilende Frequenzen. Sieben Sinuswellen in reinen Intervallen, Schwebungen durch minimale Verstimmung. Das langsamste Stück.',
+    composerNotes:
+      'Das langsamste und einfachste Stück der gesamten Sammlung — 55 BPM, sieben Sinuswellen, keine Drums, keine Melodie. Die Frequenzen bilden einen C-Dur-Akkord über zwei Oktaven (C2, G2, C3, E3, G3, C4), aber mit unterschiedlichen slow()-Werten, die Phasenverschiebungen erzeugen. Der Trick: die siebte Schicht ist ein zweites C2 mit slow(20.1) statt slow(20) — die minimale Differenz erzeugt eine Schwebung mit extrem langer Periode. Die große Terz (E3) taucht alle 50 Zyklen auf und verschwindet — der Akkord schwebt zwischen Moll und Dur, ohne sich festzulegen. Delay-Zeiten von 1.5s, 2s und 3s erzeugen Echos, die sich über Dutzende von Zyklen aufbauen. Dieses Stück ist für Meditation, Deep Focus, oder einfach zum Da-Sein.',
+    engine: 'strudel',
+    code: FREQUENZTHERAPIE_CODE,
   },
 ]
 
