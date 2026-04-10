@@ -35,5 +35,6 @@ export const DEFAULT_LAYOUT: PanelLayout = {
     spectrum: true,
     timeline: false,
     pianoroll: false,
+    punchcard: false,
   },
 }
