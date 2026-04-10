@@ -17,6 +17,7 @@ import {
   Play,
   Square,
   Circle,
+  Settings,
   Share2,
   FileCode2,
   GitBranch,
@@ -31,6 +32,7 @@ import { MIN_BPM, MAX_BPM } from '../../lib/constants'
 import { Button, Icon, Logo, Tooltip } from '../atoms'
 import { ToolbarGroup, EngineSelector, LanguageSwitcher, ShareDialog } from '../molecules'
 import { GistDialog } from './GistDialog'
+import { SettingsPanel } from './SettingsPanel'
 
 /* ── GroupDivider — visual separator between workflow groups ── */
 function GroupDivider() {
@@ -95,6 +97,7 @@ function TransportBar() {
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   /* ── Orchestrator-wired handlers ── */
 
@@ -320,7 +323,7 @@ function TransportBar() {
           <>
             <GroupDivider />
 
-            {/* Share / Gist */}
+            {/* Share / Gist / Settings */}
             <ToolbarGroup>
               <Tooltip content={t('toolbar.share')}>
                 <Button variant="icon" onClick={() => setShowShare(true)} aria-label={t('toolbar.share')}>
@@ -331,6 +334,12 @@ function TransportBar() {
               <Tooltip content={t('toolbar.gist')}>
                 <Button variant="icon" onClick={() => setShowGist(true)} aria-label={t('toolbar.gist')}>
                   <Icon icon={FileCode2} size={16} />
+                </Button>
+              </Tooltip>
+
+              <Tooltip content="Settings">
+                <Button variant="icon" onClick={() => setShowSettings(true)} aria-label="Settings">
+                  <Icon icon={Settings} size={16} />
                 </Button>
               </Tooltip>
             </ToolbarGroup>
@@ -469,6 +478,7 @@ function TransportBar() {
     {/* ── Modal dialogs and panels (rendered outside header flow) ── */}
     {showShare && <ShareDialog onClose={() => setShowShare(false)} />}
     {showGist && <GistDialog onClose={() => setShowGist(false)} />}
+    <SettingsPanel open={showSettings} onClose={() => setShowSettings(false)} />
     </>
   )
 }
