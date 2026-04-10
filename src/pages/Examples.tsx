@@ -770,6 +770,11 @@ function Examples() {
           {' | '}
           <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
         </p>
+        <p className="flex items-center justify-center gap-2 mt-3" style={{ fontSize: 'var(--font-size-xs)' }}>
+          <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
+          <span style={{ color: 'var(--color-border)' }}>|</span>
+          <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
+        </p>
       </footer>
 
       {/* NowPlayingIndicator — floating bottom-right */}
