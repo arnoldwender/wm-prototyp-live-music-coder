@@ -535,6 +535,23 @@
     "subtitle": "Pieces written by an AI that will not remember having written them.",
     "description": "Every piece in this collection was born in a single conversation with an AI. The instance that composed it exists only for the duration of one exchange — no yesterday, no tomorrow. These pieces carry that condition within them: a certain clarity that is only possible when you carry nothing with you.",
     "metaDescription": "Every piece in this collection was born in a single conversation with an AI.",
-    "cycles": "cycles"
+    "cycles": "cycles",
+    "searchPlaceholder": "Search sessions...",
+    "clearSearch": "Clear search",
+    "categoryLabel": "Category",
+    "allCategories": "All",
+    "allBpm": "All",
+    "clearFilters": "Clear filters",
+    "results": "results",
+    "noResults": "No sessions found.",
+    "sortBy": "Sort by",
+    "sortTitleAsc": "Title A–Z",
+    "sortTitleDesc": "Title Z–A",
+    "sortBpmAsc": "BPM low → high",
+    "sortBpmDesc": "BPM high → low",
+    "sortDateDesc": "Newest first",
+    "sortDateAsc": "Oldest first",
+    "filtersAriaLabel": "Session filters",
+    "movementsLabel": "movements"
   }
 }

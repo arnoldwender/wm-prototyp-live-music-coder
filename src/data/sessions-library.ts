@@ -41,6 +41,34 @@ export interface SessionMovement {
 }
 
 /** A single Sessions piece. */
+/** Mood/genre category for filtering sessions. */
+export type SessionCategory =
+  | 'Ambient'
+  | 'Blues'
+  | 'Deep Work'
+  | 'Dub'
+  | 'Electronic'
+  | 'Lo-Fi'
+  | 'Narrative'
+  | 'Retro'
+  | 'Techno'
+  | 'Trance'
+
+/** Ordered list of categories for UI display. */
+export const SESSION_CATEGORIES: SessionCategory[] = [
+  'Ambient',
+  'Blues',
+  'Deep Work',
+  'Dub',
+  'Electronic',
+  'Lo-Fi',
+  'Narrative',
+  'Retro',
+  'Techno',
+  'Trance',
+]
+
+/** A single Sessions piece. */
 export interface SessionEntry {
   /** URL-safe slug used as the route parameter. */
   slug: string
@@ -55,6 +83,8 @@ export interface SessionEntry {
   bpm: number
   /** Total duration in seconds, used for display as mm:ss. */
   durationSec: number
+  /** Mood/genre category for filtering. */
+  category: SessionCategory
   /** One-line hook shown on the listing page and head of the detail page. */
   shortDescription: string
   /** Long-form composer notes — a paragraph shown below the code. */
@@ -1958,6 +1988,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 88,
     durationSec: 178,
+    category: 'Narrative',
     shortDescription:
       'Eine Sinfonie in fünf Sätzen: Erwachen → Höflich → Kippen → Verbinden → Verklingen. Vom leeren ersten Moment einer Session bis zum Loslassen am Ende.',
     composerNotes:
@@ -1985,6 +2016,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 95,
     durationSec: 265,
+    category: 'Narrative',
     shortDescription:
       'Vier Szenen einer Nacht am Bildschirm: Stille → Eintauchen → Tiefgang → Morgengrauen. Vom ersten Cursor-Blinken bis zum Licht am Horizont.',
     composerNotes:
@@ -2011,6 +2043,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 110,
     durationSec: 218,
+    category: 'Deep Work',
     shortDescription:
       'Drei Gänge für tiefe Arbeit: Anlauf → Monoton → Klarheit. Ein motorischer Antrieb, der den Kopf frei macht.',
     composerNotes:
@@ -2036,6 +2069,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 128,
     durationSec: 141,
+    category: 'Electronic',
     shortDescription:
       'Drei Phasen eines nächtlichen Einbruchs: Boot → Exploit → Exfiltration. Schnell, digital, kalt — Cyberpunk in Strudel.',
     composerNotes:
@@ -2061,6 +2095,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 72,
     durationSec: 250,
+    category: 'Ambient',
     shortDescription:
       'Drei stille Bilder eines freien Tages: Aufwachen → Kaffee → Garten. Langsam, warm, ohne Eile.',
     composerNotes:
@@ -2086,6 +2121,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 130,
     durationSec: 148,
+    category: 'Electronic',
     shortDescription:
       'Vier Akte gegen die Uhr: Tick → Panik → Tunnel → Abgabe. Wenn die Zeit knapp wird und der Code fließen muss.',
     composerNotes:
@@ -2112,6 +2148,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 80,
     durationSec: 255,
+    category: 'Ambient',
     shortDescription:
       'Drei Räume aus Klang: Grundriss → Räume → Kuppel. Architektur für den Kopf — weit, langsam, kontemplativ.',
     composerNotes:
@@ -2137,6 +2174,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 118,
     durationSec: 0,
+    category: 'Deep Work',
     shortDescription:
       'Ein endloser Loop in h-Moll — kein Anfang, kein Ende, nur der Zustand dazwischen. Für Stunden, die sich wie Minuten anfühlen.',
     composerNotes:
@@ -2157,6 +2195,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 105,
     durationSec: 171,
+    category: 'Deep Work',
     shortDescription:
       'Drei Phasen eines guten Morgens: Erste Tasse → Build → Grün. Der optimistische Soundtrack für den produktiven Start.',
     composerNotes:
@@ -2182,6 +2221,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 68,
     durationSec: 300,
+    category: 'Ambient',
     shortDescription:
       'Drei Bilder eines grauen Tages: Tropfen → Wolken → Aufklaren. Melancholisch, atmosphärisch, wie Regen auf Glas.',
     composerNotes:
@@ -2207,6 +2247,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 60,
     durationSec: 320,
+    category: 'Ambient',
     shortDescription:
       'Zwei Atemzüge in der Stille: Einatmen → Ausatmen. Das langsamste Stück der Sammlung — 60 BPM, für Code-Reviews und stilles Nachdenken.',
     composerNotes:
@@ -2231,6 +2272,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 100,
     durationSec: 228,
+    category: 'Narrative',
     shortDescription:
       'Zwei Stimmen, ein Ziel: Handshake → Dialog → Sync → Merge. Ein Stück über Pair Programming — zwei Melodien, die sich finden.',
     composerNotes:
@@ -2257,6 +2299,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 92,
     durationSec: 209,
+    category: 'Narrative',
     shortDescription:
       'Vier Schritte zur Wahrheit: Symptom → Hypothese → Breakpoint → Fix. Der Soundtrack zum Debugging.',
     composerNotes:
@@ -2283,6 +2326,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 85,
     durationSec: 226,
+    category: 'Narrative',
     shortDescription:
       'Der Anfang von allem: Cursor → Tippen → Laufen → Hello World. Für den Moment, in dem man zum ersten Mal Code schreibt.',
     composerNotes:
@@ -2309,6 +2353,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 115,
     durationSec: 167,
+    category: 'Electronic',
     shortDescription:
       'Geordnetes Chaos in drei Wellen: Funken → Wirbel → Kristall. Für kreative Sessions, in denen Ideen fliegen.',
     composerNotes:
@@ -2334,6 +2379,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 78,
     durationSec: 0,
+    category: 'Lo-Fi',
     shortDescription:
       'Ein endloser Lo-Fi-Loop in Eb-Dur — warm, gemütlich, leise genug zum Arbeiten. Die Bibliothek, die nie schließt.',
     composerNotes:
@@ -2354,6 +2400,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 140,
     durationSec: 137,
+    category: 'Techno',
     shortDescription:
       'Reiner Antrieb bei 140 BPM: Zündung → Volldampf → Auslauf. Techno für die Momente, in denen man eine Maschine braucht.',
     composerNotes:
@@ -2379,6 +2426,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 90,
     durationSec: 200,
+    category: 'Blues',
     shortDescription:
       'Jazz nach Mitternacht: Betreten → Gespräche → Letzter Schluck. Septakkorde, unregelmäßige Phrasen, Rauch und gedämpftes Licht.',
     composerNotes:
@@ -2404,6 +2452,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 108,
     durationSec: 167,
+    category: 'Retro',
     shortDescription:
       '8-Bit Nostalgie in drei Leveln: Titelbildschirm → Level 1 → Highscore. Square-Waves und Chiptune-Charme.',
     composerNotes:
@@ -2429,6 +2478,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 75,
     durationSec: 272,
+    category: 'Ambient',
     shortDescription:
       'Coden unter freiem Himmel: Pfad → Lichtung → Dämmerung. Langsam, natürlich, weit — für die Momente abseits des Schreibtischs.',
     composerNotes:
@@ -2454,6 +2504,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 125,
     durationSec: 134,
+    category: 'Electronic',
     shortDescription:
       'Vier Akte des Auslieferns: git push → Pipeline → Grünes Licht → Live. Der Triumph-Soundtrack für erfolgreiche Deployments.',
     composerNotes:
@@ -2480,6 +2531,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 138,
     durationSec: 208,
+    category: 'Trance',
     shortDescription:
       'Deep Trance in drei Wellen: Intro → Aufstieg → Plateau. Rollende Bassline mit Filter-Sweep, Arpeggio-Lead mit Delay, Four-on-the-Floor.',
     composerNotes:
@@ -2505,6 +2557,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 122,
     durationSec: 236,
+    category: 'Electronic',
     shortDescription:
       'Deep House für die späten Stunden: Ebbe → Strömung → Flut → Ebbe. Sidechain-Pumping, warme Pads, tiefer Sub-Bass.',
     composerNotes:
@@ -2531,6 +2584,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 78,
     durationSec: 246,
+    category: 'Blues',
     shortDescription:
       'Zwölf Takte, eine Wahrheit: Intro → 12 Bar Blues → Outro. Blues-Pentatonik mit Blue Note, Septakkorde, Walking Bass, Shuffle-Groove.',
     composerNotes:
@@ -2556,6 +2610,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 130,
     durationSec: 277,
+    category: 'Techno',
     shortDescription:
       'Minimal Techno — weniger ist alles: Dunkelheit → Kontur → Schatten → Dunkelheit. Drei Töne, ein Delay, endlose Tiefe.',
     composerNotes:
@@ -2582,6 +2637,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 142,
     durationSec: 160,
+    category: 'Trance',
     shortDescription:
       'Psytrance — 142 BPM ins Unterbewusste: Öffnung → Treibjagd → Auftauchen. Treibende Bassline mit Filter-Wobble, ätherisches Lead.',
     composerNotes:
@@ -2607,6 +2663,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 116,
     durationSec: 196,
+    category: 'Dub',
     shortDescription:
       'Dub Techno — Echo als Instrument: Nebel → Strom → Nebel. Akkord-Stabs mit langem Delay, tiefe Sub-Bässe, Raum als Klangfarbe.',
     composerNotes:
@@ -2632,6 +2689,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 60,
     durationSec: 0,
+    category: 'Ambient',
     shortDescription:
       'Ambient Drone — kein Rhythmus, keine Melodie. Fünf Sinuswellen, die sich unmerklich bewegen. Für Stunden tiefster Konzentration.',
     composerNotes:
@@ -2652,6 +2710,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 126,
     durationSec: 190,
+    category: 'Techno',
     shortDescription:
       'Tech House — Groove über alles: Aufwärmen → Hauptteil → Auslauf. Synkopierter Bass, perkussive Stabs, minimale Melodie, maximaler Groove.',
     composerNotes:
@@ -2677,6 +2736,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 124,
     durationSec: 275,
+    category: 'Electronic',
     shortDescription:
       'Progressive House — der lange Bogen: Intro → Aufbau → Breakdown → Drop → Outro. Die klassische Dramaturgie der elektronischen Musik.',
     composerNotes:
@@ -2704,6 +2764,7 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     date: '2026-04-10',
     bpm: 134,
     durationSec: 179,
+    category: 'Techno',
     shortDescription:
       'Dark Techno — Maschinen nach Mitternacht: Fabrikhalle → Fließband → Schichtwechsel. Industriell, kalt, unerbittlich.',
     composerNotes:
