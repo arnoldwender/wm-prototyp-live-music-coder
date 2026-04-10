@@ -14,6 +14,7 @@ import { WaveformVisualizer } from './WaveformVisualizer';
 import { SpectrumVisualizer } from './SpectrumVisualizer';
 import { PatternTimeline } from './PatternTimeline';
 import { PianorollVisualizer } from './PianorollVisualizer';
+import { PunchcardVisualizer } from './PunchcardVisualizer';
 
 /** Composes audio-only visualizer panels with pill toggle controls */
 export function VisualizerDashboard() {
@@ -26,6 +27,7 @@ export function VisualizerDashboard() {
     visiblePanels.spectrum && { key: 'spectrum', component: <SpectrumVisualizer /> },
     visiblePanels.timeline && { key: 'timeline', component: <PatternTimeline /> },
     visiblePanels.pianoroll && { key: 'pianoroll', component: <PianorollVisualizer /> },
+    visiblePanels.punchcard && { key: 'punchcard', component: <PunchcardVisualizer /> },
   ].filter(Boolean) as { key: string; component: ReactNode }[];
 
   return (

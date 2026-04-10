@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   Play,
   Square,
+  Circle,
   Share2,
   FileCode2,
   GitBranch,
@@ -52,12 +53,14 @@ function TransportBar() {
 
   /* Transport state */
   const isPlaying = useAppStore((s) => s.isPlaying)
+  const isRecording = useAppStore((s) => s.isRecording)
   const bpm = useAppStore((s) => s.bpm)
 
   /* Transport actions */
   const togglePlay = useAppStore((s) => s.togglePlay)
   const stop = useAppStore((s) => s.stop)
   const setBpm = useAppStore((s) => s.setBpm)
+  const toggleRecord = useAppStore((s) => s.toggleRecord)
 
   /* Graph toggle */
   const showGraph = useAppStore((s) => s.layout.showGraph)
@@ -121,6 +124,23 @@ function TransportBar() {
   const handleStop = () => {
     getOrchestrator().stop()
     stop()
+  }
+
+  /* Record toggle — start/stop audio capture and download */
+  const handleRecord = async () => {
+    const { getRecorder } = await import('../../lib/audio/recorder')
+    const recorder = getRecorder()
+    if (recorder.isRecording()) {
+      try {
+        await recorder.stopAndDownload('live-music-coder')
+      } catch (err) {
+        console.error('[TransportBar] Recording stop failed:', err)
+      }
+      toggleRecord()
+    } else {
+      recorder.start()
+      toggleRecord()
+    }
   }
 
   const handleBpmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,6 +212,22 @@ function TransportBar() {
               aria-label={t('transport.stop')}
             >
               <Icon icon={Square} size={16} />
+            </Button>
+          </Tooltip>
+
+          <Tooltip content={isRecording ? t('transport.stopRecord') : t('transport.record')}>
+            <Button
+              variant="icon"
+              active={isRecording}
+              onClick={handleRecord}
+              aria-label={isRecording ? t('transport.stopRecord') : t('transport.record')}
+            >
+              <Circle
+                size={14}
+                fill={isRecording ? 'var(--color-error)' : 'none'}
+                color={isRecording ? 'var(--color-error)' : 'currentColor'}
+                style={isRecording ? { animation: 'playing-indicator 1.5s ease-in-out infinite' } : undefined}
+              />
             </Button>
           </Tooltip>
         </ToolbarGroup>
