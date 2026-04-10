@@ -13,6 +13,7 @@ import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { resetStrudelTap } from '../../lib/audio/strudel-tap';
+import { setStrudelCM, updateInlineWidgets } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
 import { Play, Square, Loader2, Trash2 } from 'lucide-react';
@@ -101,6 +102,8 @@ export function StrudelEditor() {
         try {
           const strudelCM = await import('@strudel/codemirror');
           strudelExtRef.current = strudelCM;
+          /* Share module with inline-widgets system for afterEval updates */
+          setStrudelCM(strudelCM);
         } catch (err) {
           console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
@@ -132,11 +135,15 @@ export function StrudelEditor() {
           if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
           evalTimerRef.current = setTimeout(async () => {
             try {
-              await replRef.current.evaluate(code, true);
+              const result = await replRef.current.evaluate(code, true);
               resetStrudelTap();
               setEvalError(null);
+              /* Update inline widgets on live eval too */
+              const v = viewRef.current;
+              if (v && (result?.widgets || replRef.current?.widgets)) {
+                updateInlineWidgets(v, result?.widgets ?? replRef.current.widgets);
+              }
             } catch (err) {
-              /* Show error in UI, not just console */
               setEvalError(err instanceof Error ? err.message : String(err));
             }
           }, 800);
@@ -276,7 +283,14 @@ export function StrudelEditor() {
       if (!code.trim()) { setEvaluating(false); return; }
 
       /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
-      await replRef.current.evaluate(code, true);
+      const evalResult = await replRef.current.evaluate(code, true);
+
+      /* Update inline widgets (._pianoroll(), ._scope(), slider()) if transpiler
+       * returned widget metadata. StrudelMirror's afterEval normally handles this,
+       * but since we manage our own CM6 instance, we call it explicitly. */
+      if (evalResult?.widgets || replRef.current?.widgets) {
+        updateInlineWidgets(view, evalResult?.widgets ?? replRef.current.widgets);
+      }
 
       /* Force visualizer tap to reconnect — superdough recreates audio chain lazily.
        * The controller only initializes AFTER the first note plays, so we retry

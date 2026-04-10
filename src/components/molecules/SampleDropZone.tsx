@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Upload } from 'lucide-react';
-import { importSampleFiles, isAudioFile } from '../../lib/audio/sample-import';
+import { importSampleFiles } from '../../lib/audio/sample-import';
 
 interface SampleDropZoneProps {
   /** Called with imported sample names after successful import */
