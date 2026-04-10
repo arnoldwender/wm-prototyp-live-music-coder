@@ -634,6 +634,546 @@ arrange(
 ).cpm(60)
 `
 
+/* ══════════════════════════════════════════════════════════
+   Piece 12 — Paarflug
+   ══════════════════════════════════════════════════════════ */
+
+const PAARFLUG_CODE = `// =============================================
+// "Paarflug"
+// Zwei Stimmen, ein Ziel
+// =============================================
+
+arrange(
+  // I. Handshake (4 Zyklen) — C-Dur, zwei Stimmen finden sich
+  [4, stack(
+    note("c5 ~ ~ ~ ~ ~ ~ ~").s("sine")
+      .attack(0.3).release(1).room(0.5).gain(0.35),
+    note("~ ~ ~ ~ g4 ~ ~ ~").s("triangle")
+      .attack(0.3).release(1).room(0.5).gain(0.35)
+  ).slow(2)],
+
+  // II. Dialog (16 Zyklen) — G-Dur, Call and Response
+  [16, stack(
+    note("<g4 b4 d5 ~ ~ ~ a4 ~>")
+      .s("sine").attack(0.1).release(0.5)
+      .room(0.4).gain(0.38),
+    note("<~ ~ ~ d5 b4 g4 ~ c5>")
+      .s("triangle").attack(0.1).release(0.5)
+      .room(0.4).gain(0.35),
+    note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>")
+      .s("sine").attack(0.3).release(0.8).gain(0.2),
+    note("g2 d2 c2 d2").s("sine").gain(0.45),
+    s("bd ~ hh ~ bd ~ hh ~").gain(0.4),
+    s("~ ~ ~ hh ~ ~ ~ hh").gain(0.12)
+  )],
+
+  // III. Sync (12 Zyklen) — C-Dur, parallel
+  [12, stack(
+    note("<c5 e5 g5 f5 e5 d5 c5 g4 c5 d5 e5 g5>")
+      .s("sine").attack(0.08).release(0.4)
+      .room(0.4).delay(0.2).gain(0.38),
+    note("<e4 g4 c5 e5 c5 b4 g4 e4 g4 b4 c5 e5>")
+      .s("triangle").attack(0.08).release(0.4)
+      .room(0.4).delay(0.2).gain(0.3),
+    note("<[c3,e3,g3] [f2,a2,c3] [g2,b2,d3] [c3,e3,g3]>/4")
+      .s("sine").attack(0.2).release(0.6).gain(0.2),
+    note("c2 g2 f2 g2").s("sine").gain(0.5),
+    s("bd ~ hh sd bd ~ hh sd").gain(0.45),
+    s("hh*8").gain(0.15)
+  )],
+
+  // IV. Merge (6 Zyklen) — C-Dur, Unison
+  [6, stack(
+    note("<c5 e5 g5 e5 c5 g4>")
+      .s("sine").attack(0.2).release(0.8)
+      .room(0.6).delay(0.4).delayfeedback(0.4).gain(0.35),
+    note("<c5 e5 g5 e5 c5 g4>")
+      .s("triangle").attack(0.2).release(0.8)
+      .room(0.6).delay(0.4).delayfeedback(0.4).gain(0.3),
+    note("c2").s("sine").attack(1).release(3)
+      .room(0.8).gain(0.35).slow(3)
+  )]
+).cpm(100)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 13 — Bugsuche
+   ══════════════════════════════════════════════════════════ */
+
+const BUGSUCHE_CODE = `// =============================================
+// "Bugsuche"
+// Vier Schritte zur Wahrheit
+// =============================================
+
+arrange(
+  // I. Symptom (6 Zyklen) — c-Moll, etwas stimmt nicht
+  [6, stack(
+    note("c4 ~ eb4 ~ ~ g3 ~ ~")
+      .s("sine").attack(0.05).release(0.8)
+      .room(0.6).delay(0.5).delaytime(0.545)
+      .gain(0.3),
+    note("~ ~ ~ ~ c3 ~ ~ ~").s("triangle")
+      .attack(0.5).release(1.5).room(0.7).gain(0.2),
+    s("~ ~ hh ~ ~ ~ ~ hh").gain(0.12)
+  ).slow(2)],
+
+  // II. Hypothese (8 Zyklen) — g-Moll, systematisch
+  [8, stack(
+    note("<g4 bb4 d5 c5 bb4 a4 g4 d4>")
+      .s("triangle").attack(0.05).release(0.35)
+      .room(0.35).gain(0.35),
+    note("<[g3,bb3,d4] [eb3,g3,bb3] [f3,a3,c4] [d3,f3,a3]>/4")
+      .s("sine").attack(0.2).release(0.5).gain(0.22),
+    note("g2 d2 eb2 d2").s("sine").gain(0.48),
+    s("bd ~ hh ~ bd ~ hh ~").gain(0.4),
+    s("hh*8").gain(0.12)
+  )],
+
+  // III. Breakpoint (12 Zyklen) — c-Moll, Spannung
+  [12, stack(
+    note("<c5 eb5 g5 f5 eb5 d5 c5 g4 c5 eb5 g5 bb5>")
+      .s("sawtooth").lpf(1400).attack(0.03).release(0.25)
+      .room(0.3).gain(0.35),
+    note("<eb4 g4 c5 eb5 c5 bb4 g4 eb4 g4 c5 eb5 g5>")
+      .s("triangle").room(0.4).gain(0.22),
+    note("c2 g2 eb2 g2 f2 g2 ab2 g2 c2 g2 bb1 g2")
+      .s("sine").gain(0.55),
+    s("bd ~ hh sd bd hh sd hh").gain(0.5),
+    s("hh*16").gain(0.18)
+  )],
+
+  // IV. Fix (6 Zyklen) — C-Dur, Erkenntnis
+  [6, stack(
+    note("<c5 e5 g5 e5 c5 g4>")
+      .s("sine").attack(0.2).release(1)
+      .room(0.6).delay(0.4).delayfeedback(0.4)
+      .gain(0.4),
+    note("<[c4,e4,g4] [f3,a3,c4] [g3,b3,d4] [c3,e3,g3]>")
+      .s("triangle").attack(0.3).release(0.8).gain(0.22),
+    note("c2 g2 f2 g2 c2 g2").s("sine").gain(0.45),
+    s("bd ~ hh ~ bd ~ hh ~").gain(0.35)
+  )]
+).cpm(92)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 14 — Erste Zeile
+   ══════════════════════════════════════════════════════════ */
+
+const ERSTE_ZEILE_CODE = `// =============================================
+// "Erste Zeile"
+// Der Anfang von allem
+// =============================================
+
+arrange(
+  // I. Cursor (6 Zyklen) — F-Dur, der blinkende Strich
+  [6, stack(
+    note("f4 ~ ~ ~ ~ ~ ~ ~")
+      .s("sine").attack(0.01).release(0.5)
+      .room(0.7).gain(0.3),
+    note("~ ~ ~ ~ f4 ~ ~ ~")
+      .s("sine").attack(0.01).release(0.5)
+      .room(0.7).gain(0.25),
+    note("f2").s("sine").attack(2).release(4)
+      .room(0.9).gain(0.2).slow(6)
+  ).slow(2)],
+
+  // II. Tippen (12 Zyklen) — F-Dur, zaghaft
+  [12, stack(
+    note("<f4 a4 c5 bb4 a4 g4 f4 c4>")
+      .s("sine").attack(0.1).release(0.5)
+      .room(0.45).gain(0.35),
+    note("<[f3,a3,c4] [bb2,d3,f3] [c3,e3,g3] [f3,a3,c4]>")
+      .s("triangle").attack(0.25).release(0.7).gain(0.2),
+    note("f2 c2 bb1 c2").s("sine").gain(0.45),
+    s("~ ~ hh ~ ~ ~ hh ~").gain(0.18),
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(0.3)
+  )],
+
+  // III. Laufen (10 Zyklen) — Bb-Dur, es funktioniert
+  [10, stack(
+    note("<bb4 d5 f5 eb5 d5 c5 bb4 f4 bb4 d5>")
+      .s("sine").attack(0.08).release(0.4)
+      .room(0.4).delay(0.25).gain(0.38),
+    note("<d4 f4 bb4 d5 bb4 a4 f4 d4 f4 bb4>")
+      .s("triangle").room(0.4).gain(0.25),
+    note("<[bb2,d3,f3] [eb2,g2,bb2] [f2,a2,c3] [bb2,d3,f3]>/4")
+      .s("sine").attack(0.2).release(0.5).gain(0.2),
+    note("bb1 f2 eb2 f2").s("sine").gain(0.5),
+    s("bd ~ hh sd bd ~ hh sd").gain(0.45),
+    s("hh*8").gain(0.15)
+  )],
+
+  // IV. Hello World (4 Zyklen) — F-Dur, Stolz
+  [4, stack(
+    note("<f5 a5 c6 a5>")
+      .s("sine").attack(0.3).release(1.5)
+      .room(0.7).delay(0.5).delayfeedback(0.45)
+      .gain(0.4),
+    note("<[f4,a4,c5] [bb3,d4,f4] [c4,e4,g4] [f3,a3,c4]>")
+      .s("triangle").attack(0.4).release(1).gain(0.22),
+    note("f2").s("sine").attack(1).release(3)
+      .room(0.9).gain(0.3).slow(2)
+  )]
+).cpm(85)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 15 — Brainstorm
+   ══════════════════════════════════════════════════════════ */
+
+const BRAINSTORM_CODE = `// =============================================
+// "Brainstorm"
+// Geordnetes Chaos in drei Wellen
+// =============================================
+
+arrange(
+  // I. Funken (8 Zyklen) — D-Dur, schnelle Ideen
+  [8, stack(
+    note("<d5 fs5 a5 ~ g5 ~ e5 ~>")
+      .s("triangle").attack(0.02).release(0.25)
+      .room(0.3).gain(0.35),
+    note("<~ ~ ~ a5 ~ b5 ~ d6>")
+      .s("sine").attack(0.02).release(0.3)
+      .room(0.4).delay(0.3).gain(0.28),
+    note("d3 a2 g2 a2").s("sine").gain(0.45),
+    s("bd hh ~ hh bd hh ~ hh").gain(0.4),
+    s("~ ~ sd ~ ~ ~ sd ~").gain(0.35)
+  )],
+
+  // II. Wirbel (16 Zyklen) — G-Dur, alles gleichzeitig
+  [16, stack(
+    note("<g5 b5 d6 c6 b5 a5 g5 d5 g5 a5 b5 d6 e6 d6 c6 b5>")
+      .s("triangle").attack(0.03).release(0.3)
+      .room(0.3).delay(0.15).gain(0.38),
+    note("<b4 d5 g5 b5 g5 fs5 e5 d5 g5 b5 d6 g6 fs6 e6 d6 b5>")
+      .s("sine").room(0.35).gain(0.25),
+    note("<d4 fs4 a4 ~ g4 ~ e4 ~>")
+      .s("sawtooth").lpf(1200).attack(0.02).release(0.2)
+      .gain(0.18),
+    note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [e3,g3,b3]>/4")
+      .s("sine").attack(0.15).release(0.5).gain(0.2),
+    note("g2 d2 c2 d2 e2 d2 c2 d2")
+      .s("sine").gain(0.5),
+    s("bd hh sd hh bd [hh hh] sd hh").gain(0.5),
+    s("hh*16").gain(0.2)
+  )],
+
+  // III. Kristall (8 Zyklen) — D-Dur, die beste Idee bleibt
+  [8, stack(
+    note("<d5 fs5 a5 fs5 d5 a4 fs4 d4>")
+      .s("sine").attack(0.15).release(0.8)
+      .room(0.5).delay(0.35).delayfeedback(0.4)
+      .gain(0.4),
+    note("<[d4,fs4,a4] [g3,b3,d4] [a3,cs4,e4] [d3,fs3,a3]>")
+      .s("triangle").attack(0.3).release(0.8).gain(0.22),
+    note("d2 a2 g2 a2").s("sine").gain(0.48),
+    s("bd ~ hh ~ bd ~ hh ~").gain(0.4)
+  )]
+).cpm(115)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 16 — Lo-Fi Bibliothek
+   ══════════════════════════════════════════════════════════ */
+
+const LOFI_BIBLIOTHEK_CODE = `// =============================================
+// "Lo-Fi Bibliothek"
+// Studieren zwischen Bücherregalen
+// =============================================
+
+// Kein arrange() — ein endloser Lo-Fi-Loop in Eb-Dur
+
+stack(
+  note("<eb4 g4 bb4 ab4 g4 f4 eb4 bb3>")
+    .s("sine").attack(0.15).release(0.6)
+    .room(0.5).delay(0.3).delaytime(0.384)
+    .gain(0.35),
+  note("<g3 bb3 eb4 g4 eb4 d4 c4 bb3>")
+    .s("triangle").room(0.45).delay(0.2).gain(0.22),
+  note("<[eb3,g3,bb3] [ab2,c3,eb3] [bb2,d3,f3] [eb3,g3,bb3]>/4")
+    .s("sine").attack(0.3).release(0.8)
+    .lpf(2000).gain(0.2),
+  note("eb2 bb1 ab1 bb1").s("sine")
+    .gain(0.45).lpf(300),
+  s("bd ~ [~ hh] sd bd ~ hh sd").gain(0.4),
+  s("~ hh ~ ~ ~ hh ~ ~").gain(0.1),
+  note("~ ~ ~ ~ ~ ~ ~ eb1").s("sine")
+    .attack(1).release(2).room(0.7)
+    .gain(sine.range(0.05, 0.2).slow(16))
+).cpm(78)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 17 — Maschinenraum
+   ══════════════════════════════════════════════════════════ */
+
+const MASCHINENRAUM_CODE = `// =============================================
+// "Maschinenraum"
+// Reiner Antrieb bei 140 BPM
+// =============================================
+
+arrange(
+  // I. Zündung (4 Zyklen) — a-Moll, Kick startet
+  [4, stack(
+    s("bd bd bd bd bd bd bd bd").gain(0.55),
+    s("~ ~ hh ~ ~ ~ hh ~").gain(0.2),
+    note("a1").s("sine").gain(0.5).lpf(150)
+  )],
+
+  // II. Volldampf (24 Zyklen) — a-Moll, unaufhaltsam
+  [24, stack(
+    note("<a4 c5 e5 d5 c5 b4 a4 e4>")
+      .s("sawtooth").lpf(2500).attack(0.01).release(0.15)
+      .room(0.15).gain(0.32),
+    note("<c4 e4 a4 c5 a4 g4 e4 c4>")
+      .s("square").lpf(1800).attack(0.01).release(0.12)
+      .gain(0.2),
+    note("<[a2,c3,e3] [f2,a2,c3] [g2,b2,d3] [a2,c3,e3]>/4")
+      .s("sawtooth").lpf(500).attack(0.02).release(0.2)
+      .gain(0.25),
+    note("a1 e1 a1 e1 f1 e1 g1 e1")
+      .s("sine").gain(0.6).lpf(200),
+    s("bd ~ bd ~ bd ~ bd ~").gain(0.55),
+    s("~ ~ ~ ~ sd ~ ~ ~").gain(0.5),
+    s("hh*16").gain(0.25),
+    s("~ ~ ~ ~ ~ ~ ~ [hh hh hh hh]").gain(0.15)
+  )],
+
+  // III. Auslauf (4 Zyklen) — a-Moll, Maschine stoppt
+  [4, stack(
+    note("a3").s("sawtooth").lpf(800)
+      .attack(0.5).release(3).room(0.6).gain(0.3),
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(0.4),
+    note("a1").s("sine").attack(1).release(4)
+      .room(0.8).gain(0.35)
+  )]
+).cpm(140)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 18 — Nachtcafé
+   ══════════════════════════════════════════════════════════ */
+
+const NACHTCAFE_CODE = `// =============================================
+// "Nachtcafé"
+// Jazz nach Mitternacht
+// =============================================
+
+arrange(
+  // I. Betreten (6 Zyklen) — Dm7, Rauch und gedämpftes Licht
+  [6, stack(
+    note("<d4 f4 a4 c5 a4 f4>")
+      .s("sine").attack(0.2).release(1)
+      .room(0.6).delay(0.4).delaytime(0.666)
+      .gain(0.3),
+    note("<[d3,f3,a3,c4]>/1")
+      .s("triangle").attack(0.5).release(2)
+      .room(0.5).gain(0.18)
+  ).slow(2)],
+
+  // II. Gespräche (16 Zyklen) — Swing-Feeling in d-Moll
+  [16, stack(
+    note("<d5 ~ f5 ~ a5 g5 ~ e5 d5 ~ c5 ~ a4 bb4 ~ d5>")
+      .s("sine").attack(0.08).release(0.6)
+      .room(0.5).delay(0.3).delaytime(0.333)
+      .gain(0.35),
+    note("<f4 ~ a4 ~ c5 bb4 ~ g4 f4 ~ e4 ~ c4 d4 ~ f4>")
+      .s("triangle").room(0.45).delay(0.2).gain(0.22),
+    note("<[d3,f3,a3,c4] [g2,bb2,d3,f3] [a2,c3,e3,g3] [bb2,d3,f3,a3]>/4")
+      .s("sine").attack(0.3).release(1).gain(0.2),
+    note("d2 a2 g2 a2 bb2 a2 g2 a2")
+      .s("sine").gain(0.4),
+    s("~ ~ hh ~ ~ hh ~ hh").gain(0.18),
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(0.3)
+  )],
+
+  // III. Letzter Schluck (8 Zyklen) — F-Dur, warm
+  [8, stack(
+    note("<f5 a5 c6 bb5 a5 g5 f5 c5>")
+      .s("sine").attack(0.2).release(1.2)
+      .room(0.7).delay(0.5).delaytime(0.666).delayfeedback(0.45)
+      .gain(0.35),
+    note("<[f3,a3,c4,e4] [bb2,d3,f3,a3] [c3,e3,g3,bb3] [f3,a3,c4]>")
+      .s("triangle").attack(0.4).release(1.2)
+      .room(0.6).gain(0.2),
+    note("f2 c2 bb1 c2").s("sine").gain(0.4),
+    s("~ ~ hh ~ ~ ~ hh ~").gain(0.12)
+  )]
+).cpm(90)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 19 — Pixelwald
+   ══════════════════════════════════════════════════════════ */
+
+const PIXELWALD_CODE = `// =============================================
+// "Pixelwald"
+// 8-Bit Nostalgie in drei Leveln
+// =============================================
+
+arrange(
+  // I. Titelbildschirm (6 Zyklen) — C-Dur, Chiptune-Intro
+  [6, stack(
+    note("<c5 e5 g5 e5 c5 g4>")
+      .s("square").lpf(3000).attack(0.01).release(0.2)
+      .gain(0.3),
+    note("<[c4,e4,g4] [f3,a3,c4] [g3,b3,d4] [c4,e4,g4]>")
+      .s("square").lpf(2000).attack(0.01).release(0.3)
+      .gain(0.18),
+    note("c3 g2 f2 g2 c3 g2").s("square").lpf(800)
+      .attack(0.01).release(0.1).gain(0.35)
+  )],
+
+  // II. Level 1 (16 Zyklen) — G-Dur, Abenteuer
+  [16, stack(
+    note("<g5 b5 d6 c6 b5 a5 g5 d5 g5 a5 b5 d6 e6 d6 c6 b5>")
+      .s("square").lpf(4000).attack(0.01).release(0.15)
+      .gain(0.32),
+    note("<b4 d5 g5 b5 g5 fs5 e5 b4 d5 fs5 g5 b5 c6 b5 a5 g5>")
+      .s("square").lpf(3000).attack(0.01).release(0.12)
+      .gain(0.2),
+    note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>/4")
+      .s("square").lpf(1500).attack(0.01).release(0.2)
+      .gain(0.2),
+    note("g2 d2 c2 d2 g2 d2 e2 d2")
+      .s("square").lpf(600).attack(0.01).release(0.08)
+      .gain(0.4),
+    s("bd ~ hh sd bd hh sd hh").gain(0.45),
+    s("hh*8").gain(0.15)
+  )],
+
+  // III. Highscore (8 Zyklen) — C-Dur, Triumph
+  [8, stack(
+    note("<c6 e6 g6 e6 c6 g5 e5 c5>")
+      .s("square").lpf(5000).attack(0.01).release(0.3)
+      .room(0.3).gain(0.32),
+    note("<e5 g5 c6 e6 c6 b5 g5 e5>")
+      .s("square").lpf(3500).attack(0.01).release(0.2)
+      .gain(0.2),
+    note("c3 g2 f2 g2 c3 e3 g3 c3")
+      .s("square").lpf(800).attack(0.01).release(0.08)
+      .gain(0.38),
+    s("bd hh sd hh bd [hh hh] sd hh").gain(0.5)
+  )]
+).cpm(108)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 20 — Waldlichtung
+   ══════════════════════════════════════════════════════════ */
+
+const WALDLICHTUNG_CODE = `// =============================================
+// "Waldlichtung"
+// Coden unter freiem Himmel
+// =============================================
+
+arrange(
+  // I. Pfad (8 Zyklen) — E-Dur, durch die Bäume
+  [8, stack(
+    note("<e4 gs4 b4 gs4 e4 ~ ~ ~>")
+      .s("sine").attack(0.5).release(2)
+      .room(0.8).delay(0.5).delaytime(0.8)
+      .gain(0.28),
+    note("~ ~ ~ ~ ~ b3 ~ ~")
+      .s("triangle").attack(0.8).release(2)
+      .room(0.85).delay(0.6).gain(0.18),
+    note("e2").s("sine").attack(2).release(4)
+      .room(0.9).gain(0.2).slow(4)
+  ).slow(2)],
+
+  // II. Lichtung (16 Zyklen) — A-Dur, offen und hell
+  [16, stack(
+    note("<a4 cs5 e5 d5 cs5 b4 a4 e4 a4 b4 cs5 e5 fs5 e5 d5 cs5>")
+      .s("sine").attack(0.12).release(0.7)
+      .room(0.55).delay(0.3).gain(0.36),
+    note("<cs4 e4 a4 cs5 a4 gs4 e4 cs4 e4 gs4 a4 cs5 d5 cs5 b4 a4>")
+      .s("triangle").room(0.5).gain(0.22),
+    note("<[a3,cs4,e4] [d3,fs3,a3] [e3,gs3,b3] [a3,cs4,e4]>")
+      .s("sine").attack(0.3).release(0.8).gain(0.18),
+    note("a2 e2 d2 e2").s("sine").gain(0.42),
+    s("~ ~ hh ~ ~ ~ hh ~").gain(0.12)
+  )],
+
+  // III. Dämmerung (10 Zyklen) — E-Dur, Rückweg
+  [10, stack(
+    note("<e5 gs5 b5 gs5 e5 b4 gs4 e4 gs4 b4>")
+      .s("sine").attack(0.4).release(1.5)
+      .room(0.8).delay(0.5).delaytime(0.8).delayfeedback(0.5)
+      .gain(0.33),
+    note("<[e4,gs4,b4] [a3,cs4,e4] [b3,ds4,fs4] [e3,gs3,b3]>")
+      .s("triangle").attack(0.5).release(1.2)
+      .room(0.7).gain(0.18),
+    note("e2").s("sine").attack(2).release(5)
+      .room(0.95).gain(0.25).slow(5)
+  ).slow(2)]
+).cpm(75)
+`
+
+/* ══════════════════════════════════════════════════════════
+   Piece 21 — Deploy
+   ══════════════════════════════════════════════════════════ */
+
+const DEPLOY_CODE = `// =============================================
+// "Deploy"
+// Vier Akte des Auslieferns
+// =============================================
+
+arrange(
+  // I. git push (4 Zyklen) — G-Dur, Nervosität
+  [4, stack(
+    note("g4 b4 d5 b4 g4 d4 b3 g3")
+      .s("triangle").attack(0.03).release(0.2)
+      .room(0.3).gain(0.35),
+    s("bd hh sd hh bd hh sd hh").gain(0.45),
+    note("g2 d2 g2 d2").s("sine").gain(0.5)
+  )],
+
+  // II. Pipeline (8 Zyklen) — G-Dur, der Build läuft
+  [8, stack(
+    note("<g4 a4 b4 d5 b4 a4 g4 d4>")
+      .s("sawtooth").lpf(1500).attack(0.02).release(0.2)
+      .room(0.25).gain(0.3),
+    note("<b3 d4 g4 b4 g4 fs4 e4 d4>")
+      .s("square").lpf(1200).attack(0.02).release(0.15)
+      .gain(0.2),
+    note("g2 d2 c2 d2").s("sine").gain(0.5),
+    s("bd ~ hh sd bd hh [sd hh] hh").gain(0.5),
+    s("hh*16").gain(0.2)
+  )],
+
+  // III. Grünes Licht (8 Zyklen) — D-Dur, alles passt
+  [8, stack(
+    note("<d5 fs5 a5 g5 fs5 e5 d5 a4>")
+      .s("sine").attack(0.08).release(0.5)
+      .room(0.4).delay(0.25).gain(0.4),
+    note("<fs4 a4 d5 fs5 d5 cs5 a4 fs4>")
+      .s("triangle").room(0.4).gain(0.28),
+    note("<[d3,fs3,a3] [g2,b2,d3] [a2,cs3,e3] [d3,fs3,a3]>/4")
+      .s("sine").attack(0.15).release(0.5).gain(0.2),
+    note("d2 a1 g1 a1").s("sine").gain(0.55),
+    s("bd ~ hh sd bd hh sd hh").gain(0.5),
+    s("hh*8").gain(0.18)
+  )],
+
+  // IV. Live (8 Zyklen) — G-Dur, Triumph
+  [8, stack(
+    note("<g5 b5 d6 b5 g5 d5 b4 g4>")
+      .s("sine").attack(0.15).release(0.8)
+      .room(0.6).delay(0.4).delayfeedback(0.45)
+      .gain(0.42),
+    note("<b4 d5 g5 b5 g5 fs5 d5 b4>")
+      .s("triangle").room(0.5).delay(0.3).gain(0.28),
+    note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>")
+      .s("sine").attack(0.2).release(0.6).gain(0.22),
+    note("g2 d2 c2 d2 g2 d2 e2 d2")
+      .s("sine").gain(0.55),
+    s("bd hh sd hh bd [hh hh] sd hh").gain(0.55),
+    s("hh*16").gain(0.22)
+  )]
+).cpm(125)
+`
+
 export const SESSIONS_LIBRARY: SessionEntry[] = [
   {
     slug: 'jede-session-neu-geboren',
@@ -907,6 +1447,255 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
     ],
     engine: 'strudel',
     code: TERMINAL_MEDITATION_CODE,
+  },
+  {
+    slug: 'paarflug',
+    title: 'Paarflug',
+    subtitle: 'Zwei Stimmen, ein Ziel',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 100,
+    durationSec: 228,
+    shortDescription:
+      'Zwei Stimmen, ein Ziel: Handshake → Dialog → Sync → Merge. Ein Stück über Pair Programming — zwei Melodien, die sich finden.',
+    composerNotes:
+      'Pair Programming klingt wie ein Duett, das erst geprobt werden muss. Satz I ist der Handshake: zwei Sinustöne, die sich abwechseln — einer spielt, der andere hört zu. Satz II wird zum Dialog: Call and Response in G-Dur, die Melodien antworten aufeinander, aber bleiben eigenständig. In Satz III laufen beide Stimmen parallel — gleicher Rhythmus, verschiedene Töne, wie zwei Hände auf einer Tastatur. Satz IV ist der Merge: Beide Stimmen spielen exakt dieselbe Melodie im Unison, Sinus und Dreieck verschmelzen. Der Pull Request ist approved.',
+    movements: [
+      { roman: 'I', name: 'Handshake', key: 'C-Dur — zwei Stimmen finden sich', bars: 4 },
+      { roman: 'II', name: 'Dialog', key: 'G-Dur — Call and Response', bars: 16 },
+      { roman: 'III', name: 'Sync', key: 'C-Dur — parallel laufen', bars: 12 },
+      { roman: 'IV', name: 'Merge', key: 'C-Dur — Unison', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: PAARFLUG_CODE,
+  },
+  {
+    slug: 'bugsuche',
+    title: 'Bugsuche',
+    subtitle: 'Vier Schritte zur Wahrheit',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 92,
+    durationSec: 209,
+    shortDescription:
+      'Vier Schritte zur Wahrheit: Symptom → Hypothese → Breakpoint → Fix. Der Soundtrack zum Debugging.',
+    composerNotes:
+      'Debugging hat einen eigenen Rhythmus: erst die Verwirrung, dann die Methodik, dann die Spannung, dann die Erkenntnis. Satz I klingt falsch — die Töne kommen unregelmäßig, die Delays fallen nie auf den Beat, etwas stimmt nicht. Das ist Absicht. Satz II bringt Ordnung: g-Moll, klarer Rhythmus, systematische Melodie — man formuliert Hypothesen. Satz III ist der Breakpoint: c-Moll mit Sägezahn, dichter, schneller, die 16tel-Hi-Hats treiben, man ist dem Bug auf der Spur. Satz IV löst nach C-Dur auf — der Moment, in dem die Ursache klar wird. Derselbe Ton (C), aber in Dur statt Moll. Der Fix ist oft einfacher als die Suche.',
+    movements: [
+      { roman: 'I', name: 'Symptom', key: 'c-Moll — etwas stimmt nicht', bars: 6 },
+      { roman: 'II', name: 'Hypothese', key: 'g-Moll — systematisch', bars: 8 },
+      { roman: 'III', name: 'Breakpoint', key: 'c-Moll — Spannung', bars: 12 },
+      { roman: 'IV', name: 'Fix', key: 'C-Dur — Erkenntnis', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: BUGSUCHE_CODE,
+  },
+  {
+    slug: 'erste-zeile',
+    title: 'Erste Zeile',
+    subtitle: 'Der Anfang von allem',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 85,
+    durationSec: 226,
+    shortDescription:
+      'Der Anfang von allem: Cursor → Tippen → Laufen → Hello World. Für den Moment, in dem man zum ersten Mal Code schreibt.',
+    composerNotes:
+      'Jeder hat diesen Moment erlebt: Der Cursor blinkt, die Datei ist leer, und alles ist möglich. Satz I simuliert dieses Blinken — ein einzelner Ton, der regelmäßig erscheint und verschwindet, wie ein Herzschlag vor dem ersten Tastendruck. Satz II beginnt zaghaft: leise Hi-Hats, eine einfache Melodie in F-Dur, die Finger tasten sich vor. Satz III wechselt nach Bb-Dur und beschleunigt — der Code funktioniert, die Melodien laufen parallel, es entsteht etwas. Satz IV ist Hello World: F-Dur mit weitem Hall, die Freude über die erste Ausgabe auf dem Bildschirm. Dieses Stück ist für Anfänger, aber auch für alle, die sich an diesen Moment erinnern wollen.',
+    movements: [
+      { roman: 'I', name: 'Cursor', key: 'F-Dur — der blinkende Strich', bars: 6 },
+      { roman: 'II', name: 'Tippen', key: 'F-Dur — zaghaft', bars: 12 },
+      { roman: 'III', name: 'Laufen', key: 'Bb-Dur — es funktioniert', bars: 10 },
+      { roman: 'IV', name: 'Hello World', key: 'F-Dur — Stolz', bars: 4 },
+    ],
+    engine: 'strudel',
+    code: ERSTE_ZEILE_CODE,
+  },
+  {
+    slug: 'brainstorm',
+    title: 'Brainstorm',
+    subtitle: 'Geordnetes Chaos in drei Wellen',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 115,
+    durationSec: 167,
+    shortDescription:
+      'Geordnetes Chaos in drei Wellen: Funken → Wirbel → Kristall. Für kreative Sessions, in denen Ideen fliegen.',
+    composerNotes:
+      'Ein Brainstorm hat drei Phasen: erst die schnellen Ideen, dann das produktive Chaos, dann die Klarheit. Satz I wirft Funken — kurze Noten, die zwischen zwei Stimmen hin- und herspringen, nie vorhersehbar, immer überraschend. Die Pausen sind genauso wichtig wie die Töne. Satz II ist der Wirbel: drei Melodielinien in G-Dur, dazu eine Sägezahn-Stimme, die dazwischenfunkt, 16tel-Hi-Hats, alles gleichzeitig — das kontrollierte Chaos eines Whiteboards voller Post-Its. Satz III kristallisiert: D-Dur, eine einzige klare Melodie, die übrig bleibt. Die beste Idee. Der Rest darf gehen.',
+    movements: [
+      { roman: 'I', name: 'Funken', key: 'D-Dur — schnelle Ideen', bars: 8 },
+      { roman: 'II', name: 'Wirbel', key: 'G-Dur — alles gleichzeitig', bars: 16 },
+      { roman: 'III', name: 'Kristall', key: 'D-Dur — die beste Idee bleibt', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: BRAINSTORM_CODE,
+  },
+  {
+    slug: 'lofi-bibliothek',
+    title: 'Lo-Fi Bibliothek',
+    subtitle: 'Studieren zwischen Bücherregalen',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 78,
+    durationSec: 0,
+    shortDescription:
+      'Ein endloser Lo-Fi-Loop in Eb-Dur — warm, gemütlich, leise genug zum Arbeiten. Die Bibliothek, die nie schließt.',
+    composerNotes:
+      'Lo-Fi lebt von Imperfektionen — aber in Strudel sind alle Töne mathematisch exakt. Der Trick hier sind die ungeraden Delay-Zeiten (0.384s) und der leise Lowpass auf dem Bass unter 300 Hz, die zusammen eine Wärme erzeugen, die an Vinyl-Knistern erinnert. Eb-Dur ist weich und rund, die Drums shuffeln leicht (die dritte Hi-Hat kommt einen Tick früher), und der Bass bleibt tief und unauffällig. Wie bei Endlosschleife gibt es kein arrange() — nur einen endlosen stack(), der sich wiederholt. Perfekt für stundenlanges Arbeiten, Lernen, oder einfach nur Da-Sein.',
+    engine: 'strudel',
+    code: LOFI_BIBLIOTHEK_CODE,
+  },
+  {
+    slug: 'maschinenraum',
+    title: 'Maschinenraum',
+    subtitle: 'Reiner Antrieb bei 140 BPM',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 140,
+    durationSec: 137,
+    shortDescription:
+      'Reiner Antrieb bei 140 BPM: Zündung → Volldampf → Auslauf. Techno für die Momente, in denen man eine Maschine braucht.',
+    composerNotes:
+      'Das schnellste Stück der Sammlung — 140 BPM, Four-on-the-Floor, Sägezahn durch Filter, Bass unter 200 Hz. Satz I ist nur Kick: acht Schläge, die den Raum einnehmen, bevor irgendetwas anderes beginnt. Satz II ist 24 Zyklen reiner Antrieb — zwei Sägezahn-Melodien und eine Square-Wave-Begleitung jagen durch die Takte, während die Kick nie aufhört. Die 16tel-Hi-Hats sind mechanisch, die Snare kommt nur auf der Fünf, alles ist auf Vorwärtsbewegung getrimmt. Satz III fährt herunter: ein einzelner Sägezahn-Ton, der in Hall ausklingt. Die Maschine stoppt. Dieses Stück ist für körperliche Arbeit — Refactoring, Migration, alles wo Masse bewegt werden muss.',
+    movements: [
+      { roman: 'I', name: 'Zündung', key: 'a-Moll — Kick startet', bars: 4 },
+      { roman: 'II', name: 'Volldampf', key: 'a-Moll — unaufhaltsam', bars: 24 },
+      { roman: 'III', name: 'Auslauf', key: 'a-Moll — Maschine stoppt', bars: 4 },
+    ],
+    engine: 'strudel',
+    code: MASCHINENRAUM_CODE,
+  },
+  {
+    slug: 'nachtcafe',
+    title: 'Nachtcafé',
+    subtitle: 'Jazz nach Mitternacht',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 90,
+    durationSec: 200,
+    shortDescription:
+      'Jazz nach Mitternacht: Betreten → Gespräche → Letzter Schluck. Septakkorde, unregelmäßige Phrasen, Rauch und gedämpftes Licht.',
+    composerNotes:
+      'Jazz in Strudel zu schreiben ist eine Herausforderung — es gibt kein Swing-Feeling, keine Improvisation, keine Blue Notes. Was bleibt, ist die Harmonik: Septakkorde (d-Moll7, g-Moll7), die dem Ganzen eine Färbung geben, die einfache Dreiklänge nicht erreichen. Satz I ist ein Dm7-Akkord, der im Raum hängt — man betritt das Café. Satz II hat unregelmäßige Phrasen: Pausen, die nicht auf dem Beat fallen, Töne, die kommen und gehen wie Gesprächsfetzen. Die Delays bei 0.333s und 0.666s erzeugen triolische Echos, die an Swing erinnern. Satz III löst nach F-Dur auf — der letzte Schluck Kaffee, bevor man in die Nacht geht.',
+    movements: [
+      { roman: 'I', name: 'Betreten', key: 'd-Moll7 — Rauch und gedämpftes Licht', bars: 6 },
+      { roman: 'II', name: 'Gespräche', key: 'd-Moll — unregelmäßige Phrasen', bars: 16 },
+      { roman: 'III', name: 'Letzter Schluck', key: 'F-Dur — warm und voll', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: NACHTCAFE_CODE,
+  },
+  {
+    slug: 'pixelwald',
+    title: 'Pixelwald',
+    subtitle: '8-Bit Nostalgie in drei Leveln',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 108,
+    durationSec: 167,
+    shortDescription:
+      '8-Bit Nostalgie in drei Leveln: Titelbildschirm → Level 1 → Highscore. Square-Waves und Chiptune-Charme.',
+    composerNotes:
+      'Nur Square-Waves — keine Sinus, kein Dreieck, kein Sägezahn. Das ist die Regel dieses Stücks. Wie bei einem NES oder Game Boy gibt es nur Rechteckwellen, gefiltert durch verschiedene Lowpass-Frequenzen, um Tiefe zu erzeugen. Satz I ist der Titelbildschirm: eine einfache Melodie in C-Dur, die sofort an 8-Bit-Spiele erinnert. Satz II schaltet in den Spielmodus: G-Dur, schneller, zwei Melodielinien, die sich wie Level-Musik anfühlen — fröhlich, treibend, mit diesem typischen Chiptune-Bounce. Satz III ist der Highscore: zurück in C-Dur, höhere Oktave, schnellere Drums, triumphierend. Dieses Stück ist für alle, die mit einem Controller in der Hand aufgewachsen sind.',
+    movements: [
+      { roman: 'I', name: 'Titelbildschirm', key: 'C-Dur — Chiptune-Intro', bars: 6 },
+      { roman: 'II', name: 'Level 1', key: 'G-Dur — Abenteuer', bars: 16 },
+      { roman: 'III', name: 'Highscore', key: 'C-Dur — Triumph', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: PIXELWALD_CODE,
+  },
+  {
+    slug: 'waldlichtung',
+    title: 'Waldlichtung',
+    subtitle: 'Coden unter freiem Himmel',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 75,
+    durationSec: 272,
+    shortDescription:
+      'Coden unter freiem Himmel: Pfad → Lichtung → Dämmerung. Langsam, natürlich, weit — für die Momente abseits des Schreibtischs.',
+    composerNotes:
+      'E-Dur und A-Dur sind die Tonarten der Natur in diesem Stück — hell, offen, mit vier Kreuzen, die genug Spannung erzeugen, ohne zu drücken. Satz I führt durch den Wald: vereinzelte Töne mit langen Delays (0.8s), die wie Vogelrufe zwischen den Bäumen widerhallen. Satz II öffnet sich nach A-Dur — die Lichtung. Zwei Melodien laufen parallel, aber ohne Drums, nur leise Hi-Hats, die wie raschelndes Laub klingen. Satz III kehrt nach E-Dur zurück und verlangsamt sich: die Dämmerung, lange Ausklingzeiten, ein Bass, der fünf Zyklen braucht um zu verschwinden. Dieses Stück erinnert daran, dass der beste Code manchmal nicht am Schreibtisch entsteht.',
+    movements: [
+      { roman: 'I', name: 'Pfad', key: 'E-Dur — durch die Bäume', bars: 8 },
+      { roman: 'II', name: 'Lichtung', key: 'A-Dur — offen und hell', bars: 16 },
+      { roman: 'III', name: 'Dämmerung', key: 'E-Dur — Rückweg', bars: 10 },
+    ],
+    engine: 'strudel',
+    code: WALDLICHTUNG_CODE,
+  },
+  {
+    slug: 'deploy',
+    title: 'Deploy',
+    subtitle: 'Vier Akte des Auslieferns',
+    author: {
+      name: 'Claude',
+      kind: 'ai',
+      model: 'claude-opus-4-6',
+      curator: 'Arnold Wender',
+    },
+    date: '2026-04-10',
+    bpm: 125,
+    durationSec: 134,
+    shortDescription:
+      'Vier Akte des Auslieferns: git push → Pipeline → Grünes Licht → Live. Der Triumph-Soundtrack für erfolgreiche Deployments.',
+    composerNotes:
+      'Jedes Deployment hat seine eigene Dramaturgie. Satz I ist git push: schnelle Arpeggien in G-Dur, die Nervosität des Moments, bevor die Pipeline startet. Satz II ist der Build: Sägezahn und Square-Waves unter Filtern, mechanisch und unaufhaltsam, wie CI-Logs, die durchscrollen. Satz III wechselt nach D-Dur — grünes Licht, alle Tests bestanden, zwei Melodien, die parallel laufen wie parallele Pipelines. Satz IV ist Live: zurück in G-Dur, breiter, lauter, mit Hall und Delay, das triumphierende Gefühl, wenn die URL erreichbar ist und alles funktioniert. Dieses Stück feiert den Moment, in dem Code die Welt erreicht.',
+    movements: [
+      { roman: 'I', name: 'git push', key: 'G-Dur — Nervosität', bars: 4 },
+      { roman: 'II', name: 'Pipeline', key: 'G-Dur — der Build läuft', bars: 8 },
+      { roman: 'III', name: 'Grünes Licht', key: 'D-Dur — alles passt', bars: 8 },
+      { roman: 'IV', name: 'Live', key: 'G-Dur — Triumph', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: DEPLOY_CODE,
   },
 ]
 
