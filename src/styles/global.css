@@ -62,6 +62,74 @@ pre,
   background: var(--color-text-muted);
 }
 
+/* --- Strudel slider() widget inside CodeMirror --- */
+/* The @strudel/codemirror sliderPlugin renders <input type="range">
+   inline in the editor. These styles make it visible on dark backgrounds
+   and match the purple accent theme. */
+.cm-editor input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 64px;
+  height: 14px;
+  margin: 0 4px;
+  background: transparent;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* Track */
+.cm-editor input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+  border: none;
+}
+
+.cm-editor input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+  border: none;
+}
+
+/* Thumb */
+.cm-editor input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  border: 2px solid var(--color-bg);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.5);
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+
+.cm-editor input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  border: 2px solid var(--color-bg);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.5);
+}
+
+.cm-editor input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+}
+
+.cm-editor input[type="range"]:active::-webkit-slider-thumb {
+  background: var(--color-primary-light, #c084fc);
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.9);
+}
+
+/* Strudel inline block widgets (._pianoroll, ._scope, etc.) */
+.cm-editor .cm-widgetBuffer + .cm-line {
+  margin-top: 2px;
+}
+
 /* --- Playing indicator animation for StrudelEditor --- */
 @keyframes playing-indicator {
   0% { background-position: 0% 50%; }
