@@ -98,6 +98,13 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       if (!isNoteOn && !isNoteOff) return;
       if (isNoteOff) return;
 
+      /* Throttle: skip if same note fired within 50ms (joystick/aftertouch spam) */
+      const now_ms = Date.now();
+      const lastKey = `${deviceKey}_${note}_last`;
+      const lastTime = (globalThis as any)[lastKey] ?? 0;
+      if (now_ms - lastTime < 50) return;
+      (globalThis as any)[lastKey] = now_ms;
+
       /* Composition mode: write notes to editor instead of playing sound */
       if (isComposeModeActive()) {
         composeNoteOn(note, velocity);
