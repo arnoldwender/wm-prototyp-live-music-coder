@@ -151,6 +151,9 @@ function StatusBar() {
         style={{ flex: '0 0 auto', minWidth: 0, gap: '8px' }}
       >
         <XpBar />
+        {/* What's New link — discoverability for new features */}
+        <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '10px', fontWeight: 'var(--font-weight-medium)' }}>What's New</Link>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>|</span>
         {/* Legal links — TMG requires Impressum reachable from every page */}
         <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '10px' }}>Impressum</Link>
         <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>|</span>
