@@ -93,21 +93,27 @@ function Landing() {
         <HeroSection />
       </section>
 
-      <SectionDivider />
+      {/* In Electron: show ONLY hero + footer (slim splash screen).
+          On the web: show full marketing page with features, examples, download. */}
+      {!isElectron && (
+        <>
+          <SectionDivider />
 
-      {/* Feature highlights grid with Lucide icons */}
-      <section id="features">
-        <FeatureGrid />
-      </section>
+          {/* Feature highlights grid with Lucide icons */}
+          <section id="features">
+            <FeatureGrid />
+          </section>
 
-      <SectionDivider />
+          <SectionDivider />
 
-      {/* Pre-built example demos */}
-      <section id="examples">
-        <ExampleGallery />
-      </section>
+          {/* Pre-built example demos */}
+          <section id="examples">
+            <ExampleGallery />
+          </section>
 
-      <SectionDivider />
+          <SectionDivider />
+        </>
+      )}
 
       {/* Desktop app download section — web only.
           Hidden inside the packaged Electron app because the user is
