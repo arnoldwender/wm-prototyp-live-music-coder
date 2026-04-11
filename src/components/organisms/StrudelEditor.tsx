@@ -132,16 +132,41 @@ export function StrudelEditor() {
           const draw = await import('@strudel/draw');
           const strudelCMod = strudelExtRef.current;
           if (strudelCMod?.registerWidget && draw) {
-            /* Register each inline visualizer as a CM6 block widget.
-             * registerWidget(type, fn) adds Pattern.prototype._type AND
-             * tells the transpiler to detect ._type() calls in code. */
-            const widgetTypes = ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum'];
-            for (const type of widgetTypes) {
+            /* Register inline widget methods with their draw functions.
+             * registerWidget(type, fn) does TWO things:
+             * 1. Tells the transpiler to detect ._type() calls
+             * 2. Adds Pattern.prototype._type = fn (with underscore!)
+             * We pass the __pianoroll etc. functions from @strudel/draw. */
+            const drawFns: Record<string, unknown> = {
+              pianoroll: (draw as any).__pianoroll ?? (draw as any).drawPianoroll,
+              punchcard: (draw as any).getPunchcardPainter,
+              pitchwheel: (draw as any).pitchwheel,
+            };
+            for (const [type, fn] of Object.entries(drawFns)) {
               try {
-                strudelCMod.registerWidget(type);
-              } catch { /* already registered or not available */ }
+                if (fn) strudelCMod.registerWidget(type, fn);
+                else strudelCMod.registerWidget(type);
+              } catch { /* already registered */ }
             }
-            console.log('[StrudelEditor] Inline widget methods registered (_pianoroll, _scope, etc.)');
+            /* Also register types without draw functions (transpiler-only) */
+            for (const type of ['scope', 'spiral', 'spectrum']) {
+              try { strudelCMod.registerWidget(type); } catch {}
+            }
+
+            /* Fallback: if _pianoroll still not on Pattern.prototype,
+             * alias from the non-underscore version that @strudel/draw adds */
+            try {
+              const { Pattern } = await import('@strudel/core');
+              const proto = Pattern.prototype as any;
+              for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
+                if (proto[method] && !proto[`_${method}`]) {
+                  proto[`_${method}`] = proto[method];
+                }
+              }
+              console.log('[StrudelEditor] Inline widget methods registered + aliased');
+            } catch {
+              console.log('[StrudelEditor] Widget types registered (transpiler only)');
+            }
           }
 
           /* Expose sliderWithID and slider globally — the transpiler rewrites
