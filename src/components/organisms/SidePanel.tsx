@@ -596,11 +596,23 @@ oscs.forEach((o, i) => {
 
 /* Engine-specific API references */
 const STRUDEL_REFERENCE = [
-  { title: 'Sounds', items: [
+  { title: 'Sounds & Synths', items: [
     { fn: 's("name")', desc: 'Select sound/sample' },
     { fn: 'note("c3 e3 g3")', desc: 'Play pitched notes' },
-    { fn: 'sound("bd sd")', desc: 'Alias for s()' },
+    { fn: '.s("sine")', desc: 'Sine wave — pure, clean' },
+    { fn: '.s("sawtooth")', desc: 'Sawtooth — rich harmonics, buzzy' },
+    { fn: '.s("square")', desc: 'Square — hollow, retro, 8-bit' },
+    { fn: '.s("triangle")', desc: 'Triangle — soft, muted' },
+    { fn: '.s("superpiano")', desc: 'Piano sample sound' },
     { fn: 'samples("url")', desc: 'Load sample pack' },
+  ]},
+  { title: 'Envelope & Filter', items: [
+    { fn: '.attack(0.1)', desc: 'Attack time (seconds)' },
+    { fn: '.release(0.5)', desc: 'Release time (seconds)' },
+    { fn: '.lpf(800)', desc: 'Low-pass filter Hz' },
+    { fn: '.hpf(200)', desc: 'High-pass filter Hz' },
+    { fn: '.lpenv(4)', desc: 'Filter envelope depth' },
+    { fn: '.resonance(10)', desc: 'Filter resonance (Q)' },
   ]},
   { title: 'Pattern', items: [
     { fn: 'stack(a, b)', desc: 'Layer patterns' },
@@ -644,10 +656,12 @@ const STRUDEL_REFERENCE = [
     { fn: '.pianoroll()', desc: 'Background piano roll' },
     { fn: '.scope()', desc: 'Background oscilloscope' },
   ]},
-  { title: 'Input Devices', items: [
-    { fn: 'gamepad(0)', desc: 'Gamepad analog values' },
-    { fn: 'midin("Device")', desc: 'MIDI input from controller' },
-    { fn: '.midi()', desc: 'MIDI output to device' },
+  { title: 'MIDI', items: [
+    { fn: '$: midin("*").s("sine")', desc: 'Play MIDI keyboard with sine' },
+    { fn: '$: midin("MPK mini 3")', desc: 'MIDI input from specific device' },
+    { fn: 'ccv(1).range(0, 1)', desc: 'Read MIDI CC knob value' },
+    { fn: '.midi()', desc: 'Send MIDI output to device' },
+    { fn: 'gamepad(0)', desc: 'Gamepad analog stick values' },
   ]},
   { title: 'Mini-Notation', items: [
     { fn: '"a b c d"', desc: 'Sequence events' },
