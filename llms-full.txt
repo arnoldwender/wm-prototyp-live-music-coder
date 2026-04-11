@@ -10,11 +10,15 @@ Live Music Coder is a browser-based and Electron desktop live coding music IDE. 
 
 ## Metrics
 
-- Test files: 16
-- Tests: 82
-- Components: 46+ (13 atoms, 14 molecules, 19 organisms)
-- Routes: 9
-- Pages: 8 (Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Legal)
+- Test files: 20
+- Tests: 120
+- Components: 55 (13 atoms, 16 molecules, 26 organisms)
+- Routes: 12
+- Pages: 11 (Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal)
+- Examples: 200+
+- Sessions: 43
+- MIDI device profiles: 19
+- Blog posts: 7
 - Languages: 3 (DE, EN, ES)
 
 ## Architecture
@@ -34,19 +38,25 @@ One shared AudioContext. Each engine adapter implements a common EngineAdapter i
 | Strudel   | @strudel/core      | Pattern-based live coding  |
 | Tone.js   | tone               | High-level synths, effects |
 | Web Audio | Native API         | Low-level audio nodes      |
-| MIDI      | @strudel/midi + custom | Keyboard input (midikeys), CC knobs (midin), output |
+| MIDI      | @strudel/midi + custom | Keyboard input (midikeys), CC knobs (midin), compose mode (play-to-code), MIDI learn (CC mapping), 19 device profiles, output |
 
 ### Atomic Design Hierarchy
 
 - Atoms (13): ActivityBarButton, Badge, Button, CanvasVisualizer, EngineNode, ErrorBoundary, Icon, Logo, NotFound, TabButton, Toggle, Tooltip, WaveformBackground
-- Molecules (14): AchievementToast, EngineSelector, ErrorBar, FeatureCard, FileTabs, FilterPill, HelpPanel, LanguageSwitcher, NowPlayingIndicator, ShareDialog, SortSelect, ToolbarGroup, VisualizerPills, VisualizerToggle
-- Organisms (20): ActivityBar, CodeEditor, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, NodeGraph, PatternTimeline, PianorollVisualizer, SidePanel, SiteNav, SpectrumVisualizer, StatusBar, StrudelEditor, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
+- Molecules (16): AchievementToast, EngineSelector, ErrorBar, FeatureCard, FileTabs, FilterPill, HelpPanel, LanguageSwitcher, MarkdownRenderer, NowPlayingIndicator, SampleDropZone, ShareDialog, SortSelect, ToolbarGroup, VisualizerPills, VisualizerToggle
+- Organisms (26): ActivityBar, CodeEditor, ConsolePanel, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, MidiPanel, NodeGraph, PatternTimeline, PianorollVisualizer, PitchwheelVisualizer, PunchcardVisualizer, SettingsPanel, SidePanel, SiteNav, SpectrumVisualizer, SpiralVisualizer, StatusBar, StrudelEditor, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
 
 Hierarchy rules: atoms import nothing, molecules import only atoms, organisms import molecules and atoms, layouts compose organisms, pages use layouts.
 
 ### MIDI Keyboard Input
 
 Custom `midikeys()` implementation in `src/lib/midi/strudel-keys.ts` bypasses @strudel/midi's broken `getIsStarted()` check (caused by Vite's double @strudel/core module instance). Uses raw Web MIDI API + own AudioContext + OscillatorNode for zero-dependency sound. `midin()` for CC knobs delegates to @strudel/midi (CC reading doesn't have the isStarted bug). MIDI quick-action menu in the editor toolbar auto-loads test code when a controller is connected.
+
+**Compose Mode** (`src/lib/midi/compose-mode.ts`): Play notes on a connected MIDI keyboard and have them convert to Strudel mini-notation in real time inside the editor. Supports quantization and auto-insert.
+
+**MIDI Learn** (`src/lib/midi/midi-learn.ts`): Map any MIDI CC knob or fader to app parameters with a visual learn workflow. Connect hardware to software controls without editing code.
+
+**19 Device Profiles** (`src/data/midi-devices.ts`): Factory CC mappings for MPK mini, Launchkey, Arturia KeyStep/MiniLab, Novation, Korg nanoKONTROL/minilogue, M-Audio, and more. Auto-detected by device name on connection.
 
 **CRITICAL**: Never use `input.onmidimessage =` — use `addEventListener('midimessage', ...)`. The exclusive `onmidimessage` property steals events from @strudel/midi's webmidi library.
 
@@ -150,7 +160,7 @@ electron.vite.config.ts defines three build targets:
 - vite, vitest
 - wait-on
 
-## Routes (9)
+## Routes (12)
 
 | Route             | Page          | Description                                |
 |-------------------|---------------|--------------------------------------------|
@@ -162,6 +172,9 @@ electron.vite.config.ts defines three build targets:
 | /examples         | Examples      | Curated code examples per engine           |
 | /sessions         | Sessions      | Curated AI-composed pieces — listing       |
 | /sessions/:slug   | SessionPiece  | Individual piece (code, movements, notes)  |
+| /changelog        | Changelog     | Project changelog                          |
+| /blog             | Blog          | Developer blog — listing                   |
+| /blog/:slug       | BlogPost      | Individual blog post                       |
 | /legal            | Legal         | Impressum, Datenschutz, Lizenzen           |
 
 ## License Structure
