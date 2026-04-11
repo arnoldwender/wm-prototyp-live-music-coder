@@ -88,9 +88,13 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Clock Sync** — Multi-tab synchronization via BroadcastChannel (leader election, BPM broadcast).
 
-**Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists.
+**MIDI Panel** — Connected device list, real-time CC activity monitor with value bars, usage hints. Accessible via USB icon in sidebar.
+
+**Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists, download code as .js file.
 
 **Console Panel** — In-editor log output with color-coded levels and timestamps.
+
+**Live Coding** — 150ms debounce in live mode for near-instant feedback. Clear button with confirmation dialog.
 
 **Internationalization** — Full DE / EN / ES support.
 
