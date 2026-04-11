@@ -27,7 +27,7 @@ export async function initMidiInput(): Promise<boolean> {
   }
 
   try {
-    midiAccess = await navigator.requestMIDIAccess();
+    midiAccess = await navigator.requestMIDIAccess({ sysex: false });
     initialized = true;
 
     /* Listen on all current inputs */

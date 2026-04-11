@@ -467,11 +467,27 @@ export function StrudelEditor() {
     }
   }, [isPlaying, togglePlay]);
 
+  /* Double-click to clear: first click arms, second click within 2s clears */
+  const clearArmedRef = useRef(false);
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleClear = useCallback(() => {
     const view = viewRef.current;
     if (!view) return;
     const code = view.state.doc.toString();
-    if (code.trim() && !window.confirm('Clear all code? This cannot be undone.')) return;
+    if (!code.trim()) return;
+
+    if (!clearArmedRef.current) {
+      /* First click: arm the clear */
+      clearArmedRef.current = true;
+      if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+      clearTimerRef.current = setTimeout(() => { clearArmedRef.current = false; }, 2000);
+      return;
+    }
+
+    /* Second click: actually clear */
+    clearArmedRef.current = false;
+    if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: '' } });
     if (activeFile) updateFileCode(activeFile.id, '');
   }, [activeFile, updateFileCode]);
@@ -509,9 +525,9 @@ export function StrudelEditor() {
             <Download size={12} />
           </Button>
         </Tooltip>
-        <Tooltip content="Clear all code (will ask to confirm)">
+        <Tooltip content={clearArmedRef.current ? 'Click again to clear' : 'Clear code (click twice)'}>
           <Button variant="ghost" onClick={handleClear} className="!py-0.5 !px-2 text-xs">
-            <RotateCcw size={12} />
+            <RotateCcw size={12} style={clearArmedRef.current ? { color: 'var(--color-error)' } : undefined} />
           </Button>
         </Tooltip>
         {/* Live mode toggle */}
