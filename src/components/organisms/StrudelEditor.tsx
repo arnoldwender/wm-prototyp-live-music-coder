@@ -16,7 +16,7 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown, PenLine } from 'lucide-react';
+import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown, PenLine, Volume2 } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
@@ -731,6 +731,33 @@ export function StrudelEditor() {
                   <PenLine size={11} />
                   {composeMode ? 'Compose Mode ON' : 'Compose Mode — Write Notes'}
                 </button>
+
+                {/* Divider before Sound Browser */}
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-1) 0' }} />
+
+                {/* Sound Browser — audition Strudel sounds via MIDI keyboard */}
+                <div
+                  className="px-3 py-1"
+                  style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  <Volume2 size={10} />
+                  Sound Browser
+                </div>
+                <div className="grid grid-cols-2 gap-0.5 px-1 pb-1">
+                  {(['sine', 'sawtooth', 'square', 'triangle', 'superpiano', 'supersaw', 'metal', 'piano'] as const).map((sound) => (
+                    <button
+                      type="button"
+                      key={sound}
+                      className="text-left px-2 py-1 text-xs rounded hover:opacity-80 cursor-pointer truncate"
+                      style={{ color: 'var(--color-text)', backgroundColor: 'transparent' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      onClick={() => loadMidiCode(`const kb = await midikeys(0)\n$: kb().s("${sound}").room(0.3)`)}
+                    >
+                      {sound}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
