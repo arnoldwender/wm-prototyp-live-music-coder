@@ -3,13 +3,14 @@
    ──────────────────────────────────────────────────────────
    Legal page — Impressum + Datenschutz with tab navigation */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../components/atoms';
 import { LanguageSwitcher } from '../components/molecules';
 import { IMPRESSUM_HTML, DATENSCHUTZ_HTML } from '../data/legal';
 import { usePageMeta } from '../lib/usePageMeta';
+import { useScrollablePage } from '../lib/useScrollablePage';
 
 function Legal() {
   const { t } = useTranslation();
@@ -25,18 +26,30 @@ function Legal() {
     path: '/legal',
   });
 
-  /* Override body overflow for scrolling */
-  useEffect(() => {
-    document.body.style.overflow = 'auto';
-    document.body.style.height = 'auto';
-    return () => {
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100vh';
-    };
-  }, []);
+  /* Override body overflow for scrolling (shared hook) */
+  useScrollablePage();
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      {/* --- Skip-to-content for a11y --- */}
+      <a
+        href="#legal-content"
+        className="sr-only focus:not-sr-only"
+        style={{
+          position: 'absolute',
+          top: 'var(--space-2)',
+          left: 'var(--space-2)',
+          zIndex: 100,
+          padding: 'var(--space-2) var(--space-4)',
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {t('a11y.skipToContent')}
+      </a>
+
       {/* Header */}
       <nav
         aria-label="Legal page navigation"
@@ -98,8 +111,8 @@ function Legal() {
 
       {/* Content — ARIA tabpanel */}
       <article
+        id="legal-content"
         role="tabpanel"
-        id={`tabpanel-${tab}`}
         aria-labelledby={`tab-${tab}`}
         className="max-w-3xl mx-auto"
         style={{ padding: 'var(--space-8) var(--space-6)', lineHeight: 'var(--line-height-loose)' }}

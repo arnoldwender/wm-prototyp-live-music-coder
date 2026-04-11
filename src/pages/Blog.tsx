@@ -88,27 +88,56 @@ export default function Blog() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
-      <a href="#blog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-text)', borderRadius: 'var(--radius-sm)' }}>
-        Skip to blog posts
+      <a href="#blog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-text)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
+        {t('a11y.skipToContent')}
       </a>
 
       <SiteNav />
 
-      {/* Hero */}
-      <header className="text-center" style={{ padding: 'var(--space-8) var(--space-6) var(--space-4)' }}>
-        <p style={{ fontSize: 'var(--font-size-xs)', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
+      {/* Hero — matches Sessions golden page pattern */}
+      <section
+        style={{
+          maxWidth: '960px',
+          margin: '0 auto',
+          padding: 'var(--space-12) var(--space-6) var(--space-8)',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-primary)',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            margin: '0 0 var(--space-3)',
+          }}
+        >
           {t('blog.eyebrow')}
         </p>
-        <h1 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>
+        <h1
+          style={{
+            fontSize: 'var(--font-size-4xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            lineHeight: 'var(--line-height-tight)',
+            margin: '0 0 var(--space-4)',
+          }}
+        >
           {t('blog.title')}
         </h1>
-        <p style={{ fontSize: 'var(--font-size-base)', color: 'var(--color-text-muted)', maxWidth: '600px', margin: '0 auto' }}>
+        <p
+          style={{
+            fontSize: 'var(--font-size-lg)',
+            color: 'var(--color-text-secondary)',
+            maxWidth: '640px',
+            margin: 0,
+            fontStyle: 'italic',
+          }}
+        >
           {t('blog.subtitle')}
         </p>
-      </header>
+      </section>
 
       {/* Filters — sticky on scroll */}
-      <section aria-label={t('blog.filtersAriaLabel')} className="sticky-filters" style={{ maxWidth: '900px', margin: '0 auto', padding: 'var(--space-3) var(--space-6) 0' }}>
+      <section aria-label={t('blog.filtersAriaLabel')} className="sticky-filters" style={{ maxWidth: '960px', margin: '0 auto', padding: 'var(--space-3) var(--space-6) 0' }}>
         <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 'var(--space-3)' }}>
           <input
             type="search"
@@ -138,14 +167,14 @@ export default function Blog() {
       </section>
 
       {/* Results */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 var(--space-6)', marginBottom: 'var(--space-4)' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-6)', marginBottom: 'var(--space-4)' }}>
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
           {sorted.length} {t('blog.results')}
         </p>
       </div>
 
       {/* Post cards */}
-      <section id="blog-list" aria-label={t('blog.listAriaLabel')} style={{ maxWidth: '900px', margin: '0 auto', padding: '0 var(--space-6) var(--space-8)' }}>
+      <section id="blog-list" aria-label={t('blog.listAriaLabel')} style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-6) var(--space-8)' }}>
         {sorted.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-8) 0' }}>
             {t('blog.noResults')}
@@ -182,10 +211,10 @@ export default function Blog() {
                     </Badge>
                   ))}
                 </div>
-                <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+                <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-1)' }}>
                   {post.title}
                 </h2>
-                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', lineHeight: 'var(--line-height-base)' }}>
                   {post.summary}
                 </p>
               </Link>

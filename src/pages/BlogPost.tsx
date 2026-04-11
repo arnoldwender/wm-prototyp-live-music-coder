@@ -32,9 +32,28 @@ export default function BlogPost() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      {/* --- Skip-to-content for a11y --- */}
+      <a
+        href="#blog-post-content"
+        className="sr-only focus:not-sr-only"
+        style={{
+          position: 'absolute',
+          top: 'var(--space-2)',
+          left: 'var(--space-2)',
+          zIndex: 100,
+          padding: 'var(--space-2) var(--space-4)',
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-text)',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--font-size-sm)',
+        }}
+      >
+        {t('a11y.skipToContent')}
+      </a>
+
       <SiteNav />
 
-      <article style={{ maxWidth: '760px', margin: '0 auto', padding: 'var(--space-6)' }}>
+      <article id="blog-post-content" style={{ maxWidth: '760px', margin: '0 auto', padding: 'var(--space-6)' }}>
         {/* Back link */}
         <Link
           to="/blog"
@@ -59,7 +78,7 @@ export default function BlogPost() {
         </div>
 
         {/* Title */}
-        <h1 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 700, lineHeight: 1.2, marginBottom: 'var(--space-3)' }}>
+        <h1 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-bold)', lineHeight: 'var(--line-height-tight)', marginBottom: 'var(--space-3)' }}>
           {post.title}
         </h1>
 

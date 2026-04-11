@@ -6,12 +6,13 @@
    NowPlaying indicator, and "Try in Editor" links.
    ---------------------------------------------------------- */
 
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
 import { SiteNav } from '../components/organisms/SiteNav'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
 import type { SampleEntry } from '../data/sample-library'
 import { ENGINE_COLORS } from '../lib/constants'
@@ -274,15 +275,8 @@ function Samples() {
     path: '/samples',
   })
 
-  /* Override body overflow for scrolling */
-  useEffect(() => {
-    document.body.style.overflow = 'auto'
-    document.body.style.height = 'auto'
-    return () => {
-      document.body.style.overflow = 'hidden'
-      document.body.style.height = '100vh'
-    }
-  }, [])
+  /* Override body overflow for scrolling (shared hook) */
+  useScrollablePage()
 
   /* Sort options for the SortSelect dropdown */
   const sortOptions = useMemo(() => [
