@@ -162,6 +162,125 @@ pre,
   margin: 0 auto;
 }
 
+/* ── Accessibility: prefers-reduced-motion global reset ──────
+   Disables ALL animations, transitions, and smooth scrolling
+   for users who request reduced motion. Applies before any
+   component-level animation so nothing slips through. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Focus-visible outlines on ALL interactive elements ──────
+   Global rule ensures keyboard focus is always visible with a
+   primary-colored ring. Overrides any inline outline:none. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Remove the default focus outline — focus-visible handles it */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Button microinteraction states (global) ─────────────────
+   Applies hover, active, and disabled transitions to all
+   <button> elements. Uses compositor-only transform + filter. */
+button {
+  transition: transform var(--transition-fast),
+              filter var(--transition-fast),
+              opacity var(--transition-fast),
+              background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Input / select / textarea focus states ──────────────────
+   Consistent focus ring + border glow for all form controls. */
+input,
+select,
+textarea {
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25);
+  outline: none;
+}
+
+/* ── Card hover lift ─────────────────────────────────────────
+   Generic card hover effect — apply .card-hover class to any
+   card element (blog posts, changelog, session cards, examples). */
+.card-hover {
+  transition: transform var(--transition-spring),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.card-hover:hover {
+  transform: var(--animation-card-lift);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Sticky filter bar transition ────────────────────────────
+   Smooth blur + shadow when the sticky bar is pinned. */
+.sticky-filters {
+  transition: box-shadow var(--transition-base),
+              backdrop-filter var(--transition-base);
+}
+
+/* ── Compose Mode pulse bar ──────────────────────────────────
+   Subtle pulse animation for the compose-mode indicator. */
+@keyframes compose-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+.compose-pulse {
+  animation: compose-pulse 2s ease-in-out infinite;
+}
+
+/* ── MIDI menu dropdown entrance ─────────────────────────────
+   Slide-down + fade for context menus and dropdowns. */
+@keyframes menu-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.menu-enter {
+  animation: menu-enter var(--transition-fast) ease-out;
+}
+
 /* --- Playing indicator animation for StrudelEditor --- */
 @keyframes playing-indicator {
   0% { background-position: 0% 50%; }

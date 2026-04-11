@@ -40,7 +40,7 @@ export function SortSelect({ value, onChange, options }: SortSelectProps) {
         padding: 'var(--space-1) var(--space-3)',
         cursor: 'pointer',
         transition: 'var(--transition-fast)',
-        outline: 'none',
+        /* outline handled by global :focus-visible rule in global.css */
         lineHeight: 'var(--line-height-base)',
         /* Remove default arrow in some browsers for consistent look */
         appearance: 'auto',

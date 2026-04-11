@@ -69,7 +69,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       border: variantStyles[variant].border ?? 'none',
       cursor: rest.disabled ? 'not-allowed' : 'pointer',
       opacity: rest.disabled ? 0.5 : (active ? 0.8 : 1),
-      outline: 'none',
+      /* outline handled by global :focus-visible rule in global.css */
       transition: 'var(--transition-fast)',
       fontFamily: 'var(--font-family-sans)',
       fontSize: 'var(--font-size-sm)',
@@ -83,17 +83,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={`hover:brightness-110 ${className}`}
         style={merged}
-        onFocus={(e) => {
-          /* Focus-visible style — matches theme primary color */
-          if (e.target.matches(':focus-visible')) {
-            e.target.style.outline = '2px solid var(--color-primary)'
-            e.target.style.outlineOffset = '2px'
-          }
-        }}
-        onBlur={(e) => {
-          e.target.style.outline = 'none'
-          e.target.style.outlineOffset = '0'
-        }}
+        /* Focus-visible handled by global CSS rule — no JS needed */
         {...rest}
       >
         {children}

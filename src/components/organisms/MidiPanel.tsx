@@ -152,7 +152,9 @@ export function MidiPanel() {
                         width: `${entry.value * 100}%`,
                         height: '100%',
                         backgroundColor: 'var(--color-primary)',
-                        transition: 'width 50ms',
+                        /* MIDI velocity meter — width transition is intentional
+                           for progress bar fill. 50ms matches MIDI message rate. */
+                        transition: 'width 50ms linear',
                       }}
                     />
                   </div>
