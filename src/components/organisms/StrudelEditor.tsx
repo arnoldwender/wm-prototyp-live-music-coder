@@ -156,8 +156,8 @@ export function StrudelEditor() {
             /* Fallback: if _pianoroll still not on Pattern.prototype,
              * alias from the non-underscore version that @strudel/draw adds */
             try {
-              const { Pattern } = await import('@strudel/core');
-              const proto = Pattern.prototype as any;
+              const core = await import('@strudel/core') as any;
+              const proto = core.Pattern?.prototype;
               for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
                 if (proto[method] && !proto[`_${method}`]) {
                   proto[`_${method}`] = proto[method];
