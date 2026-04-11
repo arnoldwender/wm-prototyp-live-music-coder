@@ -115,6 +115,26 @@ export function StrudelEditor() {
           }
         }
 
+        /* Load @strudel/midi via REPL — same approach as samples loading.
+         * This puts midin/midikeys in the REPL's eval scope.
+         * The import() inside repl.evaluate works because @strudel/web's
+         * transpiler resolves it at runtime within the REPL context. */
+        try {
+          await repl.evaluate(`await import('https://cdn.jsdelivr.net/npm/@strudel/midi@latest/dist/index.mjs')`, false);
+          console.log('[StrudelEditor] @strudel/midi loaded via REPL CDN');
+        } catch (e) {
+          console.warn('[StrudelEditor] @strudel/midi CDN failed, trying local:', e);
+          /* Fallback: put functions on globalThis from Vite import */
+          try {
+            const sm = await import('@strudel/midi') as any;
+            for (const fn of ['midin', 'midikeys', 'midimaps', 'enableWebMidi']) {
+              if (sm[fn]) (globalThis as any)[fn] = sm[fn];
+            }
+            if (sm.enableWebMidi) await sm.enableWebMidi();
+            console.log('[StrudelEditor] @strudel/midi loaded via Vite fallback');
+          } catch { /* neither worked */ }
+        }
+
         /* Load Strudel CM6 extensions (sliders, highlighting, widgets) */
         try {
           const strudelCM = await import('@strudel/codemirror');
@@ -183,25 +203,7 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
-        /* Load @strudel/midi — Vite imports the module, then we put the functions
-         * on window so the REPL's eval scope can access them. */
-        try {
-          const strudelMidi = await import('@strudel/midi') as any;
-          /* Put ALL midi functions on window */
-          const fnNames = ['midin', 'midikeys', 'midimaps', 'midicontrolMap', 'midisoundMap', 'enableWebMidi'];
-          for (const fn of fnNames) {
-            if (strudelMidi[fn]) (window as any)[fn] = strudelMidi[fn];
-          }
-          /* enableWebMidi() MUST succeed — it initializes the WebMidi.js library
-           * that midin/midikeys depend on. Log errors instead of swallowing them. */
-          if (strudelMidi.enableWebMidi) {
-            await strudelMidi.enableWebMidi();
-            console.log('[StrudelEditor] WebMidi enabled — MIDI devices accessible');
-          }
-          console.log('[StrudelEditor] @strudel/midi loaded (midin + midikeys on window)');
-        } catch (err) {
-          console.error('[StrudelEditor] @strudel/midi FAILED:', err);
-        }
+        /* @strudel/midi already loaded via REPL above */
 
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
          * onKey, createParams, clock sync, all() global transforms) */
