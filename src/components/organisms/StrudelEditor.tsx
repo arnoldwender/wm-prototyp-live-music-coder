@@ -183,24 +183,26 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
-        /* Load @strudel/midi and register ALL midi functions globally.
-         * midin() = CC knobs/sliders, midikeys() = keyboard notes.
-         * enableWebMidi() initializes Web MIDI API for all devices.
-         * Works with any MIDI controller (MPK mini, Launchpad, etc.) */
+        /* Load @strudel/midi — register midin/midikeys in the REPL's eval scope.
+         * globalThis doesn't work because the REPL runs code in its own isolated scope.
+         * Instead, we evaluate an import statement THROUGH the REPL itself,
+         * which makes the functions available in the same scope as user code. */
         try {
-          const strudelMidi = await import('@strudel/midi') as any;
-          /* Register all midi functions in global eval scope */
-          const midiFns = ['midin', 'midikeys', 'midimaps', 'midicontrolMap', 'midisoundMap'];
-          for (const fn of midiFns) {
-            if (strudelMidi[fn]) (globalThis as any)[fn] = strudelMidi[fn];
+          /* First: import the module so it registers on Pattern.prototype */
+          await import('@strudel/midi');
+          /* Second: evaluate through REPL to make functions available in eval scope.
+           * This is how strudel.cc's prebake works — it evaluates imports through
+           * the REPL so they're in the same scope as user code. */
+          if (repl) {
+            await repl.evaluate(
+              `const { midin, midikeys, enableWebMidi } = await import('@strudel/midi');\n` +
+              `await enableWebMidi();`,
+              false /* don't autoplay */
+            );
           }
-          /* Enable Web MIDI API — prompts browser permission, detects all devices */
-          if (strudelMidi.enableWebMidi) {
-            try { await strudelMidi.enableWebMidi(); } catch { /* user denied or not supported */ }
-          }
-          console.log('[StrudelEditor] @strudel/midi loaded (midin + midikeys registered)');
-        } catch {
-          console.warn('[StrudelEditor] @strudel/midi not available');
+          console.log('[StrudelEditor] @strudel/midi loaded via REPL (midin + midikeys in eval scope)');
+        } catch (err) {
+          console.warn('[StrudelEditor] @strudel/midi load failed:', err);
         }
 
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
