@@ -129,21 +129,19 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       let played = false;
       if (replInst.evaluate) {
         try {
-          /* Extract synth and effects from the user's active code.
-           * Parses `.s("name")` and common effects (.room, .lpf, .delay, etc.)
-           * from whatever the user wrote in the editor. */
+          /* Extract ONLY the synth name from user's code — skip effects
+           * because nested parens like .room(cc(74).range(0,0.8)) break
+           * the regex and produce invalid JS syntax errors. */
           const activeCode = replInst.state?.activeCode ?? '';
           const synthMatch = activeCode.match(/\.s\(\s*["']([^"']+)["']\s*\)/);
           const synth = synthMatch?.[1] ?? 'sine';
 
-          /* Extract effect chain: .room(0.3).lpf(2000).delay(0.2) etc. */
-          const effectPattern = /\.(room|lpf|hpf|delay|delaytime|gain|pan|speed|crush|coarse|vowel|shape|orbit|rev)\s*\([^)]*\)/g;
-          const effects = (activeCode.match(effectPattern) ?? []).join('');
-
+          /* Simple one-shot: note + synth + gain. No effects — those are
+           * applied by the user's main pattern via the cyclist. */
           replInst.evaluate(
-            `note(${midiNote}).s("${synth}").gain(${vel})${effects}`,
+            `note(${midiNote}).s("${synth}").gain(${vel})`,
             false
-          ).then(() => { /* async eval ok */ }).catch(() => { /* ignore */ });
+          ).then(() => {}).catch(() => {});
           played = true;
         } catch { /* REPL evaluate failed — use fallback */ }
       }
