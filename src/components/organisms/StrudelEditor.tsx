@@ -13,7 +13,7 @@ import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { resetStrudelTap } from '../../lib/audio/strudel-tap';
-import { setStrudelCM, updateInlineWidgets } from '../../lib/editor/inline-widgets';
+import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
 import { Play, Square, Loader2, Trash2 } from 'lucide-react';
@@ -68,9 +68,26 @@ export function StrudelEditor() {
     let mounted = true;
     (async () => {
       try {
-        /* Load Strudel REPL */
+        /* Load Strudel REPL with afterEval hook for inline widgets.
+         * afterEval receives { code, pattern, meta } where meta contains
+         * widgets and miniLocations from the transpiler. */
         const { initStrudel } = await import('@strudel/web');
-        const repl = await initStrudel();
+        const repl = await initStrudel({
+          afterEval: ({ meta }: { meta?: { widgets?: unknown[]; miniLocations?: unknown[] } }) => {
+            const view = viewRef.current;
+            if (view && meta) {
+              /* Dispatch widgets to CM6 extensions — same as StrudelMirror.afterEval */
+              import('../../lib/editor/inline-widgets').then(({ syncWidgetsAfterEval }) => {
+                /* Write meta into repl.state so syncWidgetsAfterEval can read it */
+                if (replRef.current?.state) {
+                  replRef.current.state.widgets = meta.widgets ?? [];
+                  replRef.current.state.miniLocations = meta.miniLocations ?? [];
+                }
+                syncWidgetsAfterEval(view, replRef.current);
+              });
+            }
+          },
+        });
         if (!mounted) return;
         replRef.current = repl;
         /* Expose REPL globally for pianoroll and other visualizers */
@@ -158,14 +175,12 @@ export function StrudelEditor() {
           if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
           evalTimerRef.current = setTimeout(async () => {
             try {
-              const result = await replRef.current.evaluate(code, true);
+              await replRef.current.evaluate(code, true);
               resetStrudelTap();
               setEvalError(null);
-              /* Update inline widgets on live eval too */
+              /* Sync inline widgets on live eval too */
               const v = viewRef.current;
-              if (v && (result?.widgets || replRef.current?.widgets)) {
-                updateInlineWidgets(v, result?.widgets ?? replRef.current.widgets);
-              }
+              if (v) syncWidgetsAfterEval(v, replRef.current);
             } catch (err) {
               setEvalError(err instanceof Error ? err.message : String(err));
             }
@@ -357,14 +372,13 @@ export function StrudelEditor() {
       if (!code.trim()) { setEvaluating(false); return; }
 
       /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
-      const evalResult = await replRef.current.evaluate(code, true);
+      await replRef.current.evaluate(code, true);
 
-      /* Update inline widgets (._pianoroll(), ._scope(), slider()) if transpiler
-       * returned widget metadata. StrudelMirror's afterEval normally handles this,
-       * but since we manage our own CM6 instance, we call it explicitly. */
-      if (evalResult?.widgets || replRef.current?.widgets) {
-        updateInlineWidgets(view, evalResult?.widgets ?? replRef.current.widgets);
-      }
+      /* Sync inline widgets from REPL state to CM6 editor.
+       * After evaluate(), repl.state.widgets contains slider and block widget
+       * metadata extracted by the transpiler. We dispatch these to the CM6
+       * sliderPlugin and widgetPlugin extensions (same as StrudelMirror.afterEval). */
+      syncWidgetsAfterEval(view, replRef.current);
 
       /* Force visualizer tap to reconnect — superdough recreates audio chain lazily.
        * The controller only initializes AFTER the first note plays, so we retry
