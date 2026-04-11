@@ -16,7 +16,7 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play, Square, Loader2, Trash2 } from 'lucide-react';
+import { Play, Square, Loader2, RotateCcw, Download } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
@@ -202,7 +202,7 @@ export function StrudelEditor() {
             } catch (err) {
               setEvalError(err instanceof Error ? err.message : String(err));
             }
-          }, 800);
+          }, 150);
         }
       }
     });
@@ -434,9 +434,25 @@ export function StrudelEditor() {
   const handleClear = useCallback(() => {
     const view = viewRef.current;
     if (!view) return;
+    const code = view.state.doc.toString();
+    if (code.trim() && !window.confirm('Clear all code? This cannot be undone.')) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: '' } });
     if (activeFile) updateFileCode(activeFile.id, '');
   }, [activeFile, updateFileCode]);
+
+  const handleDownload = useCallback(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    const code = view.state.doc.toString();
+    if (!code.trim()) return;
+    const blob = new Blob([code], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${activeFile?.name || 'pattern'}.js`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [activeFile]);
 
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -452,9 +468,14 @@ export function StrudelEditor() {
             <Square size={12} /> {t('editor.stop')}
           </Button>
         </Tooltip>
-        <Tooltip content="Clear code">
+        <Tooltip content="Download code as file">
+          <Button variant="ghost" onClick={handleDownload} className="!py-0.5 !px-2 text-xs">
+            <Download size={12} />
+          </Button>
+        </Tooltip>
+        <Tooltip content="Clear all code (will ask to confirm)">
           <Button variant="ghost" onClick={handleClear} className="!py-0.5 !px-2 text-xs">
-            <Trash2 size={12} />
+            <RotateCcw size={12} />
           </Button>
         </Tooltip>
         {/* Live mode toggle */}
