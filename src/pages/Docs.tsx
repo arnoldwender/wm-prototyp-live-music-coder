@@ -157,7 +157,7 @@ function Docs() {
           fontSize: 'var(--font-size-sm)',
         }}
       >
-        {t('docs.skipToContent')}
+        {t('a11y.skipToContent')}
       </a>
 
       {/* --- Header navbar --- */}
