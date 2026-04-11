@@ -2,73 +2,82 @@
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
    Inline widget integration — bridges @strudel/codemirror's
-   widgetPlugin with our StrudelEditor. After each evaluation,
-   updates CodeMirror block decorations for ._pianoroll(),
-   ._scope(), ._punchcard(), ._spiral(), ._pitchwheel().
+   widgetPlugin with our StrudelEditor.
 
-   The widgetPlugin from @strudel/codemirror creates <canvas>
-   elements INSIDE the CodeMirror editor as block decorations.
-   The transpiler detects ._method() calls and records widget
-   metadata (type, position, options). After eval, we dispatch
-   those widgets to the CM6 StateField via updateWidgets().
+   In strudel.cc, StrudelMirror.afterEval does:
+     1. Read meta.widgets from transpiler output
+     2. Split into sliders (type === 'slider') and block widgets
+     3. Call updateSliderWidgets(editor, sliders)
+     4. Call updateWidgets(editor, blockWidgets)
+     5. Call updateMiniLocations(editor, miniLocations)
+
+   We replicate this by reading repl.state.widgets after evaluate()
+   and dispatching to the same CM6 extension functions.
    ────────────────────────────────────────────────────────── */
 
 import type { EditorView } from '@codemirror/view';
 
-/** Strudel CM module — dynamically imported */
-let strudelCM: {
-  updateWidgets?: (view: EditorView, widgets: unknown[]) => void;
-  updateSliderWidgets?: (view: EditorView, sliders: unknown[]) => void;
-  registerWidget?: (type: string, fn?: unknown) => void;
-} | null = null;
+/* Cached references to @strudel/codemirror functions */
+let _updateSliderWidgets: ((view: EditorView, widgets: unknown[]) => void) | null = null;
+let _updateWidgets: ((view: EditorView, widgets: unknown[]) => void) | null = null;
+let _updateMiniLocations: ((view: EditorView, locations: unknown[]) => void) | null = null;
 
-/** Cache the module reference */
-export function setStrudelCM(mod: unknown): void {
-  strudelCM = mod as typeof strudelCM;
+/** Cache the @strudel/codemirror module functions */
+export function setStrudelCM(mod: Record<string, unknown>): void {
+  /* These are the minified export names — we use the full names from the export map */
+  _updateSliderWidgets = (mod.updateSliderWidgets as typeof _updateSliderWidgets) ?? null;
+  _updateWidgets = (mod.updateWidgets as typeof _updateWidgets) ?? null;
+  _updateMiniLocations = (mod.updateMiniLocations as typeof _updateMiniLocations) ?? null;
+
+  if (_updateSliderWidgets) console.log('[InlineWidgets] updateSliderWidgets ready');
+  if (_updateWidgets) console.log('[InlineWidgets] updateWidgets ready');
+  if (_updateMiniLocations) console.log('[InlineWidgets] updateMiniLocations ready');
 }
 
 /**
- * After evaluation, extract widget metadata from the transpiler output
- * and dispatch inline widget decorations to CodeMirror.
+ * After evaluation, read widget metadata from REPL state and dispatch
+ * to CodeMirror's widget extensions. This replicates StrudelMirror.afterEval.
  *
- * Called from StrudelEditor after repl.evaluate() succeeds.
- * The transpiler output includes `widgets` array with entries like:
- * { type: 'pianoroll', from: 42, to: 60, options: { fold: 1 } }
+ * @param view - The CM6 EditorView instance
+ * @param repl - The Strudel REPL (from initStrudel)
  */
-export function updateInlineWidgets(
+export function syncWidgetsAfterEval(
   view: EditorView,
-  widgets: unknown[] | undefined,
+  repl: { state?: { widgets?: unknown[]; miniLocations?: unknown[] } },
 ): void {
-  if (!strudelCM?.updateWidgets || !widgets?.length) return;
+  const widgets = repl.state?.widgets;
+  const miniLocations = repl.state?.miniLocations;
 
-  try {
-    /* Separate sliders from block widgets */
-    const sliders = (widgets as any[]).filter((w) => w.type === 'slider');
-    const blocks = (widgets as any[]).filter((w) => w.type !== 'slider');
-
-    /* Update slider inline decorations */
-    if (sliders.length > 0 && strudelCM.updateSliderWidgets) {
-      strudelCM.updateSliderWidgets(view, sliders);
+  /* Update sliders — type === 'slider' */
+  if (widgets && _updateSliderWidgets) {
+    const sliders = (widgets as { type: string }[]).filter((w) => w.type === 'slider');
+    if (sliders.length > 0) {
+      try {
+        _updateSliderWidgets(view, sliders);
+      } catch (err) {
+        console.warn('[InlineWidgets] Slider update failed:', err);
+      }
     }
-
-    /* Update block widget decorations (pianoroll, scope, punchcard, etc.) */
-    if (blocks.length > 0) {
-      strudelCM.updateWidgets(view, blocks);
-    }
-  } catch (err) {
-    console.warn('[InlineWidgets] Failed to update widgets:', err);
   }
-}
 
-/**
- * Register custom widget types with the Strudel transpiler.
- * This tells the AST walker to detect ._customViz() calls
- * and include them in the widget metadata.
- */
-export function registerCustomWidgets(): void {
-  if (!strudelCM?.registerWidget) return;
+  /* Update block widgets — ._pianoroll(), ._scope(), ._punchcard(), etc. */
+  if (widgets && _updateWidgets) {
+    const blocks = (widgets as { type: string }[]).filter((w) => w.type !== 'slider');
+    if (blocks.length > 0) {
+      try {
+        _updateWidgets(view, blocks);
+      } catch (err) {
+        console.warn('[InlineWidgets] Block widget update failed:', err);
+      }
+    }
+  }
 
-  /* These are already registered by @strudel/codemirror:
-   * pianoroll, punchcard, scope, spiral, pitchwheel, spectrum
-   * We only need to register if we add NEW custom widget types. */
+  /* Update mini-notation highlighting locations */
+  if (miniLocations && _updateMiniLocations) {
+    try {
+      _updateMiniLocations(view, miniLocations);
+    } catch (err) {
+      console.warn('[InlineWidgets] Mini-location update failed:', err);
+    }
+  }
 }
