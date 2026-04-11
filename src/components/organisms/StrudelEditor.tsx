@@ -183,10 +183,12 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
-        /* Load @strudel/midi for MIDI input/output in patterns (midin, midi) */
+        /* Load @strudel/midi and register midin/midi globally for eval scope */
         try {
-          await import('@strudel/midi');
-          console.log('[StrudelEditor] @strudel/midi loaded');
+          const strudelMidi = await import('@strudel/midi') as any;
+          if (strudelMidi.midin) (globalThis as any).midin = strudelMidi.midin;
+          if (strudelMidi.enableWebMidi) await strudelMidi.enableWebMidi();
+          console.log('[StrudelEditor] @strudel/midi loaded + midin registered');
         } catch {
           console.warn('[StrudelEditor] @strudel/midi not available');
         }
