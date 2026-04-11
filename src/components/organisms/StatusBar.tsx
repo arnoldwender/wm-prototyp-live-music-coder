@@ -68,7 +68,9 @@ function XpBar() {
             height: '100%',
             backgroundColor: 'var(--color-primary)',
             borderRadius: '2px',
-            transition: 'width 300ms ease',
+            /* XP progress bar — width transition is intentional for
+               smooth fill. Uses token for duration. */
+            transition: 'width var(--transition-base)',
           }}
         />
       </span>
