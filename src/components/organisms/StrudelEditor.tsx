@@ -16,7 +16,7 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play, Square, Loader2, RotateCcw, Download } from 'lucide-react';
+import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
@@ -62,6 +62,52 @@ export function StrudelEditor() {
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const activeFile = files.find((f) => f.active);
+
+  /* MIDI keyboard quick-action menu */
+  const [midiConnected, setMidiConnected] = useState(false);
+  const [midiDeviceName, setMidiDeviceName] = useState<string>('');
+  const [midiMenuOpen, setMidiMenuOpen] = useState(false);
+  const midiMenuRef = useRef<HTMLDivElement>(null);
+
+  /* Detect MIDI devices */
+  useEffect(() => {
+    if (!navigator.requestMIDIAccess) return;
+    let mounted = true;
+    navigator.requestMIDIAccess({ sysex: false }).then((midi) => {
+      if (!mounted) return;
+      const checkDevices = () => {
+        const inputs = [...midi.inputs.values()];
+        setMidiConnected(inputs.length > 0);
+        setMidiDeviceName(inputs[0]?.name ?? '');
+      };
+      checkDevices();
+      midi.onstatechange = checkDevices;
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, []);
+
+  /* Close MIDI menu on outside click */
+  useEffect(() => {
+    if (!midiMenuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (midiMenuRef.current && !midiMenuRef.current.contains(e.target as Node)) {
+        setMidiMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [midiMenuOpen]);
+
+  /* MIDI quick-action: load code into editor and evaluate */
+  const loadMidiCode = useCallback((code: string) => {
+    const view = viewRef.current;
+    if (!view || !activeFile) return;
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } });
+    updateFileCode(activeFile.id, code);
+    setMidiMenuOpen(false);
+    /* Auto-evaluate after loading */
+    setTimeout(() => handleEvaluate(), 100);
+  }, [activeFile, updateFileCode]);
 
   /* Initialize Strudel REPL + load @strudel/codemirror extensions */
   useEffect(() => {
@@ -115,24 +161,30 @@ export function StrudelEditor() {
           }
         }
 
-        /* Load @strudel/midi via REPL — same approach as samples loading.
-         * This puts midin/midikeys in the REPL's eval scope.
-         * The import() inside repl.evaluate works because @strudel/web's
-         * transpiler resolves it at runtime within the REPL context. */
+        /* Load @strudel/midi via evalScope for .midi() output + CC functions,
+         * then REPLACE midikeys/midin with our custom implementations.
+         *
+         * WHY: Vite creates two @strudel/core module instances in dev mode.
+         * @strudel/midi's midikeys checks getIsStarted() from instance B
+         * (always false), silently dropping ALL MIDI note events.
+         * Our custom midikeys uses the raw Web MIDI API (proven to work)
+         * and constructs Patterns from @strudel/web (same instance as REPL). */
         try {
-          await repl.evaluate(`await import('https://cdn.jsdelivr.net/npm/@strudel/midi@latest/dist/index.mjs')`, false);
-          console.log('[StrudelEditor] @strudel/midi loaded via REPL CDN');
+          const { evalScope } = await import('@strudel/web');
+          await evalScope(import('@strudel/midi'));
+          console.log('[StrudelEditor] @strudel/midi loaded (CC, .midi() output)');
         } catch (e) {
-          console.warn('[StrudelEditor] @strudel/midi CDN failed, trying local:', e);
-          /* Fallback: put functions on globalThis from Vite import */
-          try {
-            const sm = await import('@strudel/midi') as any;
-            for (const fn of ['midin', 'midikeys', 'midimaps', 'enableWebMidi']) {
-              if (sm[fn]) (globalThis as any)[fn] = sm[fn];
-            }
-            if (sm.enableWebMidi) await sm.enableWebMidi();
-            console.log('[StrudelEditor] @strudel/midi loaded via Vite fallback');
-          } catch { /* neither worked */ }
+          console.warn('[StrudelEditor] @strudel/midi load failed:', e);
+        }
+
+        /* Register our custom midikeys/midin that bypass the double-instance bug */
+        try {
+          const { customMidikeys, customMidin } = await import('../../lib/midi/strudel-keys');
+          (globalThis as any).midikeys = customMidikeys;
+          (globalThis as any).midin = customMidin;
+          console.log('[StrudelEditor] Custom midikeys/midin registered (raw MIDI API)');
+        } catch (e) {
+          console.warn('[StrudelEditor] Custom MIDI registration failed:', e);
         }
 
         /* Load Strudel CM6 extensions (sliders, highlighting, widgets) */
@@ -176,7 +228,7 @@ export function StrudelEditor() {
             /* Fallback: if _pianoroll still not on Pattern.prototype,
              * alias from the non-underscore version that @strudel/draw adds */
             try {
-              const core = await import('@strudel/core') as any;
+              const core = await import('@strudel/web') as any;
               const proto = core.Pattern?.prototype;
               for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
                 if (proto[method] && !proto[`_${method}`]) {
@@ -570,6 +622,80 @@ export function StrudelEditor() {
             {t('editor.playing')}
           </span>
         )}
+        {/* MIDI keyboard quick-action button */}
+        {midiConnected && (
+          <div className="relative" ref={midiMenuRef}>
+            <Tooltip content={`MIDI: ${midiDeviceName || 'Connected'}`}>
+              <Button
+                variant="ghost"
+                onClick={() => setMidiMenuOpen(!midiMenuOpen)}
+                className="!py-0.5 !px-2 text-xs"
+                style={{ color: 'var(--color-success)' }}
+              >
+                <Piano size={12} />
+                <ChevronDown size={8} />
+              </Button>
+            </Tooltip>
+            {midiMenuOpen && (
+              <div
+                className="absolute top-full left-0 z-50 mt-1 min-w-[220px] rounded-md shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-bg-alt)',
+                  border: '1px solid var(--color-border)',
+                  padding: 'var(--space-1)',
+                }}
+              >
+                {/* Device info header */}
+                <div
+                  className="px-3 py-1.5"
+                  style={{ fontSize: '10px', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }}
+                >
+                  <Piano size={10} className="inline mr-1" style={{ color: 'var(--color-success)' }} />
+                  {midiDeviceName}
+                </div>
+
+                {/* Quick actions */}
+                <button
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer"
+                  style={{ color: 'var(--color-text)', backgroundColor: 'transparent' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onClick={() => loadMidiCode(`// MIDI Keyboard — Sine\nconst kb = await midikeys(0)\n$: kb().s("sine").room(0.3)`)}
+                >
+                  Test Keyboard — Sine
+                </button>
+                <button
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer"
+                  style={{ color: 'var(--color-text)', backgroundColor: 'transparent' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onClick={() => loadMidiCode(`// MIDI Keyboard — Sawtooth with filter\nconst kb = await midikeys(0)\n$: kb().s("sawtooth").lpf(2000).gain(0.4).room(0.3)`)}
+                >
+                  Test Keyboard — Sawtooth
+                </button>
+                <button
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer"
+                  style={{ color: 'var(--color-text)', backgroundColor: 'transparent' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onClick={() => loadMidiCode(`// Full MIDI Setup — Keys + Knobs + Drums\nconst kb = await midikeys(0)\nconst cc = await midin(0)\n\n$: kb().s("sawtooth")\n  .lpf(cc(70).range(400, 4000))\n  .room(cc(74).range(0, 0.8))\n  .gain(0.4)\n\n$: s("bd ~ hh sd bd hh [sd hh] hh")\n  .gain(0.5)`)}
+                >
+                  Full Setup — Keys + Knobs + Drums
+                </button>
+                <button
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer"
+                  style={{ color: 'var(--color-text)', backgroundColor: 'transparent' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onClick={() => loadMidiCode(`// MIDI CC Knobs — Control filter and reverb\nconst cc = await midin(0)\n\nnote("c3 e3 g3 c4")\n  .s("sawtooth")\n  .lpf(cc(70).range(200, 5000))\n  .room(cc(74).range(0, 0.9))\n  .gain(0.4)`)}
+                >
+                  CC Knobs — Filter + Reverb
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <span className="ml-auto flex items-center gap-1" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ready ? 'var(--color-success)' : 'var(--color-warning)' }} />
           {ready ? t('editor.ready') : t('editor.loading')}

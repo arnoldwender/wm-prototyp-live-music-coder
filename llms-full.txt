@@ -34,7 +34,7 @@ One shared AudioContext. Each engine adapter implements a common EngineAdapter i
 | Strudel   | @strudel/core      | Pattern-based live coding  |
 | Tone.js   | tone               | High-level synths, effects |
 | Web Audio | Native API         | Low-level audio nodes      |
-| MIDI      | webmidi            | External device output     |
+| MIDI      | @strudel/midi + custom | Keyboard input (midikeys), CC knobs (midin), output |
 
 ### Atomic Design Hierarchy
 
@@ -43,6 +43,12 @@ One shared AudioContext. Each engine adapter implements a common EngineAdapter i
 - Organisms (20): ActivityBar, CodeEditor, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, NodeGraph, PatternTimeline, PianorollVisualizer, SidePanel, SiteNav, SpectrumVisualizer, StatusBar, StrudelEditor, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
 
 Hierarchy rules: atoms import nothing, molecules import only atoms, organisms import molecules and atoms, layouts compose organisms, pages use layouts.
+
+### MIDI Keyboard Input
+
+Custom `midikeys()` implementation in `src/lib/midi/strudel-keys.ts` bypasses @strudel/midi's broken `getIsStarted()` check (caused by Vite's double @strudel/core module instance). Uses raw Web MIDI API + own AudioContext + OscillatorNode for zero-dependency sound. `midin()` for CC knobs delegates to @strudel/midi (CC reading doesn't have the isStarted bug). MIDI quick-action menu in the editor toolbar auto-loads test code when a controller is connected.
+
+**CRITICAL**: Never use `input.onmidimessage =` — use `addEventListener('midimessage', ...)`. The exclusive `onmidimessage` property steals events from @strudel/midi's webmidi library.
 
 ### Persistence
 

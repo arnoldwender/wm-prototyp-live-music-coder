@@ -72,7 +72,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
 
-**41 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
+**43 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
 
 **190+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, synth oscillators, and test patterns.
 
@@ -222,6 +222,17 @@ Hosted on [Netlify](https://www.netlify.com/). Automatic deploys from `main`.
 npm run build
 netlify deploy --prod --dir=dist
 ```
+
+---
+
+## Roadmap
+
+| Status | Feature | Description |
+|--------|---------|-------------|
+| Planned | **MIDI Composition Mode** | Play notes on a connected MIDI keyboard and have them convert to Strudel code in real time inside the editor |
+| Planned | **Strudel Sound Library Browser** | Browse and audition all Strudel sounds (Dirt-Samples, synths, soundfonts) directly from the MIDI keyboard |
+| Planned | **Professional-Grade MIDI Integration** | Full velocity support, CC knob mapping, multi-device routing. Any USB MIDI controller works out of the box |
+| Ongoing | **Democratizing Music Production** | Making algorave/live coding accessible to everyone — professional features delivered as open source, built on years of community contributions |
 
 ---
 

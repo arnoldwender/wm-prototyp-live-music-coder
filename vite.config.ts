@@ -12,13 +12,12 @@ export default defineConfig({
     tailwindcss(),
   ],
   resolve: {
-    /* Force a single superdough instance — Vite may pre-bundle two copies
-     * (one from @strudel/web, one standalone) causing a dead audio chain */
-    dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio'],
+    /* Force single instances of audio packages to avoid dead audio chains
+     * and duplicate @strudel/core state (the double-instance MIDI bug) */
+    dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio', '@strudel/midi', '@strudel/draw', '@strudel/codemirror'],
   },
   optimizeDeps: {
-    /* Force all strudel packages into a single pre-bundle group so
-     * @strudel/core is only evaluated once in dev mode */
+    /* Pre-bundle all strudel packages together */
     include: [
       '@strudel/core',
       '@strudel/web',
@@ -26,13 +25,15 @@ export default defineConfig({
       '@strudel/mini',
       '@strudel/tonal',
       '@strudel/transpiler',
+      '@strudel/midi',
+      '@strudel/draw',
+      '@strudel/codemirror',
       'superdough',
     ],
   },
   build: {
     rollupOptions: {
       output: {
-        /* Split heavy deps into separate chunks — loaded on demand */
         manualChunks(id: string) {
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router') || id.includes('node_modules/zustand')) return 'vendor-react'
           if (id.includes('node_modules/@codemirror')) return 'vendor-codemirror'

@@ -11,6 +11,8 @@ declare module '@strudel/core' {
     scheduler: { start(): void; stop(): void; setPattern(p: unknown): void }
     [key: string]: unknown
   }
+  /** Injects module exports into globalThis + strudelScope for REPL eval access */
+  export function evalScope(...modules: (Promise<unknown> | Record<string, unknown>)[]): Promise<unknown[]>
 }
 
 declare module '@strudel/webaudio' {
