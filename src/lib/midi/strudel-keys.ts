@@ -13,6 +13,85 @@
 /** Buffered MIDI haps per device, keyed by device name/index */
 const kHaps: Record<string, any[]> = {};
 
+/* ── Shared OscillatorNode trigger ──
+ *
+ * Both the physical MIDI controller and the on-screen VirtualKeyboard
+ * funnel notes through `playOscillatorNote`. The function lazily creates
+ * a single AudioContext, picks an OscillatorType (defaulting to the
+ * VirtualKeyboard's selected waveform), and plays a short ADSR-shaped
+ * note. Exposed globally as `window.__lmcPlayNote` so the React tree
+ * can call it without importing this module directly. */
+
+let sharedAudioCtx: AudioContext | null = null;
+
+/** Currently selected oscillator type — settable from the synth UI */
+let currentOscillatorType: OscillatorType = 'sine';
+
+/** Lazily create / resume the shared AudioContext */
+function getSharedAudioCtx(): AudioContext {
+  if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
+    sharedAudioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  if (sharedAudioCtx.state === 'suspended') {
+    /* Fire and forget — resume() returns a promise but we don't need to await */
+    sharedAudioCtx.resume().catch(() => { /* may fail before user gesture */ });
+  }
+  return sharedAudioCtx;
+}
+
+/** Set the oscillator type used by `playOscillatorNote` (no fallback chain) */
+export function setLmcOscillatorType(type: OscillatorType): void {
+  currentOscillatorType = type;
+}
+
+/** Map a MIDI note number (0–127) to its concert frequency in Hz */
+function midiToFreq(note: number): number {
+  return 440 * Math.pow(2, (note - 69) / 12);
+}
+
+/**
+ * Play a short note via OscillatorNode.
+ *
+ * @param midiNote  - MIDI note number 0–127
+ * @param velocity  - 0–1 normalized velocity
+ * @param oscType   - Optional waveform override; falls back to the value set
+ *                    by `setLmcOscillatorType` (default: 'sine')
+ */
+export function playOscillatorNote(
+  midiNote: number,
+  velocity: number,
+  oscType?: OscillatorType
+): void {
+  try {
+    const ac = getSharedAudioCtx();
+    const freq = midiToFreq(midiNote);
+    const vol = Math.max(0, Math.min(1, velocity));
+
+    const osc = ac.createOscillator();
+    osc.type = oscType ?? currentOscillatorType;
+    osc.frequency.value = freq;
+
+    const gainNode = ac.createGain();
+    /* Quick attack + 400ms exponential decay — matches the physical
+     * MIDI handler in customMidikeys for sonic consistency */
+    gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
+
+    osc.connect(gainNode);
+    gainNode.connect(ac.destination);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + 0.45);
+  } catch { /* audio failed — silently drop the note */ }
+}
+
+/* Expose globally for the on-screen VirtualKeyboard.
+ * The React tree imports nothing from this module — it just calls
+ * `window.__lmcPlayNote(note, velocity)` after the synth UI fires. */
+if (typeof window !== 'undefined') {
+  (window as any).__lmcPlayNote = playOscillatorNote;
+  (window as any).__lmcSetOscillator = setLmcOscillatorType;
+}
+
 /** Track which devices have listeners attached */
 const attachedDevices = new Set<string>();
 

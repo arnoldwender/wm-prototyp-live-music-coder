@@ -526,7 +526,12 @@
     "evaluating": "Evaluando...",
     "liveMode": "Modo en vivo",
     "sharedCodeWarning": "Este código fue cargado desde una URL compartida. Revísalo antes de ejecutarlo.",
-    "dismiss": "Cerrar"
+    "dismiss": "Cerrar",
+    "synthMode": "Modo Synth",
+    "oscillator": "Oscilador",
+    "virtualKeyboard": "Teclado virtual",
+    "collapse": "Colapsar",
+    "expand": "Expandir"
   },
   "templates": {
     "title": "Elige una plantilla inicial",

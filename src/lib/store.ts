@@ -98,6 +98,10 @@ interface AppState {
   setEditorTheme: (id: string) => void
   setVimMode: (enabled: boolean) => void
 
+  /* Synth panel — selected oscillator waveform for the on-screen MIDI keyboard */
+  synthOscillator: 'sine' | 'sawtooth' | 'square' | 'triangle'
+  setSynthOscillator: (type: 'sine' | 'sawtooth' | 'square' | 'triangle') => void
+
   /* Detail panel — right collapsible sidebar */
   activeDetailSection: string | null
   detailPanelWidth: number
@@ -192,6 +196,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
   vimMode: loadEditorSettingsForStore().vimMode,
   setEditorTheme: (id: string) => set({ editorTheme: id }),
   setVimMode: (enabled: boolean) => set({ vimMode: enabled }),
+
+  /* Synth panel — defaults to sine, the most musical and forgiving waveform */
+  synthOscillator: 'sine',
+  setSynthOscillator: (type) => set({ synthOscillator: type }),
 
   activeDetailSection: 'samples',
   detailPanelWidth: 280,
