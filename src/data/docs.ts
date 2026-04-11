@@ -186,4 +186,84 @@ export const docSections: DocSection[] = [
       { type: 'text', contentKey: 'docs.shortcuts.tipsText' },
     ],
   },
+
+  /* 8. Interactive Controls */
+  {
+    id: 'interactive-controls',
+    titleKey: 'docs.controls.title',
+    content: [
+      { type: 'heading', contentKey: 'docs.controls.sliderHeading' },
+      { type: 'text', contentKey: 'docs.controls.sliderText' },
+      { type: 'code', code: `// Slider appears inline in the editor — drag to adjust
+note("c3 e3 g3 c4")
+  .s("sawtooth")
+  .lpf(slider(800, 100, 5000))
+  .gain(slider(0.5, 0, 1))
+  .room(0.3)` },
+      { type: 'heading', contentKey: 'docs.controls.onkeyHeading' },
+      { type: 'text', contentKey: 'docs.controls.onkeyText' },
+      { type: 'code', code: `// Bind keys (outside editor focus)
+onKey('a', () => s("bd").play())
+onKey('s', () => s("sd").play())` },
+      { type: 'heading', contentKey: 'docs.controls.paramsHeading' },
+      { type: 'text', contentKey: 'docs.controls.paramsText' },
+      { type: 'code', code: `const cutoff = createParams("cutoff", 1000)
+note("c2 e2 g2").s("sawtooth").lpf(cutoff)
+// Later: setParam("cutoff", 2000)` },
+    ],
+  },
+
+  /* 9. Visualizers */
+  {
+    id: 'visualizers',
+    titleKey: 'docs.visualizers.title',
+    content: [
+      { type: 'heading', contentKey: 'docs.visualizers.inlineHeading' },
+      { type: 'text', contentKey: 'docs.visualizers.inlineText' },
+      { type: 'code', code: `// Piano roll — shows notes as horizontal bars
+note("c4 e4 g4 c5")._pianoroll()
+
+// Oscilloscope — shows waveform
+note("c3").s("sawtooth")._scope()
+
+// Punchcard — dots for events
+s("bd hh sd hh")._punchcard()` },
+      { type: 'heading', contentKey: 'docs.visualizers.panelHeading' },
+      { type: 'text', contentKey: 'docs.visualizers.panelText' },
+      { type: 'list', items: [
+        'docs.visualizers.waveform',
+        'docs.visualizers.spectrum',
+        'docs.visualizers.timeline',
+        'docs.visualizers.pianoroll',
+        'docs.visualizers.punchcard',
+        'docs.visualizers.spiral',
+        'docs.visualizers.pitchwheel',
+      ]},
+    ],
+  },
+
+  /* 10. Settings & Preferences */
+  {
+    id: 'settings',
+    titleKey: 'docs.settings.title',
+    content: [
+      { type: 'heading', contentKey: 'docs.settings.themesHeading' },
+      { type: 'text', contentKey: 'docs.settings.themesText' },
+      { type: 'list', items: [
+        'docs.settings.themePurple',
+        'docs.settings.themeAmber',
+        'docs.settings.themeCyan',
+        'docs.settings.themeMatrix',
+      ]},
+      { type: 'heading', contentKey: 'docs.settings.editorHeading' },
+      { type: 'text', contentKey: 'docs.settings.editorText' },
+      { type: 'list', items: [
+        'docs.settings.fontSize',
+        'docs.settings.vimMode',
+        'docs.settings.wordWrap',
+        'docs.settings.lineNumbers',
+        'docs.settings.zenMode',
+      ]},
+    ],
+  },
 ]
