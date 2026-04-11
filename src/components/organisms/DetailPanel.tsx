@@ -11,6 +11,7 @@ import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
+import { MidiPanel } from './MidiPanel';
 import { loadFromGist } from '../../lib/persistence/gist';
 
 /* Saved Gists list — reads from localStorage */
@@ -173,6 +174,7 @@ export function DetailPanel() {
     { id: 'settings', title: 'Settings', content: <SettingsPanel /> },
     { id: 'gists', title: 'Saved Gists', content: <SavedGistsList /> },
     { id: 'console', title: 'Console', content: <ConsolePanel /> },
+    { id: 'midi', title: 'MIDI', content: <MidiPanel /> },
   ];
 
   return (
