@@ -72,6 +72,7 @@ export function StrudelEditor() {
   const [midiDeviceName, setMidiDeviceName] = useState<string>('');
   const [midiMenuOpen, setMidiMenuOpen] = useState(false);
   const [composeMode, setComposeMode] = useState(false);
+  const [midiLearning, setMidiLearning] = useState(false);
   const midiMenuRef = useRef<HTMLDivElement>(null);
 
   /* Detect MIDI devices */
@@ -759,6 +760,43 @@ export function StrudelEditor() {
                     </button>
                   ))}
                 </div>
+
+                {/* Divider before MIDI Learn */}
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-1) 0' }} />
+
+                {/* MIDI Learn — map a physical knob to lpf parameter (proof of concept) */}
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer flex items-center gap-2"
+                  style={{
+                    color: midiLearning ? 'var(--color-warning)' : 'var(--color-text)',
+                    backgroundColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-border)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onClick={() => {
+                    if (midiLearning) {
+                      import('../../lib/midi/midi-learn').then(({ stopMidiLearn }) => {
+                        stopMidiLearn();
+                        setMidiLearning(false);
+                      });
+                    } else {
+                      import('../../lib/midi/midi-learn').then(({ startMidiLearn, onMidiLearnChange }) => {
+                        /* Subscribe to learn completion — auto-dismiss after mapping */
+                        const unsub = onMidiLearnChange((s) => {
+                          if (!s.learning) {
+                            setMidiLearning(false);
+                            unsub();
+                          }
+                        });
+                        startMidiLearn('lpf');
+                        setMidiLearning(true);
+                      });
+                    }
+                  }}
+                >
+                  {midiLearning ? 'Move a knob...' : 'MIDI Learn — Map Knob'}
+                </button>
               </div>
             )}
           </div>
