@@ -16,7 +16,7 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
-import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown } from 'lucide-react';
+import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown, PenLine } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
 const setHighlights = StateEffect.define<{ from: number; to: number }[]>();
@@ -71,6 +71,7 @@ export function StrudelEditor() {
   const [midiConnected, setMidiConnected] = useState(false);
   const [midiDeviceName, setMidiDeviceName] = useState<string>('');
   const [midiMenuOpen, setMidiMenuOpen] = useState(false);
+  const [composeMode, setComposeMode] = useState(false);
   const midiMenuRef = useRef<HTMLDivElement>(null);
 
   /* Detect MIDI devices */
@@ -705,6 +706,31 @@ export function StrudelEditor() {
                 >
                   CC Knobs — Filter + Reverb
                 </button>
+
+                {/* Divider */}
+                <div style={{ borderTop: '1px solid var(--color-border)', margin: 'var(--space-1) 0' }} />
+
+                {/* Compose Mode toggle — writes MIDI notes as code */}
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-1.5 text-xs rounded hover:opacity-80 cursor-pointer flex items-center gap-2"
+                  style={{
+                    color: composeMode ? 'var(--color-success)' : 'var(--color-text)',
+                    backgroundColor: composeMode ? 'color-mix(in srgb, var(--color-success) 15%, transparent)' : 'transparent',
+                  }}
+                  onMouseEnter={(e) => { if (!composeMode) e.currentTarget.style.backgroundColor = 'var(--color-border)'; }}
+                  onMouseLeave={(e) => { if (!composeMode) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  onClick={() => {
+                    import('../../lib/midi/compose-mode').then(({ toggleComposeMode }) => {
+                      const enabled = toggleComposeMode(viewRef.current);
+                      setComposeMode(enabled);
+                      setMidiMenuOpen(false);
+                    });
+                  }}
+                >
+                  <PenLine size={11} />
+                  {composeMode ? 'Compose Mode ON' : 'Compose Mode — Write Notes'}
+                </button>
               </div>
             )}
           </div>
@@ -718,6 +744,37 @@ export function StrudelEditor() {
 
       {isPlaying && (
         <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label={t('editor.playing')} />
+      )}
+
+      {/* Compose Mode indicator — visible when MIDI notes write to editor */}
+      {composeMode && (
+        <div
+          className="shrink-0 flex items-center gap-2"
+          style={{
+            padding: '2px var(--space-3)',
+            backgroundColor: 'color-mix(in srgb, var(--color-success) 15%, var(--color-bg))',
+            borderBottom: '1px solid var(--color-success)',
+            fontSize: 'var(--font-size-xs)',
+            color: 'var(--color-success)',
+            fontFamily: 'var(--font-family-mono)',
+          }}
+        >
+          <PenLine size={10} />
+          <span>COMPOSE MODE — Play keys to write notes</span>
+          <button
+            type="button"
+            onClick={() => {
+              import('../../lib/midi/compose-mode').then(({ disableComposeMode }) => {
+                disableComposeMode();
+                setComposeMode(false);
+              });
+            }}
+            className="ml-auto cursor-pointer"
+            style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}
+          >
+            ESC to exit
+          </button>
+        </div>
       )}
 
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />

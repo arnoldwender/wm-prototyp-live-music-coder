@@ -60,6 +60,7 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
    * set by the running REPL, unlike @strudel/midi's instance B imports. */
   const strudelWeb = await import('@strudel/web') as any;
   const { Pattern, Hap, TimeSpan } = strudelWeb;
+  const { composeNoteOn, isComposeModeActive } = await import('./compose-mode');
   /* Create our OWN AudioContext — don't import from @strudel/webaudio
    * because that module also suffers from the double-instance bug.
    * A fresh AudioContext works after any user gesture (clicking Play). */
@@ -97,6 +98,12 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       if (!isNoteOn && !isNoteOff) return;
       if (isNoteOff) return;
 
+      /* Composition mode: write notes to editor instead of playing sound */
+      if (isComposeModeActive()) {
+        composeNoteOn(note, velocity);
+        return; /* Don't trigger audio — just write to editor */
+      }
+
       const replInst = getRepl();
       if (!replInst?.scheduler) return;
 
@@ -122,8 +129,17 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       let played = false;
       if (replInst.evaluate) {
         try {
-          const synth = (globalThis as any).__midiSynth ?? 'sine';
-          const effects = (globalThis as any).__midiEffects ?? '';
+          /* Extract synth and effects from the user's active code.
+           * Parses `.s("name")` and common effects (.room, .lpf, .delay, etc.)
+           * from whatever the user wrote in the editor. */
+          const activeCode = replInst.state?.activeCode ?? '';
+          const synthMatch = activeCode.match(/\.s\(\s*["']([^"']+)["']\s*\)/);
+          const synth = synthMatch?.[1] ?? 'sine';
+
+          /* Extract effect chain: .room(0.3).lpf(2000).delay(0.2) etc. */
+          const effectPattern = /\.(room|lpf|hpf|delay|delaytime|gain|pan|speed|crush|coarse|vowel|shape|orbit|rev)\s*\([^)]*\)/g;
+          const effects = (activeCode.match(effectPattern) ?? []).join('');
+
           replInst.evaluate(
             `note(${midiNote}).s("${synth}").gain(${vel})${effects}`,
             false
