@@ -184,20 +184,23 @@ export function StrudelEditor() {
         }
 
         /* Load @strudel/midi — Vite imports the module, then we put the functions
-         * on window so the REPL's eval scope can access them. The REPL can't
-         * resolve bare specifiers like '@strudel/midi' at runtime — only Vite can. */
+         * on window so the REPL's eval scope can access them. */
         try {
           const strudelMidi = await import('@strudel/midi') as any;
-          /* Put midi functions on window — the REPL eval scope CAN see window.* */
-          if (strudelMidi.midin) (window as any).midin = strudelMidi.midin;
-          if (strudelMidi.midikeys) (window as any).midikeys = strudelMidi.midikeys;
-          if (strudelMidi.midimaps) (window as any).midimaps = strudelMidi.midimaps;
+          /* Put ALL midi functions on window */
+          const fnNames = ['midin', 'midikeys', 'midimaps', 'midicontrolMap', 'midisoundMap', 'enableWebMidi'];
+          for (const fn of fnNames) {
+            if (strudelMidi[fn]) (window as any)[fn] = strudelMidi[fn];
+          }
+          /* enableWebMidi() MUST succeed — it initializes the WebMidi.js library
+           * that midin/midikeys depend on. Log errors instead of swallowing them. */
           if (strudelMidi.enableWebMidi) {
-            try { await strudelMidi.enableWebMidi(); } catch { /* user denied */ }
+            await strudelMidi.enableWebMidi();
+            console.log('[StrudelEditor] WebMidi enabled — MIDI devices accessible');
           }
           console.log('[StrudelEditor] @strudel/midi loaded (midin + midikeys on window)');
         } catch (err) {
-          console.warn('[StrudelEditor] @strudel/midi not available:', err);
+          console.error('[StrudelEditor] @strudel/midi FAILED:', err);
         }
 
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
@@ -214,10 +217,9 @@ export function StrudelEditor() {
           const { startGamepadPolling } = await import('../../lib/input/gamepad');
           startGamepadPolling();
         } catch { /* gamepad not available */ }
-        try {
-          const { initMidiInput } = await import('../../lib/midi/input');
-          await initMidiInput();
-        } catch { /* MIDI not available */ }
+        /* Our own initMidiInput is DISABLED — @strudel/midi handles MIDI access.
+         * Running both causes port conflicts. The MIDI panel still shows devices
+         * via @strudel/midi's WebMidi instance. */
 
         setReady(true);
         console.log('[StrudelEditor] Ready');
