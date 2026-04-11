@@ -16,6 +16,9 @@ import { resetStrudelTap } from '../../lib/audio/strudel-tap';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
+import SynthPanel from './SynthPanel';
+/* Side-effect import — registers window.__lmcPlayNote / __lmcSetOscillator */
+import '../../lib/midi/strudel-keys';
 import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown, PenLine, Volume2 } from 'lucide-react';
 
 /* Custom CM6 highlight system — marks code ranges that are currently sounding */
@@ -62,6 +65,29 @@ export function StrudelEditor() {
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const activeFile = files.find((f) => f.active);
+
+  /* Synth panel — oscillator type lives in the global store so it survives
+   * StrudelEditor unmount/remount and can be controlled from elsewhere. */
+  const synthOscillator = useAppStore((s) => s.synthOscillator);
+  const setSynthOscillator = useAppStore((s) => s.setSynthOscillator);
+
+  /* Active notes shown on the on-screen keyboard. We don't yet mirror
+   * physical MIDI here — Phase 1 only highlights internally pressed keys. */
+  const synthActiveNotes: number[] = [];
+
+  /* Forward synth panel notes to the shared OscillatorNode trigger. The
+   * window.__lmcPlayNote handle is registered by strudel-keys.ts on load. */
+  const handleSynthNoteOn = useCallback((note: number, velocity: number) => {
+    /* Sync the selected oscillator type before playing — strudel-keys.ts
+     * stores it in module state so the call site doesn't need to pass it. */
+    const setOsc = (window as unknown as { __lmcSetOscillator?: (t: OscillatorType) => void }).__lmcSetOscillator;
+    if (setOsc) setOsc(synthOscillator);
+    const play = (window as unknown as { __lmcPlayNote?: (n: number, v: number) => void }).__lmcPlayNote;
+    if (play) play(note, velocity);
+  }, [synthOscillator]);
+
+  /* No-op note-off — OscillatorNode self-decays in 400ms, no release needed */
+  const handleSynthNoteOff = useCallback((_note: number) => { /* noop */ }, []);
 
   /* Editor settings from Zustand — triggers CM6 rebuild when changed */
   const editorTheme = useAppStore((s) => s.editorTheme);
@@ -811,6 +837,17 @@ export function StrudelEditor() {
       {isPlaying && (
         <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label={t('editor.playing')} />
       )}
+
+      {/* Synth Panel — collapsible MIDI keyboard surface, only when MIDI is connected */}
+      <SynthPanel
+        midiConnected={midiConnected}
+        midiDeviceName={midiDeviceName}
+        activeNotes={synthActiveNotes}
+        onNoteOn={handleSynthNoteOn}
+        onNoteOff={handleSynthNoteOff}
+        oscillator={synthOscillator}
+        onOscillatorChange={setSynthOscillator}
+      />
 
       {/* Compose Mode indicator — visible when MIDI notes write to editor */}
       {composeMode && (

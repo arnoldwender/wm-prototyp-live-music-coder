@@ -526,7 +526,12 @@
     "evaluating": "Auswerten...",
     "liveMode": "Live-Modus",
     "sharedCodeWarning": "Dieser Code wurde aus einer geteilten URL geladen. Bitte vor dem Ausführen überprüfen.",
-    "dismiss": "Schließen"
+    "dismiss": "Schließen",
+    "synthMode": "Synth-Modus",
+    "oscillator": "Oszillator",
+    "virtualKeyboard": "Virtuelle Tastatur",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
   },
   "templates": {
     "title": "Wähle eine Startvorlage",

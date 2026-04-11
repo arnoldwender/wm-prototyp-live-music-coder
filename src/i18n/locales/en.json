@@ -526,7 +526,12 @@
     "evaluating": "Evaluating...",
     "liveMode": "Live mode",
     "sharedCodeWarning": "This code was loaded from a shared URL. Review it before running.",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "synthMode": "Synth Mode",
+    "oscillator": "Oscillator",
+    "virtualKeyboard": "Virtual Keyboard",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "templates": {
     "title": "Choose a starter template",
