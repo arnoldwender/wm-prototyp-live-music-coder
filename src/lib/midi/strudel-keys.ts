@@ -27,6 +27,18 @@ let sharedAudioCtx: AudioContext | null = null;
 /** Currently selected oscillator type — settable from the synth UI */
 let currentOscillatorType: OscillatorType = 'sine';
 
+/* ── Synth filter state ──
+ *
+ * The SynthPanel FilterControl feeds into these three module-scoped values
+ * via `setLmcFilter`. Each `playOscillatorNote` call reads them and inserts
+ * a fresh BiquadFilterNode between the oscillator and the gain node, so
+ * knob tweaks take effect on the very next note without needing to rebuild
+ * the audio graph. */
+let currentFilterType: BiquadFilterType = 'lowpass';
+let currentFilterCutoff = 2000;
+/* Q ranges roughly 0.1 (neutral) to 20 (screaming) — our UI 0-1 maps here */
+let currentFilterResonance = 0.1;
+
 /** Lazily create / resume the shared AudioContext */
 function getSharedAudioCtx(): AudioContext {
   if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
@@ -42,6 +54,23 @@ function getSharedAudioCtx(): AudioContext {
 /** Set the oscillator type used by `playOscillatorNote` (no fallback chain) */
 export function setLmcOscillatorType(type: OscillatorType): void {
   currentOscillatorType = type;
+}
+
+/**
+ * Configure the biquad filter stage used by `playOscillatorNote`.
+ *
+ * @param type       - Web Audio BiquadFilterType ('lowpass', 'highpass', etc.)
+ * @param cutoff     - Cutoff frequency in Hz (20–20000)
+ * @param resonance  - UI resonance 0–1; mapped internally to a biquad Q value
+ */
+export function setLmcFilter(
+  type: BiquadFilterType,
+  cutoff: number,
+  resonance: number
+): void {
+  currentFilterType = type;
+  currentFilterCutoff = Math.max(20, Math.min(20000, cutoff));
+  currentFilterResonance = Math.max(0, Math.min(1, resonance));
 }
 
 /** Map a MIDI note number (0–127) to its concert frequency in Hz */
@@ -77,7 +106,18 @@ export function playOscillatorNote(
     gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
 
-    osc.connect(gainNode);
+    /* Biquad filter stage — configurable live via `setLmcFilter`.
+     * Created per-note so type/cutoff/resonance changes take effect
+     * on the next note played, without rebuilding the whole graph.
+     * UI resonance (0-1) maps to biquad Q (0.5-20) exponentially so
+     * the last bit of knob travel feels most expressive. */
+    const filter = ac.createBiquadFilter();
+    filter.type = currentFilterType;
+    filter.frequency.value = currentFilterCutoff;
+    filter.Q.value = 0.5 + currentFilterResonance * 19.5;
+
+    osc.connect(filter);
+    filter.connect(gainNode);
     gainNode.connect(ac.destination);
     osc.start(ac.currentTime);
     osc.stop(ac.currentTime + 0.45);
@@ -90,6 +130,7 @@ export function playOscillatorNote(
 if (typeof window !== 'undefined') {
   (window as any).__lmcPlayNote = playOscillatorNote;
   (window as any).__lmcSetOscillator = setLmcOscillatorType;
+  (window as any).__lmcSetFilter = setLmcFilter;
 }
 
 /** Track which devices have listeners attached */

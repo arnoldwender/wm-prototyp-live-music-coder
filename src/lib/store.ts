@@ -102,6 +102,15 @@ interface AppState {
   synthOscillator: 'sine' | 'sawtooth' | 'square' | 'triangle'
   setSynthOscillator: (type: 'sine' | 'sawtooth' | 'square' | 'triangle') => void
 
+  /* Synth filter — type + cutoff (Hz) + resonance (0-1) for the filter stage
+   * inserted between the oscillator and the destination in strudel-keys. */
+  synthFilterType: 'lpf' | 'hpf' | 'bpf' | 'notch'
+  synthFilterCutoff: number
+  synthFilterResonance: number
+  setSynthFilterType: (type: 'lpf' | 'hpf' | 'bpf' | 'notch') => void
+  setSynthFilterCutoff: (hz: number) => void
+  setSynthFilterResonance: (value: number) => void
+
   /* Detail panel — right collapsible sidebar */
   activeDetailSection: string | null
   detailPanelWidth: number
@@ -200,6 +209,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
   /* Synth panel — defaults to sine, the most musical and forgiving waveform */
   synthOscillator: 'sine',
   setSynthOscillator: (type) => set({ synthOscillator: type }),
+
+  /* Synth filter defaults — LPF open at 2 kHz with a gentle touch of resonance */
+  synthFilterType: 'lpf',
+  synthFilterCutoff: 2000,
+  synthFilterResonance: 0.1,
+  setSynthFilterType: (type) => set({ synthFilterType: type }),
+  setSynthFilterCutoff: (hz) => set({ synthFilterCutoff: hz }),
+  setSynthFilterResonance: (value) => set({ synthFilterResonance: value }),
 
   activeDetailSection: 'samples',
   detailPanelWidth: 280,
