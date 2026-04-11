@@ -57,7 +57,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Strudel | Pattern-based live coding (mini-notation) | `@strudel/core` + `web` + `draw` |
 | Tone.js | High-level synths, effects, transport | `tone` |
 | Web Audio | Low-level audio node programming | Native API |
-| MIDI | External hardware output + input CC mapping | `webmidi` |
+| MIDI | Keyboard input + CC knobs + output | `@strudel/midi` |
 | Extras | Microtonal, soundfonts, OSC, serial | `@strudel/xen`, `soundfonts`, `osc`, `serial` |
 
 **7 Real-Time Visualizers** — All rendered on Canvas 2D at 60fps:
@@ -74,11 +74,13 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **41 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
 
-**175+ Code Examples** — Including interactive controls (slider, onKey, createParams) and visualizer demos (._pianoroll, ._scope, ._punchcard).
+**190+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, synth oscillators, and test patterns.
 
 **Sample Library** — Browse 218 Dirt-Samples with categories, drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
 
-**Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI input with CC value mapping, keyboard bindings via `onKey()`.
+**MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. Works with any USB MIDI device.
+
+**Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI CC value mapping, keyboard bindings via `onKey()`.
 
 **Audio Recording** — Record button in transport bar, exports as WebM.
 
