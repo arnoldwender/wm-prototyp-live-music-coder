@@ -71,6 +71,30 @@ export function StrudelEditor() {
   const synthOscillator = useAppStore((s) => s.synthOscillator);
   const setSynthOscillator = useAppStore((s) => s.setSynthOscillator);
 
+  /* Synth filter state — subscribed from the store so knob tweaks
+   * trigger a side-effect that configures the shared BiquadFilterNode
+   * in strudel-keys.ts via window.__lmcSetFilter. */
+  const synthFilterType = useAppStore((s) => s.synthFilterType);
+  const synthFilterCutoff = useAppStore((s) => s.synthFilterCutoff);
+  const synthFilterResonance = useAppStore((s) => s.synthFilterResonance);
+  const setSynthFilterType = useAppStore((s) => s.setSynthFilterType);
+  const setSynthFilterCutoff = useAppStore((s) => s.setSynthFilterCutoff);
+  const setSynthFilterResonance = useAppStore((s) => s.setSynthFilterResonance);
+
+  /* Map UI filter types to Web Audio BiquadFilterType strings */
+  useEffect(() => {
+    const setFilter = (window as unknown as {
+      __lmcSetFilter?: (t: BiquadFilterType, hz: number, q: number) => void;
+    }).__lmcSetFilter;
+    if (!setFilter) return;
+    const biquadType: BiquadFilterType =
+      synthFilterType === 'lpf' ? 'lowpass'
+        : synthFilterType === 'hpf' ? 'highpass'
+        : synthFilterType === 'bpf' ? 'bandpass'
+        : 'notch';
+    setFilter(biquadType, synthFilterCutoff, synthFilterResonance);
+  }, [synthFilterType, synthFilterCutoff, synthFilterResonance]);
+
   /* Active notes shown on the on-screen keyboard. We don't yet mirror
    * physical MIDI here — Phase 1 only highlights internally pressed keys. */
   const synthActiveNotes: number[] = [];
@@ -847,6 +871,12 @@ export function StrudelEditor() {
         onNoteOff={handleSynthNoteOff}
         oscillator={synthOscillator}
         onOscillatorChange={setSynthOscillator}
+        filterType={synthFilterType}
+        filterCutoff={synthFilterCutoff}
+        filterResonance={synthFilterResonance}
+        onFilterTypeChange={setSynthFilterType}
+        onFilterCutoffChange={setSynthFilterCutoff}
+        onFilterResonanceChange={setSynthFilterResonance}
       />
 
       {/* Compose Mode indicator — visible when MIDI notes write to editor */}

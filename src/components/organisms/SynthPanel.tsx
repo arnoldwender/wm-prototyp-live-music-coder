@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp, Piano } from 'lucide-react'
 import VirtualKeyboard from '../atoms/VirtualKeyboard'
 import OscillatorSelector from '../molecules/OscillatorSelector'
+import FilterControl, { type FilterType } from '../molecules/FilterControl'
 import type { WaveformType } from '../atoms/WaveformIcon'
 
 interface SynthPanelProps {
@@ -28,6 +29,18 @@ interface SynthPanelProps {
   oscillator: WaveformType
   /** Oscillator change callback */
   onOscillatorChange: (type: WaveformType) => void
+  /** Current filter topology */
+  filterType: FilterType
+  /** Current filter cutoff (Hz) */
+  filterCutoff: number
+  /** Current filter resonance (0-1) */
+  filterResonance: number
+  /** Filter topology change handler */
+  onFilterTypeChange: (type: FilterType) => void
+  /** Filter cutoff change handler — receives real Hz */
+  onFilterCutoffChange: (hz: number) => void
+  /** Filter resonance change handler */
+  onFilterResonanceChange: (value: number) => void
   /** Optional MIDI device name to display in the header */
   midiDeviceName?: string
 }
@@ -58,6 +71,12 @@ function SynthPanel({
   onNoteOff,
   oscillator,
   onOscillatorChange,
+  filterType,
+  filterCutoff,
+  filterResonance,
+  onFilterTypeChange,
+  onFilterCutoffChange,
+  onFilterResonanceChange,
   midiDeviceName,
 }: SynthPanelProps) {
   const { t } = useTranslation()
@@ -169,6 +188,28 @@ function SynthPanel({
               {t('editor.oscillator')}
             </div>
             <OscillatorSelector value={oscillator} onChange={onOscillatorChange} />
+          </div>
+
+          {/* Filter — cutoff / resonance / type + frequency response curve */}
+          <div>
+            <div
+              style={{
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--color-text-muted)',
+                marginBottom: 'var(--space-1)',
+                fontFamily: 'var(--font-family-sans)',
+              }}
+            >
+              Filter
+            </div>
+            <FilterControl
+              type={filterType}
+              cutoff={filterCutoff}
+              resonance={filterResonance}
+              onTypeChange={onFilterTypeChange}
+              onCutoffChange={onFilterCutoffChange}
+              onResonanceChange={onFilterResonanceChange}
+            />
           </div>
 
           {/* Virtual keyboard */}
