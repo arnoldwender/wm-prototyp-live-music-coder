@@ -120,6 +120,11 @@ declare module '@strudel/osc' {
   export function osc(options?: Record<string, unknown>): unknown
 }
 
+declare module '@strudel/midi' {
+  export function midin(device?: string): unknown
+  export function midi(options?: Record<string, unknown>): unknown
+}
+
 declare module '@strudel/serial' {
   export function serial(options?: Record<string, unknown>): unknown
 }
