@@ -1257,10 +1257,12 @@ const NACHTCAFE_CODE = `// =============================================
 arrange(
   // I. Betreten (6 Zyklen) — Dm7, Rauch und gedämpftes Licht
   [6, stack(
+    // Melody: Dm7 arpeggio, smoky atmosphere, triplet delay
     note("<d4 f4 a4 c5 a4 f4>")
       .s("sine").attack(0.2).release(1)
       .room(0.6).delay(0.4).delaytime(0.666)
       .gain(0.3),
+    // Chord: sustained Dm7, dim lights
     note("<[d3,f3,a3,c4]>/1")
       .s("triangle").attack(0.5).release(2)
       .room(0.5).gain(0.18)
@@ -1268,30 +1270,40 @@ arrange(
 
   // II. Gespräche (16 Zyklen) — Swing-Feeling in d-Moll
   [16, stack(
+    // Lead: jazz melody with rests — swing phrasing, conversations
     note("<d5 ~ f5 ~ a5 g5 ~ e5 d5 ~ c5 ~ a4 bb4 ~ d5>")
       .s("sine").attack(0.08).release(0.6)
       .room(0.5).delay(0.3).delaytime(0.333)
       .gain(0.35),
+    // Counter-line: parallel jazz voice, thirds below
     note("<f4 ~ a4 ~ c5 bb4 ~ g4 f4 ~ e4 ~ c4 d4 ~ f4>")
       .s("triangle").room(0.45).delay(0.2).gain(0.22),
+    // Chords: Dm7 → Gm7 → Am7 → Bbmaj7, jazz changes
     note("<[d3,f3,a3,c4] [g2,bb2,d3,f3] [a2,c3,e3,g3] [bb2,d3,f3,a3]>/4")
       .s("sine").attack(0.3).release(1).gain(0.2),
+    // Walking bass: jazz-style root movement
     note("d2 a2 g2 a2 bb2 a2 g2 a2")
       .s("sine").gain(0.4),
+    // Brushes: irregular hat pattern, jazz ride feel
     s("~ ~ hh ~ ~ hh ~ hh").gain(0.18),
+    // Kick: sparse, just marking the one
     s("bd ~ ~ ~ bd ~ ~ ~").gain(0.3)
   )],
 
   // III. Letzter Schluck (8 Zyklen) — F-Dur, warm
   [8, stack(
+    // Melody: warm F major, last sip of the night
     note("<f5 a5 c6 bb5 a5 g5 f5 c5>")
       .s("sine").attack(0.2).release(1.2)
       .room(0.7).delay(0.5).delaytime(0.666).delayfeedback(0.45)
       .gain(0.35),
+    // Chords: Fmaj7 → Bb → C7 → F, closing progression
     note("<[f3,a3,c4,e4] [bb2,d3,f3,a3] [c3,e3,g3,bb3] [f3,a3,c4]>")
       .s("triangle").attack(0.4).release(1.2)
       .room(0.6).gain(0.2),
+    // Bass: gentle walk home
     note("f2 c2 bb1 c2").s("sine").gain(0.4),
+    // Soft hat: fading, last whispers
     s("~ ~ hh ~ ~ ~ hh ~").gain(0.12)
   )]
 ).cpm(90)
@@ -1311,45 +1323,58 @@ const PIXELWALD_CODE = `// =============================================
 arrange(
   // I. Titelbildschirm (6 Zyklen) — C-Dur, Chiptune-Intro
   [6, stack(
+    // Melody: 8-bit square wave, classic title screen
     note("<c5 e5 g5 e5 c5 g4>")
       .s("square").lpf(3000).attack(0.01).release(0.2)
       .gain(0.3),
+    // Chords: chiptune harmony, C → F → G → C
     note("<[c4,e4,g4] [f3,a3,c4] [g3,b3,d4] [c4,e4,g4]>")
       .s("square").lpf(2000).attack(0.01).release(0.3)
       .gain(0.18),
+    // Bass: square wave bassline, NES-era sound
     note("c3 g2 f2 g2 c3 g2").s("square").lpf(800)
       .attack(0.01).release(0.1).gain(0.35)
   )],
 
   // II. Level 1 (16 Zyklen) — G-Dur, Abenteuer
   [16, stack(
+    // Lead: full 16-step adventure melody, bright and fast
     note("<g5 b5 d6 c6 b5 a5 g5 d5 g5 a5 b5 d6 e6 d6 c6 b5>")
       .s("square").lpf(4000).attack(0.01).release(0.15)
       .gain(0.32),
+    // Harmony: second 8-bit voice, call and response
     note("<b4 d5 g5 b5 g5 fs5 e5 b4 d5 fs5 g5 b5 c6 b5 a5 g5>")
       .s("square").lpf(3000).attack(0.01).release(0.12)
       .gain(0.2),
+    // Chord channel: slow chiptune pads
     note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>/4")
       .s("square").lpf(1500).attack(0.01).release(0.2)
       .gain(0.2),
+    // Bass channel: rapid 8-bit bass, lo-fi filtered
     note("g2 d2 c2 d2 g2 d2 e2 d2")
       .s("square").lpf(600).attack(0.01).release(0.08)
       .gain(0.4),
+    // Drums: classic game groove
     s("bd ~ hh sd bd hh sd hh").gain(0.45),
+    // Hat texture: 8th-note pulse
     s("hh*8").gain(0.15)
   )],
 
   // III. Highscore (8 Zyklen) — C-Dur, Triumph
   [8, stack(
+    // Lead: high C major fanfare — new high score!
     note("<c6 e6 g6 e6 c6 g5 e5 c5>")
       .s("square").lpf(5000).attack(0.01).release(0.3)
       .room(0.3).gain(0.32),
+    // Harmony: victory theme second voice
     note("<e5 g5 c6 e6 c6 b5 g5 e5>")
       .s("square").lpf(3500).attack(0.01).release(0.2)
       .gain(0.2),
+    // Bass: ascending celebration, triumphant
     note("c3 g2 f2 g2 c3 e3 g3 c3")
       .s("square").lpf(800).attack(0.01).release(0.08)
       .gain(0.38),
+    // Drums: full energy victory groove
     s("bd hh sd hh bd [hh hh] sd hh").gain(0.5)
   )]
 ).cpm(108)
@@ -1369,39 +1394,50 @@ const WALDLICHTUNG_CODE = `// =============================================
 arrange(
   // I. Pfad (8 Zyklen) — E-Dur, durch die Bäume
   [8, stack(
+    // Melody: sparse E major notes — stepping through a forest
     note("<e4 gs4 b4 gs4 e4 ~ ~ ~>")
       .s("sine").attack(0.5).release(2)
       .room(0.8).delay(0.5).delaytime(0.8)
       .gain(0.28),
+    // Echo: single B3 answering, bird call in the distance
     note("~ ~ ~ ~ ~ b3 ~ ~")
       .s("triangle").attack(0.8).release(2)
       .room(0.85).delay(0.6).gain(0.18),
+    // Drone: deep E2, the forest floor
     note("e2").s("sine").attack(2).release(4)
       .room(0.9).gain(0.2).slow(4)
   ).slow(2)],
 
   // II. Lichtung (16 Zyklen) — A-Dur, offen und hell
   [16, stack(
+    // Lead: bright A major melody — sunlight in the clearing
     note("<a4 cs5 e5 d5 cs5 b4 a4 e4 a4 b4 cs5 e5 fs5 e5 d5 cs5>")
       .s("sine").attack(0.12).release(0.7)
       .room(0.55).delay(0.3).gain(0.36),
+    // Counter-melody: parallel thirds, rustling leaves
     note("<cs4 e4 a4 cs5 a4 gs4 e4 cs4 e4 gs4 a4 cs5 d5 cs5 b4 a4>")
       .s("triangle").room(0.5).gain(0.22),
+    // Pad: A → D → E → A, wide open chords
     note("<[a3,cs4,e4] [d3,fs3,a3] [e3,gs3,b3] [a3,cs4,e4]>")
       .s("sine").attack(0.3).release(0.8).gain(0.18),
+    // Bass: simple root motion, grounded
     note("a2 e2 d2 e2").s("sine").gain(0.42),
+    // Soft hat: gentle breeze
     s("~ ~ hh ~ ~ ~ hh ~").gain(0.12)
   )],
 
   // III. Dämmerung (10 Zyklen) — E-Dur, Rückweg
   [10, stack(
+    // Melody: E major 10-step phrase — twilight walk home
     note("<e5 gs5 b5 gs5 e5 b4 gs4 e4 gs4 b4>")
       .s("sine").attack(0.4).release(1.5)
       .room(0.8).delay(0.5).delaytime(0.8).delayfeedback(0.5)
       .gain(0.33),
+    // Pad: E → A → B → E, fading light
     note("<[e4,gs4,b4] [a3,cs4,e4] [b3,ds4,fs4] [e3,gs3,b3]>")
       .s("triangle").attack(0.5).release(1.2)
       .room(0.7).gain(0.18),
+    // Pedal bass: deep E2 drone, night approaching
     note("e2").s("sine").attack(2).release(5)
       .room(0.95).gain(0.25).slow(5)
   ).slow(2)]
@@ -1422,53 +1458,73 @@ const DEPLOY_CODE = `// =============================================
 arrange(
   // I. git push (4 Zyklen) — G-Dur, Nervosität
   [4, stack(
+    // Descending arpeggio: rapid G major, finger on Enter
     note("g4 b4 d5 b4 g4 d4 b3 g3")
       .s("triangle").attack(0.03).release(0.2)
       .room(0.3).gain(0.35),
+    // Drums: nervous full groove, heart racing
     s("bd hh sd hh bd hh sd hh").gain(0.45),
+    // Bass: oscillating root-fifth, anticipation
     note("g2 d2 g2 d2").s("sine").gain(0.5)
   )],
 
   // II. Pipeline (8 Zyklen) — G-Dur, der Build läuft
   [8, stack(
+    // Lead: sawtooth melody — build steps running
     note("<g4 a4 b4 d5 b4 a4 g4 d4>")
       .s("sawtooth").lpf(1500).attack(0.02).release(0.2)
       .room(0.25).gain(0.3),
+    // Second voice: square wave, CI pipeline processing
     note("<b3 d4 g4 b4 g4 fs4 e4 d4>")
       .s("square").lpf(1200).attack(0.02).release(0.15)
       .gain(0.2),
+    // Bass: root motion, steady process
     note("g2 d2 c2 d2").s("sine").gain(0.5),
+    // Drums: full groove with double hat fills
     s("bd ~ hh sd bd hh [sd hh] hh").gain(0.5),
+    // 16th hats: machine working
     s("hh*16").gain(0.2)
   )],
 
   // III. Grünes Licht (8 Zyklen) — D-Dur, alles passt
   [8, stack(
+    // Lead: D major melody with delay — all checks green
     note("<d5 fs5 a5 g5 fs5 e5 d5 a4>")
       .s("sine").attack(0.08).release(0.5)
       .room(0.4).delay(0.25).gain(0.4),
+    // Counter-melody: warm triangle harmony
     note("<fs4 a4 d5 fs5 d5 cs5 a4 fs4>")
       .s("triangle").room(0.4).gain(0.28),
+    // Chords: D → G → A → D, confidence building
     note("<[d3,fs3,a3] [g2,b2,d3] [a2,cs3,e3] [d3,fs3,a3]>/4")
       .s("sine").attack(0.15).release(0.5).gain(0.2),
+    // Bass: deep root motion
     note("d2 a1 g1 a1").s("sine").gain(0.55),
+    // Drums: full groove, everything passing
     s("bd ~ hh sd bd hh sd hh").gain(0.5),
+    // Hat shimmer: steady 8ths
     s("hh*8").gain(0.18)
   )],
 
   // IV. Live (8 Zyklen) — G-Dur, Triumph
   [8, stack(
+    // Lead: soaring G major with delay — it's live!
     note("<g5 b5 d6 b5 g5 d5 b4 g4>")
       .s("sine").attack(0.15).release(0.8)
       .room(0.6).delay(0.4).delayfeedback(0.45)
       .gain(0.42),
+    // Harmony: warm triangle voice, celebration
     note("<b4 d5 g5 b5 g5 fs5 d5 b4>")
       .s("triangle").room(0.5).delay(0.3).gain(0.28),
+    // Chords: G → C → D → G, triumphant resolution
     note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>")
       .s("sine").attack(0.2).release(0.6).gain(0.22),
+    // Bass: walking celebration line
     note("g2 d2 c2 d2 g2 d2 e2 d2")
       .s("sine").gain(0.55),
+    // Drums: maximum energy, double hats
     s("bd hh sd hh bd [hh hh] sd hh").gain(0.55),
+    // 16th hat wall: full production, deployed
     s("hh*16").gain(0.22)
   )]
 ).cpm(125)
