@@ -20,7 +20,7 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - Strudel: pattern-based live coding (@strudel/core + @strudel/webaudio)
 - Tone.js: high-level synths and effects
 - Web Audio: raw browser API (oscillators, filters, gain nodes)
-- MIDI: external device output only (WebMidi.js)
+- MIDI: keyboard input (custom midikeys via raw Web MIDI API + OscillatorNode), CC knobs (midin), output (@strudel/midi)
 
 ## Persistence
 - IndexedDB autosave (idb)

@@ -53,7 +53,11 @@ export async function initMidiInput(): Promise<boolean> {
 }
 
 function attachInput(input: MIDIInput): void {
-  input.onmidimessage = handleMessage;
+  /* Use addEventListener instead of onmidimessage — the onmidimessage property
+   * is exclusive (only one handler), and @strudel/midi's webmidi library uses it
+   * for midikeys()/midin(). Setting it here would STEAL note events from Strudel.
+   * addEventListener allows both handlers to coexist. */
+  input.addEventListener('midimessage', handleMessage as EventListener);
 }
 
 function handleMessage(e: MIDIMessageEvent): void {
