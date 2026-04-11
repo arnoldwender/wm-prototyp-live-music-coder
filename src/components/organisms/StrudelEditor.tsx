@@ -183,12 +183,22 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
-        /* Load @strudel/midi and register midin/midi globally for eval scope */
+        /* Load @strudel/midi and register ALL midi functions globally.
+         * midin() = CC knobs/sliders, midikeys() = keyboard notes.
+         * enableWebMidi() initializes Web MIDI API for all devices.
+         * Works with any MIDI controller (MPK mini, Launchpad, etc.) */
         try {
           const strudelMidi = await import('@strudel/midi') as any;
-          if (strudelMidi.midin) (globalThis as any).midin = strudelMidi.midin;
-          if (strudelMidi.enableWebMidi) await strudelMidi.enableWebMidi();
-          console.log('[StrudelEditor] @strudel/midi loaded + midin registered');
+          /* Register all midi functions in global eval scope */
+          const midiFns = ['midin', 'midikeys', 'midimaps', 'midicontrolMap', 'midisoundMap'];
+          for (const fn of midiFns) {
+            if (strudelMidi[fn]) (globalThis as any)[fn] = strudelMidi[fn];
+          }
+          /* Enable Web MIDI API — prompts browser permission, detects all devices */
+          if (strudelMidi.enableWebMidi) {
+            try { await strudelMidi.enableWebMidi(); } catch { /* user denied or not supported */ }
+          }
+          console.log('[StrudelEditor] @strudel/midi loaded (midin + midikeys registered)');
         } catch {
           console.warn('[StrudelEditor] @strudel/midi not available');
         }
