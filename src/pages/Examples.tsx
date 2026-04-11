@@ -7,7 +7,7 @@
    inline playback with NowPlayingIndicator.
    ---------------------------------------------------------- */
 
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
@@ -16,6 +16,7 @@ import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../dat
 import type { ExampleEntry } from '../data/example-library'
 import { ENGINE_COLORS } from '../lib/constants'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 import { useInlinePlayer } from '../lib/useInlinePlayer'
 import { Play, Square, X } from 'lucide-react'
 import type { EngineType } from '../types/engine'
@@ -340,15 +341,8 @@ function Examples() {
     path: '/examples',
   })
 
-  /* Override body overflow for scrolling */
-  useEffect(() => {
-    document.body.style.overflow = 'auto'
-    document.body.style.height = 'auto'
-    return () => {
-      document.body.style.overflow = 'hidden'
-      document.body.style.height = '100vh'
-    }
-  }, [])
+  /* Override body overflow for scrolling (shared hook) */
+  useScrollablePage()
 
   /* ── Engine change resets invalid categories ────────── */
   const handleEngineChange = (engine: EngineType | null) => {

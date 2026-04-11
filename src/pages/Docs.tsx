@@ -11,6 +11,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Logo } from '../components/atoms'
 import { LanguageSwitcher } from '../components/molecules'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 import { docSections } from '../data/docs'
 import type { DocBlock } from '../data/docs'
 
@@ -124,15 +125,8 @@ function Docs() {
     path: '/docs',
   })
 
-  /* Override body overflow for scrolling */
-  useEffect(() => {
-    document.body.style.overflow = 'auto'
-    document.body.style.height = 'auto'
-    return () => {
-      document.body.style.overflow = 'hidden'
-      document.body.style.height = '100vh'
-    }
-  }, [])
+  /* Override body overflow for scrolling (shared hook) */
+  useScrollablePage()
 
   /* Scroll to top when switching sections */
   useEffect(() => {

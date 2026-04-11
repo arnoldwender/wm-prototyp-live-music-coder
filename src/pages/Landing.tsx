@@ -5,7 +5,6 @@
    example gallery, and powered-by footer.
    ---------------------------------------------------------- */
 
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { HeroSection } from '../components/organisms/HeroSection'
@@ -13,6 +12,7 @@ import { FeatureGrid } from '../components/organisms/FeatureGrid'
 import { ExampleGallery } from '../components/organisms/ExampleGallery'
 import { SiteNav } from '../components/organisms/SiteNav'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useScrollablePage } from '../lib/useScrollablePage'
 import { isElectron } from '../lib/platform'
 
 /** Subtle horizontal divider with center fade */
@@ -57,15 +57,8 @@ function Landing() {
     path: '/',
   })
 
-  /* Override body overflow for scrolling */
-  useEffect(() => {
-    document.body.style.overflow = 'auto';
-    document.body.style.height = 'auto';
-    return () => {
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100vh';
-    };
-  }, []);
+  /* Override body overflow for scrolling (shared hook) */
+  useScrollablePage()
 
   return (
     <main
