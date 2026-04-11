@@ -101,6 +101,29 @@ declare module '@strudel/web' {
   }>
 }
 
+declare module '@strudel/draw' {
+  export function pianoroll(options?: Record<string, unknown>): unknown
+  export function scope(options?: Record<string, unknown>): unknown
+  export function punchcard(options?: Record<string, unknown>): unknown
+}
+
+declare module '@strudel/xen' {
+  const xen: unknown
+  export default xen
+}
+
+declare module '@strudel/soundfonts' {
+  export function soundfonts(url?: string): Promise<void>
+}
+
+declare module '@strudel/osc' {
+  export function osc(options?: Record<string, unknown>): unknown
+}
+
+declare module '@strudel/serial' {
+  export function serial(options?: Record<string, unknown>): unknown
+}
+
 declare module 'superdough' {
   export function samples(
     sampleMap: string | Record<string, unknown>,
