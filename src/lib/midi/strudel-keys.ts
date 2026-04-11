@@ -97,57 +97,64 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       if (!isNoteOn && !isNoteOff) return;
       if (isNoteOff) return;
 
-      const repl = getRepl();
-      if (!repl?.scheduler) return;
+      const replInst = getRepl();
+      if (!replInst?.scheduler) return;
 
-      /* Get scheduler state from @strudel/web (instance A — same as REPL) */
-      const triggerFunc = strudelWeb.getTriggerFunc?.();
-      const currentPattern = strudelWeb.getPattern?.() ?? repl.state?.pattern;
-      const cps = strudelWeb.getCps?.() ?? 0.5;
-      const now = repl.scheduler.now();
-      const latency = 0.01;
-      const t = now + latency;
+      const midiNote = Math.round(note);
+      const vel = (velocity / 127).toFixed(2);
+      const now = replInst.scheduler.now();
+      const t = now + 0.01;
 
-      const key = `${deviceKey}_${note}`;
-      const value = {
-        midikey: key,
-        note: Math.round(note),
-        velocity: velocity / 127,
-      };
+      const key = `${deviceKey}_${midiNote}`;
+      const hapValue = { midikey: key, note: midiNote, velocity: velocity / 127 };
 
-      /* Buffer the hap with a real duration (0.5 cycles default).
-       * A zero-length hap (TimeSpan(t,t)) causes superdough to compute NaN
-       * for audio envelope params, crashing setValueAtTime. */
+      /* Buffer hap for cyclist queries */
       const noteLen = 0.5;
-      const whole = new TimeSpan(t, t + noteLen);
-      const part = new TimeSpan(t, t + noteLen);
-      kHaps[deviceKey].push(new Hap(whole, part, value, {}));
+      kHaps[deviceKey].push(new Hap(
+        new TimeSpan(t, t + noteLen),
+        new TimeSpan(t, t + noteLen),
+        hapValue, {}
+      ));
 
-      /* IMMEDIATE TRIGGER: Raw Web Audio API — zero Strudel dependencies.
-       * superdough has the same double-instance problem as @strudel/core.
-       * OscillatorNode + GainNode is the most reliable path to sound. */
-      try {
-        const ac = getMidiAudioCtx();
-        const freq = 440 * Math.pow(2, (note - 69) / 12);
-        const vol = velocity / 127;
-
-        const osc = ac.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-
-        const gainNode = ac.createGain();
-        gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
-
-        osc.connect(gainNode);
-        gainNode.connect(ac.destination);
-        osc.start(ac.currentTime);
-        osc.stop(ac.currentTime + 0.35);
-
-        console.log(`[midikeys] PLAYED note=${note} freq=${freq.toFixed(1)} vel=${vol.toFixed(2)}`);
-      } catch (err) {
-        console.warn('[midikeys] WebAudio trigger failed:', err);
+      /* IMMEDIATE TRIGGER: Two paths for sound output.
+       * 1. REPL evaluate — full Strudel sound library access
+       * 2. Fallback: raw OscillatorNode — always works */
+      let played = false;
+      if (replInst.evaluate) {
+        try {
+          const synth = (globalThis as any).__midiSynth ?? 'sine';
+          const effects = (globalThis as any).__midiEffects ?? '';
+          replInst.evaluate(
+            `note(${midiNote}).s("${synth}").gain(${vel})${effects}`,
+            false
+          ).then(() => { /* async eval ok */ }).catch(() => { /* ignore */ });
+          played = true;
+        } catch { /* REPL evaluate failed — use fallback */ }
       }
+
+      /* Path 2: Raw OscillatorNode — guaranteed to produce sound */
+      if (!played) {
+        try {
+          const ac = getMidiAudioCtx();
+          const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+          const vol = velocity / 127;
+
+          const osc = ac.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+
+          const gainNode = ac.createGain();
+          gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
+
+          osc.connect(gainNode);
+          gainNode.connect(ac.destination);
+          osc.start(ac.currentTime);
+          osc.stop(ac.currentTime + 0.35);
+        } catch { /* last resort failed */ }
+      }
+
+      console.log(`[midikeys] PLAYED note=${midiNote} vel=${vel} ${played ? '(REPL)' : '(OscNode)'}`);
     }) as EventListener);
   }
 

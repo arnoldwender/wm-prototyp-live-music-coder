@@ -25,6 +25,9 @@ const Examples = lazy(() => import('./pages/Examples'))
 const Legal = lazy(() => import('./pages/Legal'))
 const Sessions = lazy(() => import('./pages/Sessions'))
 const SessionPiece = lazy(() => import('./pages/SessionPiece'))
+const Changelog = lazy(() => import('./pages/Changelog'))
+const Blog = lazy(() => import('./pages/Blog'))
+const BlogPost = lazy(() => import('./pages/BlogPost'))
 
 /* Electron needs HashRouter under file:// because HTML5 history
    can't distinguish file:// paths. `isElectron` is imported from
@@ -121,6 +124,9 @@ function App() {
           <Route path="/examples" element={<Examples />} />
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/sessions/:slug" element={<SessionPiece />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/legal" element={<Legal />} />
           {/* Catch-all — any unmatched path renders the 404 page */}
           <Route path="*" element={<NotFound />} />

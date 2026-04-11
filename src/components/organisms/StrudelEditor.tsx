@@ -170,7 +170,7 @@ export function StrudelEditor() {
          * Our custom midikeys uses the raw Web MIDI API (proven to work)
          * and constructs Patterns from @strudel/web (same instance as REPL). */
         try {
-          const { evalScope } = await import('@strudel/web');
+          const { evalScope } = await import('@strudel/web') as any;
           await evalScope(import('@strudel/midi'));
           console.log('[StrudelEditor] @strudel/midi loaded (CC, .midi() output)');
         } catch (e) {
