@@ -722,7 +722,8 @@ export function StrudelEditor() {
                   onMouseLeave={(e) => { if (!composeMode) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   onClick={() => {
                     import('../../lib/midi/compose-mode').then(({ toggleComposeMode }) => {
-                      const enabled = toggleComposeMode(viewRef.current);
+                      /* Pass getter — view ref changes on editor rebuild */
+                      const enabled = toggleComposeMode(() => viewRef.current);
                       setComposeMode(enabled);
                       setMidiMenuOpen(false);
                     });
