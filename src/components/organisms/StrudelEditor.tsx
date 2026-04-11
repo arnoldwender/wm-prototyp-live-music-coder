@@ -143,6 +143,17 @@ export function StrudelEditor() {
             }
             console.log('[StrudelEditor] Inline widget methods registered (_pianoroll, _scope, etc.)');
           }
+
+          /* Expose sliderWithID and slider globally — the transpiler rewrites
+           * slider(0.5, 0, 1) to sliderWithID("slider_42", 0.5, 0, 1) but
+           * sliderWithID must be in the global eval scope. */
+          if (strudelCMod?.sliderWithID) {
+            (globalThis as any).sliderWithID = strudelCMod.sliderWithID;
+            console.log('[StrudelEditor] sliderWithID registered globally');
+          }
+          if (strudelCMod?.slider) {
+            (globalThis as any).slider = strudelCMod.slider;
+          }
         } catch (err) {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
