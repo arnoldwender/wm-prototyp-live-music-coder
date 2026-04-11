@@ -292,136 +292,135 @@ export function StrudelEditor() {
     };
   }, []);
 
-  /* Create CM6 editor with Strudel extensions */
+  /* Create CM6 editor with Strudel extensions.
+   * Uses an async IIFE so the vim() dynamic import resolves before
+   * the editor is instantiated. The `mounted` guard prevents stale
+   * creation when the effect is cleaned up during the await. */
   useEffect(() => {
     if (!editorRef.current || !activeFile) return;
     viewRef.current?.destroy();
+    viewRef.current = null;
+    let mounted = true;
 
-    const updateListener = EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
-        const code = update.state.doc.toString();
-        updateFileCode(activeFile.id, code);
-        /* Live mode: debounced auto-evaluate — only if code parses cleanly */
-        if (liveModeRef.current && replRef.current && isPlaying) {
-          if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
-          evalTimerRef.current = setTimeout(async () => {
-            try {
-              await replRef.current.evaluate(code, true);
-              resetStrudelTap();
-              setEvalError(null);
-              /* Sync inline widgets on live eval too */
-              const v = viewRef.current;
-              if (v) syncWidgetsAfterEval(v, replRef.current);
-            } catch (err) {
-              setEvalError(err instanceof Error ? err.message : String(err));
-            }
-          }, 150);
+    (async () => {
+      const updateListener = EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          const code = update.state.doc.toString();
+          updateFileCode(activeFile.id, code);
+          /* Live mode: debounced auto-evaluate — only if code parses cleanly */
+          if (liveModeRef.current && replRef.current && isPlaying) {
+            if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
+            evalTimerRef.current = setTimeout(async () => {
+              try {
+                await replRef.current.evaluate(code, true);
+                resetStrudelTap();
+                setEvalError(null);
+                const v = viewRef.current;
+                if (v) syncWidgetsAfterEval(v, replRef.current);
+              } catch (err) {
+                setEvalError(err instanceof Error ? err.message : String(err));
+              }
+            }, 150);
+          }
+        }
+      });
+
+      /* Ctrl+Enter / Cmd+Enter keybinding to evaluate code */
+      const evalKeymapExt = keymap.of([
+        {
+          key: 'Ctrl-Enter',
+          mac: 'Cmd-Enter',
+          run: () => { handleEvaluate(); return true; },
+        },
+        /* Solo/Mute shortcuts — Alt+1..9 to solo, Shift+Alt+1..9 to mute */
+        ...Array.from({ length: 9 }, (_, i) => ({
+          key: `Alt-${i + 1}`,
+          run: () => {
+            import('../../lib/audio/solo-mute').then(({ toggleSolo }) => {
+              toggleSolo(`d${i + 1}`);
+              console.log(`[Solo] Toggle d${i + 1}`);
+            });
+            return true;
+          },
+        })),
+        ...Array.from({ length: 9 }, (_, i) => ({
+          key: `Shift-Alt-${i + 1}`,
+          run: () => {
+            import('../../lib/audio/solo-mute').then(({ toggleMute }) => {
+              toggleMute(`d${i + 1}`);
+              console.log(`[Mute] Toggle d${i + 1}`);
+            });
+            return true;
+          },
+        })),
+      ]);
+
+      /* Build extension list — theme ID from Zustand store drives CM6 theme */
+      const extensions = [
+        ...getBaseExtensions(editorTheme),
+        ...getEngineExtensions(activeFile.engine),
+        highlightField,
+        updateListener,
+        evalKeymapExt,
+      ];
+
+      /* Vim mode — driven by Zustand store, loaded via dynamic import.
+       * Vite caches the module after the first load so subsequent
+       * rebuilds resolve instantly. */
+      if (vimMode) {
+        try {
+          const vimModule = await import('@replit/codemirror-vim');
+          if (vimModule.vim) {
+            extensions.push(vimModule.vim());
+            console.log('[StrudelEditor] Vim mode enabled');
+          }
+        } catch { /* @replit/codemirror-vim not available */ }
+      }
+
+      /* Apply font size and word wrap from localStorage (non-reactive settings) */
+      try {
+        const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
+        if (settings.fontSize && settings.fontSize !== 14) {
+          extensions.push(EditorView.theme({
+            '.cm-content': { fontSize: `${settings.fontSize}px` },
+          }));
+        }
+        if (settings.wordWrap) {
+          extensions.push(EditorView.lineWrapping);
+        }
+      } catch { /* settings not available */ }
+
+      /* Add Strudel-specific CM6 extensions if loaded (optional) */
+      const strudelCM = strudelExtRef.current;
+      if (strudelCM) {
+        try {
+          if (strudelCM.sliderPlugin) extensions.push(strudelCM.sliderPlugin);
+          if (strudelCM.widgetPlugin) extensions.push(strudelCM.widgetPlugin);
+          if (strudelCM.highlightExtension) extensions.push(strudelCM.highlightExtension);
+          if (strudelCM.flashField) extensions.push(strudelCM.flashField);
+        } catch (err) {
+          console.warn('[StrudelEditor] Failed to add Strudel CM extensions:', err);
         }
       }
-    });
 
-    /* Ctrl+Enter / Cmd+Enter keybinding to evaluate code */
-    const evalKeymap = keymap.of([
-      {
-        key: 'Ctrl-Enter',
-        mac: 'Cmd-Enter',
-        run: () => { handleEvaluate(); return true; },
-      },
-      /* Solo/Mute shortcuts — Alt+1..9 to solo, Shift+Alt+1..9 to mute */
-      ...Array.from({ length: 9 }, (_, i) => ({
-        key: `Alt-${i + 1}`,
-        run: () => {
-          import('../../lib/audio/solo-mute').then(({ toggleSolo }) => {
-            toggleSolo(`d${i + 1}`);
-            console.log(`[Solo] Toggle d${i + 1}`);
-          });
-          return true;
-        },
-      })),
-      ...Array.from({ length: 9 }, (_, i) => ({
-        key: `Shift-Alt-${i + 1}`,
-        run: () => {
-          import('../../lib/audio/solo-mute').then(({ toggleMute }) => {
-            toggleMute(`d${i + 1}`);
-            console.log(`[Mute] Toggle d${i + 1}`);
-          });
-          return true;
-        },
-      })),
-    ]);
+      /* Guard: bail if effect was cleaned up while awaiting vim import */
+      if (!mounted || !editorRef.current) return;
 
-    /* Build extension list — theme ID from Zustand store drives CM6 theme */
-    const extensions = [
-      ...getBaseExtensions(editorTheme),
-      ...getEngineExtensions(activeFile.engine),
-      highlightField,
-      updateListener,
-      evalKeymap,
-    ];
+      const state = EditorState.create({
+        doc: activeFile.code,
+        extensions,
+      });
 
-    /* Vim mode — driven by Zustand store, loaded synchronously */
-    /* Vim mode — lazy-loaded via dynamic import. The editor rebuilds
-     * when vimMode changes (it's in the useEffect deps), so on the
-     * SECOND render the module is already cached and loads instantly. */
-    if (vimMode) {
-      try {
-        /* eslint-disable-next-line @typescript-eslint/no-var-requires */
-        const vimModule = (window as any).__cachedVim;
-        if (vimModule?.vim) {
-          extensions.push(vimModule.vim());
-          console.log('[StrudelEditor] Vim mode enabled');
-        } else {
-          /* First load: cache the module and trigger rebuild */
-          import('@replit/codemirror-vim').then((mod) => {
-            (window as any).__cachedVim = mod;
-            /* Force re-render by touching a state the effect depends on */
-          }).catch(() => {});
-        }
-      } catch { /* @replit/codemirror-vim not available */ }
-    }
+      viewRef.current = new EditorView({ state, parent: editorRef.current });
+    })();
 
-    /* Apply font size and word wrap from localStorage (non-reactive settings) */
-    try {
-      const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
-      if (settings.fontSize && settings.fontSize !== 14) {
-        extensions.push(EditorView.theme({
-          '.cm-content': { fontSize: `${settings.fontSize}px` },
-        }));
-      }
-      if (settings.wordWrap) {
-        extensions.push(EditorView.lineWrapping);
-      }
-    } catch { /* settings not available */ }
-
-    /* Add Strudel-specific CM6 extensions if loaded (optional) */
-    const strudelCM = strudelExtRef.current;
-    if (strudelCM) {
-      try {
-        /* Slider widget plugin — allows slider(value, min, max, step) in code */
-        if (strudelCM.sliderPlugin) extensions.push(strudelCM.sliderPlugin);
-        /* Widget plugin — supports other inline widgets (._pianoroll, ._scope, etc.) */
-        if (strudelCM.widgetPlugin) extensions.push(strudelCM.widgetPlugin);
-        /* Pattern highlighting extension — marks active haps in code */
-        if (strudelCM.highlightExtension) extensions.push(strudelCM.highlightExtension);
-        /* Flash extension — visual feedback on eval */
-        if (strudelCM.flashField) extensions.push(strudelCM.flashField);
-      } catch (err) {
-        console.warn('[StrudelEditor] Failed to add Strudel CM extensions:', err);
-      }
-    }
-
-    const state = EditorState.create({
-      doc: activeFile.code,
-      extensions,
-    });
-
-    viewRef.current = new EditorView({ state, parent: editorRef.current });
     return () => {
+      mounted = false;
       viewRef.current?.destroy();
       viewRef.current = null;
       if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
     };
-  }, [activeFile?.id, activeFile?.engine, ready]);
+  }, [activeFile?.id, activeFile?.engine, ready, editorTheme, vimMode]);
 
   /* Sync external store code changes into CM6 */
   useEffect(() => {
