@@ -3,7 +3,7 @@
    ──────────────────────────────────────────────────────────
    src/components/organisms/ActivityBar.tsx
    ────────────────────────────────────────────────────────── */
-import { Music, BookOpen, Terminal, Settings, FileCode2 } from 'lucide-react';
+import { Music, BookOpen, Terminal, Settings, FileCode2, Usb } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { ActivityBarButton } from '../atoms';
 
@@ -13,6 +13,7 @@ const SECTIONS = [
   { id: 'gists', icon: FileCode2, label: 'Saved Gists' },
   { id: 'settings', icon: Settings, label: 'Settings' },
   { id: 'console', icon: Terminal, label: 'Console' },
+  { id: 'midi', icon: Usb, label: 'MIDI' },
 ] as const;
 
 export function ActivityBar() {
