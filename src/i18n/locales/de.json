@@ -464,6 +464,45 @@
       "stop": "Strg+. — Alles stoppen",
       "tipsHeading": "Performance-Tipps",
       "tipsText": "Halte deine Patterns kurz und modular. Nutze separate Zeilen für Drums, Bass und Melodie, damit du schnell einzelne Layer auskommentieren oder ändern kannst. Strg+Enter wertet den gesamten Code auf einmal aus, sodass du Änderungen über mehrere Zeilen vorbereiten kannst."
+    },
+    "controls": {
+      "title": "Interaktive Steuerung",
+      "sliderHeading": "slider() — Inline-Regler",
+      "sliderText": "slider(wert, min, max, step) erzeugt einen Schieberegler direkt im Code. Ziehen Sie den Regler, um den Wert in Echtzeit zu ändern — der Code aktualisiert sich automatisch.",
+      "onkeyHeading": "onKey() — Tastenbelegung",
+      "onkeyText": "Binden Sie Tasten an Aktionen mit onKey(taste, callback). Funktioniert nur, wenn der Editor nicht fokussiert ist.",
+      "paramsHeading": "createParams() — Benannte Parameter",
+      "paramsText": "Erstellen Sie benannte Parameter mit createParams(name, standard). Ändern Sie sie mit setParam() oder über MIDI-CC-Mapping."
+    },
+    "visualizers": {
+      "title": "Visualisierer",
+      "inlineHeading": "Inline-Visualisierer",
+      "inlineText": "Fügen Sie ._pianoroll(), ._scope() oder ._punchcard() am Ende einer Pattern-Kette hinzu, um eine Visualisierung direkt unter dem Code anzuzeigen.",
+      "panelHeading": "Visualisierungs-Panels",
+      "panelText": "7 Visualisierungs-Panels verfügbar — aktivieren Sie sie über die Pill-Buttons am unteren Rand:",
+      "waveform": "Waveform — Echtzeit-Wellenform (Oszilloskop)",
+      "spectrum": "Spectrum — Frequenzanalyse mit Balken",
+      "timeline": "Timeline — Beat-Raster und Level-Meter",
+      "pianoroll": "Piano Roll — DAW-Qualität, scrollende Noten (Ableton-Stil)",
+      "punchcard": "Punchcard — Punkt-Raster für Events",
+      "spiral": "Spiral — rotierende Notenvisualisierung",
+      "pitchwheel": "Pitchwheel — 12-Ton-Kreis (harmonische Analyse)"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "themesHeading": "Themes",
+      "themesText": "4 Editor-Themes verfügbar — wechseln Sie über das Zahnrad-Icon in der Toolbar:",
+      "themePurple": "Purple (Standard) — Zinc/Lila, die Standard-Ästhetik",
+      "themeAmber": "Amber — warme Stein-/Bernsteintöne",
+      "themeCyan": "Cyan — tiefer Ozean, Türkistöne",
+      "themeMatrix": "Matrix — Grün auf Schwarz, Terminal-Stil",
+      "editorHeading": "Editor-Optionen",
+      "editorText": "Passen Sie den Editor an Ihre Vorlieben an:",
+      "fontSize": "Schriftgröße — Slider von 10px bis 22px",
+      "vimMode": "Vim-Modus — Vim-Tastenkombinationen im Editor",
+      "wordWrap": "Zeilenumbruch — automatischer Umbruch langer Zeilen",
+      "lineNumbers": "Zeilennummern — ein-/ausblenden",
+      "zenMode": "Zen-Modus — alle UI-Elemente ausblenden, nur Code"
     }
   },
   "a11y": {
