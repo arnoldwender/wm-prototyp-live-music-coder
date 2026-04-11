@@ -464,6 +464,45 @@
       "stop": "Ctrl+. — detener todo el audio",
       "tipsHeading": "Consejos de performance",
       "tipsText": "Mantén tus patrones cortos y modulares. Usa líneas separadas para batería, bajo y melodía para poder comentar o modificar capas individuales rápidamente. Ctrl+Enter evalúa todo el código a la vez, para que puedas preparar cambios en múltiples líneas antes de aplicarlos."
+    },
+    "controls": {
+      "title": "Controles Interactivos",
+      "sliderHeading": "slider() — Control Inline",
+      "sliderText": "slider(valor, min, max, step) crea un control deslizante inline en el código. Arrástralo para cambiar el valor en tiempo real — el código se actualiza automáticamente.",
+      "onkeyHeading": "onKey() — Atajos de Teclado",
+      "onkeyText": "Asigna teclas a acciones con onKey(tecla, callback). Funciona cuando el editor no tiene foco.",
+      "paramsHeading": "createParams() — Parámetros Nombrados",
+      "paramsText": "Crea parámetros nombrados con createParams(nombre, predeterminado). Cámbialos con setParam() o mapeo MIDI CC."
+    },
+    "visualizers": {
+      "title": "Visualizadores",
+      "inlineHeading": "Visualizadores Inline",
+      "inlineText": "Agrega ._pianoroll(), ._scope() o ._punchcard() al final de una cadena de patrón para mostrar una visualización debajo del código.",
+      "panelHeading": "Paneles de Visualización",
+      "panelText": "7 paneles de visualización disponibles — actívalos con los botones pill en la parte inferior:",
+      "waveform": "Waveform — osciloscopio en tiempo real",
+      "spectrum": "Spectrum — analizador de frecuencias",
+      "timeline": "Timeline — cuadrícula de beats y medidor de nivel",
+      "pianoroll": "Piano Roll — notas scrolleantes calidad DAW (estilo Ableton)",
+      "punchcard": "Punchcard — cuadrícula de puntos para eventos",
+      "spiral": "Spiral — visualización rotativa de notas",
+      "pitchwheel": "Pitchwheel — círculo de 12 tonos (análisis armónico)"
+    },
+    "settings": {
+      "title": "Configuración",
+      "themesHeading": "Temas",
+      "themesText": "4 temas de editor disponibles — cambia con el icono de engranaje en la barra de herramientas:",
+      "themePurple": "Purple (Por defecto) — zinc/morado, la estética predeterminada",
+      "themeAmber": "Amber — tonos cálidos piedra/ámbar",
+      "themeCyan": "Cyan — océano profundo, tonos turquesa",
+      "themeMatrix": "Matrix — verde sobre negro, estilo terminal",
+      "editorHeading": "Opciones del Editor",
+      "editorText": "Personaliza el editor a tu gusto:",
+      "fontSize": "Tamaño de fuente — slider de 10px a 22px",
+      "vimMode": "Modo Vim — atajos de teclado vim en el editor",
+      "wordWrap": "Ajuste de línea — ajuste automático de líneas largas",
+      "lineNumbers": "Números de línea — mostrar/ocultar",
+      "zenMode": "Modo Zen — ocultar toda la UI, solo código"
     }
   },
   "a11y": {

@@ -44,28 +44,55 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 ## Features
 
-**Code Editor** — CodeMirror 6 with dark theme, multi-tab files, per-engine syntax highlighting, and live evaluation with 500ms debounce.
+**Code Editor** — CodeMirror 6 with dark theme, multi-tab files, per-engine syntax highlighting, live evaluation, inline `slider()` widgets, and `._pianoroll()` / `._scope()` visualizers rendered directly in the code.
+
+**Interactive Controls** — `slider(value, min, max, step)` creates draggable inline widgets. `onKey()` binds keyboard shortcuts. `createParams()` creates named parameters controllable via MIDI CC.
 
 **Visual Node Graph** — React Flow canvas showing audio routing as draggable, connectable nodes. Auto-derived from code in real time.
 
-**4 Audio Engines**
+**4 Audio Engines + Extensions**
 
 | Engine | Purpose | Package |
 |--------|---------|---------|
-| Strudel | Pattern-based live coding (mini-notation) | `@strudel/core` |
+| Strudel | Pattern-based live coding (mini-notation) | `@strudel/core` + `web` + `draw` |
 | Tone.js | High-level synths, effects, transport | `tone` |
 | Web Audio | Low-level audio node programming | Native API |
-| MIDI | External hardware output | `webmidi` |
+| MIDI | External hardware output + input CC mapping | `webmidi` |
+| Extras | Microtonal, soundfonts, OSC, serial | `@strudel/xen`, `soundfonts`, `osc`, `serial` |
 
-**Real-Time Visualizers** — Waveform, spectrum analyzer, and pattern timeline rendered on Canvas 2D at 60fps with superdough audio tap integration.
+**7 Real-Time Visualizers** — All rendered on Canvas 2D at 60fps:
 
-**Sample Library** — Browse and preview built-in audio samples by category with inline playback.
+| Visualizer | Description |
+|------------|-------------|
+| Waveform | Oscilloscope with gradient fill and peak detection |
+| Spectrum | Frequency bars with logarithmic distribution |
+| Timeline | Beat grid with playhead, level meter, BPM display |
+| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid |
+| Punchcard | Dot grid — size/opacity mapped to velocity |
+| Spiral | Rotational display — time = angle, age = radius |
+| Pitchwheel | 12-tone circle for harmonic analysis |
 
-**Example Gallery** — Curated code examples per engine with one-click load into the editor.
+**41 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
 
-**Code Sharing** — Share code via compressed URLs (lz-string), save/load GitHub Gists, and record audio sessions as WebM.
+**175+ Code Examples** — Including interactive controls (slider, onKey, createParams) and visualizer demos (._pianoroll, ._scope, ._punchcard).
 
-**Internationalization** — Full DE / EN / ES support with 419 translation keys.
+**Sample Library** — Browse 218 Dirt-Samples with categories, drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
+
+**Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI input with CC value mapping, keyboard bindings via `onKey()`.
+
+**Audio Recording** — Record button in transport bar, exports as WebM.
+
+**Settings Panel** — 4 editor themes (Purple, Amber, Cyan, Matrix), font size, vim mode, word wrap, zen mode.
+
+**Solo/Mute** — Alt+1..9 to solo patterns, Shift+Alt+1..9 to mute. `_$:` prefix in code mutes patterns.
+
+**Clock Sync** — Multi-tab synchronization via BroadcastChannel (leader election, BPM broadcast).
+
+**Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists.
+
+**Console Panel** — In-editor log output with color-coded levels and timestamps.
+
+**Internationalization** — Full DE / EN / ES support.
 
 **Dark Mode** — Music production aesthetic powered by a complete design token system.
 
@@ -164,10 +191,12 @@ src/
     orchestrator/   # Multi-engine management + DAG audio graph
     engines/        # Strudel, Tone.js, WebAudio, MIDI adapters
     audio/          # Shared AudioContext, analyser, recorder
-    editor/         # CodeMirror theme, setup, extensions
+    editor/         # CodeMirror theme, setup, extensions, inline-widgets, 4 themes
+    input/          # Gamepad API polling
+    midi/           # MIDI input CC mapping
     parser/         # Code-to-graph extraction (per engine)
     codegen/        # Graph-to-code generation
-    visualizers/    # Waveform, spectrum, timeline (Canvas 2D)
+    visualizers/    # Waveform, spectrum, timeline, pianoroll, punchcard, spiral, pitchwheel
     persistence/    # IndexedDB, URL sharing, GitHub Gist
     store.ts        # Zustand global state
     history.ts      # Undo/redo (100-entry cap)
