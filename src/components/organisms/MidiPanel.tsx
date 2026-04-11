@@ -12,7 +12,6 @@ import {
   isMidiAvailable,
   initMidiInput,
   onCCChange,
-  getCCValue,
 } from '../../lib/midi/input';
 
 interface CCEntry {
