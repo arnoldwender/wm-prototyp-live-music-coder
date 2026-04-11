@@ -12,7 +12,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing'
 import { NotFound, ErrorBoundary } from './components/atoms'
 import { isElectron, isElectronMac, TITLEBAR_HEIGHT } from './lib/platform'
@@ -112,10 +112,12 @@ function App() {
       <Router>
         <Suspense fallback={<RouteLoader />}>
         <Routes>
-          {/* Root route renders the Landing (hero) on both web and
-              Electron. The hero's "Start Coding" CTA links to /editor,
-              which is where the actual IDE lives. */}
-          <Route path="/" element={<Landing />} />
+          {/* In the Electron desktop app, skip the marketing landing
+              and go straight to the editor — the user already installed
+              the app so a "Download Desktop App" CTA is pointless.
+              On the web, render the landing page as normal.
+              See .wm-electron-audit.md R2. */}
+          <Route path="/" element={isElectron ? <Navigate to="/editor" replace /> : <Landing />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/editor" element={<Editor />} />
           <Route path="/docs" element={<Docs />} />

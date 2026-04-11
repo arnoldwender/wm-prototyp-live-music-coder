@@ -9,8 +9,9 @@
 
 import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { Button } from '../atoms'
-import { X, Copy, Check } from 'lucide-react'
+import { X, Copy, Check, Sparkles } from 'lucide-react'
 
 interface HelpPanelProps {
   onClose: () => void
@@ -364,6 +365,38 @@ export function HelpPanel({ onClose }: HelpPanelProps) {
       </div>
 
       <div className="p-4 space-y-6">
+        {/* --- What's New — feature discoverability --- */}
+        <section>
+          <h3
+            className="text-sm font-semibold mb-2 flex items-center gap-1"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            <Sparkles size={14} />
+            {t('help.whatsNew', "What's New")}
+          </h3>
+          <div
+            className="space-y-2 text-xs"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            <div className="flex gap-2 items-start">
+              <span style={{ color: 'var(--color-midi)', fontWeight: 'var(--font-weight-bold)' }}>MIDI</span>
+              <span>{t('help.whatsNewMidi', 'Connect any MIDI keyboard or controller — auto-detected with 19 device profiles.')}</span>
+            </div>
+            <div className="flex gap-2 items-start">
+              <span style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-weight-bold)', whiteSpace: 'nowrap' }}>Compose</span>
+              <span>{t('help.whatsNewCompose', 'Compose Mode — visual multi-track arrangement with piano roll and pattern timeline.')}</span>
+            </div>
+            <div
+              className="flex gap-2 mt-2 pt-2"
+              style={{ borderTop: '1px solid var(--color-border)' }}
+            >
+              <Link to="/blog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Blog</Link>
+              <span style={{ color: 'var(--color-border)' }}>|</span>
+              <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Changelog</Link>
+            </div>
+          </div>
+        </section>
+
         {/* --- Getting Started guide --- */}
         <Section titleKey="help.gettingStarted">
           <div

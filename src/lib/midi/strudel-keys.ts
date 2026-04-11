@@ -123,52 +123,48 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
         hapValue, {}
       ));
 
-      /* IMMEDIATE TRIGGER: Two paths for sound output.
-       * 1. REPL evaluate — full Strudel sound library access
-       * 2. Fallback: raw OscillatorNode — always works */
-      let played = false;
-      if (replInst.evaluate) {
-        try {
-          /* Extract ONLY the synth name from user's code — skip effects
-           * because nested parens like .room(cc(74).range(0,0.8)) break
-           * the regex and produce invalid JS syntax errors. */
-          const activeCode = replInst.state?.activeCode ?? '';
-          const synthMatch = activeCode.match(/\.s\(\s*["']([^"']+)["']\s*\)/);
-          const synth = synthMatch?.[1] ?? 'sine';
+      /* IMMEDIATE TRIGGER: Always use OscillatorNode for guaranteed sound.
+       * The REPL evaluate path has too many failure modes:
+       * - "superpiano not found" (double superdough instance)
+       * - SyntaxError from effect extraction
+       * - Timing conflicts with the cyclist
+       *
+       * OscillatorNode is instant, reliable, and respects velocity.
+       * The user's .s("synth") choice maps to an oscillator type. */
+      const SYNTH_TO_OSC: Record<string, OscillatorType> = {
+        sine: 'sine', sawtooth: 'sawtooth', square: 'square', triangle: 'triangle',
+        supersaw: 'sawtooth', saw: 'sawtooth', pulse: 'square',
+        /* Sample-based synths fall back to sine — the most musical default */
+        superpiano: 'sine', piano: 'triangle', metal: 'square',
+        bass: 'sawtooth', pluck: 'triangle', organ: 'sine',
+      };
 
-          /* Simple one-shot: note + synth + gain. No effects — those are
-           * applied by the user's main pattern via the cyclist. */
-          replInst.evaluate(
-            `note(${midiNote}).s("${synth}").gain(${vel})`,
-            false
-          ).then(() => {}).catch(() => {});
-          played = true;
-        } catch { /* REPL evaluate failed — use fallback */ }
-      }
+      const activeCode = replInst.state?.activeCode ?? '';
+      const synthMatch = activeCode.match(/\.s\(\s*["']([^"']+)["']\s*\)/);
+      const synthName = synthMatch?.[1] ?? 'sine';
+      const oscType = SYNTH_TO_OSC[synthName] ?? 'sine';
 
-      /* Path 2: Raw OscillatorNode — guaranteed to produce sound */
-      if (!played) {
-        try {
-          const ac = getMidiAudioCtx();
-          const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
-          const vol = velocity / 127;
+      /* OscillatorNode — always produces sound, maps synth name to oscillator type */
+      try {
+        const ac = getMidiAudioCtx();
+        const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+        const vol = velocity / 127;
 
-          const osc = ac.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.value = freq;
+        const osc = ac.createOscillator();
+        osc.type = oscType;
+        osc.frequency.value = freq;
 
-          const gainNode = ac.createGain();
-          gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
+        const gainNode = ac.createGain();
+        gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
 
-          osc.connect(gainNode);
-          gainNode.connect(ac.destination);
-          osc.start(ac.currentTime);
-          osc.stop(ac.currentTime + 0.35);
-        } catch { /* last resort failed */ }
-      }
+        osc.connect(gainNode);
+        gainNode.connect(ac.destination);
+        osc.start(ac.currentTime);
+        osc.stop(ac.currentTime + 0.45);
+      } catch { /* audio failed */ }
 
-      console.log(`[midikeys] PLAYED note=${midiNote} vel=${vel} ${played ? '(REPL)' : '(OscNode)'}`);
+      console.log(`[midikeys] PLAYED note=${midiNote} vel=${vel} osc=${oscType} (${synthName})`);
     }) as EventListener);
   }
 

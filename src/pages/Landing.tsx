@@ -200,6 +200,13 @@ function Landing() {
           Web Audio
         </p>
 
+        {/* Blog + Changelog — highlight new features */}
+        <p className="flex items-center justify-center gap-3 mb-3" style={{ fontSize: 'var(--font-size-xs)' }}>
+          <Link to="/blog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Blog</Link>
+          <span>|</span>
+          <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Changelog</Link>
+        </p>
+
         {/* Legal links + GitHub + License */}
         <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
           <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
