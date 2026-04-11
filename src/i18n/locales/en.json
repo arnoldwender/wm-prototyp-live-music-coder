@@ -464,6 +464,45 @@
       "stop": "Ctrl+. — stop all audio",
       "tipsHeading": "Performance Tips",
       "tipsText": "Keep your patterns short and modular. Use separate lines for drums, bass, and melody so you can quickly comment out or modify individual layers. The Ctrl+Enter shortcut evaluates all code at once, so you can prepare changes across multiple lines before committing them."
+    },
+    "controls": {
+      "title": "Interactive Controls",
+      "sliderHeading": "slider() — Inline Widget",
+      "sliderText": "slider(value, min, max, step) creates an inline slider widget right in your code. Drag it to change the value in real-time — the code updates automatically.",
+      "onkeyHeading": "onKey() — Keyboard Bindings",
+      "onkeyText": "Bind keyboard keys to actions with onKey(key, callback). Works when the editor is not focused.",
+      "paramsHeading": "createParams() — Named Parameters",
+      "paramsText": "Create named parameters with createParams(name, default). Change them with setParam() or via MIDI CC mapping."
+    },
+    "visualizers": {
+      "title": "Visualizers",
+      "inlineHeading": "Inline Visualizers",
+      "inlineText": "Add ._pianoroll(), ._scope(), or ._punchcard() at the end of a pattern chain to show a visualization right below the code.",
+      "panelHeading": "Visualizer Panels",
+      "panelText": "7 visualizer panels available — toggle them via the pill buttons at the bottom:",
+      "waveform": "Waveform — real-time oscilloscope",
+      "spectrum": "Spectrum — frequency bars analyzer",
+      "timeline": "Timeline — beat grid and level meter",
+      "pianoroll": "Piano Roll — DAW-quality scrolling notes (Ableton-style)",
+      "punchcard": "Punchcard — dot grid for events",
+      "spiral": "Spiral — rotational note visualization",
+      "pitchwheel": "Pitchwheel — 12-tone circle (harmonic analysis)"
+    },
+    "settings": {
+      "title": "Settings",
+      "themesHeading": "Themes",
+      "themesText": "4 editor themes available — switch via the gear icon in the toolbar:",
+      "themePurple": "Purple (Default) — zinc/purple, the default aesthetic",
+      "themeAmber": "Amber — warm stone/amber tones",
+      "themeCyan": "Cyan — deep ocean, teal tones",
+      "themeMatrix": "Matrix — green on black, terminal style",
+      "editorHeading": "Editor Options",
+      "editorText": "Customize the editor to your preferences:",
+      "fontSize": "Font Size — slider from 10px to 22px",
+      "vimMode": "Vim Mode — vim keybindings in the editor",
+      "wordWrap": "Word Wrap — automatically wrap long lines",
+      "lineNumbers": "Line Numbers — show/hide",
+      "zenMode": "Zen Mode — hide all UI, code only"
     }
   },
   "a11y": {
