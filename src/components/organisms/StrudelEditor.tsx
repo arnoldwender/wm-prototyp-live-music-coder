@@ -183,12 +183,26 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
-        /* Load @strudel/midi for MIDI input/output in patterns (midin, midi) */
+        /* Load @strudel/midi — register midin/midikeys in the REPL's eval scope.
+         * globalThis doesn't work because the REPL runs code in its own isolated scope.
+         * Instead, we evaluate an import statement THROUGH the REPL itself,
+         * which makes the functions available in the same scope as user code. */
         try {
+          /* First: import the module so it registers on Pattern.prototype */
           await import('@strudel/midi');
-          console.log('[StrudelEditor] @strudel/midi loaded');
-        } catch {
-          console.warn('[StrudelEditor] @strudel/midi not available');
+          /* Second: evaluate through REPL to make functions available in eval scope.
+           * This is how strudel.cc's prebake works — it evaluates imports through
+           * the REPL so they're in the same scope as user code. */
+          if (repl) {
+            await repl.evaluate(
+              `const { midin, midikeys, enableWebMidi } = await import('@strudel/midi');\n` +
+              `await enableWebMidi();`,
+              false /* don't autoplay */
+            );
+          }
+          console.log('[StrudelEditor] @strudel/midi loaded via REPL (midin + midikeys in eval scope)');
+        } catch (err) {
+          console.warn('[StrudelEditor] @strudel/midi load failed:', err);
         }
 
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
