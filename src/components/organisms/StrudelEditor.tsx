@@ -124,10 +124,28 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
 
-        /* Load @strudel/draw for inline canvas visualizers */
+        /* Load @strudel/draw and register inline widget methods on Pattern.prototype.
+         * @strudel/draw exports pianoroll/punchcard/spiral/pitchwheel as background
+         * painters (Pattern.prototype.pianoroll). The _underscore versions (_pianoroll)
+         * are inline CM6 widgets — they need registerWidget from @strudel/codemirror. */
         try {
-          await import('@strudel/draw');
-        } catch { /* draw not available */ }
+          const draw = await import('@strudel/draw');
+          const strudelCMod = strudelExtRef.current;
+          if (strudelCMod?.registerWidget && draw) {
+            /* Register each inline visualizer as a CM6 block widget.
+             * registerWidget(type, fn) adds Pattern.prototype._type AND
+             * tells the transpiler to detect ._type() calls in code. */
+            const widgetTypes = ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum'];
+            for (const type of widgetTypes) {
+              try {
+                strudelCMod.registerWidget(type);
+              } catch { /* already registered or not available */ }
+            }
+            console.log('[StrudelEditor] Inline widget methods registered (_pianoroll, _scope, etc.)');
+          }
+        } catch (err) {
+          console.warn('[StrudelEditor] @strudel/draw load failed:', err);
+        }
 
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
          * onKey, createParams, clock sync, all() global transforms) */
