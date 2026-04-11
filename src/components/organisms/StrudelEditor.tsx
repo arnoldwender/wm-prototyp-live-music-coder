@@ -183,6 +183,14 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
         }
 
+        /* Load @strudel/midi for MIDI input/output in patterns (midin, midi) */
+        try {
+          await import('@strudel/midi');
+          console.log('[StrudelEditor] @strudel/midi loaded');
+        } catch {
+          console.warn('[StrudelEditor] @strudel/midi not available');
+        }
+
         /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
          * onKey, createParams, clock sync, all() global transforms) */
         try {
