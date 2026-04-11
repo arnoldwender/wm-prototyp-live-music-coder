@@ -20,7 +20,7 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - Strudel: pattern-based live coding (@strudel/core + @strudel/webaudio)
 - Tone.js: high-level synths and effects
 - Web Audio: raw browser API (oscillators, filters, gain nodes)
-- MIDI: keyboard input (custom midikeys via raw Web MIDI API + OscillatorNode), CC knobs (midin), output (@strudel/midi)
+- MIDI: keyboard input (custom midikeys via raw Web MIDI API + OscillatorNode), CC knobs (midin), output (@strudel/midi), compose mode (play-to-code), MIDI learn (CC-to-parameter mapping), 19 device profiles (MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, etc.)
 
 ## Persistence
 - IndexedDB autosave (idb)
@@ -34,10 +34,10 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - NEVER hardcode colors/spacing — use design tokens
 - This is Vite + React SPA, NOT Next.js
 - AGPL-3.0-or-later license (combined app, Strudel dependency); MIT for original components
-- 82 tests across 16 test files, 9 routes
+- 120 tests across 20 test files, 12 routes
 - Colocated tests (foo.test.ts next to foo.ts)
 
-## Routes (9)
+## Routes (12)
 - `/` → Landing page (hero, features, examples) — also the Electron splash
 - `/editor` → Main IDE (code editor, node graph, visualizers)
 - `/docs` → Documentation hub
@@ -46,6 +46,9 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - `/examples` → Curated code examples per engine
 - `/sessions` → Curated AI-composed pieces — listing
 - `/sessions/:slug` → Individual session piece (code, movements, composer notes)
+- `/changelog` → Project changelog
+- `/blog` → Developer blog — listing
+- `/blog/:slug` → Individual blog post
 - `/legal` → Impressum, Datenschutz, Lizenzen
 
 ## Version

@@ -74,11 +74,15 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **43 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
 
-**190+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, synth oscillators, and test patterns.
+**200+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, and test patterns.
 
 **Sample Library** — Browse 218 Dirt-Samples with categories, drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
 
-**MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. Works with any USB MIDI device.
+**MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. 19 device profiles (MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more) with factory CC mappings. Works with any USB MIDI device.
+
+**MIDI Compose Mode** — Play notes on a connected MIDI keyboard and have them convert to Strudel mini-notation in real time inside the editor. Quantize, auto-insert, and build patterns by playing.
+
+**MIDI Learn** — Map any MIDI CC knob or fader to app parameters with a visual learn workflow. Connect hardware to software controls without editing code.
 
 **Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI CC value mapping, keyboard bindings via `onKey()`.
 
@@ -139,6 +143,9 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `/examples` | Curated code examples per engine |
 | `/sessions` | Curated AI-composed pieces — listing |
 | `/sessions/:slug` | Individual session piece (code, movements, composer notes) |
+| `/changelog` | Project changelog |
+| `/blog` | Developer blog — listing |
+| `/blog/:slug` | Individual blog post |
 | `/legal` | Impressum, Datenschutz |
 
 ---
@@ -192,21 +199,21 @@ src/
     molecules/      # EngineSelector, FileTabs, ShareDialog, ...
     organisms/      # TransportBar, CodeEditor, NodeGraph, SiteNav, Visualizers, ...
   layouts/          # EditorLayout (resizable 3-zone IDE)
-  pages/            # Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Legal
+  pages/            # Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal
   lib/
     orchestrator/   # Multi-engine management + DAG audio graph
     engines/        # Strudel, Tone.js, WebAudio, MIDI adapters
     audio/          # Shared AudioContext, analyser, recorder
     editor/         # CodeMirror theme, setup, extensions, inline-widgets, 4 themes
     input/          # Gamepad API polling
-    midi/           # MIDI input CC mapping
+    midi/           # MIDI input, compose mode, MIDI learn, strudel-keys, device profiles
     parser/         # Code-to-graph extraction (per engine)
     codegen/        # Graph-to-code generation
     visualizers/    # Waveform, spectrum, timeline, pianoroll, punchcard, spiral, pitchwheel
     persistence/    # IndexedDB, URL sharing, GitHub Gist
     store.ts        # Zustand global state
     history.ts      # Undo/redo (100-entry cap)
-  data/             # Templates, docs, examples, sessions, sample catalog
+  data/             # Templates, docs, examples, sessions, sample catalog, midi-devices, blog, changelog
   i18n/             # DE, EN, ES translations
   styles/tokens/    # colors.css, typography.css, spacing.css
   types/            # TypeScript type definitions
@@ -229,9 +236,11 @@ netlify deploy --prod --dir=dist
 
 | Status | Feature | Description |
 |--------|---------|-------------|
-| Planned | **MIDI Composition Mode** | Play notes on a connected MIDI keyboard and have them convert to Strudel code in real time inside the editor |
+| Done | **MIDI Composition Mode** | Play notes on a connected MIDI keyboard and have them convert to Strudel code in real time inside the editor |
+| Done | **MIDI Learn** | Map any MIDI CC knob or fader to app parameters with a visual learn workflow |
+| Done | **19 MIDI Device Profiles** | Factory CC mappings for MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more |
+| Done | **Developer Blog + Changelog** | In-app blog and changelog pages with Markdown rendering |
 | Planned | **Strudel Sound Library Browser** | Browse and audition all Strudel sounds (Dirt-Samples, synths, soundfonts) directly from the MIDI keyboard |
-| Planned | **Professional-Grade MIDI Integration** | Full velocity support, CC knob mapping, multi-device routing. Any USB MIDI controller works out of the box |
 | Ongoing | **Democratizing Music Production** | Making algorave/live coding accessible to everyone — professional features delivered as open source, built on years of community contributions |
 
 ---
