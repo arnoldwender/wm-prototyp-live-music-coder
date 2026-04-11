@@ -107,11 +107,19 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
 
-        /* Load @strudel/draw for inline canvas visualizers (._pianoroll, ._scope, etc.) */
+        /* Load @strudel/draw for inline canvas visualizers */
         try {
           await import('@strudel/draw');
-          console.log('[StrudelEditor] @strudel/draw loaded');
-        } catch { /* draw package not available — inline visualizers won't render canvases */ }
+        } catch { /* draw not available */ }
+
+        /* Load ALL optional Strudel extensions (xen, soundfonts, osc, serial,
+         * onKey, createParams, clock sync, all() global transforms) */
+        try {
+          const { loadAllExtensions } = await import('../../lib/strudel-extensions');
+          await loadAllExtensions();
+        } catch (err) {
+          console.warn('[StrudelEditor] Extensions load failed:', err);
+        }
 
         /* Initialize input devices (gamepad polling + MIDI input) */
         try {
@@ -209,10 +217,11 @@ export function StrudelEditor() {
     try {
       const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
       if (settings.vimMode) {
-        import('@replit/codemirror-vim').then(({ vim }) => {
-          /* Vim extension needs to be added to the editor — requires recreation.
-           * For now, log that it's enabled; full integration needs compartment reconfiguration. */
-          console.log('[StrudelEditor] Vim mode enabled');
+        import('@replit/codemirror-vim').then((vimModule) => {
+          if (vimModule.vim) {
+            extensions.push(vimModule.vim());
+            console.log('[StrudelEditor] Vim mode enabled');
+          }
         }).catch(() => {});
       }
       /* Apply font size from settings */
@@ -338,7 +347,13 @@ export function StrudelEditor() {
         if (ctx?.state === 'suspended') await ctx.resume();
       } catch { /* AudioContext resume failed — Strudel will handle it */ }
 
-      const code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
+      /* Pre-process code: handle _$: muted patterns before evaluation */
+      let code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
+      try {
+        const { processMutedLabels, clearKeyBindings } = await import('../../lib/strudel-extensions');
+        code = processMutedLabels(code);
+        clearKeyBindings(); /* Reset onKey bindings before re-eval */
+      } catch { /* extensions not loaded */ }
       if (!code.trim()) { setEvaluating(false); return; }
 
       /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
