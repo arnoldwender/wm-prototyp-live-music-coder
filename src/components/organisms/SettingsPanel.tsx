@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { EDITOR_THEMES } from '../../lib/editor/themes';
+import { useAppStore } from '../../lib/store';
 
 /* ── Settings type ────────────────────────────────────── */
 
@@ -56,12 +57,16 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanelProps) {
   const [settings, setSettings] = useState<EditorSettings>(loadSettings);
+  const setEditorTheme = useAppStore((s) => s.setEditorTheme);
+  const setVimMode = useAppStore((s) => s.setVimMode);
 
-  /* Persist on change */
+  /* Persist on change and sync to Zustand store for reactive CM6 reconfiguration */
   useEffect(() => {
     saveSettings(settings);
+    setEditorTheme(settings.themeId);
+    setVimMode(settings.vimMode);
     onSettingsChange?.(settings);
-  }, [settings, onSettingsChange]);
+  }, [settings, onSettingsChange, setEditorTheme, setVimMode]);
 
   if (!open) return null;
 

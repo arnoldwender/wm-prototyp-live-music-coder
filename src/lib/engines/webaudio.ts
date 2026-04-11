@@ -72,8 +72,10 @@ export class WebAudioEngine extends BaseEngine {
       .replace(/new\s+AudioContext\s*\([^)]*\)/g, 'ctx')
 
     try {
-      await Function('ctx', 'out', `"use strict"; return (async () => { ${patchedCode} })()`)(
-        ctxProxy, masterGain
+      /* Inject masterGain and audioContext into the eval scope so user code
+         (and all example snippets) can reference them directly */
+      await Function('ctx', 'masterGain', 'audioContext', 'out', `"use strict"; return (async () => { ${patchedCode} })()`)(
+        ctxProxy, masterGain, ctxProxy, masterGain
       )
       resetStrudelTap()
     } catch (err) {

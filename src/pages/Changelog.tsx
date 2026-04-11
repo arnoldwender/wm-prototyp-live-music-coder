@@ -122,8 +122,8 @@ export default function Changelog() {
         </p>
       </header>
 
-      {/* Filters */}
-      <section aria-label={t('changelog.filtersAriaLabel')} style={{ maxWidth: '900px', margin: '0 auto', padding: '0 var(--space-6) var(--space-4)' }}>
+      {/* Filters — sticky on scroll */}
+      <section aria-label={t('changelog.filtersAriaLabel')} className="sticky-filters" style={{ maxWidth: '900px', margin: '0 auto', padding: 'var(--space-3) var(--space-6) 0' }}>
         <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: 'var(--space-3)' }}>
           <input
             type="search"
