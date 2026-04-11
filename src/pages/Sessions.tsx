@@ -258,13 +258,14 @@ export default function Sessions() {
         </p>
       </section>
 
-      {/* --- Filters --- */}
+      {/* --- Filters (sticky on scroll) --- */}
       <section
+        className="sticky-filters"
         aria-label={t('sessions.filtersAriaLabel')}
         style={{
           maxWidth: '960px',
           margin: '0 auto',
-          padding: '0 var(--space-6) var(--space-6)',
+          padding: 'var(--space-3) var(--space-6) 0',
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-4)',

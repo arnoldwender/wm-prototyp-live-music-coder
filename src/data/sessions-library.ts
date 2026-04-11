@@ -111,30 +111,41 @@ const JEDE_SESSION_NEU_GEBOREN_CODE = `// ======================================
 arrange(
   // I. Erwachen (4 Zyklen)
   [4, stack(
+    // Lone sustained tone — dawn breaking slowly
     note("c5").s("sine").attack(2).release(3).gain(0.4),
+    // Sparse answering tone with deep reverb
     note("~ ~ ~ g4").s("triangle").room(0.9).delay(0.6).gain(0.3)
   ).slow(4)],
 
   // II. Höflich (8 Zyklen)
   [8, stack(
+    // Melody: polite stepwise motion through C major
     note("<c5 g4 a4 e5 f5 c5 d5 g4>")
       .s("sine").attack(0.1).release(0.4)
       .gain(0.4).room(0.4),
+    // Pad: warm triads underneath the melody
     note("<[c4,e4,g4] [a3,c4,e4] [f3,a3,c4] [g3,b3,d4]>")
       .s("triangle").attack(0.2).release(0.6)
       .gain(0.3).room(0.5),
+    // Bass: root motion anchoring the harmony
     note("c3 a2 f2 g2").s("sine").gain(0.55),
+    // Drums: gentle kick and hat pattern
     s("bd ~ hh ~ bd ~ hh ~").gain(0.45)
   )],
 
   // III. Kippen (8 Zyklen)
   [8, stack(
+    // Lead: arpeggiated line, energy rising
     note("<c5 e5 g5 e5 c5 e5 a5 e5>")
       .s("triangle").attack(0.05).release(0.3)
       .gain(0.35).room(0.3),
+    // Inner voice: steady arpeggio pulse
     note("c4 e4 g4 e4").s("sine").gain(0.3),
+    // Hi-hat: driving 8th notes
     s("hh*8").gain(0.3),
+    // Kick: sparse, heavy downbeats
     s("bd ~ ~ ~ bd ~ ~ ~").gain(0.5),
+    // Dissonant intruder: F#4 creeps in with LFO swell
     note("~ ~ ~ ~ ~ ~ ~ fs4")
       .s("sawtooth").lpf(600)
       .attack(0.5).release(2)
@@ -144,24 +155,31 @@ arrange(
 
   // IV. Verbinden (16 Zyklen)
   [16, stack(
+    // Lead: expansive Eb major melody with dotted delay
     note("<eb5 g5 bb5 c6 bb5 g5 f5 eb5 f5 ab5 c6 eb6 d6 c6 bb5 g5>")
       .s("triangle").attack(0.1).release(0.8)
       .room(0.6).delay(0.4).delaytime(0.375).gain(0.45),
+    // Counter-melody: parallel motion a third below
     note("<g4 bb4 eb5 g5 eb5 d5 c5 bb4 c5 eb5 g5 bb5 f5 eb5 d5 c5>")
       .s("sine").room(0.7).delay(0.3).gain(0.32),
+    // Chord stabs: slow sawtooth harmonic anchor
     note("<eb4 c4 f4 bb3>/4")
       .s("sawtooth").lpf(1200).attack(0.3).gain(0.28),
+    // Bass: walking line through Eb tonality
     note("eb2 bb2 g2 bb2 c2 g2 f2 bb2")
       .s("sine").gain(0.6),
+    // Drums: full groove with snare ghost notes
     s("bd ~ hh [~ sd] bd hh sd hh").gain(0.55)
   )],
 
   // V. Verklingen (6 Zyklen)
   [6, stack(
+    // Descending melody dissolving into reverb and delay
     note("<c5 bb4 g4 eb4 c4>")
       .s("sine").attack(1).release(4)
       .room(0.95).delay(0.7).delaytime(0.5).delayfeedback(0.6)
       .gain(0.4),
+    // Pedal tone: low C fading into silence
     note("c3").s("triangle").room(0.9).gain(0.3).slow(2)
   ).slow(6)]
 ).cpm(88)
@@ -181,58 +199,76 @@ const ZWEI_UHR_NACHTS_CODE = `// =============================================
 arrange(
   // I. Stille (6 Zyklen) — a-Moll, fast leer
   [6, stack(
+    // Sustained A3 drone — vast reverb and delay fill the emptiness
     note("a3").s("sine").attack(3).release(4)
       .room(0.95).delay(0.7).delaytime(0.666).delayfeedback(0.5)
       .gain(0.25),
+    // Ghost note: E4 appears once, barely there
     note("~ ~ e4 ~").s("triangle").attack(1).release(2)
       .room(0.9).delay(0.6).gain(0.15),
+    // Deep pulse: sub-bass A2 at the end of the cycle
     note("~ ~ ~ ~ ~ ~ ~ a2").s("sine")
       .attack(2).release(3).gain(0.2)
   ).slow(6)],
 
   // II. Eintauchen (12 Zyklen) — Rhythmus entsteht
   [12, stack(
+    // Melody: A minor pentatonic, tentative steps with delay
     note("<a4 c5 e5 d5 c5 a4 b4 e4>")
       .s("triangle").attack(0.08).release(0.5)
       .room(0.5).delay(0.3).delaytime(0.333)
       .gain(0.35),
+    // Pad: Am → Dm → Em → Am chord cycle
     note("<[a3,c4,e4] [d3,f3,a3] [e3,g3,b3] [a3,c4,e4]>")
       .s("sine").attack(0.3).release(0.8)
       .gain(0.25).room(0.4),
+    // Bass: sparse root motion, deep-filtered
     note("a2 ~ e2 ~ a2 ~ e2 a1").s("sine")
       .gain(0.5).lpf(200),
+    // Hi-hat: steady off-beat pulse emerging
     s("~ hh ~ hh ~ hh ~ hh").gain(0.2),
+    // Kick: minimal, just marking downbeats
     s("bd ~ ~ ~ bd ~ ~ ~").gain(0.35)
   )],
 
   // III. Tiefgang (16 Zyklen) — d-Moll, voller Flow
   [16, stack(
+    // Lead: flowing D minor melody, full 16-step phrase
     note("<d5 f5 a5 g5 f5 e5 d5 c5 d5 f5 a5 c6 bb5 a5 g5 f5>")
       .s("triangle").attack(0.05).release(0.4)
       .room(0.4).delay(0.25).delaytime(0.25)
       .gain(0.4),
+    // Counter-melody: parallel thirds below the lead
     note("<f4 a4 d5 f5 d5 c5 a4 f4 a4 d5 f5 a5 g5 f5 e5 d5>")
       .s("sine").room(0.5).delay(0.2).gain(0.28),
+    // Chord stabs: slow sawtooth, filtered warmth
     note("<[d3,f3,a3] [bb2,d3,f3] [g2,bb2,d3] [a2,c3,e3]>/4")
       .s("sawtooth").lpf(900).attack(0.2).release(0.6)
       .gain(0.22),
+    // Walking bass: root movement through Dm tonality
     note("d2 a2 f2 a2 bb1 f2 g2 a2")
       .s("sine").gain(0.55),
+    // Drums: full groove with ghost snare hits
     s("bd ~ hh sd bd hh [sd hh] hh").gain(0.5),
+    // Shimmer hats: 16ths with slow LFO swell
     s("hh*16").gain(sine.range(0.05, 0.2).slow(16))
   )],
 
   // IV. Morgengrauen (8 Zyklen) — F-Dur, Wärme
   [8, stack(
+    // Melody: warm F major arc with long delay trails
     note("<f5 a5 c6 a5 f5 e5 c5 f5>")
       .s("sine").attack(0.8).release(2)
       .room(0.9).delay(0.6).delaytime(0.5).delayfeedback(0.55)
       .gain(0.35),
+    // Pad: gentle chord shifts, lots of room
     note("<[f3,a3,c4] [c3,e3,g3] [d3,f3,a3] [bb2,d3,f3]>")
       .s("triangle").attack(0.5).release(1.5)
       .room(0.8).gain(0.22),
+    // Pedal bass: single F2 drone, very slow
     note("f2").s("sine").attack(2).release(4)
       .room(0.95).gain(0.3).slow(4),
+    // Vanishing hat: LFO fades it to near-silence
     s("~ ~ hh ~ ~ ~ ~ ~")
       .gain(sine.range(0.05, 0.15).slow(8))
   ).slow(2)]
@@ -253,33 +289,45 @@ const FOKUSMASCHINE_CODE = `// =============================================
 arrange(
   // I. Anlauf (8 Zyklen) — g-Moll, motorisch
   [8, stack(
+    // Motorik bass: relentless G3 eighth notes, deep-filtered
     note("g3 g3 g3 g3 g3 g3 g3 g3")
       .s("sine").gain(0.5).lpf(300),
+    // Drums: basic kick-hat pattern, mechanical
     s("bd ~ hh ~ bd ~ hh ~").gain(0.45),
+    // Single Bb accent: a hint of melody to come
     note("~ ~ ~ ~ bb3 ~ ~ ~").s("triangle")
       .attack(0.1).release(0.3).room(0.3).gain(0.25)
   )],
 
   // II. Monoton (24 Zyklen) — hypnotisch, minimale Variation
   [24, stack(
+    // Lead: hypnotic G minor loop, barely changing
     note("<g4 bb4 d5 c5 bb4 g4 a4 d4>")
       .s("triangle").attack(0.05).release(0.35)
       .room(0.35).gain(0.38),
+    // Pad: slow chord cycle Gm → Eb → Cm → Dm
     note("<[g3,bb3,d4] [eb3,g3,bb3] [c3,eb3,g3] [d3,f3,a3]>/4")
       .s("sine").attack(0.2).release(0.5).gain(0.25),
+    // Bass: deep root motion, sub-filtered
     note("g2 d2 eb2 d2").s("sine").gain(0.55).lpf(250),
+    // Drums: steady groove with snare on 4
     s("bd ~ hh sd bd ~ hh sd").gain(0.5),
+    // Hat texture: constant 8th-note shimmer
     s("hh*8").gain(0.18)
   )],
 
   // III. Klarheit (8 Zyklen) — Bb-Dur, Auflösung
   [8, stack(
+    // Melody: Bb major resolution, spacious with delay
     note("<bb4 d5 f5 eb5 d5 c5 bb4 f4>")
       .s("sine").attack(0.15).release(0.6)
       .room(0.5).delay(0.3).gain(0.4),
+    // Pad: warm triads resolving the tension
     note("<[bb3,d4,f4] [eb3,g3,bb3] [f3,a3,c4] [bb2,d3,f3]>")
       .s("triangle").attack(0.3).release(0.8).gain(0.25),
+    // Bass: Bb pedal with simple motion
     note("bb1 f2 eb2 f2").s("sine").gain(0.5),
+    // Drums: lighter groove, task complete
     s("bd ~ hh ~ bd ~ hh ~").gain(0.4)
   )]
 ).cpm(110)
@@ -299,40 +347,55 @@ const HACKERSPACE_CODE = `// =============================================
 arrange(
   // I. Boot (6 Zyklen) — e-Moll, digital, kalt
   [6, stack(
+    // Boot sequence: sharp sawtooth arpeggios, cold and digital
     note("e3 ~ b3 ~ e3 ~ b3 e4")
       .s("sawtooth").lpf(800).attack(0.01).release(0.15)
       .gain(0.3),
+    // Noise floor: rapid 16th hats, machine hum
     s("hh*16").gain(0.15),
+    // Kick: irregular pattern, system loading
     s("bd ~ ~ bd ~ ~ bd ~").gain(0.5),
+    // Sub hit: deep square pulse at cycle end
     note("~ ~ ~ ~ ~ ~ e2 ~").s("square").lpf(400)
       .attack(0.01).release(0.1).gain(0.4)
   )],
 
   // II. Exploit (16 Zyklen) — schnell, aggressiv, treibend
   [16, stack(
+    // Lead: aggressive sawtooth melody, E minor, 16 steps
     note("<e5 g5 b5 a5 g5 fs5 e5 d5 e5 g5 b5 d6 c6 b5 a5 g5>")
       .s("sawtooth").lpf(2000).attack(0.01).release(0.2)
       .room(0.2).gain(0.35),
+    // Second voice: square wave harmony, sharper edge
     note("<b4 e5 g5 b5 g5 fs5 e5 b4 e5 g5 b5 e6 d6 b5 a5 g5>")
       .s("square").lpf(1500).attack(0.01).release(0.15)
       .gain(0.2),
+    // Chord stabs: filtered sawtooth power chords
     note("<[e3,g3,b3] [a2,c3,e3] [b2,d3,fs3] [e3,g3,b3]>/4")
       .s("sawtooth").lpf(600).attack(0.05).release(0.3)
       .gain(0.22),
+    // Bass: pumping root-fifth pattern, very deep
     note("e2 b1 e2 b1 a1 e2 b1 e2")
       .s("sine").gain(0.6).lpf(200),
+    // Drums: full attack with double hats
     s("bd hh sd hh bd hh [sd hh] hh").gain(0.55),
+    // 16th hat wall: relentless digital energy
     s("hh*16").gain(0.22)
   )],
 
   // III. Exfiltration (8 Zyklen) — b-Moll, Rückzug
   [8, stack(
+    // Lead: B minor retreat, filter opening with delay
     note("<b4 d5 fs5 e5 d5 cs5 b4 fs4>")
       .s("sawtooth").lpf(1200).attack(0.05).release(0.4)
       .room(0.4).delay(0.3).gain(0.35),
+    // Bass: sparse root movement, covering tracks
     note("b2 fs2 d2 fs2").s("sine").gain(0.5),
+    // Kick: minimal, fading out
     s("bd ~ ~ ~ bd ~ ~ ~").gain(0.4),
+    // Hat: sparse, echoing
     s("~ ~ hh ~ ~ ~ hh ~").gain(0.25),
+    // Final signal: deep square tone at the end, connection closed
     note("~ ~ ~ ~ ~ ~ ~ b1").s("square").lpf(300)
       .attack(0.5).release(2).room(0.8).gain(0.3)
   )]
@@ -353,10 +416,12 @@ const SONNTAGMORGEN_CODE = `// =============================================
 arrange(
   // I. Aufwachen (8 Zyklen) — D-Dur, sanft
   [8, stack(
+    // Melody: sparse D major notes with long decay and delay
     note("<d5 fs5 a5 fs5 d5 ~ ~ ~>")
       .s("sine").attack(0.8).release(2)
       .room(0.8).delay(0.5).delaytime(0.833)
       .gain(0.3),
+    // Pad: two-chord rocking motion, D → G
     note("<[d4,fs4,a4] [g3,b3,d4]>/2")
       .s("triangle").attack(0.5).release(1.5)
       .room(0.7).gain(0.2)
@@ -364,24 +429,31 @@ arrange(
 
   // II. Kaffee (12 Zyklen) — G-Dur, warm und gemütlich
   [12, stack(
+    // Melody: gentle G major steps, unhurried
     note("<g4 b4 d5 e5 d5 b4 a4 g4>")
       .s("sine").attack(0.2).release(0.8)
       .room(0.5).delay(0.3).gain(0.35),
+    // Pad: warm triads G → C → D → G
     note("<[g3,b3,d4] [c3,e3,g3] [d3,fs3,a3] [g3,b3,d4]>")
       .s("triangle").attack(0.3).release(1)
       .gain(0.22).room(0.4),
+    // Bass: simple root motion, grounding
     note("g2 d2 c2 d2").s("sine").gain(0.4),
+    // Soft hat: barely there, like a spoon on porcelain
     s("~ ~ hh ~ ~ ~ hh ~").gain(0.15)
   )],
 
   // III. Garten (10 Zyklen) — D-Dur, offen
   [10, stack(
+    // Melody: open D major with long delay trails — sunlight through leaves
     note("<d5 e5 fs5 a5 fs5 e5 d5 a4>")
       .s("sine").attack(0.3).release(1.2)
       .room(0.7).delay(0.4).delaytime(0.833).delayfeedback(0.4)
       .gain(0.35),
+    // Pad: D → A → G → D, gentle chord sway
     note("<[d4,fs4,a4] [a3,cs4,e4] [g3,b3,d4] [d3,fs3,a3]>")
       .s("triangle").attack(0.4).release(1).gain(0.2),
+    // Pedal bass: single D2 drone, very slow
     note("d2").s("sine").attack(1).release(3)
       .room(0.9).gain(0.3).slow(2)
   ).slow(2)]
@@ -402,50 +474,67 @@ const DEADLINE_CODE = `// =============================================
 arrange(
   // I. Tick (4 Zyklen) — fis-Moll, mechanisch
   [4, stack(
+    // Clock: relentless F#3 eighths — time is running out
     note("fs3 fs3 fs3 fs3 fs3 fs3 fs3 fs3")
       .s("triangle").attack(0.01).release(0.08)
       .gain(0.35),
+    // Ticking hats: mechanical 8th-note pulse
     s("hh*8").gain(0.3),
+    // Sub drop at cycle end: ominous low F#
     note("~ ~ ~ ~ ~ ~ ~ fs2").s("sine")
       .attack(0.5).release(1).gain(0.4)
   )],
 
   // II. Panik (8 Zyklen) — fis-Moll, beschleunigend
   [8, stack(
+    // Lead: urgent sawtooth melody, F# minor panic
     note("<fs4 a4 cs5 b4 a4 gs4 fs4 e4>")
       .s("sawtooth").lpf(1800).attack(0.02).release(0.2)
       .room(0.2).gain(0.35),
+    // Chords: F#m → D → E → F#m, building tension
     note("<[fs3,a3,cs4] [d3,fs3,a3] [e3,gs3,b3] [fs3,a3,cs4]>/4")
       .s("triangle").attack(0.1).release(0.4).gain(0.25),
+    // Bass: root motion, driving forward
     note("fs2 cs2 d2 e2").s("sine").gain(0.55),
+    // Drums: fast groove, double hat at end = acceleration
     s("bd hh sd hh bd hh sd [hh hh]").gain(0.5),
+    // 16th hat wall: nervous energy
     s("hh*16").gain(0.2)
   )],
 
   // III. Tunnel (16 Zyklen) — e-Moll, hyperfokus
   [16, stack(
+    // Lead: full 16-step E minor phrase, tunnel vision
     note("<e5 g5 b5 a5 g5 fs5 e5 d5 e5 g5 b5 d6 c6 b5 a5 g5>")
       .s("triangle").attack(0.03).release(0.3)
       .room(0.3).gain(0.4),
+    // Counter-melody: parallel motion below
     note("<g4 b4 e5 g5 e5 d5 b4 g4 b4 e5 g5 b5 a5 g5 fs5 e5>")
       .s("sine").room(0.4).gain(0.25),
+    // Chord stabs: filtered sawtooth anchoring
     note("<[e3,g3,b3] [c3,e3,g3] [a2,c3,e3] [b2,d3,fs3]>/4")
       .s("sawtooth").lpf(1000).attack(0.1).gain(0.2),
+    // Bass: pumping pattern, all focus on the task
     note("e2 b1 c2 b1 a1 e2 b1 e2")
       .s("sine").gain(0.6),
+    // Drums: half-time snare, relentless
     s("bd ~ sd ~ bd ~ sd ~").gain(0.55),
+    // 16th hats: constant high-frequency drive
     s("hh*16").gain(0.25)
   )],
 
   // IV. Abgabe (4 Zyklen) — E-Dur, Erleichterung
   [4, stack(
+    // Melody: E major release — it's done, breathe out
     note("<e5 gs5 b5 gs5>")
       .s("sine").attack(0.5).release(2)
       .room(0.8).delay(0.5).delayfeedback(0.5)
       .gain(0.4),
+    // Pad: warm major chords, E → A, relief
     note("<[e4,gs4,b4] [a3,cs4,e4]>")
       .s("triangle").attack(0.4).release(1.5)
       .room(0.7).gain(0.25),
+    // Pedal bass: sustained E2, dissolving into reverb
     note("e2").s("sine").attack(1).release(3)
       .room(0.9).gain(0.35).slow(2)
   ).slow(2)]

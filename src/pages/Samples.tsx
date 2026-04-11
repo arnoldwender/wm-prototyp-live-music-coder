@@ -450,13 +450,14 @@ function Samples() {
         </p>
       </header>
 
-      {/* --- Search and filter controls --- */}
+      {/* --- Search and filter controls (sticky on scroll) --- */}
       <section
         id="filters"
+        className="sticky-filters"
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 var(--space-6) var(--space-6)',
+          padding: 'var(--space-3) var(--space-6) 0',
         }}
       >
         {/* 1. Search bar — full width with clear button */}

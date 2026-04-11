@@ -92,6 +92,12 @@ interface AppState {
   /* Files */
   files: ProjectFile[]
 
+  /* Editor settings — synced from SettingsPanel for reactive CM6 reconfiguration */
+  editorTheme: string
+  vimMode: boolean
+  setEditorTheme: (id: string) => void
+  setVimMode: (enabled: boolean) => void
+
   /* Detail panel — right collapsible sidebar */
   activeDetailSection: string | null
   detailPanelWidth: number
@@ -148,6 +154,21 @@ interface AppState {
   getActiveFile: () => ProjectFile | undefined
 }
 
+/** Load editor settings from localStorage for initial store hydration */
+function loadEditorSettingsForStore(): { editorTheme: string; vimMode: boolean } {
+  try {
+    const raw = localStorage.getItem('lmc-editor-settings')
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      return {
+        editorTheme: typeof parsed.themeId === 'string' ? parsed.themeId : 'purple',
+        vimMode: typeof parsed.vimMode === 'boolean' ? parsed.vimMode : false,
+      }
+    }
+  } catch { /* corrupted storage */ }
+  return { editorTheme: 'purple', vimMode: false }
+}
+
 /** Default file loaded on startup — Strudel demo pattern */
 const DEFAULT_FILE: ProjectFile = {
   id: 'file_1',
@@ -165,6 +186,13 @@ export const useAppStore = create<AppState>()((set, get) => ({
   defaultEngine: DEFAULT_ENGINE,
   layout: { ...DEFAULT_LAYOUT, visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels } },
   files: [{ ...DEFAULT_FILE }],
+
+  /* Editor settings — hydrated from localStorage */
+  editorTheme: loadEditorSettingsForStore().editorTheme,
+  vimMode: loadEditorSettingsForStore().vimMode,
+  setEditorTheme: (id: string) => set({ editorTheme: id }),
+  setVimMode: (enabled: boolean) => set({ vimMode: enabled }),
+
   activeDetailSection: 'samples',
   detailPanelWidth: 280,
   setActiveDetailSection: (section: string | null) => set({ activeDetailSection: section }),

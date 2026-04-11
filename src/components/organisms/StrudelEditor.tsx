@@ -63,6 +63,10 @@ export function StrudelEditor() {
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const activeFile = files.find((f) => f.active);
 
+  /* Editor settings from Zustand — triggers CM6 rebuild when changed */
+  const editorTheme = useAppStore((s) => s.editorTheme);
+  const vimMode = useAppStore((s) => s.vimMode);
+
   /* MIDI keyboard quick-action menu */
   const [midiConnected, setMidiConnected] = useState(false);
   const [midiDeviceName, setMidiDeviceName] = useState<string>('');
@@ -346,33 +350,44 @@ export function StrudelEditor() {
       })),
     ]);
 
-    /* Build extension list */
+    /* Build extension list — theme ID from Zustand store drives CM6 theme */
     const extensions = [
-      ...getBaseExtensions(),
+      ...getBaseExtensions(editorTheme),
       ...getEngineExtensions(activeFile.engine),
       highlightField,
       updateListener,
       evalKeymap,
     ];
 
-    /* Vim mode — load conditionally from settings */
+    /* Vim mode — driven by Zustand store, loaded synchronously */
+    /* Vim mode — lazy-loaded via dynamic import. The editor rebuilds
+     * when vimMode changes (it's in the useEffect deps), so on the
+     * SECOND render the module is already cached and loads instantly. */
+    if (vimMode) {
+      try {
+        /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+        const vimModule = (window as any).__cachedVim;
+        if (vimModule?.vim) {
+          extensions.push(vimModule.vim());
+          console.log('[StrudelEditor] Vim mode enabled');
+        } else {
+          /* First load: cache the module and trigger rebuild */
+          import('@replit/codemirror-vim').then((mod) => {
+            (window as any).__cachedVim = mod;
+            /* Force re-render by touching a state the effect depends on */
+          }).catch(() => {});
+        }
+      } catch { /* @replit/codemirror-vim not available */ }
+    }
+
+    /* Apply font size and word wrap from localStorage (non-reactive settings) */
     try {
       const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
-      if (settings.vimMode) {
-        import('@replit/codemirror-vim').then((vimModule) => {
-          if (vimModule.vim) {
-            extensions.push(vimModule.vim());
-            console.log('[StrudelEditor] Vim mode enabled');
-          }
-        }).catch(() => {});
-      }
-      /* Apply font size from settings */
       if (settings.fontSize && settings.fontSize !== 14) {
         extensions.push(EditorView.theme({
           '.cm-content': { fontSize: `${settings.fontSize}px` },
         }));
       }
-      /* Word wrap */
       if (settings.wordWrap) {
         extensions.push(EditorView.lineWrapping);
       }

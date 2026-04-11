@@ -130,6 +130,38 @@ pre,
   margin-top: 2px;
 }
 
+/* --- Sticky filter bar for listing pages (Examples, Samples, Sessions, Blog, Changelog) ---
+   Makes filters/search visible while scrolling through large collections. */
+.sticky-filters {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: var(--color-bg);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Compact hero for listing pages — reduced vertical space */
+.listing-hero {
+  padding: var(--space-6) var(--space-6) var(--space-2);
+  text-align: center;
+}
+
+.listing-hero h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.listing-hero p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 /* --- Playing indicator animation for StrudelEditor --- */
 @keyframes playing-indicator {
   0% { background-position: 0% 50%; }
