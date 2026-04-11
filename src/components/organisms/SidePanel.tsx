@@ -656,10 +656,12 @@ const STRUDEL_REFERENCE = [
     { fn: '.pianoroll()', desc: 'Background piano roll' },
     { fn: '.scope()', desc: 'Background oscilloscope' },
   ]},
-  { title: 'MIDI', items: [
-    { fn: '$: midin("*").s("sine")', desc: 'Play MIDI keyboard with sine' },
-    { fn: '$: midin("MPK mini 3")', desc: 'MIDI input from specific device' },
-    { fn: 'ccv(1).range(0, 1)', desc: 'Read MIDI CC knob value' },
+  { title: 'MIDI Input/Output', items: [
+    { fn: 'await midikeys(0)', desc: 'MIDI keyboard notes (any device)' },
+    { fn: 'await midikeys("MPK mini 3")', desc: 'MIDI notes from specific device' },
+    { fn: 'kb().s("sine")', desc: 'Play keys through a synth' },
+    { fn: 'await midin(0)', desc: 'MIDI CC knobs/sliders (any device)' },
+    { fn: 'cc(70).range(200, 5000)', desc: 'Map CC knob to value range' },
     { fn: '.midi()', desc: 'Send MIDI output to device' },
     { fn: 'gamepad(0)', desc: 'Gamepad analog stick values' },
   ]},
