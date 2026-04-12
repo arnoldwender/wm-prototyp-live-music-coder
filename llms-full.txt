@@ -4,7 +4,7 @@
 
 Live Music Coder is a browser-based and Electron desktop live coding music IDE. Users write code to create music in real time using 4 audio engines. The app features a CodeMirror 6 code editor, a React Flow visual node graph, Canvas 2D audio visualizers (waveform, spectrum, timeline, pianoroll), and full i18n (DE/EN/ES). It ships as both a Netlify-hosted SPA and a native desktop app via Electron.
 
-**Version:** 1.0.2
+**Version:** 1.0.3
 **Live:** https://live-music-coder.pro
 **Repo:** https://github.com/arnoldwender/wm-prototyp-live-music-coder
 

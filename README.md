@@ -33,8 +33,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.2-arm64.dmg) |
-| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.2.dmg) |
+| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.3-arm64.dmg) |
+| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.0.3.dmg) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
@@ -225,7 +225,7 @@ src/
 
 ## Deploy
 
-Hosted on [Netlify](https://www.netlify.com/). Automatic deploys from `main`.
+Hosted on [Netlify](https://www.netlify.com/). Continuous deployment is disabled — builds run locally and are deployed manually:
 
 ```bash
 npm run build
