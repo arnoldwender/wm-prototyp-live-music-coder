@@ -15,6 +15,11 @@ export function CanvasVisualizer({ draw, className = '', ariaLabel }: CanvasVisu
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
+  /* Stable ref to the latest draw callback — updated every render without
+   * triggering the RAF effect, preventing loop teardown on prop changes. */
+  const drawRef = useRef(draw);
+  useEffect(() => { drawRef.current = draw; }, [draw]);
+
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -30,6 +35,9 @@ export function CanvasVisualizer({ draw, className = '', ariaLabel }: CanvasVisu
     if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }, []);
 
+  /* RAF loop — only restarts when resizeCanvas identity changes (stable).
+   * Reads drawRef.current each frame so the latest draw fn is always used
+   * without making draw a dep (which would restart the loop every re-render). */
   useEffect(() => {
     resizeCanvas();
     const observer = new ResizeObserver(resizeCanvas);
@@ -44,7 +52,7 @@ export function CanvasVisualizer({ draw, className = '', ariaLabel }: CanvasVisu
       const dpr = window.devicePixelRatio || 1;
       const width = canvas.width / dpr;
       const height = canvas.height / dpr;
-      draw(ctx, width, height, time);
+      drawRef.current(ctx, width, height, time);
       animRef.current = requestAnimationFrame(animate);
     };
     animRef.current = requestAnimationFrame(animate);
@@ -53,7 +61,7 @@ export function CanvasVisualizer({ draw, className = '', ariaLabel }: CanvasVisu
       cancelAnimationFrame(animRef.current);
       observer.disconnect();
     };
-  }, [draw, resizeCanvas]);
+  }, [resizeCanvas]);
 
   return <canvas ref={canvasRef} className={`block ${className}`} role="img" aria-label={ariaLabel ?? 'Audio visualizer'} />;
 }
