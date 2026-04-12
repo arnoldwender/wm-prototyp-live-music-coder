@@ -48,12 +48,15 @@ interface SynthPanelProps {
 /** localStorage key for persisting the collapsed state */
 const STORAGE_KEY = 'lmc-synth-panel-collapsed'
 
-/** Read the persisted collapsed state — defaults to expanded on first load */
+/** Read the persisted collapsed state — defaults to collapsed on first load
+ *  so the panel does not consume vertical space when MIDI first connects. */
 function loadCollapsed(): boolean {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'true'
+    const stored = localStorage.getItem(STORAGE_KEY)
+    /* If never set, default to collapsed — user can expand when they want it */
+    return stored === null ? true : stored === 'true'
   } catch {
-    return false
+    return true
   }
 }
 
@@ -104,23 +107,33 @@ function SynthPanel({
         borderBottom: '1px solid var(--color-border)',
       }}
     >
-      {/* ── Header — title + collapse toggle + device name ── */}
+      {/* ── Header — entire bar is the collapse toggle ── */}
       <header
+        role="button"
+        tabIndex={0}
+        aria-expanded={collapsed ? 'false' : 'true'}
+        aria-label={collapsed ? t('editor.expand') : t('editor.collapse')}
+        onClick={toggleCollapsed}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleCollapsed()}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 'var(--space-3)',
+          gap: 'var(--space-2)',
           padding: 'var(--space-2) var(--space-3)',
+          cursor: 'pointer',
+          userSelect: 'none',
         }}
       >
-        <Piano size={14} style={{ color: 'var(--color-success)' }} aria-hidden="true" />
+        <Piano size={13} style={{ color: 'var(--color-success)', flexShrink: 0 }} aria-hidden="true" />
 
         <span
           style={{
-            fontSize: 'var(--font-size-sm)',
+            fontSize: 'var(--font-size-xs)',
             fontWeight: 'var(--font-weight-medium)',
-            color: 'var(--color-text)',
-            fontFamily: 'var(--font-family-sans)',
+            color: 'var(--color-text-secondary)',
+            fontFamily: 'var(--font-family-mono)',
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
           }}
         >
           {t('editor.synthMode')}
@@ -132,36 +145,20 @@ function SynthPanel({
               fontSize: 'var(--font-size-xs)',
               color: 'var(--color-text-muted)',
               fontFamily: 'var(--font-family-mono)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '180px',
             }}
           >
-            {midiDeviceName}
+            — {midiDeviceName}
           </span>
         )}
 
-        <button
-          type="button"
-          onClick={toggleCollapsed}
-          aria-expanded={!collapsed}
-          aria-label={collapsed ? t('editor.expand') : t('editor.collapse')}
-          style={{
-            marginLeft: 'auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-1)',
-            padding: 'var(--space-1) var(--space-2)',
-            backgroundColor: 'transparent',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-sm)',
-            color: 'var(--color-text-secondary)',
-            cursor: 'pointer',
-            fontSize: 'var(--font-size-xs)',
-            fontFamily: 'var(--font-family-sans)',
-            transition: 'var(--transition-fast)',
-          }}
-        >
-          {collapsed ? <ChevronDown size={12} /> : <ChevronUp size={12} />}
-          {collapsed ? t('editor.expand') : t('editor.collapse')}
-        </button>
+        {/* Chevron pushed to the right — visually communicates toggle */}
+        <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', display: 'flex' }}>
+          {collapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+        </span>
       </header>
 
       {/* ── Body — only rendered when expanded ── */}

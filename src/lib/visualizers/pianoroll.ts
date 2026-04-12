@@ -1,10 +1,17 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   DAW-quality piano roll draw function.
-   Renders a scrolling note view inspired by Ableton Live and
-   FL Studio: beat grid, piano key sidebar, velocity-colored
-   notes, playhead with glow, auto-range pitch fitting.
+   DAW-quality piano roll — Ableton / FL Studio aesthetics.
+
+   Features:
+   • Real piano key sidebar — white/black key shapes with overlap
+   • Scrolling timeline following playhead (2 cycles back, 1 ahead)
+   • Beat grid with bar / half / quarter / 8th / 16th subdivisions
+   • Velocity-mapped note colors (dim blue → vivid purple → pink)
+   • Active note glow + pulse
+   • Playhead with triangle and glow
+   • Velocity lane (bottom strip)
+   • Horizontal (time) + vertical (pitch) zoom via zoomX / zoomY
    ────────────────────────────────────────────────────────── */
 
 import { VIZ_COLORS } from './colors';
@@ -12,21 +19,29 @@ import { VIZ_COLORS } from './colors';
 /* ── Constants ─────────────────────────────────────────── */
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+/** Which semitones in an octave are black keys */
 const BLACK_KEYS = new Set([1, 3, 6, 8, 10]);
 
-/* Piano sidebar width in pixels */
-const KEYS_WIDTH = 36;
+/** Piano key sidebar width — wider to fit proper key aesthetics */
+const KEYS_WIDTH = 52;
 
-/* Time window: how many cycles to show (past + future) */
-const CYCLES_BACK = 2;
-const CYCLES_FORWARD = 1;
+/** Black key width as fraction of sidebar width */
+const BLACK_KEY_W = 0.62;
 
-/* Note height constraints */
-const MIN_NOTE_HEIGHT = 4;
-const MAX_NOTE_HEIGHT = 20;
+/** Default time window: cycles visible before and after playhead */
+const BASE_CYCLES_BACK = 2;
+const BASE_CYCLES_FORWARD = 1;
 
-/* Pitch padding above/below the note range */
-const PITCH_PADDING = 3;
+/** Note height clamp */
+const MIN_NOTE_HEIGHT = 3;
+const MAX_NOTE_HEIGHT = 28;
+
+/** Pitch rows above/below active note range */
+const PITCH_PADDING = 4;
+
+/** Velocity lane height at the bottom */
+const VEL_LANE_H = 18;
 
 /* ── Types ─────────────────────────────────────────────── */
 
@@ -37,22 +52,26 @@ interface NoteEvent {
   velocity: number;
 }
 
-/* ── Note color — velocity-mapped brightness ──────────── */
+/* ── Color helpers ──────────────────────────────────────── */
 
-/** Warm purple-to-blue palette based on velocity (gain).
- *  Higher velocity = brighter and more saturated. */
-function noteColorByVelocity(note: number, velocity: number, isActive: boolean): string {
-  /* Hue: slight variation by pitch class for visual interest */
-  const hue = 260 + (note % 12) * 3;
-  /* Saturation: higher velocity = more saturated */
-  const sat = 50 + velocity * 40;
-  /* Lightness: active notes glow brighter */
-  const light = isActive ? 55 + velocity * 20 : 35 + velocity * 20;
-  const alpha = isActive ? 0.95 : 0.7;
+/** Velocity-mapped note color.
+ *  dim blue-purple (low) → vivid purple (mid) → bright pink (high) */
+function noteColor(velocity: number, isActive: boolean): string {
+  /* Map velocity to a hue range: 240° (blue) → 290° (purple) → 320° (pink) */
+  const hue = 240 + velocity * 80;
+  const sat = 45 + velocity * 45;
+  const light = isActive ? 45 + velocity * 30 : 28 + velocity * 24;
+  const alpha = isActive ? 0.95 : 0.65 + velocity * 0.2;
   return `hsla(${hue}, ${sat}%, ${light}%, ${alpha})`;
 }
 
-/* ── MIDI note extraction from hap values ─────────────── */
+/** Glow color for active notes */
+function noteGlow(velocity: number): string {
+  const hue = 270 + velocity * 50;
+  return `hsla(${hue}, 80%, 60%, 0.5)`;
+}
+
+/* ── MIDI note extraction ───────────────────────────────── */
 
 function extractMidi(val: unknown): number {
   if (typeof val === 'number') return val;
@@ -81,7 +100,235 @@ function extractVelocity(val: unknown): number {
     const v = val as Record<string, unknown>;
     if (typeof v.gain === 'number') return Math.min(1, Math.max(0, v.gain));
   }
-  return 0.8;
+  return 0.75;
+}
+
+/* ── Piano key sidebar ──────────────────────────────────── */
+
+/** Draw the piano key sidebar.
+ *  Renders white/black key shapes in proportion to the note grid rows.
+ *  Black keys are narrower rectangles overlapping into the white key rows
+ *  above and below them — matching the visual language of a real keyboard. */
+function drawKeysSidebar(
+  ctx: CanvasRenderingContext2D,
+  height: number,
+  minNote: number,
+  maxNote: number,
+  noteHeight: number,
+  yOffset: number,
+  activeNotes: Set<number>,
+) {
+  /* Sidebar background */
+  ctx.fillStyle = '#0d0d10';
+  ctx.fillRect(0, 0, KEYS_WIDTH, height);
+
+  /* First pass: draw white key backgrounds (full-width rows) */
+  for (let n = minNote; n <= maxNote; n++) {
+    const y = yOffset + (maxNote - n) * noteHeight;
+    const isBlack = BLACK_KEYS.has(n % 12);
+    const isActive = activeNotes.has(n);
+
+    if (!isBlack) {
+      /* White key background */
+      ctx.fillStyle = isActive
+        ? 'rgba(168, 85, 247, 0.35)'
+        : '#1c1c22';
+      ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
+      /* Bottom border for white key separation */
+      ctx.fillStyle = '#08080a';
+      ctx.fillRect(0, y + noteHeight - 0.5, KEYS_WIDTH - 1, 1);
+    }
+  }
+
+  /* Second pass: draw black keys on top (narrower, darker) */
+  for (let n = minNote; n <= maxNote; n++) {
+    const y = yOffset + (maxNote - n) * noteHeight;
+    const isBlack = BLACK_KEYS.has(n % 12);
+    const isActive = activeNotes.has(n);
+
+    if (isBlack) {
+      const bw = Math.round(KEYS_WIDTH * BLACK_KEY_W);
+      ctx.fillStyle = isActive
+        ? 'rgba(168, 85, 247, 0.5)'
+        : '#0a0a0d';
+      ctx.fillRect(0, y, bw, noteHeight);
+      /* Right-edge gradient effect */
+      const grad = ctx.createLinearGradient(bw - 6, 0, bw, 0);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(1, 'rgba(255,255,255,0.06)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(bw - 6, y, 6, noteHeight);
+    }
+  }
+
+  /* Third pass: note labels */
+  for (let n = minNote; n <= maxNote; n++) {
+    const y = yOffset + (maxNote - n) * noteHeight;
+    const isBlack = BLACK_KEYS.has(n % 12);
+    const isC = n % 12 === 0;
+    const isActive = activeNotes.has(n);
+
+    if ((isC || isActive) && noteHeight >= 7) {
+      const xPos = isBlack ? Math.round(KEYS_WIDTH * BLACK_KEY_W) - 3 : KEYS_WIDTH - 5;
+      ctx.fillStyle = isActive
+        ? VIZ_COLORS.accent
+        : isC ? VIZ_COLORS.textDim : 'transparent';
+      if (isC || isActive) {
+        ctx.font = `${Math.min(9, noteHeight - 2)}px monospace`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        const label = NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 1);
+        ctx.fillText(label, xPos, y + noteHeight / 2);
+      }
+    }
+  }
+
+  /* Sidebar right border */
+  ctx.strokeStyle = VIZ_COLORS.gridLight;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(KEYS_WIDTH - 0.5, 0);
+  ctx.lineTo(KEYS_WIDTH - 0.5, height);
+  ctx.stroke();
+}
+
+/* ── Beat grid ──────────────────────────────────────────── */
+
+/** Draw vertical beat grid lines with progressive subdivision:
+ *  bar → half → quarter → 8th → 16th (each finer tier is dimmer). */
+function drawBeatGrid(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  timeStart: number,
+  timeEnd: number,
+  timeX: (t: number) => number,
+  zoomX: number,
+) {
+  const cycleStart = Math.floor(timeStart);
+  const cycleEnd = Math.ceil(timeEnd);
+
+  /* Determine how many subdivisions to show based on zoom level.
+   * More zoom → finer grid lines become visible. */
+  const maxDiv = zoomX >= 3 ? 16 : zoomX >= 1.5 ? 8 : zoomX >= 0.75 ? 4 : 2;
+
+  for (let cyc = cycleStart; cyc <= cycleEnd; cyc++) {
+    for (let sub = 0; sub < 16; sub++) {
+      if (sub % (16 / Math.min(maxDiv, 16)) !== 0) continue;
+
+      const t = cyc + sub / 16;
+      const x = timeX(t);
+      if (x <= KEYS_WIDTH || x >= width) continue;
+
+      const isBar = sub === 0;
+      const isHalf = sub === 8;
+      const isQuarter = sub % 4 === 0;
+      const isEighth = sub % 2 === 0;
+
+      if (isBar) {
+        ctx.strokeStyle = VIZ_COLORS.gridLight;
+        ctx.lineWidth = 0.8;
+        /* Bar number label */
+        ctx.fillStyle = VIZ_COLORS.textDim;
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`${cyc + 1}`, x, 3);
+      } else if (isHalf) {
+        ctx.strokeStyle = 'rgba(63, 63, 70, 0.7)';
+        ctx.lineWidth = 0.6;
+      } else if (isQuarter) {
+        ctx.strokeStyle = 'rgba(63, 63, 70, 0.5)';
+        ctx.lineWidth = 0.5;
+      } else if (isEighth) {
+        ctx.strokeStyle = 'rgba(63, 63, 70, 0.3)';
+        ctx.lineWidth = 0.4;
+      } else {
+        ctx.strokeStyle = 'rgba(63, 63, 70, 0.15)';
+        ctx.lineWidth = 0.3;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+  }
+}
+
+/* ── Note row backgrounds ───────────────────────────────── */
+
+function drawNoteRowBackgrounds(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  minNote: number,
+  maxNote: number,
+  noteHeight: number,
+  yOffset: number,
+) {
+  for (let n = minNote; n <= maxNote; n++) {
+    const y = yOffset + (maxNote - n) * noteHeight;
+    const isBlack = BLACK_KEYS.has(n % 12);
+
+    if (isBlack) {
+      /* Black key rows: slightly darker background */
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+      ctx.fillRect(KEYS_WIDTH, y, width - KEYS_WIDTH, noteHeight);
+    }
+    /* C note separator line */
+    if (n % 12 === 0) {
+      ctx.strokeStyle = 'rgba(63, 63, 70, 0.35)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(KEYS_WIDTH, y + noteHeight);
+      ctx.lineTo(width, y + noteHeight);
+      ctx.stroke();
+    }
+  }
+}
+
+/* ── Note bars ──────────────────────────────────────────── */
+
+function drawNoteBar(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y: number,
+  w: number,
+  h: number,
+  velocity: number,
+  isActive: boolean,
+) {
+  const color = noteColor(velocity, isActive);
+  const r = Math.min(3, h / 2, w / 2);
+
+  if (isActive) {
+    ctx.save();
+    ctx.shadowColor = noteGlow(velocity);
+    ctx.shadowBlur = 14;
+  }
+
+  /* Note fill — rounded rect */
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x1 + r, y);
+  ctx.lineTo(x1 + w - r, y);
+  ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
+  ctx.lineTo(x1 + w, y + h - r);
+  ctx.arcTo(x1 + w, y + h, x1, y + h, r);
+  ctx.lineTo(x1 + r, y + h);
+  ctx.arcTo(x1, y + h, x1, y, r);
+  ctx.lineTo(x1, y + r);
+  ctx.arcTo(x1, y, x1 + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+
+  /* Top highlight line — shimmer effect */
+  if (h > 4) {
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.12 + velocity * 0.18})`;
+    ctx.fillRect(x1 + r, y, Math.max(1, w - r * 2), 1);
+  }
+
+  if (isActive) ctx.restore();
 }
 
 /* ── Main draw function ───────────────────────────────── */
@@ -91,7 +338,12 @@ export function drawPianoroll(
   width: number,
   height: number,
   _time: number,
-  getRepl: () => { scheduler: { now(): number }; state: { pattern: { queryArc(a: number, b: number): unknown[] } | null } } | null,
+  getRepl: () => {
+    scheduler: { now(): number };
+    state: { pattern: { queryArc(a: number, b: number): unknown[] } | null };
+  } | null,
+  zoomX = 1,
+  zoomY = 1,
 ) {
   /* ── Background ─────────────────────────────────────── */
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -99,7 +351,6 @@ export function drawPianoroll(
 
   const repl = getRepl();
   if (!repl?.scheduler || !repl.state?.pattern?.queryArc) {
-    /* Empty state hint */
     ctx.fillStyle = VIZ_COLORS.textDim;
     ctx.font = '11px monospace';
     ctx.textAlign = 'center';
@@ -110,8 +361,12 @@ export function drawPianoroll(
 
   /* ── Query haps ─────────────────────────────────────── */
   const now = repl.scheduler.now();
-  const timeStart = now - CYCLES_BACK;
-  const timeEnd = now + CYCLES_FORWARD;
+
+  /* zoomX shrinks the time window — higher zoom = fewer cycles visible */
+  const cyclesBack = BASE_CYCLES_BACK / zoomX;
+  const cyclesForward = BASE_CYCLES_FORWARD / zoomX;
+  const timeStart = now - cyclesBack;
+  const timeEnd = now + cyclesForward;
   const timeRange = timeEnd - timeStart;
 
   let haps: unknown[];
@@ -126,19 +381,19 @@ export function drawPianoroll(
   let minNote = 127;
   let maxNote = 0;
 
-  for (const hap of haps as any[]) {
+  for (const hap of haps as Record<string, unknown>[]) {
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;
-    const vel = extractVelocity(hap.value);
-    minNote = Math.min(minNote, midi);
-    maxNote = Math.max(maxNote, midi);
+    const whole = hap.whole as { begin: number; end: number };
     events.push({
       note: midi,
-      start: hap.whole.begin,
-      end: hap.whole.end,
-      velocity: vel,
+      start: whole.begin,
+      end: whole.end,
+      velocity: extractVelocity(hap.value),
     });
+    minNote = Math.min(minNote, midi);
+    maxNote = Math.max(maxNote, midi);
   }
 
   if (events.length === 0) {
@@ -146,14 +401,14 @@ export function drawPianoroll(
     ctx.font = '11px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Piano Roll — waiting for notes...', width / 2, height / 2);
+    ctx.fillText('Piano Roll — waiting for notes…', width / 2, height / 2);
     return;
   }
 
-  /* ── Auto-range: fit pitch to active notes ──────────── */
+  /* ── Auto-range: fit visible pitch window ───────────── */
   minNote = Math.max(0, minNote - PITCH_PADDING);
   maxNote = Math.min(127, maxNote + PITCH_PADDING);
-  /* Ensure minimum 1-octave visible range */
+  /* Enforce minimum 1-octave window */
   if (maxNote - minNote < 12) {
     const mid = Math.round((minNote + maxNote) / 2);
     minNote = Math.max(0, mid - 6);
@@ -162,76 +417,37 @@ export function drawPianoroll(
   const noteRange = maxNote - minNote + 1;
 
   /* ── Layout ─────────────────────────────────────────── */
-  const drawWidth = width - KEYS_WIDTH;
-  const noteHeight = Math.min(MAX_NOTE_HEIGHT, Math.max(MIN_NOTE_HEIGHT, (height - 2) / noteRange));
-  const totalNotesHeight = noteHeight * noteRange;
-  /* Vertical offset to center notes if canvas is taller than needed */
-  const yOffset = Math.max(0, (height - totalNotesHeight) / 2);
+  const velLane = height > 100 ? VEL_LANE_H : 0;
+  const drawH = height - velLane;
+  const drawW = width - KEYS_WIDTH;
 
-  /* Helper: note index (0 = minNote) → Y position (top of row) */
+  /* zoomY scales note height — higher zoom = taller rows, fewer pitches visible */
+  const baseNoteH = Math.min(MAX_NOTE_HEIGHT, Math.max(MIN_NOTE_HEIGHT, drawH / noteRange));
+  const noteHeight = Math.min(MAX_NOTE_HEIGHT, Math.max(MIN_NOTE_HEIGHT, baseNoteH * zoomY));
+
+  const totalH = noteHeight * noteRange;
+  /* Center vertically if canvas is taller than the note area */
+  const yOffset = Math.max(0, (drawH - totalH) / 2);
+
+  /* Coordinate helpers */
   const noteY = (n: number) => yOffset + (maxNote - n) * noteHeight;
-  /* Helper: time → X position */
-  const timeX = (t: number) => KEYS_WIDTH + ((t - timeStart) / timeRange) * drawWidth;
+  const timeX = (t: number) => KEYS_WIDTH + ((t - timeStart) / timeRange) * drawW;
 
-  /* ── Draw note row backgrounds ──────────────────────── */
-  for (let n = minNote; n <= maxNote; n++) {
-    const y = noteY(n);
-    /* Black keys get a slightly darker background */
-    if (BLACK_KEYS.has(n % 12)) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-      ctx.fillRect(KEYS_WIDTH, y, drawWidth, noteHeight);
-    }
-    /* C notes: horizontal separator line */
-    if (n % 12 === 0) {
-      ctx.strokeStyle = VIZ_COLORS.gridLight;
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(KEYS_WIDTH, y + noteHeight);
-      ctx.lineTo(width, y + noteHeight);
-      ctx.stroke();
-    }
-  }
+  /* ── Note row backgrounds ───────────────────────────── */
+  drawNoteRowBackgrounds(ctx, width, minNote, maxNote, noteHeight, yOffset);
 
-  /* ── Beat grid (vertical lines) ─────────────────────── */
-  const cycleStart = Math.floor(timeStart);
-  const cycleEnd = Math.ceil(timeEnd);
-  for (let cyc = cycleStart; cyc <= cycleEnd; cyc++) {
-    /* Whole cycle lines (bar lines) */
-    const x = timeX(cyc);
-    if (x > KEYS_WIDTH && x < width) {
-      ctx.strokeStyle = VIZ_COLORS.gridLight;
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-      /* Cycle number label */
-      ctx.fillStyle = VIZ_COLORS.textDim;
-      ctx.font = '9px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(`${cyc + 1}`, x, 2);
-    }
-    /* Quarter subdivisions */
-    for (let q = 1; q < 4; q++) {
-      const qx = timeX(cyc + q / 4);
-      if (qx > KEYS_WIDTH && qx < width) {
-        ctx.strokeStyle = q === 2 ? VIZ_COLORS.grid : 'rgba(39, 39, 42, 0.5)';
-        ctx.lineWidth = q === 2 ? 0.5 : 0.3;
-        ctx.beginPath();
-        ctx.moveTo(qx, 0);
-        ctx.lineTo(qx, height);
-        ctx.stroke();
-      }
-    }
-  }
+  /* ── Beat grid ──────────────────────────────────────── */
+  drawBeatGrid(ctx, width, drawH, timeStart, timeEnd, timeX, zoomX);
 
-  /* ── Draw note bars ─────────────────────────────────── */
-  /* Sort: inactive first, active on top */
+  /* ── Note bars — inactive first, active on top ──────── */
+  const activeNotes = new Set(
+    events.filter((e) => e.start <= now && e.end > now).map((e) => e.note),
+  );
+
   const sorted = events.slice().sort((a, b) => {
-    const aActive = a.start <= now && a.end > now;
-    const bActive = b.start <= now && b.end > now;
-    return (aActive ? 1 : 0) - (bActive ? 1 : 0);
+    const aA = a.start <= now && a.end > now ? 1 : 0;
+    const bA = b.start <= now && b.end > now ? 1 : 0;
+    return aA - bA;
   });
 
   for (const evt of sorted) {
@@ -239,123 +455,57 @@ export function drawPianoroll(
     const x2 = timeX(evt.end);
     const y = noteY(evt.note);
     const w = Math.max(3, x2 - x1);
-    const h = Math.max(3, noteHeight - 1);
+    const h = Math.max(2, noteHeight - 1);
     const isActive = evt.start <= now && evt.end > now;
 
-    /* Active note glow */
-    if (isActive) {
-      ctx.save();
-      ctx.shadowColor = noteColorByVelocity(evt.note, evt.velocity, true);
-      ctx.shadowBlur = 12;
-    }
+    /* Skip notes completely outside the draw area */
+    if (x1 > width || x2 < KEYS_WIDTH) continue;
 
-    /* Note bar — rounded rectangle */
-    const color = noteColorByVelocity(evt.note, evt.velocity, isActive);
-    ctx.fillStyle = color;
-    const r = Math.min(3, h / 2, w / 2);
-    ctx.beginPath();
-    ctx.moveTo(x1 + r, y);
-    ctx.lineTo(x1 + w - r, y);
-    ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
-    ctx.lineTo(x1 + w, y + h - r);
-    ctx.arcTo(x1 + w, y + h, x1, y + h, r);
-    ctx.lineTo(x1 + r, y + h);
-    ctx.arcTo(x1, y + h, x1, y, r);
-    ctx.lineTo(x1, y + r);
-    ctx.arcTo(x1, y, x1 + w, y, r);
-    ctx.closePath();
-    ctx.fill();
+    drawNoteBar(ctx, x1, y, w, h, evt.velocity, isActive);
 
-    /* Velocity indicator: thin bright line at top of note */
-    if (h > 5) {
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + evt.velocity * 0.3})`;
-      ctx.fillRect(x1 + r, y, Math.max(1, w - r * 2), 1);
-    }
-
-    /* Note label on wider bars */
-    if (w > 28 && h > 8) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.font = `${Math.min(9, h - 2)}px monospace`;
+    /* Note name label on wide bars */
+    if (w > 28 && h > 9) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.font = `${Math.min(9, h - 3)}px monospace`;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      const name = NOTE_NAMES[evt.note % 12] + (Math.floor(evt.note / 12) - 1);
-      ctx.fillText(name, x1 + 4, y + h / 2);
+      ctx.fillText(NOTE_NAMES[evt.note % 12] + (Math.floor(evt.note / 12) - 1), x1 + 4, y + h / 2);
     }
-
-    if (isActive) ctx.restore();
   }
 
   /* ── Playhead ───────────────────────────────────────── */
   const phX = timeX(now);
   ctx.save();
   ctx.shadowColor = VIZ_COLORS.accentGlow;
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 12;
   ctx.strokeStyle = VIZ_COLORS.accent;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(phX, 0);
-  ctx.lineTo(phX, height);
+  ctx.lineTo(phX, drawH);
   ctx.stroke();
-  /* Playhead triangle at top */
+  /* Triangle at top */
   ctx.fillStyle = VIZ_COLORS.accent;
   ctx.beginPath();
   ctx.moveTo(phX - 5, 0);
   ctx.lineTo(phX + 5, 0);
-  ctx.lineTo(phX, 7);
+  ctx.lineTo(phX, 8);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
 
   /* ── Piano keys sidebar ─────────────────────────────── */
-  /* Background */
-  ctx.fillStyle = '#111113';
-  ctx.fillRect(0, 0, KEYS_WIDTH, height);
-  /* Separator line */
-  ctx.strokeStyle = VIZ_COLORS.gridLight;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(KEYS_WIDTH - 0.5, 0);
-  ctx.lineTo(KEYS_WIDTH - 0.5, height);
-  ctx.stroke();
+  drawKeysSidebar(ctx, drawH, minNote, maxNote, noteHeight, yOffset, activeNotes);
 
-  /* Keys */
-  const activeNotes = new Set(
-    events.filter((e) => e.start <= now && e.end > now).map((e) => e.note),
-  );
+  /* ── Velocity lane ──────────────────────────────────── */
+  if (velLane > 0) {
+    const velY = height - velLane;
 
-  for (let n = minNote; n <= maxNote; n++) {
-    const y = noteY(n);
-    const isBlack = BLACK_KEYS.has(n % 12);
-    const isC = n % 12 === 0;
-    const isActive = activeNotes.has(n);
+    /* Lane background */
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fillRect(KEYS_WIDTH, velY, drawW, velLane);
 
-    /* Key background */
-    if (isActive) {
-      ctx.fillStyle = 'rgba(168, 85, 247, 0.3)';
-      ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
-    } else if (isBlack) {
-      ctx.fillStyle = '#0d0d0f';
-      ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
-    }
-
-    /* Label for C notes and active notes */
-    if (isC || (isActive && noteHeight > 7)) {
-      ctx.fillStyle = isActive ? VIZ_COLORS.accent : VIZ_COLORS.textDim;
-      ctx.font = `${Math.min(9, noteHeight - 1)}px monospace`;
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      const label = NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 1);
-      ctx.fillText(label, KEYS_WIDTH - 5, y + noteHeight / 2);
-    }
-  }
-
-  /* ── Velocity lane (bottom strip, 16px) ─────────────── */
-  const velLaneH = 16;
-  if (height > 100) {
-    const velY = height - velLaneH;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.fillRect(KEYS_WIDTH, velY, drawWidth, velLaneH);
-    /* Separator */
+    /* Separator line */
     ctx.strokeStyle = VIZ_COLORS.grid;
     ctx.lineWidth = 0.5;
     ctx.beginPath();
@@ -368,12 +518,12 @@ export function drawPianoroll(
       const x1 = timeX(evt.start);
       const x2 = timeX(evt.end);
       const w = Math.max(2, x2 - x1);
-      const barH = evt.velocity * (velLaneH - 2);
+      const barH = Math.max(2, evt.velocity * (velLane - 3));
       const isActive = evt.start <= now && evt.end > now;
-      ctx.fillStyle = isActive
-        ? `rgba(168, 85, 247, ${0.5 + evt.velocity * 0.4})`
-        : `rgba(168, 85, 247, ${0.2 + evt.velocity * 0.3})`;
-      ctx.fillRect(x1, velY + velLaneH - barH - 1, w, barH);
+      const hue = 270 + evt.velocity * 50;
+      const alpha = isActive ? 0.55 + evt.velocity * 0.4 : 0.25 + evt.velocity * 0.3;
+      ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
+      ctx.fillRect(x1, velY + velLane - barH - 1, w, barH);
     }
   }
 }

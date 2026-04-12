@@ -8,7 +8,7 @@
    20 Hz - 20 kHz range.
    ────────────────────────────────────────────────────────── */
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Knob from '../atoms/Knob'
 import FilterCurve from '../atoms/FilterCurve'
 
@@ -74,16 +74,32 @@ function FilterControl({
   onCutoffChange,
   onResonanceChange,
 }: FilterControlProps) {
+  /* Measure container width so FilterCurve fills 100% without overflow */
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [curveWidth, setCurveWidth] = useState(240)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const obs = new ResizeObserver(([entry]) => {
+      /* padding: 8px each side = 16px total */
+      const w = Math.max(80, Math.floor(entry.contentRect.width - 16))
+      setCurveWidth(w)
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
   /* Cutoff knob handler — converts 0–1 back to Hz for the parent */
   const handleCutoffNorm = useCallback(
     (norm: number) => onCutoffChange(normToHz(norm)),
-    [onCutoffChange]
+    [onCutoffChange],
   )
 
   /* Resonance knob handler — passes through 0–1 directly */
   const handleResonance = useCallback(
     (value: number) => onResonanceChange(value),
-    [onResonanceChange]
+    [onResonanceChange],
   )
 
   const cutoffNorm = hzToNorm(cutoff)
@@ -92,6 +108,7 @@ function FilterControl({
 
   return (
     <div
+      ref={containerRef}
       role="group"
       aria-label="Filter control"
       style={{
@@ -104,18 +121,50 @@ function FilterControl({
         borderRadius: 'var(--radius-md)',
       }}
     >
-      {/* Frequency response curve on top */}
-      <FilterCurve type={type} cutoff={cutoff} resonance={resonance} width={240} height={60} />
-
-      {/* Knobs + type selector row */}
+      {/* Type selector — horizontal row at the top, always fully visible */}
       <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-        }}
+        role="radiogroup"
+        aria-label="Filter type"
+        style={{ display: 'flex', gap: 'var(--space-1)' }}
       >
-        {/* Cutoff knob — log scale, display in Hz */}
+        {TYPES.map((filterT) => {
+          const isSelected = filterT === type
+          return (
+            <button
+              key={filterT}
+              type="button"
+              role="radio"
+              aria-checked={isSelected ? 'true' : 'false'}
+              aria-label={TYPE_ARIA[filterT]}
+              onClick={() => onTypeChange(filterT)}
+              style={{
+                flex: 1,
+                padding: 'var(--space-1) 0',
+                backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',
+                color: isSelected ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+                border: '1px solid',
+                borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                fontSize: 'var(--font-size-xs)',
+                fontFamily: 'var(--font-family-mono)',
+                fontWeight: isSelected ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)',
+                minHeight: '24px',
+                transition: 'var(--transition-fast)',
+              }}
+            >
+              {TYPE_LABELS[filterT]}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Frequency response curve — responsive width */}
+      <FilterCurve type={type} cutoff={cutoff} resonance={resonance} width={curveWidth} height={56} />
+
+      {/* Knobs row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+        {/* Cutoff knob — log scale */}
         <Knob
           value={cutoffNorm}
           min={MIN_HZ}
@@ -127,7 +176,6 @@ function FilterControl({
           size="md"
           onChange={handleCutoffNorm}
         />
-
         {/* Resonance knob — linear 0–1 */}
         <Knob
           value={resonance}
@@ -139,51 +187,6 @@ function FilterControl({
           size="md"
           onChange={handleResonance}
         />
-
-        {/* Type selector — 4 small buttons, radiogroup semantics */}
-        <div
-          role="radiogroup"
-          aria-label="Filter type"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-1)',
-            marginLeft: 'auto',
-          }}
-        >
-          {TYPES.map((t) => {
-            const isSelected = t === type
-            return (
-              <button
-                key={t}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                aria-label={TYPE_ARIA[t]}
-                onClick={() => onTypeChange(t)}
-                style={{
-                  padding: 'var(--space-1) var(--space-2)',
-                  backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',
-                  color: isSelected ? 'var(--color-bg)' : 'var(--color-text-secondary)',
-                  border: '1px solid',
-                  borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  cursor: 'pointer',
-                  fontSize: 'var(--font-size-xs)',
-                  fontFamily: 'var(--font-family-sans)',
-                  fontWeight: isSelected
-                    ? 'var(--font-weight-bold)'
-                    : 'var(--font-weight-normal)',
-                  minWidth: '48px',
-                  minHeight: '24px',
-                  transition: 'var(--transition-fast)',
-                }}
-              >
-                {TYPE_LABELS[t]}
-              </button>
-            )
-          })}
-        </div>
       </div>
     </div>
   )
