@@ -15,6 +15,7 @@ import { X } from 'lucide-react'
 import { SiteNav } from '../components/organisms/SiteNav'
 import { FilterPill } from '../components/molecules/FilterPill'
 import { SortSelect } from '../components/molecules/SortSelect'
+import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
 import {
   SESSIONS_LIBRARY,
   SESSION_CATEGORIES,
@@ -205,6 +206,63 @@ export default function Sessions() {
 
       <SiteNav />
 
+      {/* --- Two-column layout: sidebar + content --- */}
+      <div
+        className="flex"
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          minHeight: 'calc(100vh - 64px)',
+          alignItems: 'flex-start',
+        }}
+      >
+        {/* Sidebar — category + BPM filters on desktop */}
+        <ContentSidebar>
+          {/* Category filter */}
+          <SidebarSection title={t('sidebar.filterCategories')}>
+            <SidebarFilterItem
+              active={activeCategory === null}
+              count={SESSIONS_LIBRARY.length}
+              onClick={() => setActiveCategory(null)}
+            >
+              {t('sessions.allCategories')}
+            </SidebarFilterItem>
+            {visibleCategories.map((cat) => (
+              <SidebarFilterItem
+                key={cat}
+                active={activeCategory === cat}
+                count={categoryCounts[cat] || 0}
+                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+              >
+                {cat}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+
+          {/* BPM filter */}
+          <SidebarSection title={t('sidebar.filterBpm')}>
+            <SidebarFilterItem
+              active={activeBpm === null}
+              onClick={() => setActiveBpm(null)}
+            >
+              {t('sessions.allBpm')}
+            </SidebarFilterItem>
+            {BPM_RANGES.map((r) => (
+              <SidebarFilterItem
+                key={r.key}
+                active={activeBpm === r.key}
+                count={bpmCounts[r.key] || 0}
+                onClick={() => setActiveBpm(activeBpm === r.key ? null : r.key)}
+              >
+                {r.label}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+        </ContentSidebar>
+
+        {/* Content column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+
       {/* --- Page header --- */}
       <section
         style={{
@@ -322,8 +380,9 @@ export default function Sessions() {
           )}
         </div>
 
-        {/* Category pills */}
+        {/* Category pills — mobile only (sidebar handles desktop) */}
         <div
+          className="lg:hidden"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -358,8 +417,9 @@ export default function Sessions() {
           ))}
         </div>
 
-        {/* BPM pills */}
+        {/* BPM pills — mobile only (sidebar handles desktop) */}
         <div
+          className="lg:hidden"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -603,6 +663,8 @@ export default function Sessions() {
           </Link>
         ))}
       </section>
+        </div>{/* end content column */}
+      </div>{/* end flex wrapper */}
     </main>
   )
 }

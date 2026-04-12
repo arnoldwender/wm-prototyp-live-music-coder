@@ -61,6 +61,9 @@ export function StrudelEditor() {
   const evalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isPlaying = useAppStore((s) => s.isPlaying);
+  /* Ref so the update listener always reads the current value, not a stale closure */
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
   const togglePlay = useAppStore((s) => s.togglePlay);
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
@@ -95,9 +98,53 @@ export function StrudelEditor() {
     setFilter(biquadType, synthFilterCutoff, synthFilterResonance);
   }, [synthFilterType, synthFilterCutoff, synthFilterResonance]);
 
-  /* Active notes shown on the on-screen keyboard. We don't yet mirror
-   * physical MIDI here — Phase 1 only highlights internally pressed keys. */
-  const synthActiveNotes: number[] = [];
+  /* Active notes shown on the on-screen keyboard.
+   * Updated by lmc-midi-note events dispatched from strudel-keys.ts whenever
+   * a physical MIDI key is pressed / released. Auto-cleared after 450ms on
+   * note-on so they always release even if note-off never arrives. */
+  const [synthActiveNotes, setSynthActiveNotes] = useState<number[]>([]);
+
+  useEffect(() => {
+    const handleNote = (e: Event) => {
+      const { note, on } = (e as CustomEvent<{ note: number; on: boolean }>).detail;
+      setSynthActiveNotes(prev =>
+        on ? [...prev.filter(n => n !== note), note] : prev.filter(n => n !== note)
+      );
+      /* Auto-release after 450ms — matches OscillatorNode decay so the key
+       * doesn't stay lit if a note-off message never arrives. */
+      if (on) {
+        setTimeout(() => {
+          setSynthActiveNotes(prev => prev.filter(n => n !== note));
+        }, 450);
+      }
+    };
+    window.addEventListener('lmc-midi-note', handleNote);
+    return () => window.removeEventListener('lmc-midi-note', handleNote);
+  }, []);
+
+  /* Map hardware CC knobs to synth UI controls.
+   * MPK mini 3 defaults: K1=CC70, K2=CC71, K3=CC72; mod wheel=CC1.
+   * CC 70 / 1 → filter cutoff (log scale Hz), 71 → resonance, 72 → osc type. */
+  useEffect(() => {
+    const LOG2_MIN = Math.log2(20);
+    const LOG2_RANGE = Math.log2(20000) - LOG2_MIN;
+
+    const handleCc = (e: Event) => {
+      const { cc, value } = (e as CustomEvent<{ cc: number; value: number }>).detail;
+      if (cc === 70 || cc === 1) {
+        /* Log-scale map 0-1 → 20-20000 Hz — matches FilterControl's knob scale */
+        setSynthFilterCutoff(Math.pow(2, LOG2_MIN + value * LOG2_RANGE));
+      } else if (cc === 71) {
+        setSynthFilterResonance(value);
+      } else if (cc === 72) {
+        /* Four quadrants → four waveforms */
+        const types = ['sine', 'triangle', 'square', 'sawtooth'] as const;
+        setSynthOscillator(types[Math.min(3, Math.floor(value * 4))]);
+      }
+    };
+    window.addEventListener('lmc-midi-cc', handleCc);
+    return () => window.removeEventListener('lmc-midi-cc', handleCc);
+  }, [setSynthFilterCutoff, setSynthFilterResonance, setSynthOscillator]);
 
   /* Forward synth panel notes to the shared OscillatorNode trigger. The
    * window.__lmcPlayNote handle is registered by strudel-keys.ts on load. */
@@ -122,6 +169,8 @@ export function StrudelEditor() {
   const [midiDeviceName, setMidiDeviceName] = useState<string>('');
   const [midiMenuOpen, setMidiMenuOpen] = useState(false);
   const [composeMode, setComposeMode] = useState(false);
+  const composeModeRef = useRef(false);
+  composeModeRef.current = composeMode;
   const [midiLearning, setMidiLearning] = useState(false);
   const midiMenuRef = useRef<HTMLDivElement>(null);
 
@@ -359,9 +408,19 @@ export function StrudelEditor() {
         if (update.docChanged) {
           const code = update.state.doc.toString();
           updateFileCode(activeFile.id, code);
-          /* Live mode: debounced auto-evaluate — only if code parses cleanly */
-          if (liveModeRef.current && replRef.current && isPlaying) {
+          /* Live mode: debounced auto-evaluate.
+           * Fires when:
+           *   a) Live mode + transport is playing (normal live coding)
+           *   b) Compose mode + live mode (writing MIDI notes → immediate playback)
+           *      The debounce is slightly longer in compose mode so a chord's
+           *      notes all land before the eval fires (chord window = 20ms,
+           *      eval delay = 300ms → no partial-chord evaluations). */
+          const shouldEval =
+            liveModeRef.current && replRef.current &&
+            (isPlayingRef.current || composeModeRef.current);
+          if (shouldEval) {
             if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
+            const delay = composeModeRef.current ? 300 : 150;
             evalTimerRef.current = setTimeout(async () => {
               try {
                 await replRef.current.evaluate(code, true);
@@ -372,7 +431,7 @@ export function StrudelEditor() {
               } catch (err) {
                 setEvalError(err instanceof Error ? err.message : String(err));
               }
-            }, 150);
+            }, delay);
           }
         }
       });
