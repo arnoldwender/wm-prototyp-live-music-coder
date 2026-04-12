@@ -45,7 +45,7 @@ const VEL_LANE_H = 18;
 
 /* ── Types ─────────────────────────────────────────────── */
 
-interface NoteEvent {
+export interface NoteEvent {
   note: number;
   start: number;
   end: number;
@@ -76,11 +76,11 @@ function noteGlow(velocity: number): string {
 function extractMidi(val: unknown): number {
   if (typeof val === 'number') return val;
   if (typeof val === 'string') {
-    const m = val.match(/^([a-g])(s|#|b|f)?(\d)?$/i);
+    const m = val.match(/^([a-g])(s|#|b|f)?(-?\d{1,2})?$/i);
     if (m) {
       const name = m[1].toUpperCase();
       const acc = (m[2] === '#' || m[2] === 's') ? 1 : (m[2] === 'b' || m[2] === 'f') ? -1 : 0;
-      const oct = m[3] ? parseInt(m[3]) : 3;
+      const oct = m[3] ? parseInt(m[3], 10) : 3;
       const idx = NOTE_NAMES.indexOf(name);
       if (idx >= 0) return (oct + 1) * 12 + idx + acc;
     }
@@ -119,7 +119,7 @@ function drawKeysSidebar(
   activeNotes: Set<number>,
 ) {
   /* Sidebar background */
-  ctx.fillStyle = '#0d0d10';
+  ctx.fillStyle = VIZ_COLORS.keysBg;
   ctx.fillRect(0, 0, KEYS_WIDTH, height);
 
   /* First pass: draw white key backgrounds (full-width rows) */
@@ -131,11 +131,11 @@ function drawKeysSidebar(
     if (!isBlack) {
       /* White key background */
       ctx.fillStyle = isActive
-        ? 'rgba(168, 85, 247, 0.35)'
-        : '#1c1c22';
+        ? VIZ_COLORS.keysActiveOverlay
+        : VIZ_COLORS.keysWhiteKey;
       ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
       /* Bottom border for white key separation */
-      ctx.fillStyle = '#08080a';
+      ctx.fillStyle = VIZ_COLORS.keysBlackKey;
       ctx.fillRect(0, y + noteHeight - 0.5, KEYS_WIDTH - 1, 1);
     }
   }
@@ -149,13 +149,13 @@ function drawKeysSidebar(
     if (isBlack) {
       const bw = Math.round(KEYS_WIDTH * BLACK_KEY_W);
       ctx.fillStyle = isActive
-        ? 'rgba(168, 85, 247, 0.5)'
-        : '#0a0a0d';
+        ? VIZ_COLORS.accentGlow
+        : VIZ_COLORS.keysBlackKeyAlt;
       ctx.fillRect(0, y, bw, noteHeight);
       /* Right-edge gradient effect */
       const grad = ctx.createLinearGradient(bw - 6, 0, bw, 0);
       grad.addColorStop(0, 'transparent');
-      grad.addColorStop(1, 'rgba(255,255,255,0.06)');
+      grad.addColorStop(1, VIZ_COLORS.keysOctaveLine);
       ctx.fillStyle = grad;
       ctx.fillRect(bw - 6, y, 6, noteHeight);
     }
@@ -235,16 +235,17 @@ function drawBeatGrid(
         ctx.textBaseline = 'top';
         ctx.fillText(`${cyc + 1}`, x, 3);
       } else if (isHalf) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.7)';
+        /* Half-bar line — same color token as bar but at 40% opacity */
+        ctx.strokeStyle = VIZ_COLORS.gridDim;
         ctx.lineWidth = 0.6;
       } else if (isQuarter) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.5)';
+        ctx.strokeStyle = VIZ_COLORS.gridDim;
         ctx.lineWidth = 0.5;
       } else if (isEighth) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.3)';
+        ctx.strokeStyle = VIZ_COLORS.gridMid;
         ctx.lineWidth = 0.4;
       } else {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.15)';
+        ctx.strokeStyle = VIZ_COLORS.gridFaint;
         ctx.lineWidth = 0.3;
       }
 
@@ -272,12 +273,12 @@ function drawNoteRowBackgrounds(
 
     if (isBlack) {
       /* Black key rows: slightly darker background */
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+      ctx.fillStyle = VIZ_COLORS.rowBlackKeyBg;
       ctx.fillRect(KEYS_WIDTH, y, width - KEYS_WIDTH, noteHeight);
     }
     /* C note separator line */
     if (n % 12 === 0) {
-      ctx.strokeStyle = 'rgba(63, 63, 70, 0.35)';
+      ctx.strokeStyle = VIZ_COLORS.gridCLine;
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(KEYS_WIDTH, y + noteHeight);
@@ -285,6 +286,32 @@ function drawNoteRowBackgrounds(
       ctx.stroke();
     }
   }
+}
+
+/* ── Rounded-rect path helper ───────────────────────────── */
+
+/** Trace a rounded rectangle path onto ctx without stroking or filling.
+ *  Clamps the radius so it never exceeds half of width or height. */
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const safeR = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + safeR, y);
+  ctx.lineTo(x + w - safeR, y);
+  ctx.arcTo(x + w, y, x + w, y + safeR, safeR);
+  ctx.lineTo(x + w, y + h - safeR);
+  ctx.arcTo(x + w, y + h, x + w - safeR, y + h, safeR);
+  ctx.lineTo(x + safeR, y + h);
+  ctx.arcTo(x, y + h, x, y + h - safeR, safeR);
+  ctx.lineTo(x, y + safeR);
+  ctx.arcTo(x, y, x + safeR, y, safeR);
+  ctx.closePath();
 }
 
 /* ── Note bars ──────────────────────────────────────────── */
@@ -307,19 +334,9 @@ function drawNoteBar(
     ctx.shadowBlur = 14;
   }
 
-  /* Note fill — rounded rect */
+  /* Note fill — rounded rect via shared helper */
   ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(x1 + r, y);
-  ctx.lineTo(x1 + w - r, y);
-  ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
-  ctx.lineTo(x1 + w, y + h - r);
-  ctx.arcTo(x1 + w, y + h, x1, y + h, r);
-  ctx.lineTo(x1 + r, y + h);
-  ctx.arcTo(x1, y + h, x1, y, r);
-  ctx.lineTo(x1, y + r);
-  ctx.arcTo(x1, y, x1 + w, y, r);
-  ctx.closePath();
+  roundRectPath(ctx, x1, y, w, h, r);
   ctx.fill();
 
   /* Top highlight line — shimmer effect */
@@ -344,6 +361,10 @@ export function drawPianoroll(
   } | null,
   zoomX = 1,
   zoomY = 1,
+  timeOffset = 0,
+  velocityOverrides?: Map<string, number>,
+  pitchOverrides?: Map<string, number>,
+  eventSink?: { events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number; minNote: number; maxNote: number; noteHeight: number; yOffset: number },
 ) {
   /* ── Background ─────────────────────────────────────── */
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -365,8 +386,8 @@ export function drawPianoroll(
   /* zoomX shrinks the time window — higher zoom = fewer cycles visible */
   const cyclesBack = BASE_CYCLES_BACK / zoomX;
   const cyclesForward = BASE_CYCLES_FORWARD / zoomX;
-  const timeStart = now - cyclesBack;
-  const timeEnd = now + cyclesForward;
+  const timeStart = now - cyclesBack - timeOffset;
+  const timeEnd   = now + cyclesForward - timeOffset;
   const timeRange = timeEnd - timeStart;
 
   let haps: unknown[];
@@ -378,8 +399,9 @@ export function drawPianoroll(
 
   /* ── Parse note events ──────────────────────────────── */
   const events: NoteEvent[] = [];
-  let minNote = 127;
-  let maxNote = 0;
+  /* Use Infinity sentinels so any real MIDI note wins the first comparison */
+  let minNote = Infinity;
+  let maxNote = -Infinity;
 
   for (const hap of haps as Record<string, unknown>[]) {
     if (!hap.whole) continue;
@@ -395,6 +417,9 @@ export function drawPianoroll(
     minNote = Math.min(minNote, midi);
     maxNote = Math.max(maxNote, midi);
   }
+
+  /* Guard: if no valid MIDI events were found, reset to a sensible default range */
+  if (!isFinite(minNote) || !isFinite(maxNote)) { minNote = 48; maxNote = 72; }
 
   if (events.length === 0) {
     ctx.fillStyle = VIZ_COLORS.textDim;
@@ -433,6 +458,19 @@ export function drawPianoroll(
   const noteY = (n: number) => yOffset + (maxNote - n) * noteHeight;
   const timeX = (t: number) => KEYS_WIDTH + ((t - timeStart) / timeRange) * drawW;
 
+  /* Export events and layout data for hit-testing by the React component */
+  if (eventSink) {
+    eventSink.events = events;
+    eventSink.timeStart = timeStart;
+    eventSink.timeEnd = timeEnd;
+    eventSink.drawW = drawW;
+    eventSink.keysWidth = KEYS_WIDTH;
+    eventSink.minNote = minNote;
+    eventSink.maxNote = maxNote;
+    eventSink.noteHeight = noteHeight;
+    eventSink.yOffset = yOffset;
+  }
+
   /* ── Note row backgrounds ───────────────────────────── */
   drawNoteRowBackgrounds(ctx, width, minNote, maxNote, noteHeight, yOffset);
 
@@ -453,7 +491,6 @@ export function drawPianoroll(
   for (const evt of sorted) {
     const x1 = timeX(evt.start);
     const x2 = timeX(evt.end);
-    const y = noteY(evt.note);
     const w = Math.max(3, x2 - x1);
     const h = Math.max(2, noteHeight - 1);
     const isActive = evt.start <= now && evt.end > now;
@@ -461,15 +498,48 @@ export function drawPianoroll(
     /* Skip notes completely outside the draw area */
     if (x1 > width || x2 < KEYS_WIDTH) continue;
 
+    /* Apply pitch override for display position — original evt.note used as key */
+    const overrideKey = `${evt.note}:${evt.start}`;
+    const drawNote = pitchOverrides?.get(overrideKey) ?? evt.note;
+    const y = noteY(drawNote);
+
     drawNoteBar(ctx, x1, y, w, h, evt.velocity, isActive);
 
-    /* Note name label on wide bars */
-    if (w > 28 && h > 9) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = `${Math.min(9, h - 3)}px monospace`;
+    /* Accent outline when pitch has been dragged from its original position */
+    if (drawNote !== evt.note) {
+      /* Accent outline via shared helper — marks notes whose pitch has been dragged */
+      const r = Math.min(3, h / 2, w / 2);
+      ctx.save();
+      ctx.strokeStyle = `${VIZ_COLORS.accent}99`; // accent at 60% opacity
+      ctx.lineWidth = 1;
+      roundRectPath(ctx, x1, y, w, h, r);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* Note name label — rendered when bar is tall and wide enough to fit text.
+     * Clipped to bar bounds so text never bleeds into adjacent rows. */
+    if (w > 8 && noteHeight >= 10) {
+      const pitchClass = NOTE_NAMES[drawNote % 12];
+      /* C notes get octave suffix (e.g. "C4") for orientation; others just pitch class */
+      const label = pitchClass === 'C'
+        ? 'C' + (Math.floor(drawNote / 12) - 1)
+        : pitchClass;
+      /* Active / pitch-overridden notes use accent color to signal override */
+      const labelColor = (isActive || drawNote !== evt.note)
+        ? VIZ_COLORS.accent
+        : VIZ_COLORS.noteLabelText;
+      ctx.save();
+      /* Clip text to note bar so it never spills outside */
+      ctx.beginPath();
+      ctx.rect(x1, y, w, h);
+      ctx.clip();
+      ctx.fillStyle = labelColor;
+      ctx.font = 'bold ' + Math.min(noteHeight * 0.55, 11) + 'px system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(NOTE_NAMES[evt.note % 12] + (Math.floor(evt.note / 12) - 1), x1 + 4, y + h / 2);
+      ctx.fillText(label, x1 + 4, y + h / 2);
+      ctx.restore();
     }
   }
 
@@ -502,7 +572,7 @@ export function drawPianoroll(
     const velY = height - velLane;
 
     /* Lane background */
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fillStyle = VIZ_COLORS.velLaneBg;
     ctx.fillRect(KEYS_WIDTH, velY, drawW, velLane);
 
     /* Separator line */
@@ -513,15 +583,17 @@ export function drawPianoroll(
     ctx.lineTo(width, velY);
     ctx.stroke();
 
-    /* Velocity bars */
+    /* Velocity bars — apply overrides when dragging */
     for (const evt of events) {
+      const overrideKey = `${evt.note}:${evt.start}`;
+      const vel = velocityOverrides?.get(overrideKey) ?? evt.velocity;
       const x1 = timeX(evt.start);
       const x2 = timeX(evt.end);
       const w = Math.max(2, x2 - x1);
-      const barH = Math.max(2, evt.velocity * (velLane - 3));
+      const barH = Math.max(2, vel * (velLane - 3));
       const isActive = evt.start <= now && evt.end > now;
-      const hue = 270 + evt.velocity * 50;
-      const alpha = isActive ? 0.55 + evt.velocity * 0.4 : 0.25 + evt.velocity * 0.3;
+      const hue = 270 + vel * 50;
+      const alpha = isActive ? 0.55 + vel * 0.4 : 0.25 + vel * 0.3;
       ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
       ctx.fillRect(x1, velY + velLane - barH - 1, w, barH);
     }

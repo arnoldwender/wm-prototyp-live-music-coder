@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Logo } from '../components/atoms'
-import { LanguageSwitcher } from '../components/molecules'
+import { LanguageSwitcher, ContentSidebar, SidebarSection } from '../components/molecules'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
 import { docSections } from '../data/docs'
@@ -233,43 +233,19 @@ function Docs() {
           minHeight: 'calc(100vh - 64px)',
         }}
       >
-        {/* Sidebar navigation */}
-        <aside
-          aria-label={t('docs.sidebarLabel')}
-          style={{
-            width: '260px',
-            flexShrink: 0,
-            borderRight: '1px solid var(--color-border)',
-            padding: 'var(--space-10) var(--space-8)',
-            position: 'sticky',
-            top: '64px',
-            height: 'calc(100vh - 64px)',
-            overflowY: 'auto',
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 'var(--font-size-xs)',
-              fontWeight: 'var(--font-weight-bold)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: 'var(--color-text-muted)',
-              marginBottom: 'var(--space-8)',
-            }}
-          >
-            {t('docs.sidebarTitle')}
-          </h2>
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {/* Sidebar — shared ContentSidebar with doc section links as children */}
+        <ContentSidebar>
+          <SidebarSection title={t('docs.sidebarTitle')}>
             {docSections.map((section) => {
               const isActive = section.id === activeId
               return (
-                <li key={section.id} style={{ marginBottom: 'var(--space-2)' }}>
+                <li key={section.id} style={{ marginBottom: 'var(--space-1)' }}>
                   <Link
                     to={`/docs/${section.id}`}
+                    aria-current={isActive ? 'page' : undefined}
                     style={{
                       display: 'block',
-                      padding: 'var(--space-3) var(--space-4)',
+                      padding: 'var(--space-2) var(--space-3)',
                       fontSize: 'var(--font-size-sm)',
                       fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-normal)',
                       color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
@@ -284,8 +260,8 @@ function Docs() {
                 </li>
               )
             })}
-          </ul>
-        </aside>
+          </SidebarSection>
+        </ContentSidebar>
 
         {/* Content area */}
         <main

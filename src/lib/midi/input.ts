@@ -15,6 +15,9 @@ const noteState = new Map<string, number>();
 /** Listeners notified when any CC value changes */
 const listeners = new Set<(channel: number, cc: number, value: number) => void>();
 
+/** Listeners notified when the MIDI device list changes */
+const deviceListeners = new Set<(names: string[]) => void>();
+
 let midiAccess: MIDIAccess | null = null;
 let initialized = false;
 
@@ -35,13 +38,17 @@ export async function initMidiInput(): Promise<boolean> {
       attachInput(input);
     }
 
-    /* Listen for new devices */
+    /* Listen for new devices — fires on both connect and disconnect */
     midiAccess.onstatechange = (e) => {
       const port = (e as MIDIConnectionEvent).port;
-      if (port && port.type === 'input' && port.state === 'connected') {
+      if (!port || port.type !== 'input') return;
+      if (port.state === 'connected') {
         attachInput(port as MIDIInput);
         console.log(`[MidiInput] Connected: ${port.name}`);
+      } else if (port.state === 'disconnected') {
+        console.log(`[MidiInput] Disconnected: ${port.name}`);
       }
+      notifyDeviceListeners();
     };
 
     console.log(`[MidiInput] Initialized with ${midiAccess.inputs.size} inputs`);
@@ -118,4 +125,16 @@ export function getMidiInputNames(): string[] {
 /** Check if MIDI is available and initialized */
 export function isMidiAvailable(): boolean {
   return initialized && midiAccess !== null;
+}
+
+/** Subscribe to MIDI device connect/disconnect events */
+export function onDeviceListChange(fn: (names: string[]) => void): () => void {
+  deviceListeners.add(fn);
+  return () => deviceListeners.delete(fn);
+}
+
+/** Notify all device list subscribers */
+function notifyDeviceListeners(): void {
+  const names = getMidiInputNames();
+  deviceListeners.forEach((fn) => fn(names));
 }

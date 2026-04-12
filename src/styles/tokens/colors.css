@@ -30,6 +30,8 @@
 
   /* --- Overlays --- */
   --color-backdrop: rgba(0, 0, 0, 0.6);
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-overlay-heavy: rgba(0, 0, 0, 0.75);
 
   /* --- Semantic --- */
   --color-primary: #a855f7;

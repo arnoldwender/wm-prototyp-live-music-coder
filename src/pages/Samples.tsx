@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
+import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
 import { SiteNav } from '../components/organisms/SiteNav'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
@@ -421,6 +422,56 @@ function Samples() {
       {/* Shared top nav (single source of truth in SiteNav) */}
       <SiteNav />
 
+      {/* --- Two-column layout: sidebar + content --- */}
+      <div
+        className="flex"
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          minHeight: 'calc(100vh - 64px)',
+          alignItems: 'flex-start',
+        }}
+      >
+        {/* Sidebar — engine + category filters on desktop */}
+        <ContentSidebar>
+          {/* Engine filter */}
+          <SidebarSection title={t('sidebar.filterEngine')}>
+            {ENGINE_LABELS.map((engine) => (
+              <SidebarFilterItem
+                key={engine.id}
+                active={activeEngine === engine.id}
+                onClick={() => setActiveEngine(activeEngine === engine.id ? 'all' : engine.id)}
+              >
+                {engine.label}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+
+          {/* Category filter */}
+          <SidebarSection title={t('sidebar.filterCategories')}>
+            <SidebarFilterItem
+              active={activeCategory === null}
+              count={sorted.length}
+              onClick={() => setActiveCategory(null)}
+            >
+              {t('samples.allCategories')}
+            </SidebarFilterItem>
+            {visibleCategories.map((cat) => (
+              <SidebarFilterItem
+                key={cat}
+                active={activeCategory === cat}
+                count={categoryCounts[cat] || 0}
+                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+              >
+                {CATEGORY_I18N_MAP[cat] ? t(CATEGORY_I18N_MAP[cat]) : cat}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+        </ContentSidebar>
+
+        {/* Content column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+
       {/* --- Page header with title and stats --- */}
       <header
         style={{
@@ -507,9 +558,9 @@ function Samples() {
           )}
         </div>
 
-        {/* 2. Filter row 1 — Engine filter pills */}
+        {/* 2. Filter row 1 — Engine filter pills (mobile only) */}
         <div
-          className="flex flex-wrap items-center"
+          className="lg:hidden flex flex-wrap items-center"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
         >
           <span
@@ -534,9 +585,9 @@ function Samples() {
           ))}
         </div>
 
-        {/* 3. Filter row 2 — Category pills with count badges */}
+        {/* 3. Filter row 2 — Category pills (mobile only) */}
         <div
-          className="flex flex-wrap"
+          className="lg:hidden flex flex-wrap"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
         >
           <FilterPill
@@ -716,6 +767,9 @@ function Samples() {
           <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
         </p>
       </footer>
+
+        </div>{/* end content column */}
+      </div>{/* end flex wrapper */}
 
       {/* NowPlaying floating indicator — shows when a sample is playing */}
       <NowPlayingIndicator

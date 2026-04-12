@@ -363,6 +363,14 @@
     "categoryWaRouting": "Routing",
     "categoryWaSynthesis": "Synthese"
   },
+  "sidebar": {
+    "browse": "Entdecken",
+    "ariaLabel": "Inhaltsnavigation",
+    "filterCategories": "Kategorien",
+    "filterBpm": "BPM",
+    "filterEngine": "Engine",
+    "all": "Alle"
+  },
   "docs": {
     "skipToContent": "Zum Inhalt springen",
     "navigation": "Dokumentationsnavigation",
