@@ -9,9 +9,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Usb } from 'lucide-react';
 import {
   getMidiInputNames,
-  isMidiAvailable,
   initMidiInput,
   onCCChange,
+  onDeviceListChange,
 } from '../../lib/midi/input';
 
 interface CCEntry {
@@ -28,7 +28,7 @@ export function MidiPanel() {
   const maxEntries = 20;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  /* Init MIDI and poll devices */
+  /* Init MIDI and subscribe to device connect/disconnect events */
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -38,14 +38,11 @@ export function MidiPanel() {
       setDevices(getMidiInputNames());
     })();
 
-    /* Poll for device changes every 2s */
-    const interval = setInterval(() => {
-      if (isMidiAvailable()) {
-        setDevices(getMidiInputNames());
-      }
-    }, 2000);
+    const unsub = onDeviceListChange((names) => {
+      if (mounted) setDevices(names);
+    });
 
-    return () => { mounted = false; clearInterval(interval); };
+    return () => { mounted = false; unsub(); };
   }, []);
 
   /* Subscribe to CC changes */
