@@ -83,10 +83,10 @@ function Toast({ icon, title, onDismiss }: ToastProps) {
         maxWidth: '240px',
       }}
     >
-      <span style={{ fontSize: '14px', lineHeight: 1, flexShrink: 0 }} aria-hidden="true">
+      <span style={{ fontSize: 'var(--font-size-sm)', lineHeight: 1, flexShrink: 0 }} aria-hidden="true">
         {icon}
       </span>
-      <span style={{ fontSize: '11px', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <span style={{ fontSize: 'var(--font-size-ui)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {title}
       </span>
     </button>

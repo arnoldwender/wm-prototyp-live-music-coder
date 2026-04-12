@@ -99,7 +99,7 @@ export function SampleDropZone({ onImport }: SampleDropZoneProps) {
         style={{ color: dragging ? 'var(--color-primary)' : 'var(--color-text-muted)' }}
       />
 
-      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+      <span style={{ fontSize: 'var(--font-size-ui)', color: 'var(--color-text-muted)' }}>
         {importing
           ? 'Importing...'
           : dragging
@@ -107,13 +107,13 @@ export function SampleDropZone({ onImport }: SampleDropZoneProps) {
             : 'Drop audio files or click to browse'}
       </span>
 
-      <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', opacity: 0.6 }}>
+      <span style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)', opacity: 0.6 }}>
         WAV, MP3, OGG, FLAC, AAC, M4A
       </span>
 
       {/* Show last imported samples */}
       {lastImported.length > 0 && (
-        <div style={{ fontSize: '10px', color: 'var(--color-success)', marginTop: 'var(--space-1)' }}>
+        <div style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-success)', marginTop: 'var(--space-1)' }}>
           Imported: {lastImported.map((n) => `s("${n}")`).join(', ')}
         </div>
       )}

@@ -39,7 +39,7 @@ function SavedGistsList() {
 
   if (gists.length === 0) {
     return (
-      <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: '11px', textAlign: 'center' }}>
+      <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-ui)', textAlign: 'center' }}>
         No saved gists yet. Use the Gist button in the toolbar to save.
       </div>
     );
@@ -48,7 +48,7 @@ function SavedGistsList() {
   return (
     <div style={{ padding: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
       {gists.map((g) => (
-        <div key={g.id} className="flex items-center" style={{ fontSize: '11px', padding: 'var(--space-2)', backgroundColor: 'var(--color-bg)', borderRadius: 'var(--radius-sm)', gap: 'var(--space-2)' }}>
+        <div key={g.id} className="flex items-center" style={{ fontSize: 'var(--font-size-ui)', padding: 'var(--space-2)', backgroundColor: 'var(--color-bg)', borderRadius: 'var(--radius-sm)', gap: 'var(--space-2)' }}>
           <a
             href={g.url}
             target="_blank"
@@ -57,14 +57,14 @@ function SavedGistsList() {
           >
             {g.id.slice(0, 10)}...
           </a>
-          <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', flexShrink: 0 }}>
+          <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)', flexShrink: 0 }}>
             {new Date(g.date).toLocaleDateString()}
           </span>
           <button
             type="button"
             onClick={() => handleLoad(g.id)}
             disabled={loading === g.id}
-            style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '10px', padding: '1px var(--space-2)', flexShrink: 0 }}
+            style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', padding: '1px var(--space-2)', flexShrink: 0 }}
           >
             {loading === g.id ? '...' : 'Load'}
           </button>
@@ -108,7 +108,7 @@ function AccordionSection({ id: _id, title, children, forceOpen }: AccordionProp
           border: 'none',
           color: 'var(--color-text)',
           cursor: 'pointer',
-          fontSize: '11px',
+          fontSize: 'var(--font-size-ui)',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
@@ -205,7 +205,7 @@ export function DetailPanel() {
         {/* Mobile close button */}
         {isMobile && (
           <div className="flex items-center justify-between shrink-0" style={{ padding: 'var(--space-2) var(--space-3)', borderBottom: '1px solid var(--color-border)' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: 'var(--font-size-ui)', fontWeight: 600, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {sections.find(s => s.id === activeSection)?.title}
             </span>
             <button

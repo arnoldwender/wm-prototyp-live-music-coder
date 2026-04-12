@@ -57,7 +57,7 @@ export function ConsolePanel() {
       style={{
         backgroundColor: 'var(--color-bg)',
         fontFamily: 'var(--font-family-mono)',
-        fontSize: '11px',
+        fontSize: 'var(--font-size-ui)',
       }}
     >
       {/* Header */}
@@ -73,7 +73,7 @@ export function ConsolePanel() {
           Console
         </span>
         <div className="flex items-center gap-2">
-          <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>
+          <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>
             {messages.length} msg
           </span>
           <button

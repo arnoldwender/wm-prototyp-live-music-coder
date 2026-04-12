@@ -254,7 +254,7 @@ export function ExampleGallery() {
           border: '1px solid var(--color-primary)',
           borderRadius: 'var(--radius-md)',
           boxShadow: '0 0 12px color-mix(in srgb, var(--color-primary) 20%, transparent)',
-          fontSize: '11px',
+          fontSize: 'var(--font-size-ui)',
           color: 'var(--color-text)',
         }}>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-success)' }} />
@@ -268,7 +268,7 @@ export function ExampleGallery() {
               borderRadius: 'var(--radius-sm)',
               color: 'var(--color-text-muted)',
               cursor: 'pointer',
-              fontSize: '10px',
+              fontSize: 'var(--font-size-2xs)',
               padding: '1px var(--space-2)',
               marginLeft: 'var(--space-2)',
             }}

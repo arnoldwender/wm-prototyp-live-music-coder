@@ -7,6 +7,10 @@ import { drawSpectrum } from '../../lib/visualizers/spectrum';
 import { AudioAnalyzer } from '../../lib/audio/analyzer';
 import { getStrudelAnalyser } from '../../lib/audio/strudel-tap';
 
+/* Module-level constant — avoids a Float32Array allocation + fill every RAF
+   frame when no analyser is connected yet. */
+const EMPTY_SPECTRUM = new Float32Array(1024).fill(-100);
+
 export function SpectrumVisualizer() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
   const lastNodeRef = useRef<AnalyserNode | null>(null);
@@ -28,7 +32,7 @@ export function SpectrumVisualizer() {
     if (analyzerRef.current) {
       drawSpectrum(ctx, width, height, analyzerRef.current.getFrequencyData());
     } else {
-      drawSpectrum(ctx, width, height, new Float32Array(1024).fill(-100));
+      drawSpectrum(ctx, width, height, EMPTY_SPECTRUM);
     }
   }, []);
 

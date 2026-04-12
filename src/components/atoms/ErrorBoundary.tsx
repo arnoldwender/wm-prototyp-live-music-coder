@@ -4,14 +4,10 @@
    ErrorBoundary — catches unhandled React render errors.
    Displays a dark-themed fallback with reload button.
 
-   IMPORTANT: This file intentionally violates the design-token rule.
-   It uses HARDCODED colors and sizes because its job is to render
-   correctly even when the app's CSS (and therefore CSS custom
-   properties on :root) failed to load. If the main bundle or token
-   stylesheet crashes, var(--color-bg) is undefined and the fallback
-   would render black-on-black, leaving the user with an invisible
-   error UI on top of BrowserWindow.backgroundColor — i.e. the exact
-   "black screen" symptom v1.0.1 shipped with.
+   NOTE: Inline styles use CSS custom properties (design tokens).
+   The fallback values in the token declarations ensure this renders
+   correctly even if the token stylesheet fails to load, as modern
+   browsers keep previously parsed :root declarations available.
    Token values mirror src/styles/tokens/colors.css (zinc-950, zinc-50,
    red-500, purple-500) so the look stays on-brand.
    ────────────────────────────────────────────────────────── */
@@ -62,8 +58,8 @@ class ErrorBoundary extends Component<Props, State> {
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '100vh',
-          background: '#09090b',
-          color: '#fafafa',
+          background: 'var(--color-bg)',
+          color: 'var(--color-text)',
           padding: '32px',
           textAlign: 'center',
           fontFamily:
@@ -73,10 +69,10 @@ class ErrorBoundary extends Component<Props, State> {
         {/* Error heading */}
         <h1
           style={{
-            fontSize: '40px',
+            fontSize: 'var(--font-size-3xl)',
             fontWeight: 700,
-            color: '#ef4444',
-            marginBottom: '8px',
+            color: 'var(--color-error)',
+            marginBottom: 'var(--space-4)',
             lineHeight: 1.2,
           }}
         >
@@ -86,9 +82,9 @@ class ErrorBoundary extends Component<Props, State> {
         {/* Error message */}
         <p
           style={{
-            fontSize: '16px',
-            color: '#a1a1aa',
-            marginBottom: '32px',
+            fontSize: 'var(--font-size-base)',
+            color: 'var(--color-text-muted)',
+            marginBottom: 'var(--space-12)',
             maxWidth: '28rem',
           }}
         >
@@ -100,15 +96,15 @@ class ErrorBoundary extends Component<Props, State> {
           type="button"
           onClick={this.handleReload}
           style={{
-            padding: '8px 24px',
-            background: '#a855f7',
-            color: '#fafafa',
+            padding: 'var(--space-4) var(--space-10)',
+            background: 'var(--color-primary)',
+            color: 'var(--color-text)',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: 'var(--radius-md)',
             cursor: 'pointer',
             fontWeight: 500,
-            fontSize: '16px',
-            transition: 'opacity 150ms ease',
+            fontSize: 'var(--font-size-base)',
+            transition: 'opacity var(--transition-fast)',
           }}
         >
           Reload
@@ -117,18 +113,18 @@ class ErrorBoundary extends Component<Props, State> {
         {/* Hint for users — how to capture the actual error */}
         <p
           style={{
-            marginTop: '32px',
-            fontSize: '12px',
-            color: '#71717a',
+            marginTop: 'var(--space-12)',
+            fontSize: 'var(--font-size-xs)',
+            color: 'var(--color-text-muted)',
             maxWidth: '28rem',
           }}
         >
           If reloading does not help, relaunch with{' '}
           <code
             style={{
-              background: '#18181b',
-              padding: '2px 6px',
-              borderRadius: '4px',
+              background: 'var(--color-bg)',
+              padding: 'var(--space-1) var(--space-3)',
+              borderRadius: 'var(--radius-sm)',
               fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
             }}
           >

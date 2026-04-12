@@ -7,6 +7,10 @@ import { drawWaveform } from '../../lib/visualizers/waveform';
 import { AudioAnalyzer } from '../../lib/audio/analyzer';
 import { getStrudelAnalyser } from '../../lib/audio/strudel-tap';
 
+/* Module-level constant — avoids a Float32Array allocation every RAF frame
+   when no analyser is connected yet. */
+const EMPTY_WAVEFORM = new Float32Array(2048);
+
 export function WaveformVisualizer() {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
   const lastNodeRef = useRef<AnalyserNode | null>(null);
@@ -28,7 +32,7 @@ export function WaveformVisualizer() {
     if (analyzerRef.current) {
       drawWaveform(ctx, width, height, analyzerRef.current.getTimeDomainData());
     } else {
-      drawWaveform(ctx, width, height, new Float32Array(2048));
+      drawWaveform(ctx, width, height, EMPTY_WAVEFORM);
     }
   }, []);
 

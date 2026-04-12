@@ -851,6 +851,14 @@ const MAX_LOG_ENTRIES = 200;
 let logBuffer: { type: 'log' | 'error' | 'warn' | 'info'; message: string; time: number }[] = [];
 let logListeners: (() => void)[] = [];
 
+/* Static color map — hoisted to module level to avoid recreation on every render */
+const TYPE_COLORS: Record<string, string> = {
+  log: 'var(--color-text-secondary)',
+  error: 'var(--color-error)',
+  warn: 'var(--color-warning)',
+  info: 'var(--color-primary)',
+};
+
 export function ConsolePanel() {
   const [, forceUpdate] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -900,13 +908,6 @@ export function ConsolePanel() {
     }
   }, [logBuffer.length]);
 
-  const typeColors: Record<string, string> = {
-    log: 'var(--color-text-secondary)',
-    error: 'var(--color-error)',
-    warn: 'var(--color-warning)',
-    info: 'var(--color-primary)',
-  };
-
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto" style={{ padding: 'var(--space-2)', fontFamily: 'var(--font-family-mono)', fontSize: 'var(--font-size-ui)' }}>
       {logBuffer.length === 0 ? (
@@ -918,7 +919,7 @@ export function ConsolePanel() {
           <div
             key={i}
             style={{
-              color: typeColors[entry.type] || 'var(--color-text)',
+              color: TYPE_COLORS[entry.type] || 'var(--color-text)',
               padding: '1px 0',
               borderBottom: '1px solid var(--color-border)',
               wordBreak: 'break-all',
