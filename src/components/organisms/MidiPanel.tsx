@@ -199,9 +199,9 @@ export function MidiPanel() {
                   {/* Value bar — width represents 0-127 as percentage of track */}
                   <div
                     role="progressbar"
-                    aria-valuenow={displayValue as number}
-                    aria-valuemin={0 as number}
-                    aria-valuemax={127 as number}
+                    aria-valuenow={displayValue}
+                    aria-valuemin={0}
+                    aria-valuemax={127}
                     aria-label={`CC ${cc} ${ccName} — ${displayValue}`}
                     style={{
                       height: 'var(--space-2)',
