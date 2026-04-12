@@ -11,6 +11,7 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
+import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
 import { SiteNav } from '../components/organisms/SiteNav'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
@@ -488,11 +489,83 @@ function Examples() {
       {/* Shared top nav (single source of truth in SiteNav) */}
       <SiteNav />
 
+      {/* --- Two-column layout: sidebar + content --- */}
+      <div
+        className="flex"
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          minHeight: 'calc(100vh - 64px)',
+          alignItems: 'flex-start',
+        }}
+      >
+        {/* Sidebar — engine + category + difficulty filters on desktop */}
+        <ContentSidebar>
+          {/* Engine filter */}
+          <SidebarSection title={t('sidebar.filterEngine')}>
+            <SidebarFilterItem
+              active={activeEngine === null}
+              onClick={() => handleEngineChange(null)}
+            >
+              {t('examples.allEngines')}
+            </SidebarFilterItem>
+            {ENGINE_LABELS.map(({ id, label }) => (
+              <SidebarFilterItem
+                key={id}
+                active={activeEngine === id}
+                onClick={() => handleEngineChange(activeEngine === id ? null : id)}
+              >
+                {label}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+
+          {/* Category filter — engine-aware */}
+          <SidebarSection title={t('sidebar.filterCategories')}>
+            <SidebarFilterItem
+              active={activeCategory === null}
+              onClick={() => setActiveCategory(null)}
+            >
+              {t('examples.allCategories')}
+            </SidebarFilterItem>
+            {visibleCategories.map((cat) => (
+              <SidebarFilterItem
+                key={cat}
+                active={activeCategory === cat}
+                count={categoryCounts[cat] || 0}
+                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+              >
+                {CATEGORY_I18N_MAP[cat] ? t(CATEGORY_I18N_MAP[cat]) : cat}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+
+          {/* Difficulty filter */}
+          <SidebarSection title={t('examples.difficulty')}>
+            <SidebarFilterItem
+              active={activeDifficulty === null}
+              onClick={() => setActiveDifficulty(null)}
+            >
+              {t('examples.allLevels')}
+            </SidebarFilterItem>
+            {difficulties.map((diff) => (
+              <SidebarFilterItem
+                key={diff}
+                active={activeDifficulty === diff}
+                onClick={() => setActiveDifficulty(activeDifficulty === diff ? null : diff)}
+              >
+                {t(`examples.${diff}`)}
+              </SidebarFilterItem>
+            ))}
+          </SidebarSection>
+        </ContentSidebar>
+
+        {/* Content column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+
       {/* --- Page header --- */}
       <header
         style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
           padding: 'var(--space-12) var(--space-6) var(--space-6)',
           textAlign: 'center',
         }}
@@ -573,9 +646,9 @@ function Examples() {
           )}
         </div>
 
-        {/* Row 2: Engine filter pills with colored dots */}
+        {/* Row 2: Engine filter pills — mobile only (sidebar handles desktop) */}
         <div
-          className="flex flex-wrap items-center"
+          className="lg:hidden flex flex-wrap items-center"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
         >
           <span
@@ -604,9 +677,9 @@ function Examples() {
           ))}
         </div>
 
-        {/* Row 3: Category pills with count badges — engine-aware */}
+        {/* Row 3: Category pills — mobile only (sidebar handles desktop) */}
         <div
-          className="flex flex-wrap"
+          className="lg:hidden flex flex-wrap"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}
         >
           <FilterPill
@@ -625,9 +698,9 @@ function Examples() {
           ))}
         </div>
 
-        {/* Row 4: Difficulty pills with colored dots */}
+        {/* Row 4: Difficulty pills — mobile only (sidebar handles desktop) */}
         <div
-          className="flex flex-wrap items-center"
+          className="lg:hidden flex flex-wrap items-center"
           style={{ gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}
         >
           <span
@@ -771,6 +844,9 @@ function Examples() {
           <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
         </p>
       </footer>
+
+        </div>{/* end content column */}
+      </div>{/* end flex wrapper */}
 
       {/* NowPlayingIndicator — floating bottom-right */}
       <NowPlayingIndicator

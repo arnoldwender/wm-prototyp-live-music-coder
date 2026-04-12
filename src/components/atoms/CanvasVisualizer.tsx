@@ -6,11 +6,12 @@ import { useRef, useEffect, useCallback } from 'react';
 interface CanvasVisualizerProps {
   draw: (ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => void;
   className?: string;
+  ariaLabel?: string;
 }
 
 /** Reusable canvas component with auto-resize and animation loop.
  * The draw function is called every frame via requestAnimationFrame. */
-export function CanvasVisualizer({ draw, className = '' }: CanvasVisualizerProps) {
+export function CanvasVisualizer({ draw, className = '', ariaLabel }: CanvasVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -54,5 +55,5 @@ export function CanvasVisualizer({ draw, className = '' }: CanvasVisualizerProps
     };
   }, [draw, resizeCanvas]);
 
-  return <canvas ref={canvasRef} className={`block ${className}`} />;
+  return <canvas ref={canvasRef} className={`block ${className}`} role="img" aria-label={ariaLabel ?? 'Audio visualizer'} />;
 }

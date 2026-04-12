@@ -67,14 +67,14 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Waveform | Oscilloscope with gradient fill and peak detection |
 | Spectrum | Frequency bars with logarithmic distribution |
 | Timeline | Beat grid with playhead, level meter, BPM display |
-| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid |
+| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid, timeline pan, velocity drag |
 | Punchcard | Dot grid — size/opacity mapped to velocity |
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
 
-**43 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
+**51 Curated Sessions** — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Deep House, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
 
-**200+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, and test patterns.
+**215+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, advanced patterns (euclidean, polymetric, FM), and synthesis techniques.
 
 **Sample Library** — Browse 218 Dirt-Samples with categories, drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
 
@@ -96,7 +96,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Synth Mode** — Virtual on-screen keyboard (2 octaves, QWERTY mapping, velocity from Y position) with oscillator selector (sine/sawtooth/square/triangle), SVG knob controls, and a real-time biquad filter with frequency response curve. Shares the same audio path as the physical MIDI keyboard via `window.__lmcPlayNote`.
 
-**MIDI Panel** — Connected device list, real-time CC activity monitor with value bars, usage hints. Accessible via USB icon in sidebar.
+**MIDI Panel** — Connected device list with hot-plug detection, live CC grid (one row per CC with name map, value bar, 0–127 readout), clear button, usage hints. Accessible via USB icon in sidebar.
 
 **Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists, download code as .js file.
 

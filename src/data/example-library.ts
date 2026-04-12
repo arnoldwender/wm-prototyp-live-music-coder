@@ -1282,3 +1282,232 @@ export const TOTAL_EXAMPLE_COUNT = EXAMPLE_LIBRARY.length;
 
   { id: 'wa-drum-machine', name: 'Simple Drum Machine', category: 'Web Audio Synthesis', description: '808 kick + hat + snare loop', engine: 'webaudio' as const, code: `function kick(t){\n  const o=ctx.createOscillator(),g=ctx.createGain()\n  o.frequency.setValueAtTime(150,t)\n  o.frequency.exponentialRampToValueAtTime(40,t+0.1)\n  g.gain.setValueAtTime(0.8,t)\n  g.gain.exponentialRampToValueAtTime(0.01,t+0.4)\n  o.connect(g);g.connect(masterGain);o.start(t);o.stop(t+0.4)\n}\nfunction hat(t){\n  const b=ctx.createBuffer(1,2048,ctx.sampleRate)\n  const d=b.getChannelData(0)\n  for(let i=0;i<2048;i++)d[i]=Math.random()*2-1\n  const s=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter()\n  s.buffer=b;f.type="bandpass";f.frequency.value=8000\n  g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.01,t+0.05)\n  s.connect(f);f.connect(g);g.connect(masterGain);s.start(t)\n}\nconst now=ctx.currentTime\nfor(let i=0;i<8;i++){\n  kick(now+i*0.5)\n  hat(now+i*0.25)\n  if(i%2===1){\n    const b=ctx.createBuffer(1,4096,ctx.sampleRate)\n    const d=b.getChannelData(0)\n    for(let j=0;j<4096;j++)d[j]=Math.random()*2-1\n    const s=ctx.createBufferSource(),g=ctx.createGain()\n    s.buffer=b;g.gain.setValueAtTime(0.2,now+i*0.5);g.gain.exponentialRampToValueAtTime(0.01,now+i*0.5+0.1)\n    s.connect(g);g.connect(masterGain);s.start(now+i*0.5)\n  }\n}`, difficulty: 'advanced' as const, tags: ['drum', 'machine', 'loop'] },
 ].forEach((e: ExampleEntry) => EXAMPLE_LIBRARY.push(e));
+
+/* ══════════════════════════════════════════════════════════
+   New entries: Advanced, MIDI, Synthesis (2026-04-12)
+   ══════════════════════════════════════════════════════════ */
+EXAMPLE_LIBRARY.push(
+
+  /* ── Advanced — mathematical and structural techniques ── */
+  {
+    id: 'advanced-euclidean-polyrhythm',
+    name: 'Euclidean Polyrhythm',
+    category: 'Advanced',
+    description: 'Three interlocking Euclidean rhythms — a classic West African cross-rhythm',
+    engine: 'strudel' as const,
+    code: `stack(
+  s("bd").euclid(3, 8),
+  s("sd").euclid(5, 8).slow(2),
+  s("hh").euclid(7, 16).gain(0.4)
+)`,
+    difficulty: 'advanced' as const,
+    tags: ['euclidean', 'polyrhythm', 'rhythm', 'math'],
+  },
+  {
+    id: 'advanced-isorhythm',
+    name: 'Medieval Isorhythm',
+    category: 'Advanced',
+    description: 'Talea (rhythm) and color (pitch) cycle at different lengths — medieval technique',
+    engine: 'strudel' as const,
+    code: `note("c4 e4 g4 f4 a4 g4 b4")
+  .struct("x ~ x x ~ x ~ x x ~ x")
+  .s("triangle")
+  .room(0.5)`,
+    difficulty: 'advanced' as const,
+    tags: ['isorhythm', 'medieval', 'polyrhythm', 'theory'],
+  },
+  {
+    id: 'advanced-spectral-filter',
+    name: 'Spectral Filter Sweep',
+    category: 'Advanced',
+    description: 'LFO-driven filter sweep with resonance peak — classic electronic timbres',
+    engine: 'strudel' as const,
+    code: `note("c2*8")
+  .s("sawtooth")
+  .lpf(sine.range(200, 4000).slow(4))
+  .lpq(sine.range(0.5, 8).slow(7))
+  .gain(0.5)`,
+    difficulty: 'advanced' as const,
+    tags: ['filter', 'lfo', 'synthesis', 'sweep'],
+  },
+  {
+    id: 'advanced-fm-synthesis',
+    name: 'FM Synthesis',
+    category: 'Advanced',
+    description: 'Frequency modulation synthesis — ratio controls timbre brightness',
+    engine: 'strudel' as const,
+    code: `note("<c3 e3 g3 b3>*4")
+  .s("sine")
+  .fm("<1 2 3.5 7>")
+  .fmh("<1 2 3 4>")
+  .attack(0.02)
+  .release(0.4)
+  .gain(0.55)`,
+    difficulty: 'advanced' as const,
+    tags: ['fm', 'synthesis', 'bell', 'timbre'],
+  },
+  {
+    id: 'advanced-polymetric',
+    name: 'Polymetric Layers',
+    category: 'Advanced',
+    description: 'Three patterns in 3/4, 4/4, and 5/4 — phase-shifting composite rhythm',
+    engine: 'strudel' as const,
+    code: `stack(
+  s("bd sd sd").fast(4/3),
+  s("~ cp ~ cp"),
+  s("hh hh hh hh hh").fast(4/5).gain(0.3)
+)`,
+    difficulty: 'advanced' as const,
+    tags: ['polymetric', 'meter', 'complex'],
+  },
+
+  /* ── MIDI — live controller integration ── */
+  {
+    id: 'midi-keyboard-live',
+    name: 'Live MIDI Keyboard',
+    category: 'MIDI Input',
+    description: 'Play notes from your MIDI keyboard with reverb — requires a connected MIDI device',
+    engine: 'strudel' as const,
+    code: `const kb = await midikeys(0)
+$: kb().s("sine").room(0.6).gain(0.7)`,
+    difficulty: 'intermediate' as const,
+    tags: ['midi', 'keyboard', 'live', 'input'],
+  },
+  {
+    id: 'midi-cc-filter',
+    name: 'CC Knob → Resonance',
+    category: 'MIDI Input',
+    description: 'Map MIDI CC71 (MPK mini K2) to filter resonance — sweep from smooth to sharp peak',
+    engine: 'strudel' as const,
+    code: `const cc = await midin(0)
+$: note("c2*8")
+  .s("sawtooth")
+  .lpf(1200)
+  .resonance(cc(71).range(0, 40))
+  .gain(0.6)`,
+    difficulty: 'intermediate' as const,
+    tags: ['midi', 'cc', 'resonance', 'controller'],
+  },
+  {
+    id: 'midi-cc-melody',
+    name: 'CC Knob → Pitch',
+    category: 'MIDI Input',
+    description: 'Control melody transposition with a knob — CC71 shifts the octave',
+    engine: 'strudel' as const,
+    code: `const cc = await midin(0)
+$: note("c4 e4 g4 b4")
+  .transpose(cc(71).range(-12, 12))
+  .s("triangle")
+  .room(0.4)`,
+    difficulty: 'intermediate' as const,
+    tags: ['midi', 'cc', 'transpose', 'controller'],
+  },
+  {
+    id: 'midi-keyboard-chords',
+    name: 'MIDI Chord Layers',
+    category: 'MIDI Input',
+    description: 'Layer three octaves of the same MIDI input for thick chords',
+    engine: 'strudel' as const,
+    code: `const kb = await midikeys(0)
+$: stack(
+  kb().transpose(-12).s("sine").gain(0.4),
+  kb().s("triangle").gain(0.6),
+  kb().transpose(12).s("sine").gain(0.3)
+).room(0.5)`,
+    difficulty: 'advanced' as const,
+    tags: ['midi', 'keyboard', 'chords', 'octave'],
+  },
+  {
+    id: 'midi-cc-bpm',
+    name: 'CC Knob → BPM',
+    category: 'MIDI Input',
+    description: 'Control tempo in real time — spin the knob to speed up or slow down',
+    engine: 'strudel' as const,
+    code: `const cc = await midin(0)
+$: s("bd ~ sd ~")
+  .cpm(cc(72).range(60, 180))`,
+    difficulty: 'intermediate' as const,
+    tags: ['midi', 'bpm', 'tempo', 'cc'],
+  },
+
+  /* ── Synthesis — oscillator and timbral techniques ── */
+  {
+    id: 'synthesis-additive',
+    name: 'Additive Synthesis',
+    category: 'Synthesis',
+    description: 'Stack sine wave harmonics to build a rich organ-like timbre',
+    engine: 'strudel' as const,
+    code: `stack(
+  note("c3").s("sine").gain(0.5),
+  note("c3").transpose(12).s("sine").gain(0.3),
+  note("c3").transpose(19).s("sine").gain(0.15),
+  note("c3").transpose(24).s("sine").gain(0.1)
+)`,
+    difficulty: 'intermediate' as const,
+    tags: ['additive', 'harmonics', 'organ', 'synthesis'],
+  },
+  {
+    id: 'synthesis-waveshaping',
+    name: 'Waveshaping Distortion',
+    category: 'Synthesis',
+    description: 'Progressive overdrive — gain above 1.0 clips the waveform for grit',
+    engine: 'strudel' as const,
+    code: `note("a2*8")
+  .s("sine")
+  .gain("<0.5 1 2 4 8>".slow(4))
+  .lpf(2000)`,
+    difficulty: 'intermediate' as const,
+    tags: ['distortion', 'clipping', 'overdrive'],
+  },
+  {
+    id: 'synthesis-ring-mod',
+    name: 'FM Sidebands',
+    category: 'Synthesis',
+    description: 'Frequency modulation with shifting harmonic ratios — metallic, inharmonic timbres via FM sidebands',
+    engine: 'strudel' as const,
+    code: `note("c4 e4 g4 c5")
+  .s("sine")
+  .fm(1)
+  .fmh("<0.5 1 1.5 2 3.14>")
+  .room(0.4)
+  .gain(0.5)`,
+    difficulty: 'advanced' as const,
+    tags: ['fm', 'sidebands', 'metallic', 'synthesis'],
+  },
+  {
+    id: 'synthesis-granular',
+    name: 'Granular Texture',
+    category: 'Synthesis',
+    description: 'Dense layered pulses simulate granular synthesis texture',
+    engine: 'strudel' as const,
+    code: `stack(...Array.from({length: 8}, () =>
+  note("c4")
+    .transpose(rand.range(-0.5, 0.5))
+    .s("sine")
+    .attack(0.01)
+    .release(0.04)
+    .gain(0.12)
+    .late(rand.range(0, 1/32))
+    .euclid(4, 32)
+))`,
+    difficulty: 'advanced' as const,
+    tags: ['granular', 'texture', 'cloud', 'grains'],
+  },
+  {
+    id: 'synthesis-chowning-fm',
+    name: 'Classic FM Bell',
+    category: 'Synthesis',
+    description: 'John Chowning-style FM bell — one carrier, one modulator, ratio 1:7',
+    engine: 'strudel' as const,
+    code: `note("<c4 e4 g4 c5>*2")
+  .s("sine")
+  .fm(3)
+  .fmh(7)
+  .attack(0.001)
+  .release("<0.5 1 2>")
+  .room(0.6)
+  .gain(0.5)`,
+    difficulty: 'advanced' as const,
+    tags: ['fm', 'bell', 'chowning', 'synthesis'],
+  },
+);
