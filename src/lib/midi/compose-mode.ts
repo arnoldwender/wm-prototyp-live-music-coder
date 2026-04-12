@@ -73,14 +73,14 @@ export function enableComposeMode(viewGetterFn: (() => any) | any, _options?: {
   capturedNotes = []
   noteCount = 0
   undoStack.length = 0
-  console.log('[ComposeMode] Enabled')
+  import.meta.env.DEV && console.log('[ComposeMode] Enabled')
 }
 
 export function disableComposeMode(): void {
   enabled = false
   if (flushTimer) { clearTimeout(flushTimer); flushTimer = null }
   capturedNotes = []
-  console.log('[ComposeMode] Disabled')
+  import.meta.env.DEV && console.log('[ComposeMode] Disabled')
 }
 
 export function toggleComposeMode(viewGetterFn: (() => any) | any): boolean {
@@ -106,7 +106,7 @@ export function undoLastNote(): boolean {
   /* Verify text still matches before removing */
   const currentText = view.state.doc.sliceString(from, to)
   if (currentText !== entry.text) {
-    console.warn('[ComposeMode] Undo skipped — editor text changed')
+    import.meta.env.DEV && console.warn('[ComposeMode] Undo skipped — editor text changed')
     return false
   }
 
@@ -130,7 +130,7 @@ export function composeNoteOn(midiNote: number, velocity: number): void {
 
   const view = viewGetter?.()
   if (!view) {
-    console.warn('[ComposeMode] No editor view — is the editor mounted?')
+    import.meta.env.DEV && console.warn('[ComposeMode] No editor view — is the editor mounted?')
     return
   }
 
@@ -153,7 +153,7 @@ function flush(view: any): void {
   /* Re-resolve view in case it changed during the 20ms window */
   const currentView = viewGetter?.() ?? view
   if (!currentView?.state) {
-    console.warn('[ComposeMode] View lost during flush')
+    import.meta.env.DEV && console.warn('[ComposeMode] View lost during flush')
     capturedNotes = []
     return
   }

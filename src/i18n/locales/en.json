@@ -605,7 +605,8 @@
     "oscillator": "Oscillator",
     "virtualKeyboard": "Virtual Keyboard",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "settingsSavedAutomatically": "Settings are saved automatically"
   },
   "templates": {
     "title": "Choose a starter template",
@@ -634,7 +635,8 @@
     "console": "Console",
     "settings": "Settings",
     "searchSamples": "Search samples",
-    "searchApi": "Search API"
+    "searchApi": "Search API",
+    "audioOutputDevice": "Audio Output Device"
   },
   "gamification": {
     "achievementUnlocked": "Achievement Unlocked",
