@@ -45,7 +45,7 @@ const VEL_LANE_H = 18;
 
 /* ── Types ─────────────────────────────────────────────── */
 
-interface NoteEvent {
+export interface NoteEvent {
   note: number;
   start: number;
   end: number;
@@ -345,6 +345,8 @@ export function drawPianoroll(
   zoomX = 1,
   zoomY = 1,
   timeOffset = 0,
+  velocityOverrides?: Map<string, number>,
+  eventSink?: { events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number },
 ) {
   /* ── Background ─────────────────────────────────────── */
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -434,6 +436,15 @@ export function drawPianoroll(
   const noteY = (n: number) => yOffset + (maxNote - n) * noteHeight;
   const timeX = (t: number) => KEYS_WIDTH + ((t - timeStart) / timeRange) * drawW;
 
+  /* Export events for hit-testing by the React component */
+  if (eventSink) {
+    eventSink.events = events;
+    eventSink.timeStart = timeStart;
+    eventSink.timeEnd = timeEnd;
+    eventSink.drawW = drawW;
+    eventSink.keysWidth = KEYS_WIDTH;
+  }
+
   /* ── Note row backgrounds ───────────────────────────── */
   drawNoteRowBackgrounds(ctx, width, minNote, maxNote, noteHeight, yOffset);
 
@@ -514,15 +525,17 @@ export function drawPianoroll(
     ctx.lineTo(width, velY);
     ctx.stroke();
 
-    /* Velocity bars */
+    /* Velocity bars — apply overrides when dragging */
     for (const evt of events) {
+      const overrideKey = `${evt.note}:${evt.start}`;
+      const vel = velocityOverrides?.get(overrideKey) ?? evt.velocity;
       const x1 = timeX(evt.start);
       const x2 = timeX(evt.end);
       const w = Math.max(2, x2 - x1);
-      const barH = Math.max(2, evt.velocity * (velLane - 3));
+      const barH = Math.max(2, vel * (velLane - 3));
       const isActive = evt.start <= now && evt.end > now;
-      const hue = 270 + evt.velocity * 50;
-      const alpha = isActive ? 0.55 + evt.velocity * 0.4 : 0.25 + evt.velocity * 0.3;
+      const hue = 270 + vel * 50;
+      const alpha = isActive ? 0.55 + vel * 0.4 : 0.25 + vel * 0.3;
       ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
       ctx.fillRect(x1, velY + velLane - barH - 1, w, barH);
     }

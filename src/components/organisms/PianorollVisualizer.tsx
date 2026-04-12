@@ -8,6 +8,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawPianoroll } from '../../lib/visualizers/pianoroll';
+import type { NoteEvent } from '../../lib/visualizers/pianoroll';
 
 function getRepl() {
   return (window as unknown as { __strudelRepl?: unknown }).__strudelRepl ?? null;
@@ -38,24 +39,77 @@ export function PianorollVisualizer() {
   const [timeOffset, setTimeOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startOffset: number } | null>(null);
+  const [velocityOverrides, setVelocityOverrides] = useState<Map<string, number>>(new Map());
+  const eventSinkRef = useRef<{ events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number }>({
+    events: [], timeStart: 0, timeEnd: 0, drawW: 0, keysWidth: 52,
+  });
+  const velDragRef = useRef<{ key: string; startY: number; startVel: number } | null>(null);
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
       drawPianoroll(
         ctx, width, height, time,
         getRepl as Parameters<typeof drawPianoroll>[4],
-        zoomX, zoomY, timeOffset,
+        zoomX, zoomY, timeOffset, velocityOverrides, eventSinkRef.current,
       );
     },
-    [zoomX, zoomY, timeOffset],
+    [zoomX, zoomY, timeOffset, velocityOverrides],
   );
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  /* Hit-test: is clientY inside the velocity lane (bottom 18px)? */
+  function isInVelLane(canvas: HTMLCanvasElement, clientY: number): boolean {
+    const rect = canvas.getBoundingClientRect();
+    const y = clientY - rect.top;
+    return canvas.height > 100 && y > canvas.height - 18;
+  }
+
+  /* Find the note event under clientX in the velocity lane */
+  function findVelNote(clientX: number, canvas: HTMLCanvasElement): { key: string; vel: number } | null {
+    const sink = eventSinkRef.current;
+    if (sink.events.length === 0 || sink.drawW === 0) return null;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const timeRange = sink.timeEnd - sink.timeStart;
+    const t = sink.timeStart + ((x - sink.keysWidth) / sink.drawW) * timeRange;
+    let best: NoteEvent | null = null;
+    let bestDist = Infinity;
+    for (const evt of sink.events) {
+      if (t >= evt.start && t <= evt.end) {
+        const dist = Math.abs(t - (evt.start + evt.end) / 2);
+        if (dist < bestDist) { best = evt; bestDist = dist; }
+      }
+    }
+    if (!best) return null;
+    const key = `${best.note}:${best.start}`;
+    const vel = velocityOverrides.get(key) ?? best.velocity;
+    return { key, vel };
+  }
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const canvas = e.currentTarget.querySelector('canvas') as HTMLCanvasElement | null;
+    if (canvas && isInVelLane(canvas, e.clientY)) {
+      const hit = findVelNote(e.clientX, canvas);
+      if (hit) {
+        velDragRef.current = { key: hit.key, startY: e.clientY, startVel: hit.vel };
+        setIsDragging(true);
+        return;
+      }
+    }
     dragRef.current = { startX: e.clientX, startOffset: timeOffset };
     setIsDragging(true);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (velDragRef.current) {
+      const dy = velDragRef.current.startY - e.clientY;
+      const newVel = Math.min(1, Math.max(0.02, velDragRef.current.startVel + dy / 80));
+      setVelocityOverrides((prev) => {
+        const next = new Map(prev);
+        next.set(velDragRef.current!.key, newVel);
+        return next;
+      });
+      return;
+    }
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.startX;
     setTimeOffset(dragRef.current.startOffset + dx * DRAG_SENSITIVITY);
@@ -63,6 +117,7 @@ export function PianorollVisualizer() {
 
   const handleMouseUp = () => {
     dragRef.current = null;
+    velDragRef.current = null;
     setIsDragging(false);
   };
 
@@ -111,8 +166,8 @@ export function PianorollVisualizer() {
         <button style={btnStyle} title="Zoom out (pitch)" aria-label="Zoom out pitch axis"
           onClick={() => setZoomY((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP))}>−P</button>
         <span aria-hidden="true" style={{ color: 'var(--color-border)', fontSize: 'var(--font-size-xs)' }}>|</span>
-        <button style={btnStyle} title="Reset zoom and pan" aria-label="Reset view to live position"
-          onClick={() => { setZoomX(1); setZoomY(1); setTimeOffset(0); }}>↺</button>
+        <button style={btnStyle} title="Reset zoom and pan" aria-label="Reset view and velocity overrides"
+          onClick={() => { setZoomX(1); setZoomY(1); setTimeOffset(0); setVelocityOverrides(new Map()); }}>↺</button>
       </div>
     </div>
   );
