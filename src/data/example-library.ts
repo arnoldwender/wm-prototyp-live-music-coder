@@ -1510,4 +1510,73 @@ $: s("bd ~ sd ~")
     difficulty: 'advanced' as const,
     tags: ['fm', 'bell', 'chowning', 'synthesis'],
   },
+
+  /* ══════════════════════════════════════════════════════════
+     Visualizers — piano roll interactive demos
+     ══════════════════════════════════════════════════════════ */
+  {
+    id: 'pianoroll-velocity-demo',
+    name: 'Piano Roll Velocity Demo',
+    category: 'Visualizers',
+    description: 'Demonstrates piano roll velocity coloring — louder notes appear brighter. Try dragging the velocity bars at the bottom of the piano roll.',
+    engine: 'strudel' as const,
+    code: `// Piano Roll Velocity Demo
+// Open the Piano Roll visualizer to see velocity coloring.
+// Notes with higher gain appear in bright purple — quieter notes fade to dark.
+// Try dragging the velocity bars at the bottom of the piano roll.
+
+$: note("<c4 e4 g4 c5>")
+  .s("sine")
+  .gain("<0.9 0.4 0.7 0.2>")
+  .attack(0.02)
+  .release(0.3)
+  .room(0.3)`,
+    difficulty: 'beginner' as const,
+    tags: ['piano roll', 'velocity', 'visualizer', 'interactive'],
+  },
+  {
+    id: 'pianoroll-pitch-drag',
+    name: 'Piano Roll Pitch Drag',
+    category: 'Visualizers',
+    description: 'Click any note bar in the piano roll to audition it. Drag vertically to shift pitch up or down by semitones — the floating label shows the transposition.',
+    engine: 'strudel' as const,
+    code: `// Piano Roll Pitch Drag
+// Open the Piano Roll visualizer.
+// Click any note bar → hear it play immediately.
+// Drag up or down to shift pitch by semitones.
+// Accent outline + label show the transposition.
+// Press ↺ (top-right) to reset all overrides.
+
+$: note("<c4 e4 g4 b4 a4 f4 d4 g4>")
+  .s("triangle")
+  .attack(0.01)
+  .release(0.4)
+  .room(0.35)
+  .gain(0.6)`,
+    difficulty: 'beginner' as const,
+    tags: ['piano roll', 'pitch', 'drag', 'interactive', 'visualizer'],
+  },
+  {
+    id: 'pianoroll-zoom-pan',
+    name: 'Piano Roll Zoom & Pan',
+    category: 'Visualizers',
+    description: 'Use the +T/−T buttons to zoom the time axis, +P/−P to zoom pitch range. Drag left/right to pan through the timeline.',
+    engine: 'strudel' as const,
+    code: `// Piano Roll Zoom & Pan
+// Open the Piano Roll visualizer, then:
+//   +T / −T  →  zoom in/out on the time axis
+//   +P / −P  →  zoom in/out on the pitch range
+//   drag     →  pan the timeline left/right
+//   ↺        →  reset zoom, pan, and all overrides
+
+$: note("<c3 g3 c4 e4 g4 c5>*4")
+  .s("piano")
+  .gain(0.55)
+  .room(0.4)
+  .attack(0.02)
+  .release(0.6)
+  .slow(2)`,
+    difficulty: 'beginner' as const,
+    tags: ['piano roll', 'zoom', 'pan', 'visualizer', 'navigation'],
+  },
 );
