@@ -56,11 +56,13 @@ export function PianorollVisualizer() {
     [zoomX, zoomY, timeOffset, velocityOverrides],
   );
 
-  /* Hit-test: is clientY inside the velocity lane (bottom 18px)? */
+  /* Hit-test: is clientY inside the velocity lane (bottom 18px)?
+     Uses CSS pixel dimensions (getBoundingClientRect) so the threshold
+     is correct on HiDPI/Retina screens where canvas.height is scaled. */
   function isInVelLane(canvas: HTMLCanvasElement, clientY: number): boolean {
     const rect = canvas.getBoundingClientRect();
     const y = clientY - rect.top;
-    return canvas.height > 100 && y > canvas.height - 18;
+    return rect.height > 100 && y > rect.height - 18;
   }
 
   /* Find the note event under clientX in the velocity lane */
@@ -153,7 +155,7 @@ export function PianorollVisualizer() {
       <div
         role="group"
         aria-label="Piano roll zoom controls"
-        style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 3, zIndex: 10 }}
+        style={{ position: 'absolute', top: 'var(--space-2)', right: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', zIndex: 10 }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <button style={btnStyle} title="Zoom in (time)" aria-label="Zoom in time axis"
