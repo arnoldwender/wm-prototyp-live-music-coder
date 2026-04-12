@@ -1353,9 +1353,9 @@ EXAMPLE_LIBRARY.push(
     description: 'Three patterns in 3/4, 4/4, and 5/4 — phase-shifting composite rhythm',
     engine: 'strudel' as const,
     code: `stack(
-  s("bd sd sd").slow(3/4),
+  s("bd sd sd").fast(4/3),
   s("~ cp ~ cp"),
-  s("hh hh hh hh hh").slow(5/4).gain(0.3)
+  s("hh hh hh hh hh").fast(4/5).gain(0.3)
 )`,
     difficulty: 'advanced' as const,
     tags: ['polymetric', 'meter', 'complex'],
@@ -1365,7 +1365,7 @@ EXAMPLE_LIBRARY.push(
   {
     id: 'midi-keyboard-live',
     name: 'Live MIDI Keyboard',
-    category: 'MIDI',
+    category: 'MIDI Input',
     description: 'Play notes from your MIDI keyboard with reverb — requires a connected MIDI device',
     engine: 'strudel' as const,
     code: `const kb = await midikeys(0)
@@ -1375,22 +1375,23 @@ $: kb().s("sine").room(0.6).gain(0.7)`,
   },
   {
     id: 'midi-cc-filter',
-    name: 'CC Knob → Filter',
-    category: 'MIDI',
-    description: 'Map MIDI CC70 (MPK mini K1) to filter cutoff in real time',
+    name: 'CC Knob → Resonance',
+    category: 'MIDI Input',
+    description: 'Map MIDI CC71 (MPK mini K2) to filter resonance — sweep from smooth to sharp peak',
     engine: 'strudel' as const,
     code: `const cc = await midin(0)
 $: note("c2*8")
   .s("sawtooth")
-  .lpf(cc(70).range(100, 8000))
+  .lpf(1200)
+  .resonance(cc(71).range(0, 40))
   .gain(0.6)`,
     difficulty: 'intermediate' as const,
-    tags: ['midi', 'cc', 'filter', 'controller'],
+    tags: ['midi', 'cc', 'resonance', 'controller'],
   },
   {
     id: 'midi-cc-melody',
     name: 'CC Knob → Pitch',
-    category: 'MIDI',
+    category: 'MIDI Input',
     description: 'Control melody transposition with a knob — CC71 shifts the octave',
     engine: 'strudel' as const,
     code: `const cc = await midin(0)
@@ -1398,13 +1399,13 @@ $: note("c4 e4 g4 b4")
   .transpose(cc(71).range(-12, 12))
   .s("triangle")
   .room(0.4)`,
-    difficulty: 'advanced' as const,
+    difficulty: 'intermediate' as const,
     tags: ['midi', 'cc', 'transpose', 'controller'],
   },
   {
     id: 'midi-keyboard-chords',
     name: 'MIDI Chord Layers',
-    category: 'MIDI',
+    category: 'MIDI Input',
     description: 'Layer three octaves of the same MIDI input for thick chords',
     engine: 'strudel' as const,
     code: `const kb = await midikeys(0)
@@ -1419,13 +1420,13 @@ $: stack(
   {
     id: 'midi-cc-bpm',
     name: 'CC Knob → BPM',
-    category: 'MIDI',
+    category: 'MIDI Input',
     description: 'Control tempo in real time — spin the knob to speed up or slow down',
     engine: 'strudel' as const,
     code: `const cc = await midin(0)
 $: s("bd ~ sd ~")
   .cpm(cc(72).range(60, 180))`,
-    difficulty: 'advanced' as const,
+    difficulty: 'intermediate' as const,
     tags: ['midi', 'bpm', 'tempo', 'cc'],
   },
 
@@ -1460,9 +1461,9 @@ $: s("bd ~ sd ~")
   },
   {
     id: 'synthesis-ring-mod',
-    name: 'Ring Modulation',
+    name: 'FM Sidebands',
     category: 'Synthesis',
-    description: 'Two oscillators multiplied together — metallic, inharmonic timbres',
+    description: 'Frequency modulation with shifting harmonic ratios — metallic, inharmonic timbres via FM sidebands',
     engine: 'strudel' as const,
     code: `note("c4 e4 g4 c5")
   .s("sine")
@@ -1471,7 +1472,7 @@ $: s("bd ~ sd ~")
   .room(0.4)
   .gain(0.5)`,
     difficulty: 'advanced' as const,
-    tags: ['ring mod', 'fm', 'metallic', 'synthesis'],
+    tags: ['fm', 'sidebands', 'metallic', 'synthesis'],
   },
   {
     id: 'synthesis-granular',

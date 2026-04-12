@@ -60,7 +60,8 @@ export function MidiPanel() {
     return () => { mounted = false; unsub(); };
   }, []);
 
-  /* Subscribe to CC changes — update the per-CC map in place */
+  /* Subscribe to CC changes — update the per-CC map in place.
+     Channel is ignored — we monitor all channels regardless of source. */
   useEffect(() => {
     const unsub = onCCChange((_channel, cc, value) => {
       setCcMap((prev) => {
@@ -85,7 +86,7 @@ export function MidiPanel() {
   }, []);
 
   return (
-    <div style={{ padding: 'var(--space-2)', fontSize: '11px', fontFamily: 'var(--font-family-mono)' }}>
+    <div style={{ padding: 'var(--space-2)', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-mono)' }}>
       {/* Status */}
       <div
         className="flex items-center gap-2"
@@ -105,15 +106,16 @@ export function MidiPanel() {
             No MIDI devices connected. Plug in a controller and it will appear here.
           </div>
         ) : (
-          devices.map((name, i) => (
+          /* Key by device name — names are unique per Web MIDI spec */
+          devices.map((name) => (
             <div
-              key={i}
+              key={name}
               className="flex items-center gap-2"
               style={{
                 padding: 'var(--space-1) var(--space-2)',
                 backgroundColor: 'var(--color-bg-elevated)',
                 borderRadius: 'var(--radius-sm)',
-                marginBottom: '2px',
+                marginBottom: 'var(--space-1)',
                 color: 'var(--color-text)',
               }}
             >
@@ -133,7 +135,7 @@ export function MidiPanel() {
           <span style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
             CC Activity
           </span>
-          {/* Clear button — resets grid, same style as section label row */}
+          {/* Clear button — resets grid to empty state */}
           <button
             type="button"
             onClick={handleClear}
@@ -143,8 +145,8 @@ export function MidiPanel() {
               borderRadius: 'var(--radius-sm)',
               color: 'var(--color-text-muted)',
               cursor: 'pointer',
-              fontSize: '10px',
-              padding: '1px var(--space-1)',
+              fontSize: 'var(--font-size-xs)',
+              padding: 'var(--space-1) var(--space-2)',
               lineHeight: 1.4,
             }}
           >
@@ -158,6 +160,10 @@ export function MidiPanel() {
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--color-border)',
             padding: 'var(--space-1)',
+            /* Gap-based rows — no per-row border-bottom orphan */
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-1)',
           }}
         >
           {ccMap.size === 0 ? (
@@ -180,21 +186,25 @@ export function MidiPanel() {
                     gridTemplateColumns: 'auto 1fr auto',
                     alignItems: 'center',
                     gap: 'var(--space-1)',
-                    padding: '2px var(--space-1)',
-                    borderBottom: '1px solid var(--color-border)',
+                    padding: 'var(--space-1) var(--space-2)',
                   }}
                 >
                   {/* CC number + name label */}
-                  <div style={{ color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', minWidth: '80px' }}>
+                  <div style={{ color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', minWidth: 'var(--space-16)' }}>
                     <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>CC {cc}</span>
                     {' '}
-                    <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>{ccName}</span>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>{ccName}</span>
                   </div>
 
                   {/* Value bar — width represents 0-127 as percentage of track */}
                   <div
+                    role="progressbar"
+                    aria-valuenow={displayValue as number}
+                    aria-valuemin={0 as number}
+                    aria-valuemax={127 as number}
+                    aria-label={`CC ${cc} ${ccName} — ${displayValue}`}
                     style={{
-                      height: '4px',
+                      height: 'var(--space-2)',
                       backgroundColor: 'var(--color-bg-hover)',
                       borderRadius: 'var(--radius-sm)',
                       overflow: 'hidden',
@@ -206,8 +216,8 @@ export function MidiPanel() {
                         height: '100%',
                         backgroundColor: 'var(--color-primary)',
                         opacity: 0.7,
-                        /* Smooth bar updates at MIDI message rate (~50ms) */
-                        transition: 'width 50ms linear',
+                        /* Smooth bar update — fast transition matches MIDI message rate */
+                        transition: 'width var(--transition-fast)',
                       }}
                     />
                   </div>
@@ -216,8 +226,8 @@ export function MidiPanel() {
                   <span
                     style={{
                       color: 'var(--color-text-secondary)',
-                      fontSize: '10px',
-                      minWidth: '24px',
+                      fontSize: 'var(--font-size-xs)',
+                      minWidth: 'var(--space-10)',
                       textAlign: 'right',
                     }}
                   >
@@ -231,7 +241,7 @@ export function MidiPanel() {
       </div>
 
       {/* Usage hint */}
-      <div style={{ marginTop: 'var(--space-3)', color: 'var(--color-text-muted)', fontSize: '10px', lineHeight: '1.4' }}>
+      <div style={{ marginTop: 'var(--space-3)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)', lineHeight: '1.4' }}>
         Use in code: <code style={{ color: 'var(--color-primary)' }}>midin("Device")</code> for MIDI input patterns.
         CC values auto-map to <code style={{ color: 'var(--color-primary)' }}>getCCValue(ch, cc)</code>.
       </div>
