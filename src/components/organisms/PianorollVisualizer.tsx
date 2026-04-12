@@ -48,10 +48,12 @@ export function PianorollVisualizer() {
 
   return (
     <div className="h-full w-full relative" style={{ backgroundColor: 'var(--color-bg)' }}>
-      <CanvasVisualizer draw={draw} />
+      <CanvasVisualizer draw={draw} ariaLabel="Piano roll — note timeline and pitch display" />
 
       {/* Zoom controls — top-right overlay */}
       <div
+        role="group"
+        aria-label="Piano roll zoom controls"
         style={{
           position: 'absolute',
           top: 8,
@@ -66,26 +68,30 @@ export function PianorollVisualizer() {
         <button
           style={btnStyle}
           title="Zoom in (time)"
+          aria-label="Zoom in time axis"
           onClick={() => setZoomX((z) => Math.min(ZOOM_MAX, z * ZOOM_STEP))}
         >+T</button>
         <button
           style={btnStyle}
           title="Zoom out (time)"
+          aria-label="Zoom out time axis"
           onClick={() => setZoomX((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP))}
         >−T</button>
 
         {/* Separator */}
-        <span style={{ color: 'rgba(63,63,70,0.6)', fontSize: 10 }}>|</span>
+        <span aria-hidden="true" style={{ color: 'rgba(63,63,70,0.6)', fontSize: 10 }}>|</span>
 
         {/* Pitch zoom */}
         <button
           style={btnStyle}
           title="Zoom in (pitch)"
+          aria-label="Zoom in pitch axis"
           onClick={() => setZoomY((z) => Math.min(ZOOM_MAX, z * ZOOM_STEP))}
         >+P</button>
         <button
           style={btnStyle}
           title="Zoom out (pitch)"
+          aria-label="Zoom out pitch axis"
           onClick={() => setZoomY((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP))}
         >−P</button>
 
@@ -93,6 +99,7 @@ export function PianorollVisualizer() {
         <button
           style={btnStyle}
           title="Reset zoom"
+          aria-label="Reset zoom to default"
           onClick={() => { setZoomX(1); setZoomY(1); }}
         >↺</button>
       </div>
