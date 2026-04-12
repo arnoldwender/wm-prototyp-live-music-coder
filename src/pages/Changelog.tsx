@@ -17,6 +17,7 @@ import { Badge } from '../components/atoms'
 import {
   CHANGELOG,
   CHANGELOG_CATEGORIES,
+  getEntryLocale,
 } from '../data/changelog-library'
 import type { ChangelogCategory } from '../data/changelog-library'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -35,7 +36,7 @@ const CATEGORY_COLORS: Record<ChangelogCategory, string> = {
 type SortKey = 'date-desc' | 'date-asc'
 
 export default function Changelog() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   useScrollablePage()
 
   usePageMeta({
@@ -48,18 +49,19 @@ export default function Changelog() {
   const [activeCategory, setActiveCategory] = useState<ChangelogCategory | null>(null)
   const [sortBy, setSortBy] = useState<SortKey>('date-desc')
 
-  /* Filtered entries */
+  /* Filtered entries — search against locale-aware title + body */
   const filtered = useMemo(() => {
     const query = search.toLowerCase().trim()
     return CHANGELOG.filter((entry) => {
       if (activeCategory && entry.category !== activeCategory) return false
       if (query) {
-        const fields = [entry.title, entry.body, entry.category, entry.version ?? '']
+        const loc = getEntryLocale(entry, i18n.language)
+        const fields = [loc.title, loc.body, entry.category, entry.version ?? '']
         if (!fields.some((f) => f.toLowerCase().includes(query))) return false
       }
       return true
     })
-  }, [search, activeCategory])
+  }, [search, activeCategory, i18n.language])
 
   /* Sorted entries */
   const sorted = useMemo(() => {
@@ -69,19 +71,20 @@ export default function Changelog() {
       : items.sort((a, b) => b.date.localeCompare(a.date))
   }, [filtered, sortBy])
 
-  /* Category counts */
+  /* Category counts — also locale-aware for consistent filter numbers */
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {}
     const query = search.toLowerCase().trim()
     for (const entry of CHANGELOG) {
       if (query) {
-        const fields = [entry.title, entry.body, entry.category, entry.version ?? '']
+        const loc = getEntryLocale(entry, i18n.language)
+        const fields = [loc.title, loc.body, entry.category, entry.version ?? '']
         if (!fields.some((f) => f.toLowerCase().includes(query))) continue
       }
       counts[entry.category] = (counts[entry.category] || 0) + 1
     }
     return counts
-  }, [search])
+  }, [search, i18n.language])
 
   const visibleCategories = useMemo(
     () => CHANGELOG_CATEGORIES.filter((c) => categoryCounts[c] > 0),
@@ -197,50 +200,53 @@ export default function Changelog() {
           </p>
         ) : (
           <div className="flex flex-col" style={{ gap: 'var(--space-4)' }}>
-            {sorted.map((entry, i) => (
-              <article
-                key={`${entry.date}-${i}`}
-                style={{
-                  padding: 'var(--space-4)',
-                  backgroundColor: 'var(--color-bg-alt)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                }}
-              >
-                {/* Header: date + version + category badge */}
-                <div className="flex items-center gap-2 flex-wrap" style={{ marginBottom: 'var(--space-2)' }}>
-                  <time style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
-                    {entry.date}
-                  </time>
-                  {entry.version && (
-                    <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-mono)' }}>
-                      v{entry.version}
-                    </span>
-                  )}
-                  <Badge color={CATEGORY_COLORS[entry.category]}>
-                    {t(`changelog.${entry.category}`)}
-                  </Badge>
-                  {entry.pr && (
-                    <a
-                      href={`https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/${entry.pr}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}
-                    >
-                      #{entry.pr}
-                    </a>
-                  )}
-                </div>
+            {sorted.map((entry, i) => {
+              const loc = getEntryLocale(entry, i18n.language)
+              return (
+                <article
+                  key={`${entry.date}-${i}`}
+                  style={{
+                    padding: 'var(--space-4)',
+                    backgroundColor: 'var(--color-bg-alt)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
+                  {/* Header: date + version + category badge */}
+                  <div className="flex items-center gap-2 flex-wrap" style={{ marginBottom: 'var(--space-2)' }}>
+                    <time style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)' }}>
+                      {entry.date}
+                    </time>
+                    {entry.version && (
+                      <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-mono)' }}>
+                        v{entry.version}
+                      </span>
+                    )}
+                    <Badge color={CATEGORY_COLORS[entry.category]}>
+                      {t(`changelog.${entry.category}`)}
+                    </Badge>
+                    {entry.pr && (
+                      <a
+                        href={`https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/${entry.pr}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}
+                      >
+                        #{entry.pr}
+                      </a>
+                    )}
+                  </div>
 
-                {/* Title */}
-                <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-2)' }}>
-                  {entry.title}
-                </h2>
+                  {/* Title — locale-aware */}
+                  <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--space-2)' }}>
+                    {loc.title}
+                  </h2>
 
-                {/* Body */}
-                <MarkdownRenderer content={entry.body} />
-              </article>
-            ))}
+                  {/* Body — locale-aware */}
+                  <MarkdownRenderer content={loc.body} />
+                </article>
+              )
+            })}
           </div>
         )}
       </section>

@@ -41,7 +41,13 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'dec', type: 'function', detail: 'completions.strudel.dec', apply: '.dec(0.2)' },
   { label: 'sustain', type: 'function', detail: 'completions.strudel.sustain', apply: '.sustain(0.5)' },
   /* ── Interactive controls ────────────────────────────── */
-  { label: 'slider', type: 'function', detail: 'Interactive slider widget (drag to adjust)', apply: 'slider(0.5, 0, 1, 0.01)' },
+  /* slider(value, min, max, step) — transpiler rewrites to sliderWithID()
+   * creating a draggable <input type="range"> inline in the editor */
+  { label: 'slider', type: 'function', detail: 'Inline slider widget — drag to change value in real time', apply: 'slider(0.5, 0, 1, 0.01)' },
+  { label: 'slider_gain', type: 'keyword', detail: 'Slider controlling gain (0–1)', apply: 'slider(0.5, 0, 1, 0.01)' },
+  { label: 'slider_filter', type: 'keyword', detail: 'Slider controlling filter cutoff (100–5000 Hz)', apply: 'slider(1000, 100, 5000, 10)' },
+  { label: 'slider_speed', type: 'keyword', detail: 'Slider controlling playback speed (0.1–4×)', apply: 'slider(1, 0.1, 4, 0.1)' },
+  { label: 'slider_reverb', type: 'keyword', detail: 'Slider controlling reverb (0–1)', apply: 'slider(0.3, 0, 1, 0.01)' },
   { label: 'mouseX', type: 'property', detail: 'Mouse X position (0-1)', apply: 'mouseX' },
   { label: 'mouseY', type: 'property', detail: 'Mouse Y position (0-1)', apply: 'mouseY' },
   { label: 'range', type: 'function', detail: 'Map value to range', apply: '.range(0, 1)' },
@@ -62,8 +68,14 @@ const STRUDEL_COMPLETIONS: CompletionItem[] = [
   { label: 'coarse', type: 'function', detail: 'Sample rate reduction', apply: '.coarse(8)' },
   { label: 'shape', type: 'function', detail: 'Waveshaper distortion', apply: '.shape(0.5)' },
   { label: 'vowel', type: 'function', detail: 'Formant filter (a, e, i, o, u)', apply: '.vowel("a")' },
-  { label: 'pianoroll', type: 'function', detail: 'Visualize as piano roll', apply: '.pianoroll()' },
-  { label: 'scope', type: 'function', detail: 'Visualize as oscilloscope', apply: '.scope()' },
+  { label: 'pianoroll', type: 'function', detail: 'Background piano roll visualizer', apply: '.pianoroll()' },
+  { label: 'scope', type: 'function', detail: 'Background oscilloscope visualizer', apply: '.scope()' },
+  /* Inline widget variants — render a canvas INSIDE the editor block */
+  { label: '_pianoroll', type: 'function', detail: 'Inline piano roll widget inside the editor', apply: '._pianoroll()' },
+  { label: '_scope', type: 'function', detail: 'Inline oscilloscope widget inside the editor', apply: '._scope()' },
+  { label: '_punchcard', type: 'function', detail: 'Inline punchcard dot-grid widget inside the editor', apply: '._punchcard()' },
+  { label: '_spiral', type: 'function', detail: 'Inline spiral time-rotation widget inside the editor', apply: '._spiral()' },
+  { label: '_pitchwheel', type: 'function', detail: 'Inline 12-tone pitch circle widget inside the editor', apply: '._pitchwheel()' },
   /* ── Tonal music theory ────────────────────────────── */
   { label: 'scale', type: 'function', detail: 'Map to musical scale', apply: '.scale("C:minor")' },
   { label: 'voicings', type: 'function', detail: 'Automatic chord voicings', apply: '.voicings("lefthand")' },
