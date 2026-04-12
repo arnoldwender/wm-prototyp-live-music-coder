@@ -55,7 +55,7 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - `/legal` → Impressum, Datenschutz, Lizenzen
 
 ## Version
-1.0.2
+1.0.3
 
 ## Router
 Conditional router: HashRouter in Electron (file:// compatible), BrowserRouter on the web. `/` renders the Landing hero on both targets; the hero's "Start Coding" CTA links to `/editor`. See src/App.tsx.
