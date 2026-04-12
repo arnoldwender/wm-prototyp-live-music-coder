@@ -35,8 +35,6 @@ const NAV_ITEMS: {
   { to: '/examples', i18nKey: 'nav.examples' },
   { to: '/sessions', i18nKey: 'nav.sessions', italic: true },
   { to: '/docs', i18nKey: 'nav.docs' },
-  { to: '/blog', i18nKey: 'nav.blog' },
-  { to: '/changelog', i18nKey: 'nav.changelog' },
 ]
 
 /** Determine whether a nav entry matches the current path.

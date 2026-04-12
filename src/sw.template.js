@@ -2,7 +2,10 @@
  * Caches the app shell on install, serves from cache first, and
  * updates in the background (stale-while-revalidate for pages). */
 
-const CACHE_NAME = 'lmc-v1';
+/* __CACHE_VERSION__ is replaced with a Unix timestamp at build time by the
+ * swVersionPlugin in vite.config.ts — each deploy gets a fresh cache name,
+ * so the activate handler deletes the previous version automatically. */
+const CACHE_NAME = 'lmc-__CACHE_VERSION__';
 const APP_SHELL = [
   '/',
   '/editor',
