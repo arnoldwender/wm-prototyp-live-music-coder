@@ -620,7 +620,8 @@
     "loadFromGist": "Load from Gist",
     "saving": "Saving...",
     "loading": "Loading...",
-    "clear": "Clear"
+    "clear": "Clear",
+    "rememberWarning": "Stores token in browser storage (unencrypted)"
   },
   "legal": {
     "impressum": "Impressum",
@@ -631,7 +632,9 @@
     "samples": "Samples",
     "reference": "Reference",
     "console": "Console",
-    "settings": "Settings"
+    "settings": "Settings",
+    "searchSamples": "Search samples",
+    "searchApi": "Search API"
   },
   "gamification": {
     "achievementUnlocked": "Achievement Unlocked",

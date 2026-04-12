@@ -222,6 +222,18 @@ export function GistDialog({ onClose }: GistDialogProps) {
               />
               Remember token (localStorage)
             </label>
+            {/* Security warning — shown when user enables remember-me */}
+            {remember && (
+              <span
+                aria-label={t('gist.rememberWarning')}
+                style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-warning)',
+                }}
+              >
+                {t('gist.rememberWarning')}
+              </span>
+            )}
           </div>
           <div className="flex" style={{ gap: 'var(--space-3)' }}>
             <Button variant="secondary" onClick={handleSaveToken}>
@@ -311,12 +323,12 @@ export function GistDialog({ onClose }: GistDialogProps) {
         {/* --- Saved gists history --- */}
         {savedGists.length > 0 && (
           <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)' }}>
-            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>
+            <div style={{ fontSize: 'var(--font-size-2xs)', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>
               Saved Gists
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxHeight: '120px', overflowY: 'auto' }}>
               {savedGists.map((g) => (
-                <div key={g.id} className="flex items-center justify-between" style={{ fontSize: '11px', padding: 'var(--space-1) 0' }}>
+                <div key={g.id} className="flex items-center justify-between" style={{ fontSize: 'var(--font-size-ui)', padding: 'var(--space-1) 0' }}>
                   <a
                     href={g.url}
                     target="_blank"
@@ -325,14 +337,14 @@ export function GistDialog({ onClose }: GistDialogProps) {
                   >
                     {g.id.slice(0, 12)}...
                   </a>
-                  <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
                     {new Date(g.date).toLocaleDateString()}
                   </span>
                   <button
                     type="button"
                     onClick={() => { setGistInput(g.url); }}
                     title="Load this gist"
-                    style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '10px', marginLeft: 'var(--space-2)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', marginLeft: 'var(--space-2)' }}
                   >
                     Load
                   </button>

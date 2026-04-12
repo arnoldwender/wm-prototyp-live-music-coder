@@ -90,6 +90,7 @@ export function SidePanel() {
             onClick={() => setActiveTab(id)}
             aria-selected={activeTab === id}
             title={t(`sidePanel.${id}`)}
+            aria-label={t(`sidePanel.${id}`)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -114,6 +115,7 @@ export function SidePanel() {
           type="button"
           onClick={toggleSidePanel}
           title="Close panel"
+          aria-label="Close panel"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -496,6 +498,7 @@ oscs.forEach((o, i) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search samples..."
+          aria-label={t('sidePanel.searchSamples')}
           style={{
             width: '100%',
             padding: 'var(--space-2) var(--space-3) var(--space-2) 30px',
@@ -541,7 +544,7 @@ oscs.forEach((o, i) => {
               }}
             />
             {cat.label}
-            <span style={{ color: 'var(--color-text-muted)', marginLeft: 'auto', fontSize: '10px' }}>
+            <span style={{ color: 'var(--color-text-muted)', marginLeft: 'auto', fontSize: 'var(--font-size-2xs)' }}>
               {cat.samples.length}
             </span>
           </button>
@@ -561,7 +564,7 @@ oscs.forEach((o, i) => {
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius-sm)',
                     cursor: 'pointer',
-                    fontSize: '11px',
+                    fontSize: 'var(--font-size-ui)',
                     fontFamily: 'var(--font-family-mono)',
                     transition: 'var(--transition-fast)',
                   }}
@@ -782,6 +785,7 @@ export function ReferencePanel() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search API..."
+          aria-label={t('sidePanel.searchApi')}
           style={{
             width: '100%',
             padding: 'var(--space-2) var(--space-3) var(--space-2) 30px',
@@ -799,7 +803,7 @@ export function ReferencePanel() {
       {filtered.map((sec) => (
         <div key={sec.title} style={{ marginBottom: 'var(--space-3)' }}>
           <div style={{
-            fontSize: '10px',
+            fontSize: 'var(--font-size-2xs)',
             fontWeight: 'var(--font-weight-semibold)',
             color: 'var(--color-primary)',
             textTransform: 'uppercase',
@@ -816,18 +820,18 @@ export function ReferencePanel() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: 'var(--space-1) var(--space-2)',
-                fontSize: '11px',
+                fontSize: 'var(--font-size-ui)',
                 borderRadius: 'var(--radius-sm)',
               }}
             >
               <code style={{
                 fontFamily: 'var(--font-family-mono)',
                 color: 'var(--color-text)',
-                fontSize: '11px',
+                fontSize: 'var(--font-size-ui)',
               }}>
                 {item.fn}
               </code>
-              <span style={{ color: 'var(--color-text-muted)', fontSize: '10px', textAlign: 'right', marginLeft: 'var(--space-2)' }}>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)', textAlign: 'right', marginLeft: 'var(--space-2)' }}>
                 {item.desc}
               </span>
             </div>
@@ -847,30 +851,41 @@ const MAX_LOG_ENTRIES = 200;
 let logBuffer: { type: 'log' | 'error' | 'warn' | 'info'; message: string; time: number }[] = [];
 let logListeners: (() => void)[] = [];
 
-/* Intercept console for Strudel output */
-if (typeof window !== 'undefined' && !(window as any).__lmcConsolePatched) {
-  (window as any).__lmcConsolePatched = true;
-  const origLog = console.log;
-  const origError = console.error;
-  const origWarn = console.warn;
-
-  const push = (type: 'log' | 'error' | 'warn', args: unknown[]) => {
-    const message = args.map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
-    /* Filter out noisy Strudel/Vite messages */
-    if (message.includes('[vite]') || message.includes('i18next') || message.includes('locize')) return;
-    logBuffer.push({ type, message, time: Date.now() });
-    if (logBuffer.length > MAX_LOG_ENTRIES) logBuffer = logBuffer.slice(-MAX_LOG_ENTRIES);
-    logListeners.forEach((l) => l());
-  };
-
-  console.log = (...args: unknown[]) => { origLog(...args); push('log', args); };
-  console.error = (...args: unknown[]) => { origError(...args); push('error', args); };
-  console.warn = (...args: unknown[]) => { origWarn(...args); push('warn', args); };
-}
-
 export function ConsolePanel() {
   const [, forceUpdate] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  /* Install console monkey-patch on mount; restore originals on unmount.
+   * Moved from module-level side effect so cleanup is possible and HMR stays clean. */
+  useEffect(() => {
+    if ((window as any).__lmcConsolePatched) return;
+    (window as any).__lmcConsolePatched = true;
+
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    const push = (type: 'log' | 'error' | 'warn', args: unknown[]) => {
+      const message = args.map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+      /* Filter out noisy Strudel/Vite messages */
+      if (message.includes('[vite]') || message.includes('i18next') || message.includes('locize')) return;
+      logBuffer.push({ type, message, time: Date.now() });
+      if (logBuffer.length > MAX_LOG_ENTRIES) logBuffer = logBuffer.slice(-MAX_LOG_ENTRIES);
+      logListeners.forEach((l) => l());
+    };
+
+    console.log = (...args: unknown[]) => { originalLog(...args); push('log', args); };
+    console.error = (...args: unknown[]) => { originalError(...args); push('error', args); };
+    console.warn = (...args: unknown[]) => { originalWarn(...args); push('warn', args); };
+
+    return () => {
+      /* Restore original console methods and clear the patched flag */
+      console.log = originalLog;
+      console.warn = originalWarn;
+      console.error = originalError;
+      (window as any).__lmcConsolePatched = false;
+    };
+  }, []);
 
   useEffect(() => {
     const listener = () => forceUpdate((n) => n + 1);
@@ -878,12 +893,12 @@ export function ConsolePanel() {
     return () => { logListeners = logListeners.filter((l) => l !== listener); };
   }, []);
 
-  /* Auto-scroll to bottom */
+  /* Auto-scroll to bottom — only fires when new log entries arrive */
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  });
+  }, [logBuffer.length]);
 
   const typeColors: Record<string, string> = {
     log: 'var(--color-text-secondary)',
@@ -893,7 +908,7 @@ export function ConsolePanel() {
   };
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto" style={{ padding: 'var(--space-2)', fontFamily: 'var(--font-family-mono)', fontSize: '11px' }}>
+    <div ref={scrollRef} className="h-full overflow-y-auto" style={{ padding: 'var(--space-2)', fontFamily: 'var(--font-family-mono)', fontSize: 'var(--font-size-ui)' }}>
       {logBuffer.length === 0 ? (
         <div style={{ color: 'var(--color-text-muted)', padding: 'var(--space-4)', textAlign: 'center' }}>
           Console output appears here
@@ -981,7 +996,7 @@ export function SettingsPanel() {
 
   const labelStyle = {
     display: 'block',
-    fontSize: '11px',
+    fontSize: 'var(--font-size-ui)',
     color: 'var(--color-text-muted)',
     marginBottom: 'var(--space-1)',
     fontWeight: 'var(--font-weight-medium)' as const,
@@ -1045,7 +1060,7 @@ export function SettingsPanel() {
       {/* Zen mode */}
       <label
         className="flex items-center gap-2 cursor-pointer"
-        style={{ fontSize: '12px', color: 'var(--color-text)' }}
+        style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text)' }}
       >
         <input
           type="checkbox"
@@ -1066,7 +1081,7 @@ export function SettingsPanel() {
         <label
           key={key}
           className="flex items-center gap-2 cursor-pointer"
-          style={{ fontSize: '12px', color: 'var(--color-text)' }}
+          style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text)' }}
         >
           <input
             type="checkbox"
