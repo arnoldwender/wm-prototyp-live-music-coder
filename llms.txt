@@ -37,6 +37,8 @@ React 19, TypeScript 5.9, Vite 8, Tailwind CSS 4, Zustand 5, CodeMirror 6, React
 - AGPL-3.0-or-later license (combined app, Strudel dependency); MIT for original components
 - 154 tests across 24 test files, 12 routes
 - Colocated tests (foo.test.ts next to foo.ts)
+- 51 curated sessions across 15 genres; 215+ code examples
+- Piano Roll: click note to audition, drag pitch by semitones (pitchOverrides Map, visual-only), drag velocity bars, zoom, timeline pan. HiDPI: all hit-testing uses getBoundingClientRect() CSS pixels, not canvas.height physical pixels.
 
 ## Routes (12)
 - `/` → Landing page (hero, features, examples) — also the Electron splash
