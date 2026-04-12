@@ -15,13 +15,13 @@ function getRepl() {
 
 /** Shared button style for zoom controls overlay */
 const btnStyle: React.CSSProperties = {
-  background: 'rgba(15, 15, 18, 0.85)',
-  border: '1px solid rgba(63, 63, 70, 0.6)',
-  color: '#a1a1aa',
-  borderRadius: '4px',
-  fontSize: '10px',
-  fontFamily: 'monospace',
-  padding: '2px 5px',
+  background: 'var(--color-bg-alt)',
+  border: '1px solid var(--color-border)',
+  color: 'var(--color-text-muted)',
+  borderRadius: 'var(--radius-sm)',
+  fontSize: 'var(--font-size-xs)',
+  fontFamily: 'var(--font-family-mono)',
+  padding: 'var(--space-1) var(--space-2)',
   cursor: 'pointer',
   lineHeight: '1.4',
   userSelect: 'none',
@@ -79,7 +79,7 @@ export function PianorollVisualizer() {
         >−T</button>
 
         {/* Separator */}
-        <span aria-hidden="true" style={{ color: 'rgba(63,63,70,0.6)', fontSize: 10 }}>|</span>
+        <span aria-hidden="true" style={{ color: 'var(--color-border)', fontSize: 'var(--font-size-xs)' }}>|</span>
 
         {/* Pitch zoom */}
         <button
