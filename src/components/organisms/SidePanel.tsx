@@ -202,6 +202,7 @@ const WEBAUDIO_CATEGORIES = [
 ];
 
 export function SampleBrowser() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [expandedCat, setExpandedCat] = useState<string | null>('drums');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -760,6 +761,7 @@ const REFERENCE_BY_ENGINE: Record<string, typeof STRUDEL_REFERENCE> = {
 };
 
 export function ReferencePanel() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const activeEngine = useAppStore((s) => {
     const file = s.files.find(f => f.active);
@@ -949,6 +951,7 @@ export function ConsolePanel() {
    ══════════════════════════════════════════════════════════ */
 
 export function SettingsPanel() {
+  const { t } = useTranslation();
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDevice, setSelectedDevice] = useState('');
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem('lmc-font-size') || '14'));
