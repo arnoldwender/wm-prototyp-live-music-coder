@@ -15,8 +15,8 @@ Live Music Coder is a browser-based and Electron desktop live coding music IDE. 
 - Components: 62 (17 atoms, 18 molecules, 27 organisms)
 - Routes: 12
 - Pages: 11 (Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal)
-- Examples: 200+
-- Sessions: 43
+- Examples: 215+
+- Sessions: 51
 - MIDI device profiles: 19
 - Blog posts: 7
 - Languages: 3 (DE, EN, ES)
@@ -74,6 +74,30 @@ The SynthPanel organism (`src/components/organisms/SynthPanel.tsx`) appears when
 **Audio path:** `strudel-keys.ts` exports `playOscillatorNote`, `setLmcOscillatorType`, and `setLmcFilter`. All three are exposed on `window` as `__lmcPlayNote`, `__lmcSetOscillator`, `__lmcSetFilter`. Physical MIDI keyboard and VirtualKeyboard share the identical code path. The filter stage is a `BiquadFilterNode` inserted per-note between oscillator and gain — created fresh each note so knob changes take effect immediately.
 
 **Zustand state:** `synthOscillator`, `synthFilterType`, `synthFilterCutoff`, `synthFilterResonance` in `src/lib/store.ts`. `StrudelEditor` subscribes and calls `window.__lmcSetFilter` on changes.
+
+### Piano Roll Visualizer
+
+`PianorollVisualizer` (`src/components/organisms/PianorollVisualizer.tsx`) wraps `drawPianoroll()` (`src/lib/visualizers/pianoroll.ts`) which is called every RAF frame via `CanvasVisualizer`.
+
+**React state owned by PianorollVisualizer:**
+- `zoomX`, `zoomY` — time and pitch zoom (0.25–6×)
+- `timeOffset` — cycles shifted from live position (positive = past)
+- `velocityOverrides: Map<string, number>` — key `"note:start"`, value 0–1
+- `pitchOverrides: Map<string, number>` — key `"note:start"`, value MIDI 0–127 (visual-only, does not mutate code)
+
+**eventSinkRef** — mutable object populated each RAF frame by `drawPianoroll` with layout data for hit-testing without React re-renders: `{ events, timeStart, timeEnd, drawW, keysWidth, minNote, maxNote, noteHeight, yOffset }`. `noteHeight` and `yOffset` are physical canvas pixels — divide by `window.devicePixelRatio` to get CSS pixels for mouse event coordinates.
+
+**HiDPI rule:** All hit-testing uses `canvas.getBoundingClientRect()` (CSS pixels), never `canvas.height` (physical pixels, 2× on Retina). The velocity lane threshold (`rect.height - 18`) and note Y position both use CSS coordinates.
+
+**Interactions:**
+- Click note bar → audition via `window.__lmcPlayNote?.(note)`
+- Drag note bar vertically → pitch shifts by semitone, floating label shows `"C4 → D4"`, DPR-corrected: `semitones = Math.round(-dy / (noteHeight / dpr))`
+- Drag velocity bar vertically → adjusts velocity override
+- Drag background horizontally → pans timeline
+- Cursor: `grab` / `ns-resize` (during note/velocity drag) / `grabbing` (pan)
+- Reset button (↺) clears both override maps
+
+**Canvas colors:** `VIZ_COLORS` in `src/lib/visualizers/colors.ts` — all Canvas 2D palette values live here (cannot use CSS variables in Canvas context).
 
 ### Persistence
 
@@ -219,4 +243,4 @@ Copyright (c) 2026 Arnold Wender / Wender Media
 
 ## Sessions category
 
-`/sessions` is a curated collection of live-coding pieces authored inside a single conversation with an AI model. Each piece has a stable slug (e.g. `/sessions/jede-session-neu-geboren`) and its own detail route because the long-form narrative context (composer notes, movements, key signatures) doesn't fit the flat Examples grid. Entries are defined in `src/data/sessions-library.ts` via the `SessionEntry` schema (slug, title, subtitle, author with `kind: 'ai' | 'human'` and optional model, date, bpm, durationSec, short description, composer notes, movements, engine, code). The primary action on a piece is "Open in Editor", which passes the code via react-router `location.state` to `/editor` — the same flow Examples and Samples use. There is no external strudel.cc link. Sessions pages reuse the shared site nav and design tokens so the category feels like a sibling of /samples and /examples rather than a standalone sub-site. Content (the piece itself, composer notes) is authored in German; chrome labels are translated under the `sessions.*` i18n namespace.
+`/sessions` is a curated collection of live-coding pieces authored inside a single conversation with an AI model. 51 pieces across 15 genres: Ambient, Blues, Breakbeat, Deep Work, Drum & Bass, Dub, Dub Techno, Electronic, Flamenco, Jazz, Lo-Fi, Narrative, Retro, Techno, Trance. Each piece has a stable slug (e.g. `/sessions/jede-session-neu-geboren`) and its own detail route because the long-form narrative context (composer notes, movements, key signatures) doesn't fit the flat Examples grid. Entries are defined in `src/data/sessions-library.ts` via the `SessionEntry` schema (slug, title, subtitle, author with `kind: 'ai' | 'human'` and optional model, date, bpm, durationSec, short description, composer notes, movements, engine, code). The `SessionCategory` type union includes all 15 genre values; `SESSION_CATEGORIES` is the ordered array for filter UI. The primary action on a piece is "Open in Editor", which passes the code via react-router `location.state` to `/editor` — the same flow Examples and Samples use. There is no external strudel.cc link. Sessions pages reuse the shared site nav and design tokens so the category feels like a sibling of /samples and /examples rather than a standalone sub-site. Content (the piece itself, composer notes) is authored in German; chrome labels are translated under the `sessions.*` i18n namespace.

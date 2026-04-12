@@ -67,7 +67,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Waveform | Oscilloscope with gradient fill and peak detection |
 | Spectrum | Frequency bars with logarithmic distribution |
 | Timeline | Beat grid with playhead, level meter, BPM display |
-| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid, timeline pan, velocity drag |
+| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid, timeline pan, velocity drag, click-to-audition, pitch drag |
 | Punchcard | Dot grid — size/opacity mapped to velocity |
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
