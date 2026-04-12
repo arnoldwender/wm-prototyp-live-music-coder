@@ -72,7 +72,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
 
-**46 Curated Sessions** — AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work) with filters, search, sort, and category badges.
+**51 Curated Sessions** — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Deep House, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
 
 **215+ Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, advanced patterns (euclidean, polymetric, FM), and synthesis techniques.
 
