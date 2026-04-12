@@ -94,6 +94,8 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Clock Sync** — Multi-tab synchronization via BroadcastChannel (leader election, BPM broadcast).
 
+**Synth Mode** — Virtual on-screen keyboard (2 octaves, QWERTY mapping, velocity from Y position) with oscillator selector (sine/sawtooth/square/triangle), SVG knob controls, and a real-time biquad filter with frequency response curve. Shares the same audio path as the physical MIDI keyboard via `window.__lmcPlayNote`.
+
 **MIDI Panel** — Connected device list, real-time CC activity monitor with value bars, usage hints. Accessible via USB icon in sidebar.
 
 **Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists, download code as .js file.

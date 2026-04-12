@@ -10,9 +10,9 @@ Live Music Coder is a browser-based and Electron desktop live coding music IDE. 
 
 ## Metrics
 
-- Test files: 20
-- Tests: 120
-- Components: 55 (13 atoms, 16 molecules, 26 organisms)
+- Test files: 24
+- Tests: 154
+- Components: 62 (17 atoms, 18 molecules, 27 organisms)
 - Routes: 12
 - Pages: 11 (Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal)
 - Examples: 200+
@@ -42,9 +42,9 @@ One shared AudioContext. Each engine adapter implements a common EngineAdapter i
 
 ### Atomic Design Hierarchy
 
-- Atoms (13): ActivityBarButton, Badge, Button, CanvasVisualizer, EngineNode, ErrorBoundary, Icon, Logo, NotFound, TabButton, Toggle, Tooltip, WaveformBackground
-- Molecules (16): AchievementToast, EngineSelector, ErrorBar, FeatureCard, FileTabs, FilterPill, HelpPanel, LanguageSwitcher, MarkdownRenderer, NowPlayingIndicator, SampleDropZone, ShareDialog, SortSelect, ToolbarGroup, VisualizerPills, VisualizerToggle
-- Organisms (26): ActivityBar, CodeEditor, ConsolePanel, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, MidiPanel, NodeGraph, PatternTimeline, PianorollVisualizer, PitchwheelVisualizer, PunchcardVisualizer, SettingsPanel, SidePanel, SiteNav, SpectrumVisualizer, SpiralVisualizer, StatusBar, StrudelEditor, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
+- Atoms (17): ActivityBarButton, Badge, Button, CanvasVisualizer, EngineNode, ErrorBoundary, FilterCurve, Icon, Knob, Logo, NotFound, TabButton, Toggle, Tooltip, VirtualKeyboard, WaveformBackground, WaveformIcon
+- Molecules (18): AchievementToast, EngineSelector, ErrorBar, FeatureCard, FileTabs, FilterControl, FilterPill, HelpPanel, LanguageSwitcher, MarkdownRenderer, NowPlayingIndicator, OscillatorSelector, SampleDropZone, ShareDialog, SortSelect, ToolbarGroup, VisualizerPills, VisualizerToggle
+- Organisms (27): ActivityBar, CodeEditor, ConsolePanel, DetailPanel, ExampleGallery, FeatureGrid, GistDialog, HeroSection, MidiPanel, NodeGraph, PatternTimeline, PianorollVisualizer, PitchwheelVisualizer, PunchcardVisualizer, SettingsPanel, SidePanel, SiteNav, SpectrumVisualizer, SpiralVisualizer, StatusBar, StrudelEditor, SynthPanel, TemplateSelector, TransportBar, TutorialOverlay, VisualizerDashboard, WaveformVisualizer
 
 Hierarchy rules: atoms import nothing, molecules import only atoms, organisms import molecules and atoms, layouts compose organisms, pages use layouts.
 
@@ -59,6 +59,21 @@ Custom `midikeys()` implementation in `src/lib/midi/strudel-keys.ts` bypasses @s
 **19 Device Profiles** (`src/data/midi-devices.ts`): Factory CC mappings for MPK mini, Launchkey, Arturia KeyStep/MiniLab, Novation, Korg nanoKONTROL/minilogue, M-Audio, and more. Auto-detected by device name on connection.
 
 **CRITICAL**: Never use `input.onmidimessage =` — use `addEventListener('midimessage', ...)`. The exclusive `onmidimessage` property steals events from @strudel/midi's webmidi library.
+
+### Synth UI (Phase 1+2)
+
+The SynthPanel organism (`src/components/organisms/SynthPanel.tsx`) appears when a MIDI device is connected. It composes:
+
+- **VirtualKeyboard** (atom) — 2-octave on-screen piano. QWERTY mapping (a/w/s/e/d…). Velocity derived from Y-position of pointer on each key. Calls `window.__lmcPlayNote(note, velocity)`.
+- **OscillatorSelector** (molecule) — 4 radio buttons (sine / sawtooth / square / triangle) that call `window.__lmcSetOscillator(type)`.
+- **FilterControl** (molecule) — two Knob atoms (cutoff + resonance) + 4 type buttons (LP/HP/BP/Notch) + FilterCurve atom. Calls `window.__lmcSetFilter(type, cutoff, resonance)`.
+- **Knob** (atom) — SVG arc knob. 270° travel. Pointer-drag for coarse, Shift+drag for fine (0.1× sensitivity). Double-click resets to default.
+- **FilterCurve** (atom) — Canvas element rendering biquad frequency response 20Hz–20kHz on a log scale. Colors read from CSS variables via `getComputedStyle`. Redraws on every type/cutoff/resonance change.
+- **WaveformIcon** (atom) — SVG path icons for the 4 waveform types.
+
+**Audio path:** `strudel-keys.ts` exports `playOscillatorNote`, `setLmcOscillatorType`, and `setLmcFilter`. All three are exposed on `window` as `__lmcPlayNote`, `__lmcSetOscillator`, `__lmcSetFilter`. Physical MIDI keyboard and VirtualKeyboard share the identical code path. The filter stage is a `BiquadFilterNode` inserted per-note between oscillator and gain — created fresh each note so knob changes take effect immediately.
+
+**Zustand state:** `synthOscillator`, `synthFilterType`, `synthFilterCutoff`, `synthFilterResonance` in `src/lib/store.ts`. `StrudelEditor` subscribes and calls `window.__lmcSetFilter` on changes.
 
 ### Persistence
 
