@@ -132,7 +132,7 @@ function drawKeysSidebar(
       /* White key background */
       ctx.fillStyle = isActive
         ? VIZ_COLORS.keysActiveOverlay
-        : '#1c1c22';
+        : VIZ_COLORS.keysWhiteKey;
       ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
       /* Bottom border for white key separation */
       ctx.fillStyle = VIZ_COLORS.keysBlackKey;
@@ -273,12 +273,12 @@ function drawNoteRowBackgrounds(
 
     if (isBlack) {
       /* Black key rows: slightly darker background */
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+      ctx.fillStyle = VIZ_COLORS.rowBlackKeyBg;
       ctx.fillRect(KEYS_WIDTH, y, width - KEYS_WIDTH, noteHeight);
     }
     /* C note separator line */
     if (n % 12 === 0) {
-      ctx.strokeStyle = 'rgba(63, 63, 70, 0.35)';
+      ctx.strokeStyle = VIZ_COLORS.gridCLine;
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(KEYS_WIDTH, y + noteHeight);
@@ -556,7 +556,7 @@ export function drawPianoroll(
     const velY = height - velLane;
 
     /* Lane background */
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fillStyle = VIZ_COLORS.velLaneBg;
     ctx.fillRect(KEYS_WIDTH, velY, drawW, velLane);
 
     /* Separator line */
