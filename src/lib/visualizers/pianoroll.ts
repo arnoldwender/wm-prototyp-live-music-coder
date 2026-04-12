@@ -344,6 +344,7 @@ export function drawPianoroll(
   } | null,
   zoomX = 1,
   zoomY = 1,
+  timeOffset = 0,
 ) {
   /* ── Background ─────────────────────────────────────── */
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -365,8 +366,8 @@ export function drawPianoroll(
   /* zoomX shrinks the time window — higher zoom = fewer cycles visible */
   const cyclesBack = BASE_CYCLES_BACK / zoomX;
   const cyclesForward = BASE_CYCLES_FORWARD / zoomX;
-  const timeStart = now - cyclesBack;
-  const timeEnd = now + cyclesForward;
+  const timeStart = now - cyclesBack - timeOffset;
+  const timeEnd   = now + cyclesForward - timeOffset;
   const timeRange = timeEnd - timeStart;
 
   let haps: unknown[];
