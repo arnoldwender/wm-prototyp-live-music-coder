@@ -5,7 +5,7 @@
    timeline panning, velocity drag, and pitch drag.
    ────────────────────────────────────────────────────────── */
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawPianoroll } from '../../lib/visualizers/pianoroll';
 import type { NoteEvent } from '../../lib/visualizers/pianoroll';
@@ -53,20 +53,31 @@ export function PianorollVisualizer() {
     events: [], timeStart: 0, timeEnd: 0, drawW: 0, keysWidth: 52,
     minNote: 0, maxNote: 127, noteHeight: 10, yOffset: 0,
   });
+  /* Stable refs for override Maps — updated each render so draw callback
+   * reads the latest values without being recreated on every Map mutation. */
+  const velocityOverridesRef = useRef(velocityOverrides);
+  const pitchOverridesRef = useRef(pitchOverrides);
+  useEffect(() => { velocityOverridesRef.current = velocityOverrides; }, [velocityOverrides]);
+  useEffect(() => { pitchOverridesRef.current = pitchOverrides; }, [pitchOverrides]);
+
   const velDragRef = useRef<{ key: string; startY: number; startVel: number } | null>(null);
   /* Pitch drag state — tracks which note is being dragged and its original pitch */
   const pitchDragRef = useRef<{ key: string; origNote: number; startY: number } | null>(null);
   const [dragLabel, setDragLabel] = useState<{ text: string; x: number; y: number } | null>(null);
 
+  /* draw is only recreated when zoom/pan state changes — NOT on every Map mutation.
+   * Override Maps are read from refs so drag-pixel updates never restart the RAF loop. */
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
       drawPianoroll(
         ctx, width, height, time,
         getRepl as Parameters<typeof drawPianoroll>[4],
-        zoomX, zoomY, timeOffset, velocityOverrides, pitchOverrides, eventSinkRef.current,
+        zoomX, zoomY, timeOffset,
+        velocityOverridesRef.current, pitchOverridesRef.current,
+        eventSinkRef.current,
       );
     },
-    [zoomX, zoomY, timeOffset, velocityOverrides, pitchOverrides],
+    [zoomX, zoomY, timeOffset],
   );
 
   /* Hit-test: is clientY inside the velocity lane (bottom 18px)?
@@ -103,7 +114,7 @@ export function PianorollVisualizer() {
     }
     if (!best) return null;
     const key = `${best.note}:${best.start}`;
-    const vel = velocityOverrides.get(key) ?? best.velocity;
+    const vel = velocityOverridesRef.current.get(key) ?? best.velocity;
     return { key, vel };
   }
 
@@ -124,7 +135,7 @@ export function PianorollVisualizer() {
 
     for (const evt of sink.events) {
       const overrideKey = `${evt.note}:${evt.start}`;
-      const drawNote = pitchOverrides.get(overrideKey) ?? evt.note;
+      const drawNote = pitchOverridesRef.current.get(overrideKey) ?? evt.note;
       const noteTop = yOffsetCss + (sink.maxNote - drawNote) * noteHeightCss;
       if (t >= evt.start && t <= evt.end && y >= noteTop && y <= noteTop + noteHeightCss) {
         return { key: overrideKey, note: drawNote };
