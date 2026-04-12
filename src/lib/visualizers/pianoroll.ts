@@ -76,11 +76,11 @@ function noteGlow(velocity: number): string {
 function extractMidi(val: unknown): number {
   if (typeof val === 'number') return val;
   if (typeof val === 'string') {
-    const m = val.match(/^([a-g])(s|#|b|f)?(\d)?$/i);
+    const m = val.match(/^([a-g])(s|#|b|f)?(-?\d{1,2})?$/i);
     if (m) {
       const name = m[1].toUpperCase();
       const acc = (m[2] === '#' || m[2] === 's') ? 1 : (m[2] === 'b' || m[2] === 'f') ? -1 : 0;
-      const oct = m[3] ? parseInt(m[3]) : 3;
+      const oct = m[3] ? parseInt(m[3], 10) : 3;
       const idx = NOTE_NAMES.indexOf(name);
       if (idx >= 0) return (oct + 1) * 12 + idx + acc;
     }
@@ -119,7 +119,7 @@ function drawKeysSidebar(
   activeNotes: Set<number>,
 ) {
   /* Sidebar background */
-  ctx.fillStyle = '#0d0d10';
+  ctx.fillStyle = VIZ_COLORS.keysBg;
   ctx.fillRect(0, 0, KEYS_WIDTH, height);
 
   /* First pass: draw white key backgrounds (full-width rows) */
@@ -131,11 +131,11 @@ function drawKeysSidebar(
     if (!isBlack) {
       /* White key background */
       ctx.fillStyle = isActive
-        ? 'rgba(168, 85, 247, 0.35)'
+        ? VIZ_COLORS.keysActiveOverlay
         : '#1c1c22';
       ctx.fillRect(0, y, KEYS_WIDTH - 1, noteHeight);
       /* Bottom border for white key separation */
-      ctx.fillStyle = '#08080a';
+      ctx.fillStyle = VIZ_COLORS.keysBlackKey;
       ctx.fillRect(0, y + noteHeight - 0.5, KEYS_WIDTH - 1, 1);
     }
   }
@@ -149,13 +149,13 @@ function drawKeysSidebar(
     if (isBlack) {
       const bw = Math.round(KEYS_WIDTH * BLACK_KEY_W);
       ctx.fillStyle = isActive
-        ? 'rgba(168, 85, 247, 0.5)'
-        : '#0a0a0d';
+        ? VIZ_COLORS.accentGlow
+        : VIZ_COLORS.keysBlackKeyAlt;
       ctx.fillRect(0, y, bw, noteHeight);
       /* Right-edge gradient effect */
       const grad = ctx.createLinearGradient(bw - 6, 0, bw, 0);
       grad.addColorStop(0, 'transparent');
-      grad.addColorStop(1, 'rgba(255,255,255,0.06)');
+      grad.addColorStop(1, VIZ_COLORS.keysOctaveLine);
       ctx.fillStyle = grad;
       ctx.fillRect(bw - 6, y, 6, noteHeight);
     }
@@ -235,16 +235,17 @@ function drawBeatGrid(
         ctx.textBaseline = 'top';
         ctx.fillText(`${cyc + 1}`, x, 3);
       } else if (isHalf) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.7)';
+        /* Half-bar line — same color token as bar but at 40% opacity */
+        ctx.strokeStyle = VIZ_COLORS.gridDim;
         ctx.lineWidth = 0.6;
       } else if (isQuarter) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.5)';
+        ctx.strokeStyle = VIZ_COLORS.gridDim;
         ctx.lineWidth = 0.5;
       } else if (isEighth) {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.3)';
+        ctx.strokeStyle = VIZ_COLORS.gridMid;
         ctx.lineWidth = 0.4;
       } else {
-        ctx.strokeStyle = 'rgba(63, 63, 70, 0.15)';
+        ctx.strokeStyle = VIZ_COLORS.gridFaint;
         ctx.lineWidth = 0.3;
       }
 
@@ -287,6 +288,32 @@ function drawNoteRowBackgrounds(
   }
 }
 
+/* ── Rounded-rect path helper ───────────────────────────── */
+
+/** Trace a rounded rectangle path onto ctx without stroking or filling.
+ *  Clamps the radius so it never exceeds half of width or height. */
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const safeR = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + safeR, y);
+  ctx.lineTo(x + w - safeR, y);
+  ctx.arcTo(x + w, y, x + w, y + safeR, safeR);
+  ctx.lineTo(x + w, y + h - safeR);
+  ctx.arcTo(x + w, y + h, x + w - safeR, y + h, safeR);
+  ctx.lineTo(x + safeR, y + h);
+  ctx.arcTo(x, y + h, x, y + h - safeR, safeR);
+  ctx.lineTo(x, y + safeR);
+  ctx.arcTo(x, y, x + safeR, y, safeR);
+  ctx.closePath();
+}
+
 /* ── Note bars ──────────────────────────────────────────── */
 
 function drawNoteBar(
@@ -307,19 +334,9 @@ function drawNoteBar(
     ctx.shadowBlur = 14;
   }
 
-  /* Note fill — rounded rect */
+  /* Note fill — rounded rect via shared helper */
   ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(x1 + r, y);
-  ctx.lineTo(x1 + w - r, y);
-  ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
-  ctx.lineTo(x1 + w, y + h - r);
-  ctx.arcTo(x1 + w, y + h, x1, y + h, r);
-  ctx.lineTo(x1 + r, y + h);
-  ctx.arcTo(x1, y + h, x1, y, r);
-  ctx.lineTo(x1, y + r);
-  ctx.arcTo(x1, y, x1 + w, y, r);
-  ctx.closePath();
+  roundRectPath(ctx, x1, y, w, h, r);
   ctx.fill();
 
   /* Top highlight line — shimmer effect */
@@ -382,8 +399,9 @@ export function drawPianoroll(
 
   /* ── Parse note events ──────────────────────────────── */
   const events: NoteEvent[] = [];
-  let minNote = 127;
-  let maxNote = 0;
+  /* Use Infinity sentinels so any real MIDI note wins the first comparison */
+  let minNote = Infinity;
+  let maxNote = -Infinity;
 
   for (const hap of haps as Record<string, unknown>[]) {
     if (!hap.whole) continue;
@@ -399,6 +417,9 @@ export function drawPianoroll(
     minNote = Math.min(minNote, midi);
     maxNote = Math.max(maxNote, midi);
   }
+
+  /* Guard: if no valid MIDI events were found, reset to a sensible default range */
+  if (!isFinite(minNote) || !isFinite(maxNote)) { minNote = 48; maxNote = 72; }
 
   if (events.length === 0) {
     ctx.fillStyle = VIZ_COLORS.textDim;
@@ -486,21 +507,12 @@ export function drawPianoroll(
 
     /* Accent outline when pitch has been dragged from its original position */
     if (drawNote !== evt.note) {
+      /* Accent outline via shared helper — marks notes whose pitch has been dragged */
       const r = Math.min(3, h / 2, w / 2);
       ctx.save();
-      ctx.strokeStyle = `${VIZ_COLORS.accent}99`; // accent at 60% opacity — marks dragged pitch
+      ctx.strokeStyle = `${VIZ_COLORS.accent}99`; // accent at 60% opacity
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x1 + r, y);
-      ctx.lineTo(x1 + w - r, y);
-      ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
-      ctx.lineTo(x1 + w, y + h - r);
-      ctx.arcTo(x1 + w, y + h, x1, y + h, r);
-      ctx.lineTo(x1 + r, y + h);
-      ctx.arcTo(x1, y + h, x1, y, r);
-      ctx.lineTo(x1, y + r);
-      ctx.arcTo(x1, y, x1 + w, y, r);
-      ctx.closePath();
+      roundRectPath(ctx, x1, y, w, h, r);
       ctx.stroke();
       ctx.restore();
     }

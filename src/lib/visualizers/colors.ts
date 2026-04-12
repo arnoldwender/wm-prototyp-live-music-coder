@@ -45,4 +45,16 @@ export const VIZ_COLORS = {
   accent: '#a855f7',
   accentGlow: 'rgba(168, 85, 247, 0.5)',
   white: '#fafafa',
+
+  /* Piano key sidebar */
+  keysBg: '#0d0d10',
+  keysBlackKey: '#08080a',
+  keysBlackKeyAlt: '#0a0a0d',
+  keysActiveOverlay: 'rgba(168, 85, 247, 0.35)',
+  keysOctaveLine: 'rgba(255,255,255,0.06)',
+
+  /* Beat grid subdivisions (opacity variants of gridLight #3f3f46) */
+  gridDim: 'rgba(63, 63, 70, 0.4)',
+  gridMid: 'rgba(63, 63, 70, 0.25)',
+  gridFaint: 'rgba(63, 63, 70, 0.15)',
 } as const;

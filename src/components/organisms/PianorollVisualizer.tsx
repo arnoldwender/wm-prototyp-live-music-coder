@@ -118,7 +118,7 @@ export function PianorollVisualizer() {
     const dpr = window.devicePixelRatio || 1;
     const noteHeightCss = sink.noteHeight / dpr;
     const yOffsetCss = sink.yOffset / dpr;
-    if (noteHeightCss < 1) return null;
+    if (noteHeightCss <= 1) return null;
     const timeRange = sink.timeEnd - sink.timeStart;
     const t = sink.timeStart + ((x - sink.keysWidth) / sink.drawW) * timeRange;
 
@@ -163,7 +163,7 @@ export function PianorollVisualizer() {
     if (pitchDragRef.current) {
       const dpr = window.devicePixelRatio || 1;
       const noteHeightCss = eventSinkRef.current.noteHeight / dpr;
-      if (noteHeightCss < 1) return;
+      if (noteHeightCss <= 1) return;
       const dy = e.clientY - pitchDragRef.current.startY;
       const semitones = Math.round(-dy / noteHeightCss);
       const newNote = Math.max(0, Math.min(127, pitchDragRef.current.origNote + semitones));
@@ -225,7 +225,7 @@ export function PianorollVisualizer() {
           fontSize: 'var(--font-size-xs)',
           fontFamily: 'var(--font-family-mono)',
           color: 'var(--color-text)',
-          background: 'rgba(0,0,0,0.75)',
+          background: 'var(--color-overlay-heavy)',
           padding: 'var(--space-1) var(--space-2)',
           borderRadius: 'var(--radius-sm)',
           border: '1px solid var(--color-border)',
@@ -245,7 +245,7 @@ export function PianorollVisualizer() {
           fontSize: 'var(--font-size-xs)',
           fontFamily: 'var(--font-family-mono)',
           color: 'var(--color-primary)',
-          background: 'rgba(0,0,0,0.6)',
+          background: 'var(--color-overlay)',
           padding: 'var(--space-1) var(--space-2)',
           borderRadius: 'var(--radius-sm)',
         }}>
