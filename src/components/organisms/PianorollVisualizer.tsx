@@ -207,7 +207,13 @@ export function PianorollVisualizer() {
   return (
     <div
       className="h-full w-full relative"
-      style={{ backgroundColor: 'var(--color-bg)', cursor: isDragging ? 'grabbing' : 'grab' }}
+      style={{
+        backgroundColor: 'var(--color-bg)',
+        /* ns-resize for pitch/velocity vertical drags; grabbing for timeline pan; grab at rest */
+        cursor: isDragging
+          ? (pitchDragRef.current || velDragRef.current ? 'ns-resize' : 'grabbing')
+          : 'grab',
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

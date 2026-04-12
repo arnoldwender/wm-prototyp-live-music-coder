@@ -65,4 +65,7 @@ export const VIZ_COLORS = {
 
   /* Velocity lane */
   velLaneBg: 'rgba(0, 0, 0, 0.35)',
+
+  /* Note bar labels */
+  noteLabelText: 'rgba(255,255,255,0.7)',
 } as const;
