@@ -346,7 +346,8 @@ export function drawPianoroll(
   zoomY = 1,
   timeOffset = 0,
   velocityOverrides?: Map<string, number>,
-  eventSink?: { events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number },
+  pitchOverrides?: Map<string, number>,
+  eventSink?: { events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number; minNote: number; maxNote: number; noteHeight: number; yOffset: number },
 ) {
   /* ── Background ─────────────────────────────────────── */
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -436,13 +437,17 @@ export function drawPianoroll(
   const noteY = (n: number) => yOffset + (maxNote - n) * noteHeight;
   const timeX = (t: number) => KEYS_WIDTH + ((t - timeStart) / timeRange) * drawW;
 
-  /* Export events for hit-testing by the React component */
+  /* Export events and layout data for hit-testing by the React component */
   if (eventSink) {
     eventSink.events = events;
     eventSink.timeStart = timeStart;
     eventSink.timeEnd = timeEnd;
     eventSink.drawW = drawW;
     eventSink.keysWidth = KEYS_WIDTH;
+    eventSink.minNote = minNote;
+    eventSink.maxNote = maxNote;
+    eventSink.noteHeight = noteHeight;
+    eventSink.yOffset = yOffset;
   }
 
   /* ── Note row backgrounds ───────────────────────────── */
@@ -465,7 +470,6 @@ export function drawPianoroll(
   for (const evt of sorted) {
     const x1 = timeX(evt.start);
     const x2 = timeX(evt.end);
-    const y = noteY(evt.note);
     const w = Math.max(3, x2 - x1);
     const h = Math.max(2, noteHeight - 1);
     const isActive = evt.start <= now && evt.end > now;
@@ -473,7 +477,33 @@ export function drawPianoroll(
     /* Skip notes completely outside the draw area */
     if (x1 > width || x2 < KEYS_WIDTH) continue;
 
+    /* Apply pitch override for display position — original evt.note used as key */
+    const overrideKey = `${evt.note}:${evt.start}`;
+    const drawNote = pitchOverrides?.get(overrideKey) ?? evt.note;
+    const y = noteY(drawNote);
+
     drawNoteBar(ctx, x1, y, w, h, evt.velocity, isActive);
+
+    /* Accent outline when pitch has been dragged from its original position */
+    if (drawNote !== evt.note) {
+      const r = Math.min(3, h / 2, w / 2);
+      ctx.save();
+      ctx.strokeStyle = `${VIZ_COLORS.accent}99`; // accent at 60% opacity — marks dragged pitch
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x1 + r, y);
+      ctx.lineTo(x1 + w - r, y);
+      ctx.arcTo(x1 + w, y, x1 + w, y + h, r);
+      ctx.lineTo(x1 + w, y + h - r);
+      ctx.arcTo(x1 + w, y + h, x1, y + h, r);
+      ctx.lineTo(x1 + r, y + h);
+      ctx.arcTo(x1, y + h, x1, y, r);
+      ctx.lineTo(x1, y + r);
+      ctx.arcTo(x1, y, x1 + w, y, r);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
 
     /* Note name label on wide bars */
     if (w > 28 && h > 9) {
@@ -481,7 +511,7 @@ export function drawPianoroll(
       ctx.font = `${Math.min(9, h - 3)}px monospace`;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(NOTE_NAMES[evt.note % 12] + (Math.floor(evt.note / 12) - 1), x1 + 4, y + h / 2);
+      ctx.fillText(NOTE_NAMES[drawNote % 12] + (Math.floor(drawNote / 12) - 1), x1 + 4, y + h / 2);
     }
   }
 
