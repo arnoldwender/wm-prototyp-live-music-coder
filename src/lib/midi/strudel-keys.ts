@@ -181,18 +181,6 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
   const strudelWeb = await import('@strudel/web') as any;
   const { Pattern, Hap, TimeSpan } = strudelWeb;
   const { composeNoteOn, isComposeModeActive } = await import('./compose-mode');
-  /* Create our OWN AudioContext — don't import from @strudel/webaudio
-   * because that module also suffers from the double-instance bug.
-   * A fresh AudioContext works after any user gesture (clicking Play). */
-  let midiAudioCtx: AudioContext | null = null;
-  function getMidiAudioCtx(): AudioContext {
-    if (!midiAudioCtx || midiAudioCtx.state === 'closed') {
-      midiAudioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    if (midiAudioCtx.state === 'suspended') midiAudioCtx.resume();
-    return midiAudioCtx;
-  }
-
   /* Device key for hap buffer */
   const deviceKey = typeof device === 'string' ? device : `midi_${device}`;
   if (!kHaps[deviceKey]) kHaps[deviceKey] = [];
@@ -212,11 +200,27 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       const note = data[1];
       const velocity = data[2];
 
+      /* CC messages (type === 11) — dispatch to UI for knob → synth mapping */
+      const isCc = type === 11;
+      if (isCc) {
+        window.dispatchEvent(new CustomEvent('lmc-midi-cc', {
+          detail: { cc: note, value: velocity / 127 }
+        }));
+        return;
+      }
+
       /* Only handle Note On/Off */
       const isNoteOn = type === 9 && velocity > 0;
       const isNoteOff = type === 8 || (type === 9 && velocity === 0);
       if (!isNoteOn && !isNoteOff) return;
-      if (isNoteOff) return;
+
+      /* Note-off → release visual key highlight */
+      if (isNoteOff) {
+        window.dispatchEvent(new CustomEvent('lmc-midi-note', {
+          detail: { note, on: false }
+        }));
+        return;
+      }
 
       /* Throttle: skip if same note fired within 50ms (joystick/aftertouch spam) */
       const now_ms = Date.now();
@@ -235,6 +239,11 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
       if (!replInst?.scheduler) return;
 
       const midiNote = Math.round(note);
+
+      /* Visual feedback: light up the matching key on the on-screen keyboard */
+      window.dispatchEvent(new CustomEvent('lmc-midi-note', {
+        detail: { note: midiNote, on: true }
+      }));
       const vel = (velocity / 127).toFixed(2);
       const now = replInst.scheduler.now();
       const t = now + 0.01;
@@ -258,40 +267,12 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
        *
        * OscillatorNode is instant, reliable, and respects velocity.
        * The user's .s("synth") choice maps to an oscillator type. */
-      const SYNTH_TO_OSC: Record<string, OscillatorType> = {
-        sine: 'sine', sawtooth: 'sawtooth', square: 'square', triangle: 'triangle',
-        supersaw: 'sawtooth', saw: 'sawtooth', pulse: 'square',
-        /* Sample-based synths fall back to sine — the most musical default */
-        superpiano: 'sine', piano: 'triangle', metal: 'square',
-        bass: 'sawtooth', pluck: 'triangle', organ: 'sine',
-      };
+      /* Use shared playOscillatorNote — applies the current oscillator type and
+       * filter set via the SynthPanel UI (currentOscillatorType + filter state).
+       * This means the hardware knobs and the on-screen controls stay in sync. */
+      playOscillatorNote(midiNote, velocity / 127);
 
-      const activeCode = replInst.state?.activeCode ?? '';
-      const synthMatch = activeCode.match(/\.s\(\s*["']([^"']+)["']\s*\)/);
-      const synthName = synthMatch?.[1] ?? 'sine';
-      const oscType = SYNTH_TO_OSC[synthName] ?? 'sine';
-
-      /* OscillatorNode — always produces sound, maps synth name to oscillator type */
-      try {
-        const ac = getMidiAudioCtx();
-        const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
-        const vol = velocity / 127;
-
-        const osc = ac.createOscillator();
-        osc.type = oscType;
-        osc.frequency.value = freq;
-
-        const gainNode = ac.createGain();
-        gainNode.gain.setValueAtTime(vol * 0.5, ac.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
-
-        osc.connect(gainNode);
-        gainNode.connect(ac.destination);
-        osc.start(ac.currentTime);
-        osc.stop(ac.currentTime + 0.45);
-      } catch { /* audio failed */ }
-
-      console.log(`[midikeys] PLAYED note=${midiNote} vel=${vel} osc=${oscType} (${synthName})`);
+      console.log(`[midikeys] PLAYED note=${midiNote} vel=${vel}`);
     }) as EventListener);
   }
 
