@@ -4,7 +4,11 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 /* Vite config — React + Tailwind CSS v4 + Vitest
- * base: './' is required for Electron file:// protocol loading */
+ * base: './' is required for Electron file:// protocol loading
+ *
+ * Note: sw.js cache-busting is handled by scripts/inject-sw-version.mjs
+ * via the "postbuild" npm script — Vite 8 (Rolldown) plugin hooks fire
+ * before Vite copies public/ assets, making in-plugin injection unreliable. */
 export default defineConfig({
   base: './',
   plugins: [
