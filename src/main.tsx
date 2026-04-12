@@ -29,6 +29,7 @@ createRoot(document.getElementById('root')!).render(
    the console and the renderer crash logs. */
 if (
   'serviceWorker' in navigator &&
+  !import.meta.env.DEV &&
   (location.protocol === 'http:' || location.protocol === 'https:')
 ) {
   window.addEventListener('load', () => {
