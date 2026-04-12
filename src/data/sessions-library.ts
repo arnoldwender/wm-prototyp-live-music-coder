@@ -3926,6 +3926,133 @@ export const SESSIONS_LIBRARY: SessionEntry[] = [
   },
 ]
 
+/* ══════════════════════════════════════════════════════════
+   Piece — Nachtschicht
+   ══════════════════════════════════════════════════════════ */
+
+const NACHTSCHICHT_CODE = `// =============================================
+// "Nachtschicht"
+// Minimalist techno — four-to-the-floor pulse
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+// https://live-music-coder.pro/
+// =============================================
+stack(
+  // Kick: four on the floor
+  s("bd bd bd bd").gain(0.85),
+  // Clap on 2 and 4
+  s("~ cp ~ cp").gain(0.6),
+  // Hi-hats: offbeat 16ths with velocity variation
+  s("hh*16").gain("<0.25 0.45 0.3 0.55>*4"),
+  // Open hat accent
+  s("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [oh ~] ~ ~ ~ ~ ~").gain(0.5),
+  // Bass: driving minor third ostinato
+  note("a1 ~ a1 ~ c2 ~ a1 ~").s("sawtooth")
+    .lpf(sine.range(300, 1200).slow(8)).gain(0.7),
+  // Lead: sparse melodic fragment
+  note("~ ~ ~ ~ ~ ~ ~ ~ a3 c4 e4 ~ a3 ~ e4 ~")
+    .s("triangle").attack(0.03).release(0.2)
+    .room(0.4).gain(0.35)
+)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Morgenrot (Ambient drone, 2026-04-12)
+   ══════════════════════════════════════════════════════════ */
+
+const MORGENROT_AMBIENT_CODE = `// =============================================
+// "Morgenrot"
+// Slow ambient — dawn harmonic drones
+// =============================================
+stack(
+  // Root drone: very slow attack
+  note("c2").s("sine").attack(4).release(8).gain(0.4)
+    .room(0.95).delay(0.5).delaytime(1.5).slow(4),
+  // Fifth: gentle breathing
+  note("<g3 g3 a3 g3>").s("triangle").attack(3).release(6)
+    .gain(0.25).room(0.9).slow(4),
+  // Upper register: sparse crystalline
+  note("~ ~ c5 ~ ~ ~ e5 ~ ~ ~ g5 ~ ~ ~ ~ ~")
+    .s("sine").attack(0.5).release(3)
+    .room(0.99).delay(0.8).gain(0.2),
+  // Texture: FM noise swell
+  note("c3").s("sine").fm(sine.range(0, 4).slow(12))
+    .room(0.8).gain(sine.range(0.05, 0.2).slow(16))
+)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Regenspeicher
+   ══════════════════════════════════════════════════════════ */
+
+const REGENSPEICHER_CODE = `// =============================================
+// "Regenspeicher"
+// Lo-Fi Hip-Hop — tape-saturated grooves
+// =============================================
+stack(
+  // Kick: fat, slightly late
+  s("bd ~ ~ ~ bd ~ ~ ~").gain(0.75),
+  // Snare: on 2 and 4
+  s("~ ~ [sd ~] ~ ~ ~ [sd ~] ~").gain(0.55),
+  // Hi-hats: shuffled 8ths
+  s("hh [hh hh] hh ~ hh [hh hh] hh ~").gain(0.35),
+  // Rhodes-style chords
+  note("<[c4,e4,g4,b4] [a3,c4,e4,g4] [f3,a3,c4,e4] [g3,b3,d4,f4]>")
+    .s("triangle").attack(0.1).release(1.2)
+    .lpf(1800).room(0.3).gain(0.3),
+  // Bass: walking funk line
+  note("c2 ~ e2 ~ f2 ~ g2 ~").s("sine")
+    .attack(0.05).release(0.5).gain(0.6)
+)`
+
+/* Push three new sessions into the library */
+SESSIONS_LIBRARY.push(
+  {
+    slug: 'nachtschicht',
+    title: 'Nachtschicht',
+    subtitle: 'Minimalistischer Techno für lange Nächte',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 138,
+    durationSec: 240,
+    category: 'Techno',
+    shortDescription: 'Four-to-the-floor mit wachsender melodischer Spannung.',
+    composerNotes: 'Eine minimalistische Studie in Geduld. Das Stück beginnt mit dem nackten Raster — Kick, Clap, Hats — und wartet acht Zyklen, bevor die erste melodische Linie erscheint.',
+    movements: [
+      { roman: 'I', name: 'Raster', key: 'A-Moll', bars: 8 },
+      { roman: 'II', name: 'Bass', key: 'A-Moll', bars: 16 },
+      { roman: 'III', name: 'Melodie', key: 'A-Moll', bars: 16 },
+    ],
+    engine: 'strudel',
+    code: NACHTSCHICHT_CODE,
+  },
+  {
+    slug: 'morgenrot-ambient',
+    title: 'Morgenrot',
+    subtitle: 'Harmonische Drohnen zum Tagesanbruch',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 60,
+    durationSec: 300,
+    category: 'Ambient',
+    shortDescription: 'Langsame Drohnen und Obertöne — Musik für den Moment zwischen Nacht und Tag.',
+    composerNotes: 'Kein Rhythmus, keine Struktur außer dem Atem. Die Sinuswellen atmen so langsam, dass man die Bewegung erst im Nachhinein bemerkt.',
+    engine: 'strudel',
+    code: MORGENROT_AMBIENT_CODE,
+  },
+  {
+    slug: 'regenspeicher',
+    title: 'Regenspeicher',
+    subtitle: 'Lo-Fi Groove für graue Nachmittage',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 75,
+    durationSec: 180,
+    category: 'Lo-Fi',
+    shortDescription: 'Rhodes, shuffled Hats und ein warmer Bass — Musik für Nebel und Kaffee.',
+    composerNotes: 'Ein Lo-Fi-Stück, das beim ersten Hören nach fertigem Vintage-Sample klingt, aber vollständig synthesiert ist.',
+    engine: 'strudel',
+    code: REGENSPEICHER_CODE,
+  },
+)
+
 /** Look up a session by slug — used by the detail route. */
 export function getSessionBySlug(slug: string): SessionEntry | undefined {
   return SESSIONS_LIBRARY.find((s) => s.slug === slug)
