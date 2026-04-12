@@ -45,9 +45,14 @@ export interface SessionMovement {
 export type SessionCategory =
   | 'Ambient'
   | 'Blues'
+  | 'Breakbeat'
   | 'Deep Work'
+  | 'Drum & Bass'
   | 'Dub'
+  | 'Dub Techno'
   | 'Electronic'
+  | 'Flamenco'
+  | 'Jazz'
   | 'Lo-Fi'
   | 'Narrative'
   | 'Retro'
@@ -58,9 +63,14 @@ export type SessionCategory =
 export const SESSION_CATEGORIES: SessionCategory[] = [
   'Ambient',
   'Blues',
+  'Breakbeat',
   'Deep Work',
+  'Drum & Bass',
   'Dub',
+  'Dub Techno',
   'Electronic',
+  'Flamenco',
+  'Jazz',
   'Lo-Fi',
   'Narrative',
   'Retro',
@@ -4050,6 +4060,314 @@ SESSIONS_LIBRARY.push(
     composerNotes: 'Ein Lo-Fi-Stück, das beim ersten Hören nach fertigem Vintage-Sample klingt, aber vollständig synthesiert ist.',
     engine: 'strudel',
     code: REGENSPEICHER_CODE,
+  },
+)
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Betonschlucht (Drum & Bass)
+   ══════════════════════════════════════════════════════════ */
+
+const BETONSCHLUCHT_CODE = `// "Betonschlucht" — Neurofunk D&B · 174 BPM
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+
+setcps(174/120/2)
+
+// Reese bass — two detuned saws, slow LFO movement
+$: note("<d1 d1 d1 c1>*4")
+  .s("sawtooth")
+  .add(note(sine.range(-0.1, 0.1).slow(1.5)))
+  .lpf(perlin.range(200, 900).slow(4))
+  .lpq(8)
+  .gain(0.7)
+  .room(0.1)
+
+// Neurofunk break — asymmetric, with ghost notes
+$: s("<[bd ~ ~ ~] [~ sd ~ ~] [bd ~ bd ~] [~ sd ~ sd]>*2")
+  .gain("<0.9 0.6 0.8 0.5>")
+  .speed("<1 1 -1 1>")
+
+// Hi-hats — rapid 16th fragmentation
+$: s("hh*16")
+  .gain(perlin.range(0.1, 0.5))
+  .pan(sine.range(-0.4, 0.4).slow(2))
+
+// Metallic fx layer
+$: s("metal*8")
+  .speed("<2 4 2 8>")
+  .gain(0.2)
+  .room(0.4)
+  .delay(0.3)
+  .delaytime(0.125)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Tiefenwasser (Dub Techno)
+   ══════════════════════════════════════════════════════════ */
+
+const TIEFENWASSER_CODE = `// "Tiefenwasser" — Dub Techno · 128 BPM
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+
+setcps(128/120/2)
+
+// Deep kick — heavy, slightly distorted
+$: s("bd ~ ~ ~ bd ~ ~ ~")
+  .gain(0.85)
+  .speed(0.85)
+
+// Chord stab — dub delay at dotted 8th
+$: note("<[f3,ab3,c4] ~ ~ ~>*2")
+  .s("sawtooth")
+  .lpf(800)
+  .lpq(4)
+  .gain(0.45)
+  .room(0.95)
+  .delay(1)
+  .delaytime(3/8)
+  .delayfeedback(0.65)
+
+// Sub bass — slow movement
+$: note("<f1 ~ c1 ~ eb1 ~ c1 ~>")
+  .s("sine")
+  .gain(0.7)
+  .attack(0.05)
+  .release(0.4)
+
+// Metallic perc — sparse
+$: s("~ ~ hh ~ ~ ~ hh hh")
+  .gain(0.3)
+  .room(0.7)
+  .delay(0.5)
+  .delaytime(0.5)
+  .pan(sine.range(-0.5, 0.5).slow(16))
+
+// Atmospheric wash
+$: note("<f4 ~ ~ ab4>*2")
+  .s("triangle")
+  .room(0.99)
+  .delay(0.8)
+  .delaytime(0.75)
+  .gain(0.15)
+  .attack(0.5)
+  .release(2)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Blaue Stunde (Jazz)
+   ══════════════════════════════════════════════════════════ */
+
+const BLAUE_STUNDE_CODE = `// "Blaue Stunde" — Post-Bop Jazz · 92 BPM
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+
+setcps(92/120/2)
+
+// Piano — chromatisches Wandern um Am7 / Dm9
+$: note("<[a4,c5,e5,g5] ~ [d4,f4,a4,c5] ~ [e4,g4,b4,d5] ~ [a3,c4,e4,g4] ~>")
+  .s("piano")
+  .gain(0.5)
+  .room(0.6)
+  .attack(0.02)
+  .release(0.8)
+
+// Kontrabass — walking line
+$: note("<a2 c3 e3 g2 d2 f2 a2 e2>")
+  .s("bass2")
+  .gain(0.6)
+  .attack(0.04)
+  .release(0.35)
+
+// Brushes / Hi-Hat — swing feel via delaytime offset
+$: s("hh*8")
+  .gain("<0.4 0.25 0.4 0.25 0.4 0.25 0.35 0.2>")
+  .delay(0.1)
+  .delaytime(0.04)
+
+// Snare — brush on 2 and 4
+$: s("~ sd ~ sd")
+  .gain(0.35)
+  .room(0.5)
+
+// Ride cymbal
+$: s("~ ~ cp ~ ~ ~ cp ~")
+  .gain(0.3)
+  .room(0.6)
+  .speed(1.2)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Llanto del Viento (Flamenco)
+   ══════════════════════════════════════════════════════════ */
+
+const LLANTO_DEL_VIENTO_CODE = `// "Llanto del Viento" — Flamenco · 102 BPM
+// Soléares-Compás (12-beat cycle) · A Phrygian
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+
+// Soléares cycle: 12 beats, accents 3,6,8,10,12
+setcps(102/120/2)
+
+// Cajon — Soléares patrón
+$: s("[bd ~ ~ cp ~ ~ bd ~ cp ~ bd ~]/12")
+  .gain("<0.8 0.5 0.7 0.6 0.8 0.5 0.7 0.6 0.7 0.6 0.8 0.55>")
+  .fast(12/4)
+
+// Palmas — handclap on accents 3, 6, 8, 10, 12
+$: s("[~ ~ cp ~ ~ cp ~ cp ~ cp ~ cp]/12")
+  .gain(0.45)
+  .fast(12/4)
+  .room(0.3)
+
+// Guitar — A Phrygian modal melody
+$: note("<a3 ~ bb3 g3 a3 ~ f3 ~ g3 ~ a3 ~>")
+  .s("guitar")
+  .gain(0.55)
+  .room(0.4)
+  .attack(0.01)
+  .release(0.5)
+  .fast(12/4)
+
+// Bass line — root and dominant
+$: note("<a2 ~ ~ ~ e2 ~ ~ ~ a2 ~ ~ ~>")
+  .s("bass")
+  .gain(0.6)
+  .fast(12/4)
+  .attack(0.02)
+  .release(0.25)`
+
+/* ══════════════════════════════════════════════════════════
+   Piece — Rost und Staub (Breakbeat)
+   ══════════════════════════════════════════════════════════ */
+
+const ROST_UND_STAUB_CODE = `// "Rost und Staub" — Industrial Breakbeat · 138 BPM
+// Composed by Claude (claude-sonnet-4-6) · curated by Arnold Wender
+
+setcps(138/120/2)
+
+// Break — amen-style with pitch shifting
+$: s("<[bd ~ sd ~] [bd bd ~ sd] [~ sd bd ~] [bd ~ ~ sd]>")
+  .speed("<1 0.95 1.1 0.9>")
+  .gain("<0.85 0.7 0.8 0.6>")
+
+// Industrial hi-hats
+$: s("hh*8")
+  .gain(perlin.range(0.15, 0.55))
+  .speed(rand.range(0.8, 1.3))
+  .pan(rand.range(-0.4, 0.4))
+
+// Bass — distorted, gritty
+$: note("<e1 ~ g1 ~ e1 d1 ~ ~>")
+  .s("sawtooth")
+  .distort(0.5)
+  .lpf(perlin.range(150, 800).slow(3))
+  .gain(0.65)
+
+// Metal percussion
+$: s("metal*4")
+  .gain("<0.3 0.1 0.25 0.15>")
+  .speed("<4 8 4 16>")
+  .room(0.3)
+  .pan(sine.range(-0.6, 0.6).slow(3))
+
+// Dark synth stab
+$: note("<~ e3 ~ ~>*4")
+  .s("sawtooth")
+  .lpf(400)
+  .gain(0.35)
+  .room(0.5)
+  .delay(0.4)
+  .delaytime(0.25)`
+
+/* Push five new sessions into the library */
+SESSIONS_LIBRARY.push(
+  {
+    slug: 'betonschlucht-dnb',
+    title: 'Betonschlucht',
+    subtitle: 'Neurofunk durch städtische Schluchten',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 174,
+    durationSec: 210,
+    category: 'Drum & Bass',
+    shortDescription: 'Reese-Bass, zerrissene Breaks und metallische Perkussion — Neurofunk aus Stahlbeton.',
+    composerNotes: 'Die Reese-Bass-Welle entsteht durch zwei verstimmte Sägezähne. Das Break-Pattern zerfällt absichtlich — drei von vier Schlägen kommen, der vierte wird verschluckt.',
+    movements: [
+      { roman: 'I', name: 'Break', key: 'D-Moll', bars: 8 },
+      { roman: 'II', name: 'Reese', key: 'D-Moll', bars: 16 },
+      { roman: 'III', name: 'Eskalation', key: 'D-Moll', bars: 16 },
+    ],
+    engine: 'strudel',
+    code: BETONSCHLUCHT_CODE,
+  },
+  {
+    slug: 'tiefenwasser-dubtech',
+    title: 'Tiefenwasser',
+    subtitle: 'Dub Techno aus dem Meeresgrund',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 128,
+    durationSec: 300,
+    category: 'Dub Techno',
+    shortDescription: 'Hallende Akkorde, tiefer Kick und endlose Dub-Delays — Techno aus dem Ozean.',
+    composerNotes: 'Das Stück lebt von einem einzigen Akkord, der durch Hall und Delay zu einer ganzen Unterwasserwelt wird. Die Delays sind so eingestellt, dass sie sich nie vollständig auflösen.',
+    movements: [
+      { roman: 'I', name: 'Tiefe', key: 'F-Moll', bars: 16 },
+      { roman: 'II', name: 'Drift', key: 'F-Moll', bars: 32 },
+    ],
+    engine: 'strudel',
+    code: TIEFENWASSER_CODE,
+  },
+  {
+    slug: 'blaue-stunde-jazz',
+    title: 'Blaue Stunde',
+    subtitle: 'Post-Bop für späte Nächte',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 92,
+    durationSec: 240,
+    category: 'Jazz',
+    shortDescription: 'Chromatische Wanderungen, swingender Kontrabass und ein Klavier, das nie ganz landet.',
+    composerNotes: 'Das Klavier folgt keiner klassischen Chord-Progression — es umkreist Am7 und Dm9, ohne je zu resolvieren. Der Swing entsteht durch subtile Delay-Verschiebungen auf dem Hi-Hat.',
+    movements: [
+      { roman: 'I', name: 'Intro', key: 'A-Moll', bars: 4 },
+      { roman: 'II', name: 'Thema', key: 'A-Moll', bars: 16 },
+      { roman: 'III', name: 'Solo', key: 'D-Moll', bars: 16 },
+      { roman: 'IV', name: 'Coda', key: 'A-Moll', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: BLAUE_STUNDE_CODE,
+  },
+  {
+    slug: 'llanto-del-viento',
+    title: 'Llanto del Viento',
+    subtitle: 'Flamencotechno zwischen Tradition und Algorithmus',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 102,
+    durationSec: 195,
+    category: 'Flamenco',
+    shortDescription: 'Palmas, cajon und eine Gitarre, die Solea atmet — algorithmisch, aber seelenvoll.',
+    composerNotes: 'Soléares-Compás: 12 Schläge mit Akzenten auf 3, 6, 8, 10, 12. Der Cajon spielt das Leichtere (Bombo auf 1 und 5, Golpe auf 3 und 8). Die Gitarre zirkuliert durch Phrygisch.',
+    movements: [
+      { roman: 'I', name: 'Entrada', key: 'A-Phrygisch', bars: 6 },
+      { roman: 'II', name: 'Cuerpo', key: 'A-Phrygisch', bars: 12 },
+      { roman: 'III', name: 'Remate', key: 'A-Phrygisch', bars: 6 },
+    ],
+    engine: 'strudel',
+    code: LLANTO_DEL_VIENTO_CODE,
+  },
+  {
+    slug: 'rost-und-staub',
+    title: 'Rost und Staub',
+    subtitle: 'Industrial Breakbeat aus verlassenen Fabriken',
+    author: { name: 'Claude Sonnet 4.6', kind: 'ai', model: 'claude-sonnet-4-6', curator: 'Arnold Wender' },
+    date: '2026-04-12',
+    bpm: 138,
+    durationSec: 225,
+    category: 'Breakbeat',
+    shortDescription: 'Zerrissene Breaks, metallische Perkussion und ein Bass der vor Schmutz riecht.',
+    composerNotes: 'Das Break-Pattern ist absichtlich "falsch" quantisiert — der Snare liegt 30ms hinter dem Raster, was den Eindruck von mechanischem Versagen erzeugt.',
+    movements: [
+      { roman: 'I', name: 'Anlauf', key: 'E-Moll', bars: 8 },
+      { roman: 'II', name: 'Zerfall', key: 'E-Moll', bars: 16 },
+      { roman: 'III', name: 'Implosion', key: 'E-Moll', bars: 8 },
+    ],
+    engine: 'strudel',
+    code: ROST_UND_STAUB_CODE,
   },
 )
 
