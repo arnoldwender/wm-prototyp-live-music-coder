@@ -517,13 +517,29 @@ export function drawPianoroll(
       ctx.restore();
     }
 
-    /* Note name label on wide bars */
-    if (w > 28 && h > 9) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = `${Math.min(9, h - 3)}px monospace`;
+    /* Note name label — rendered when bar is tall and wide enough to fit text.
+     * Clipped to bar bounds so text never bleeds into adjacent rows. */
+    if (w > 8 && noteHeight >= 10) {
+      const pitchClass = NOTE_NAMES[drawNote % 12];
+      /* C notes get octave suffix (e.g. "C4") for orientation; others just pitch class */
+      const label = pitchClass === 'C'
+        ? 'C' + (Math.floor(drawNote / 12) - 1)
+        : pitchClass;
+      /* Active / pitch-overridden notes use accent color to signal override */
+      const labelColor = (isActive || drawNote !== evt.note)
+        ? VIZ_COLORS.accent
+        : VIZ_COLORS.noteLabelText;
+      ctx.save();
+      /* Clip text to note bar so it never spills outside */
+      ctx.beginPath();
+      ctx.rect(x1, y, w, h);
+      ctx.clip();
+      ctx.fillStyle = labelColor;
+      ctx.font = 'bold ' + Math.min(noteHeight * 0.55, 11) + 'px system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(NOTE_NAMES[drawNote % 12] + (Math.floor(drawNote / 12) - 1), x1 + 4, y + h / 2);
+      ctx.fillText(label, x1 + 4, y + h / 2);
+      ctx.restore();
     }
   }
 
