@@ -605,7 +605,8 @@
     "oscillator": "Oszillator",
     "virtualKeyboard": "Virtuelle Tastatur",
     "collapse": "Einklappen",
-    "expand": "Ausklappen"
+    "expand": "Ausklappen",
+    "settingsSavedAutomatically": "Einstellungen werden automatisch gespeichert"
   },
   "templates": {
     "title": "Wähle eine Startvorlage",
@@ -634,7 +635,8 @@
     "console": "Konsole",
     "settings": "Einstellungen",
     "searchSamples": "Samples durchsuchen",
-    "searchApi": "API durchsuchen"
+    "searchApi": "API durchsuchen",
+    "audioOutputDevice": "Audio-Ausgabegerät"
   },
   "gamification": {
     "achievementUnlocked": "Erfolg freigeschaltet",

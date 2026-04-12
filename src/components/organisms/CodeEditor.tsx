@@ -307,7 +307,7 @@ export function CodeEditor() {
 
       {/* Playing indicator bar — animated gradient line when audio is active */}
       {(isPlaying || isRunning) && (
-        <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label="Playing" />
+        <div className="shrink-0" style={{ height: '3px', background: 'linear-gradient(90deg, var(--color-success), var(--color-primary), var(--color-success))', backgroundSize: '200% 100%', animation: 'playing-indicator 1.5s ease-in-out infinite' }} role="status" aria-label={t('editor.playing')} />
       )}
 
       <div ref={editorRef} className="flex-1 min-h-0 overflow-hidden" />

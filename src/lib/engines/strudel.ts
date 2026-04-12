@@ -28,7 +28,7 @@ export class StrudelEngine extends BaseEngine {
 
     this.replInstance = await initStrudel()
 
-    console.log('[Strudel] Engine initialized via initStrudel()')
+    import.meta.env.DEV && console.log('[Strudel] Engine initialized via initStrudel()')
   }
 
   /** Evaluate Strudel code using the repl's built-in evaluate().

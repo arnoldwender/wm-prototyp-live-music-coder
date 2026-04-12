@@ -6,6 +6,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { EDITOR_THEMES } from '../../lib/editor/themes';
 import { useAppStore } from '../../lib/store';
@@ -56,6 +57,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanelProps) {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<EditorSettings>(loadSettings);
   const setEditorTheme = useAppStore((s) => s.setEditorTheme);
   const setVimMode = useAppStore((s) => s.setVimMode);
@@ -197,7 +199,7 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
             textAlign: 'center',
           }}
         >
-          Settings are saved automatically
+          {t('editor.settingsSavedAutomatically')}
         </div>
       </div>
     </div>

@@ -13,10 +13,10 @@
 export async function loadXen(): Promise<boolean> {
   try {
     await import('@strudel/xen');
-    console.log('[Strudel] @strudel/xen loaded (microtonal)');
+    import.meta.env.DEV && console.log('[Strudel] @strudel/xen loaded (microtonal)');
     return true;
   } catch {
-    console.warn('[Strudel] @strudel/xen not available');
+    import.meta.env.DEV && console.warn('[Strudel] @strudel/xen not available');
     return false;
   }
 }
@@ -25,10 +25,10 @@ export async function loadXen(): Promise<boolean> {
 export async function loadSoundfonts(): Promise<boolean> {
   try {
     await import('@strudel/soundfonts');
-    console.log('[Strudel] @strudel/soundfonts loaded');
+    import.meta.env.DEV && console.log('[Strudel] @strudel/soundfonts loaded');
     return true;
   } catch {
-    console.warn('[Strudel] @strudel/soundfonts not available');
+    import.meta.env.DEV && console.warn('[Strudel] @strudel/soundfonts not available');
     return false;
   }
 }
@@ -37,10 +37,10 @@ export async function loadSoundfonts(): Promise<boolean> {
 export async function loadOSC(): Promise<boolean> {
   try {
     await import('@strudel/osc');
-    console.log('[Strudel] @strudel/osc loaded');
+    import.meta.env.DEV && console.log('[Strudel] @strudel/osc loaded');
     return true;
   } catch {
-    console.warn('[Strudel] @strudel/osc not available');
+    import.meta.env.DEV && console.warn('[Strudel] @strudel/osc not available');
     return false;
   }
 }
@@ -49,10 +49,10 @@ export async function loadOSC(): Promise<boolean> {
 export async function loadSerial(): Promise<boolean> {
   try {
     await import('@strudel/serial');
-    console.log('[Strudel] @strudel/serial loaded');
+    import.meta.env.DEV && console.log('[Strudel] @strudel/serial loaded');
     return true;
   } catch {
-    console.warn('[Strudel] @strudel/serial not available');
+    import.meta.env.DEV && console.warn('[Strudel] @strudel/serial not available');
     return false;
   }
 }
@@ -140,7 +140,7 @@ let isClockLeader = false;
  */
 export function initClockSync(): void {
   if (typeof BroadcastChannel === 'undefined') {
-    console.warn('[ClockSync] BroadcastChannel not available');
+    import.meta.env.DEV && console.warn('[ClockSync] BroadcastChannel not available');
     return;
   }
 
@@ -165,7 +165,7 @@ export function initClockSync(): void {
       case 'sync':
         /* Receive clock sync from leader */
         if (!isClockLeader) {
-          console.log('[ClockSync] Synced to leader');
+          import.meta.env.DEV && console.log('[ClockSync] Synced to leader');
         }
         break;
       case 'bpm':
@@ -181,7 +181,7 @@ export function initClockSync(): void {
   setTimeout(() => {
     if (!isClockLeader) {
       isClockLeader = true;
-      console.log('[ClockSync] This tab is now the clock leader');
+      import.meta.env.DEV && console.log('[ClockSync] This tab is now the clock leader');
     }
   }, 500);
 }
@@ -240,7 +240,7 @@ export function ensureAllFunction(): void {
     import('@strudel/core').then((core: any) => {
       if (typeof core.all === 'function') {
         (globalThis as any).all = core.all;
-        console.log('[Strudel] all() function registered globally');
+        import.meta.env.DEV && console.log('[Strudel] all() function registered globally');
       }
     }).catch(() => {});
   } catch {
@@ -274,5 +274,5 @@ export async function loadAllExtensions(): Promise<void> {
   (globalThis as any).setParam = setParam;
   (globalThis as any).getParam = getParam;
 
-  console.log('[Strudel] All extensions loaded');
+  import.meta.env.DEV && console.log('[Strudel] All extensions loaded');
 }

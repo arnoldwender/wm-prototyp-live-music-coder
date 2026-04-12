@@ -1007,7 +1007,7 @@ export function SettingsPanel() {
     <div style={{ padding: 'var(--space-3)', display: 'flex', flexDirection: 'column' as const, gap: 'var(--space-4)' }}>
       {/* Audio output device */}
       <div>
-        <label style={labelStyle}>Audio Output Device</label>
+        <label style={labelStyle}>{t('sidePanel.audioOutputDevice')}</label>
         <select
           value={selectedDevice}
           onChange={(e) => handleDeviceChange(e.target.value)}
