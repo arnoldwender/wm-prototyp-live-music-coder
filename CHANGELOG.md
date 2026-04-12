@@ -7,6 +7,13 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- **Synth UI Phase 2 — Knob, FilterCurve, FilterControl** ([#46](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/46)) — Added three new components: a Knob atom (SVG 270° arc, pointer-drag coarse,
+- **Synth UI Phase 1 — VirtualKeyboard, OscillatorSelector, SynthPanel** ([#45](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/45)) — Added an on-screen virtual keyboard and synth controls panel.
+
 ## [1.0.2] - 2026-04-11
 
 ### Added
