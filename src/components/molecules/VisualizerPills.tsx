@@ -67,7 +67,7 @@ export function VisualizerPills() {
               alignItems: 'center',
               gap: 'var(--space-1)',
               padding: 'var(--space-1) var(--space-3)',
-              fontSize: '11px',
+              fontSize: 'var(--font-size-ui)',
               fontWeight: active ? 600 : 500,
               minHeight: '32px',
               color: active ? 'var(--color-text)' : 'var(--color-text-muted)',

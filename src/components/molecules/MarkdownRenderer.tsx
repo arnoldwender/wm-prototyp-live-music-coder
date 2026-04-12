@@ -316,7 +316,7 @@ const styles: Record<string, CSSProperties> = {
     position: 'absolute',
     top: 'var(--space-xs)',
     right: 'var(--space-sm)',
-    fontSize: '10px',
+    fontSize: 'var(--font-size-2xs)',
     color: 'var(--color-text-muted, var(--color-text-secondary))',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',

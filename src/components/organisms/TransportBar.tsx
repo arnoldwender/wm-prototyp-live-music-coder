@@ -240,7 +240,7 @@ function TransportBar() {
           <label className="flex items-center gap-2">
             <span
               style={{
-                fontSize: '11px',
+                fontSize: 'var(--font-size-ui)',
                 color: 'var(--color-text-muted)',
                 fontWeight: 500,
               }}
@@ -259,7 +259,7 @@ function TransportBar() {
                 width: '56px',
                 backgroundColor: 'var(--color-bg-elevated)',
                 color: 'var(--color-text)',
-                fontSize: '11px',
+                fontSize: 'var(--font-size-ui)',
                 fontWeight: 700,
                 fontFamily: 'var(--font-family-mono)',
                 padding: 'var(--space-2) var(--space-3)',

@@ -128,7 +128,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
                 <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--color-text)' }}>
                   {tmpl.name}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 'var(--font-size-ui)', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {tmpl.description}
                 </div>
               </div>

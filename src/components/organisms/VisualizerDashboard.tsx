@@ -44,7 +44,7 @@ export function VisualizerDashboard() {
         {activePanels.length === 0 ? (
           <div
             className="flex-1 flex items-center justify-center"
-            style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', fontSize: '11px' }}
+            style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-ui)' }}
           >
             {t('panels.noVisualizers')}
           </div>

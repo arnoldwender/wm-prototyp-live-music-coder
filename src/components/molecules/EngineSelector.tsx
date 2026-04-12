@@ -225,7 +225,7 @@ freqs.forEach((freq, i) => {
                     </span>
                   </div>
                   <div style={{
-                    fontSize: '11px',
+                    fontSize: 'var(--font-size-ui)',
                     color: 'var(--color-text-muted)',
                     marginTop: '1px',
                   }}>
@@ -244,7 +244,7 @@ freqs.forEach((freq, i) => {
           {/* MIDI warning at bottom */}
           {defaultEngine === 'midi' && (
             <div style={{
-              fontSize: '11px',
+              fontSize: 'var(--font-size-ui)',
               color: 'var(--color-warning)',
               padding: 'var(--space-2) var(--space-4)',
               borderTop: '1px solid var(--color-border)',

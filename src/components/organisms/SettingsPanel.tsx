@@ -160,9 +160,10 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
                 step={1}
                 value={settings.fontSize}
                 onChange={(e) => update('fontSize', Number(e.target.value))}
+                aria-label="Font Size"
                 style={{ width: '120px' }}
               />
-              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)', minWidth: '30px' }}>
+              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)', minWidth: '30px' }}>
                 {settings.fontSize}px
               </span>
             </div>
@@ -170,19 +171,19 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
 
           {/* Toggles */}
           <SettingRow label="Line Numbers">
-            <Toggle checked={settings.lineNumbers} onChange={(v) => update('lineNumbers', v)} />
+            <Toggle aria-label="Line Numbers" checked={settings.lineNumbers} onChange={(v) => update('lineNumbers', v)} />
           </SettingRow>
 
           <SettingRow label="Word Wrap">
-            <Toggle checked={settings.wordWrap} onChange={(v) => update('wordWrap', v)} />
+            <Toggle aria-label="Word Wrap" checked={settings.wordWrap} onChange={(v) => update('wordWrap', v)} />
           </SettingRow>
 
           <SettingRow label="Vim Mode">
-            <Toggle checked={settings.vimMode} onChange={(v) => update('vimMode', v)} />
+            <Toggle aria-label="Vim Mode" checked={settings.vimMode} onChange={(v) => update('vimMode', v)} />
           </SettingRow>
 
           <SettingRow label="Zen Mode">
-            <Toggle checked={settings.zenMode} onChange={(v) => update('zenMode', v)} />
+            <Toggle aria-label="Zen Mode" checked={settings.zenMode} onChange={(v) => update('zenMode', v)} />
           </SettingRow>
         </div>
 
@@ -191,7 +192,7 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
           style={{
             padding: 'var(--space-3) var(--space-5)',
             borderTop: '1px solid var(--color-border)',
-            fontSize: '11px',
+            fontSize: 'var(--font-size-ui)',
             color: 'var(--color-text-muted)',
             textAlign: 'center',
           }}
@@ -214,12 +215,13 @@ function SettingRow({ label, children }: { label: string; children: React.ReactN
   );
 }
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ checked, onChange, 'aria-label': ariaLabel }: { checked: boolean; onChange: (v: boolean) => void; 'aria-label'?: string }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       style={{
         width: '36px',
@@ -249,7 +251,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 }
 
 const selectStyle: React.CSSProperties = {
-  fontSize: '12px',
+  fontSize: 'var(--font-size-xs)',
   fontFamily: 'var(--font-family-sans)',
   color: 'var(--color-text)',
   backgroundColor: 'var(--color-bg-elevated)',

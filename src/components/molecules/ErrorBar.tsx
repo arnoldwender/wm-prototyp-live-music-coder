@@ -56,7 +56,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           fontWeight: 'var(--font-weight-bold)',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          fontSize: '10px',
+          fontSize: 'var(--font-size-2xs)',
           textShadow: '0 0 8px rgba(239,68,68,0.6), 2px 0 rgba(239,68,68,0.3), -2px 0 rgba(59,130,246,0.3)', /* overlay — no token equivalent */
           flexShrink: 0,
         }}>
@@ -77,7 +77,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
         {/* Error title */}
         <span className="flex-1 truncate" style={{
           color: 'var(--color-text)',
-          fontSize: '12px',
+          fontSize: 'var(--font-size-xs)',
         }}>
           {friendly ? friendly.title : error}
         </span>
@@ -87,6 +87,8 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           <button
             type="button"
             onClick={() => setShowHelp(!showHelp)}
+            aria-expanded={showHelp ? 'true' : 'false'}
+            aria-controls="error-help-panel"
             style={{
               background: showHelp ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)' : 'transparent',
               border: '1px solid',
@@ -94,7 +96,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
               borderRadius: 'var(--radius-sm)',
               color: showHelp ? 'var(--color-primary)' : 'var(--color-text-muted)',
               cursor: 'pointer',
-              fontSize: '10px',
+              fontSize: 'var(--font-size-2xs)',
               padding: '2px var(--space-2)',
               flexShrink: 0,
               fontFamily: 'var(--font-family-mono)',
@@ -116,7 +118,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             border: 'none',
             color: 'var(--color-text-muted)',
             cursor: 'pointer',
-            fontSize: '14px',
+            fontSize: 'var(--font-size-sm)',
             lineHeight: 1,
             padding: '2px',
             flexShrink: 0,
@@ -132,6 +134,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
       {/* Expanded help — terminal-style diagnostics */}
       {friendly && showHelp && (
         <div
+          id="error-help-panel"
           style={{
             padding: '0 var(--space-4) var(--space-3)',
             position: 'relative',
@@ -142,7 +145,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           <div style={{
             color: 'var(--color-text-secondary)',
             fontFamily: 'var(--font-family-mono)',
-            fontSize: '11px',
+            fontSize: 'var(--font-size-ui)',
             lineHeight: '1.6',
             padding: 'var(--space-2) 0',
           }}>
@@ -154,7 +157,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           <div style={{
             color: 'var(--color-success)',
             fontFamily: 'var(--font-family-mono)',
-            fontSize: '11px',
+            fontSize: 'var(--font-size-ui)',
             backgroundColor: 'color-mix(in srgb, var(--color-success) 8%, transparent)',
             padding: 'var(--space-2) var(--space-3)',
             borderRadius: 'var(--radius-sm)',
@@ -169,7 +172,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
           <details style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
             <summary style={{
               cursor: 'pointer',
-              fontSize: '10px',
+              fontSize: 'var(--font-size-2xs)',
               letterSpacing: '0.05em',
               textTransform: 'uppercase',
               userSelect: 'none',
@@ -178,7 +181,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             </summary>
             <code style={{
               display: 'block',
-              fontSize: '10px',
+              fontSize: 'var(--font-size-2xs)',
               wordBreak: 'break-all',
               color: 'var(--color-text-muted)',
               padding: 'var(--space-2) 0',
