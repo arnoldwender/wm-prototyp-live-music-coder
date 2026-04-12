@@ -57,4 +57,12 @@ export const VIZ_COLORS = {
   gridDim: 'rgba(63, 63, 70, 0.4)',
   gridMid: 'rgba(63, 63, 70, 0.25)',
   gridFaint: 'rgba(63, 63, 70, 0.15)',
+  gridCLine: 'rgba(63, 63, 70, 0.35)',
+
+  /* Note row backgrounds */
+  keysWhiteKey: '#1c1c22',
+  rowBlackKeyBg: 'rgba(0, 0, 0, 0.12)',
+
+  /* Velocity lane */
+  velLaneBg: 'rgba(0, 0, 0, 0.35)',
 } as const;
