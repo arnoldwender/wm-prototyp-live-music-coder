@@ -126,7 +126,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Vite dev server (localhost:5173) |
-| `npm run build` | TypeScript + Vite production build |
+| `npm run build` | TypeScript + Vite production build (runs `postbuild` automatically) |
 | `npm run test` | Run all tests (Vitest) |
 | `npm run test:watch` | Watch mode |
 | `npm run lint` | ESLint |
