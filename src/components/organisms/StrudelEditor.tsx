@@ -390,6 +390,8 @@ export function StrudelEditor() {
     return () => {
       mounted = false;
       replRef.current?.stop();
+      /* Stop gamepad RAF loop on unmount to avoid dangling requestAnimationFrame */
+      import('../../lib/input/gamepad').then(({ stopGamepadPolling }) => stopGamepadPolling()).catch(() => {});
     };
   }, []);
 
@@ -773,7 +775,7 @@ export function StrudelEditor() {
                 {/* Device info header */}
                 <div
                   className="px-3 py-1.5"
-                  style={{ fontSize: '10px', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }}
+                  style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }}
                 >
                   <Piano size={10} className="inline mr-1" style={{ color: 'var(--color-success)' }} />
                   {midiDeviceName}
@@ -849,7 +851,7 @@ export function StrudelEditor() {
                 {/* Sound Browser — audition Strudel sounds via MIDI keyboard */}
                 <div
                   className="px-3 py-1"
-                  style={{ fontSize: '10px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                   <Volume2 size={10} />
                   Sound Browser

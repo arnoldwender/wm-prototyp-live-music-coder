@@ -620,7 +620,8 @@
     "loadFromGist": "Aus Gist laden",
     "saving": "Speichern...",
     "loading": "Laden...",
-    "clear": "Löschen"
+    "clear": "Löschen",
+    "rememberWarning": "Token wird unverschlüsselt im Browser gespeichert"
   },
   "legal": {
     "impressum": "Impressum",
@@ -631,7 +632,9 @@
     "samples": "Samples",
     "reference": "Referenz",
     "console": "Konsole",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "searchSamples": "Samples durchsuchen",
+    "searchApi": "API durchsuchen"
   },
   "gamification": {
     "achievementUnlocked": "Erfolg freigeschaltet",

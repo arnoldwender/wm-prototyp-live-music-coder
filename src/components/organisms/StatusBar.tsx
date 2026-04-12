@@ -35,7 +35,7 @@ function XpBar() {
     <span
       style={{
         fontFamily: 'var(--font-family-mono)',
-        fontSize: '11px',
+        fontSize: 'var(--font-size-ui)',
         color: 'var(--color-text-muted)',
         display: 'inline-flex',
         alignItems: 'center',
@@ -60,8 +60,13 @@ function XpBar() {
           verticalAlign: 'middle',
         }}
       >
-        {/* Progress bar fill */}
+        {/* Progress bar fill — role="progressbar" for screen readers */}
         <span
+          role="progressbar"
+          aria-valuenow={Math.round(progress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="XP Fortschritt"
           style={{
             display: 'block',
             width: `${Math.round(progress * 100)}%`,
@@ -96,7 +101,7 @@ function StatusBar() {
         borderTop: '1px solid var(--color-border)',
         padding: '0 12px',
         height: '24px',
-        fontSize: '11px',
+        fontSize: 'var(--font-size-ui)',
         color: 'var(--color-text-muted)',
         fontFamily: 'var(--font-family-mono)',
         whiteSpace: 'nowrap',
@@ -154,12 +159,12 @@ function StatusBar() {
       >
         <XpBar />
         {/* What's New link — discoverability for new features */}
-        <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: '10px', fontWeight: 'var(--font-weight-medium)' }}>What's New</Link>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>|</span>
+        <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)', fontWeight: 'var(--font-weight-medium)' }}>What's New</Link>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>|</span>
         {/* Legal links — TMG requires Impressum reachable from every page */}
-        <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '10px' }}>Impressum</Link>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: '10px' }}>|</span>
-        <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '10px' }}>Datenschutz</Link>
+        <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}>Impressum</Link>
+        <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>|</span>
+        <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}>Datenschutz</Link>
       </div>
     </footer>
   )

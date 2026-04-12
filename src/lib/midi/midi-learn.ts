@@ -81,12 +81,14 @@ function handleMidiMessage(e: Event): void {
 
   /* If we're in learn mode, bind this CC to the target parameter */
   if (state.learning && state.targetParam !== null) {
-    state.mappings[state.targetParam] = cc
+    /* Save param name before nullifying — avoids stale-closure log ("null") */
+    const mappedParam = state.targetParam
+    state.mappings[mappedParam] = cc
     state.learning = false
     state.targetParam = null
     saveMappings()
     notify()
-    console.log(`[MidiLearn] Mapped CC ${cc} → "${state.targetParam}"`)
+    console.log(`[MidiLearn] Mapped CC ${cc} → "${mappedParam}"`)
   }
 }
 
