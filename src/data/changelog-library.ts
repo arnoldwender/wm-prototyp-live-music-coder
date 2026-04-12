@@ -53,6 +53,41 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
 
+  /* ── Synth UI: Phase 1 + Phase 2 ────────────────────── */
+
+  {
+    date: '2026-04-12',
+    title: 'Synth UI Phase 2 — Knob, FilterCurve, FilterControl',
+    category: 'feature',
+    body: [
+      'Added three new components: a Knob atom (SVG 270° arc, pointer-drag coarse,',
+      'Shift+drag fine, double-click reset), a FilterCurve atom (Canvas frequency',
+      'response 20Hz–20kHz log scale, colors from CSS design tokens), and a',
+      'FilterControl molecule (cutoff + resonance knobs, LP/HP/BP/Notch type',
+      'buttons, live curve). Audio path: a BiquadFilterNode is inserted per-note',
+      'in playOscillatorNote via setLmcFilter (window.__lmcSetFilter). Zustand',
+      'stores synthFilterType, synthFilterCutoff, synthFilterResonance.',
+      '19 new tests across 3 test files.',
+    ].join('\n'),
+    pr: 46,
+  },
+  {
+    date: '2026-04-12',
+    title: 'Synth UI Phase 1 — VirtualKeyboard, OscillatorSelector, SynthPanel',
+    category: 'feature',
+    body: [
+      'Added an on-screen virtual keyboard and synth controls panel.',
+      'VirtualKeyboard atom: 2-octave piano, QWERTY key mapping (a/w/s/e/d…),',
+      'velocity from Y-position. OscillatorSelector molecule: 4 waveform radio',
+      'buttons (sine/saw/square/triangle). SynthPanel organism: collapsible panel',
+      'shown when a MIDI device is connected. WaveformIcon atom: SVG path icons',
+      'for waveform types. Physical MIDI keyboard and VirtualKeyboard share the',
+      'same playOscillatorNote path via window.__lmcPlayNote.',
+      '15 new tests across 4 test files.',
+    ].join('\n'),
+    pr: 45,
+  },
+
   /* ── v1.0.2 sprint: MIDI keyboard + Strudel parity ───── */
 
   {
