@@ -242,6 +242,112 @@ s("bd hh sd hh")._punchcard()` },
     ],
   },
 
+  /* 11. Editor Tour */
+  {
+    id: 'editor-tour',
+    titleKey: 'docs.editorTour.title',
+    content: [
+      { type: 'text', contentKey: 'docs.editorTour.intro' },
+      { type: 'heading', contentKey: 'docs.editorTour.transportHeading' },
+      { type: 'list', items: [
+        'docs.editorTour.transportPlay',
+        'docs.editorTour.transportBpm',
+        'docs.editorTour.transportRecord',
+        'docs.editorTour.transportLive',
+        'docs.editorTour.transportClear',
+      ]},
+      { type: 'heading', contentKey: 'docs.editorTour.tabsHeading' },
+      { type: 'text', contentKey: 'docs.editorTour.tabsText' },
+      { type: 'heading', contentKey: 'docs.editorTour.visualizersHeading' },
+      { type: 'text', contentKey: 'docs.editorTour.visualizersText' },
+      { type: 'heading', contentKey: 'docs.editorTour.sidebarHeading' },
+      { type: 'list', items: [
+        'docs.editorTour.sidebarSamples',
+        'docs.editorTour.sidebarMidi',
+        'docs.editorTour.sidebarSettings',
+        'docs.editorTour.sidebarConsole',
+        'docs.editorTour.sidebarGist',
+      ]},
+    ],
+  },
+
+  /* 12. MIDI Setup */
+  {
+    id: 'midi-setup',
+    titleKey: 'docs.midiSetup.title',
+    content: [
+      { type: 'text', contentKey: 'docs.midiSetup.intro' },
+      { type: 'heading', contentKey: 'docs.midiSetup.connectionHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.connectionText' },
+      { type: 'heading', contentKey: 'docs.midiSetup.verifiedHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.verifiedText' },
+      { type: 'list', items: [
+        'docs.midiSetup.verifiedMpk',
+        'docs.midiSetup.verifiedOther',
+      ]},
+      { type: 'heading', contentKey: 'docs.midiSetup.synthModeHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.synthModeText' },
+      { type: 'heading', contentKey: 'docs.midiSetup.midikeysHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.midikeysText' },
+      { type: 'code', code: `// Play notes from your MIDI keyboard through a synth
+note(midikeys()).s("sawtooth").lpf(800).room(0.3)` },
+      { type: 'heading', contentKey: 'docs.midiSetup.midinHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.midinText' },
+      { type: 'code', code: `// CC 1 (mod wheel) controls filter cutoff in real time
+note("c2 e2 g2").s("sawtooth")
+  .lpf(midin(1, 200, 5000))` },
+      { type: 'heading', contentKey: 'docs.midiSetup.composeModeHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.composeModeText' },
+      { type: 'heading', contentKey: 'docs.midiSetup.learnHeading' },
+      { type: 'text', contentKey: 'docs.midiSetup.learnText' },
+    ],
+  },
+
+  /* 13. Live Coding Tips */
+  {
+    id: 'live-coding',
+    titleKey: 'docs.liveCoding.title',
+    content: [
+      { type: 'text', contentKey: 'docs.liveCoding.intro' },
+      { type: 'heading', contentKey: 'docs.liveCoding.liveModeHeading' },
+      { type: 'text', contentKey: 'docs.liveCoding.liveModeText' },
+      { type: 'heading', contentKey: 'docs.liveCoding.mutingHeading' },
+      { type: 'text', contentKey: 'docs.liveCoding.mutingText' },
+      { type: 'code', code: `// Prefix with _$: to mute a pattern without deleting it
+_$: note("c3 e3 g3").s("sawtooth")
+$: sound("bd sd hh sd")` },
+      { type: 'heading', contentKey: 'docs.liveCoding.soloMuteHeading' },
+      { type: 'text', contentKey: 'docs.liveCoding.soloMuteText' },
+      { type: 'list', items: [
+        'docs.liveCoding.altSolo',
+        'docs.liveCoding.shiftAltMute',
+      ]},
+      { type: 'heading', contentKey: 'docs.liveCoding.stackingHeading' },
+      { type: 'text', contentKey: 'docs.liveCoding.stackingText' },
+      { type: 'code', code: `// Label each layer so you can solo/mute by number
+$d1: sound("bd ~ sd ~")
+$d2: sound("hh*8").gain(0.3)
+$d3: note("c2 e2").s("sawtooth").lpf(400)` },
+    ],
+  },
+
+  /* 14. Sharing & Saving */
+  {
+    id: 'sharing-saving',
+    titleKey: 'docs.sharing.title',
+    content: [
+      { type: 'text', contentKey: 'docs.sharing.intro' },
+      { type: 'heading', contentKey: 'docs.sharing.urlHeading' },
+      { type: 'text', contentKey: 'docs.sharing.urlText' },
+      { type: 'heading', contentKey: 'docs.sharing.gistHeading' },
+      { type: 'text', contentKey: 'docs.sharing.gistText' },
+      { type: 'heading', contentKey: 'docs.sharing.downloadHeading' },
+      { type: 'text', contentKey: 'docs.sharing.downloadText' },
+      { type: 'heading', contentKey: 'docs.sharing.sessionsHeading' },
+      { type: 'text', contentKey: 'docs.sharing.sessionsText' },
+    ],
+  },
+
   /* 10. Settings & Preferences */
   {
     id: 'settings',
