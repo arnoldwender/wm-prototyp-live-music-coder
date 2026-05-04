@@ -18,6 +18,7 @@ import {
   loadFromGist,
   parseGistId,
 } from '../../lib/persistence/gist'
+import { safeJsonParse } from '../../lib/persistence/local'
 import { Button } from '../atoms'
 import type { Project } from '../../types/project'
 
@@ -36,7 +37,8 @@ export function GistDialog({ onClose }: GistDialogProps) {
   const [gistUrl, setGistUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [savedGists, setSavedGists] = useState<{ id: string; url: string; date: string }[]>(() => {
-    try { return JSON.parse(localStorage.getItem('lmc-saved-gists') || '[]') } catch { return [] }
+    const raw = localStorage.getItem('lmc-saved-gists') || '[]';
+    return safeJsonParse(raw, [])
   })
 
   const backdropRef = useRef<HTMLDivElement>(null)
@@ -357,7 +359,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
                   <button
                     type="button"
                     onClick={() => { setGistInput(g.url); }}
-                    title="Load this gist"
+                    title={t('gist.loadThisGist')}
                     style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', marginLeft: 'var(--space-2)' }}
                   >
                     Load

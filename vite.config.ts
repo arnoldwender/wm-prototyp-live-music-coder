@@ -33,6 +33,7 @@ export default defineConfig({
       '@strudel/midi',
       '@strudel/draw',
       '@strudel/codemirror',
+      '@strudel/xen',
       'superdough',
     ],
   },

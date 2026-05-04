@@ -637,7 +637,15 @@
     "saving": "Saving...",
     "loading": "Loading...",
     "clear": "Clear",
-    "rememberWarning": "Stores token in browser storage (unencrypted)"
+    "rememberWarning": "Stores token in browser storage (unencrypted)",
+    "loadThisGist": "Load this gist"
+  },
+  "pianoroll": {
+    "zoomInTime": "Zoom in (time)",
+    "zoomOutTime": "Zoom out (time)",
+    "zoomInPitch": "Zoom in (pitch)",
+    "zoomOutPitch": "Zoom out (pitch)",
+    "resetView": "Reset zoom and pan"
   },
   "legal": {
     "impressum": "Impressum",
@@ -651,7 +659,14 @@
     "settings": "Settings",
     "searchSamples": "Search samples",
     "searchApi": "Search API",
-    "audioOutputDevice": "Audio Output Device"
+    "audioOutputDevice": "Audio Output Device",
+    "closePanel": "Close panel",
+    "audioDefault": "Default",
+    "keybindingsLabel": "Keybindings",
+    "keybindingDefault": "CodeMirror (Default)",
+    "keybindingVim": "Vim",
+    "keybindingEmacs": "Emacs",
+    "keybindingVscode": "VS Code"
   },
   "gamification": {
     "achievementUnlocked": "Achievement Unlocked",

@@ -51,7 +51,7 @@ export async function importSampleFiles(files: FileList | File[]): Promise<strin
       const url = URL.createObjectURL(file);
 
       /* Register with Strudel's sample system via REPL evaluate */
-      const repl = (window as any).__strudelRepl;
+      const repl = window.__strudelRepl;
       if (repl) {
         await repl.evaluate(
           `samples({ ${name}: [{ url: '${url}' }] })`,

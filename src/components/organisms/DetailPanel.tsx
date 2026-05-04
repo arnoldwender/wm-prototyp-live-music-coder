@@ -13,6 +13,7 @@ import { useMediaQuery } from '../../lib/useMediaQuery';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 import { MidiPanel } from './MidiPanel';
 import { loadFromGist } from '../../lib/persistence/gist';
+import { safeJsonParse } from '../../lib/persistence/local';
 
 /* Saved Gists list — reads from localStorage */
 function SavedGistsList() {
@@ -20,7 +21,8 @@ function SavedGistsList() {
   const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    try { setGists(JSON.parse(localStorage.getItem('lmc-saved-gists') || '[]')); } catch { /* empty */ }
+    const raw = localStorage.getItem('lmc-saved-gists') || '[]';
+    setGists(safeJsonParse(raw, []) as { id: string; url: string; date: string }[]);
   }, []);
 
   const handleLoad = async (gistId: string) => {

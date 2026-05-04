@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawSpiral } from '../../lib/visualizers/spiral';
 
-function getRepl() { return (window as any).__strudelRepl ?? null; }
+function getRepl() { return window.__strudelRepl ?? null; }
 
 export function SpiralVisualizer() {
   const draw = useCallback(

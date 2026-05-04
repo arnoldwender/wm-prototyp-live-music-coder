@@ -9,6 +9,7 @@
    ────────────────────────────────────────────────────────── */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { safeJsonParse } from '../persistence/local'
 
 /** Reactive state exposed to consumers */
 export interface MidiLearnState {
@@ -40,10 +41,8 @@ const attachedInputs = new Set<string>()
 
 /** Load mappings from localStorage */
 function loadMappings(): Record<string, number> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as Record<string, number>
-  } catch { /* corrupt data — start fresh */ }
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (raw) return safeJsonParse<Record<string, number>>(raw, {})
   return {}
 }
 

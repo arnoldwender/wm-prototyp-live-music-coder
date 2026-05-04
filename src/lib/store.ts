@@ -10,6 +10,7 @@ import { create } from 'zustand'
 import type { EngineType } from '../types/engine'
 import type { PanelLayout, ProjectFile } from '../types/project'
 import { DEFAULT_BPM, MIN_BPM, MAX_BPM, DEFAULT_ENGINE, DEFAULT_LAYOUT } from './constants'
+import { safeJsonParse } from './persistence/local'
 
 /** Toast data for achievement notifications */
 export interface ToastData {
@@ -52,8 +53,8 @@ function calculateLevel(xp: number): number {
 function loadStreak(): StreakState {
   try {
     const raw = localStorage.getItem('lmc-streak')
-    if (raw) return JSON.parse(raw)
-  } catch { /* ignore parse errors */ }
+    if (raw) return safeJsonParse(raw, { current: 0, lastActiveDate: null })
+  } catch { /* unavailable in test/SSR environments */ }
   return { current: 0, lastActiveDate: null }
 }
 
@@ -180,13 +181,16 @@ function loadEditorSettingsForStore(): { editorTheme: string; vimMode: boolean }
   try {
     const raw = localStorage.getItem('lmc-editor-settings')
     if (raw) {
-      const parsed = JSON.parse(raw)
-      return {
-        editorTheme: typeof parsed.themeId === 'string' ? parsed.themeId : 'purple',
-        vimMode: typeof parsed.vimMode === 'boolean' ? parsed.vimMode : false,
+      const parsed = safeJsonParse(raw, null)
+      if (parsed && typeof parsed === 'object') {
+        const p = parsed as Record<string, unknown>
+        return {
+          editorTheme: typeof p.themeId === 'string' ? p.themeId : 'purple',
+          vimMode: typeof p.vimMode === 'boolean' ? p.vimMode : false,
+        }
       }
     }
-  } catch { /* corrupted storage */ }
+  } catch { /* unavailable in test/SSR environments */ }
   return { editorTheme: 'purple', vimMode: false }
 }
 

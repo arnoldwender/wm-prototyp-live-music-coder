@@ -6,6 +6,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawPianoroll } from '../../lib/visualizers/pianoroll';
 import type { NoteEvent } from '../../lib/visualizers/pianoroll';
@@ -38,6 +39,7 @@ const ZOOM_MAX = 6;
 const DRAG_SENSITIVITY = 0.004;
 
 export function PianorollVisualizer() {
+  const { t } = useTranslation();
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
   const [timeOffset, setTimeOffset] = useState(0);
@@ -277,17 +279,17 @@ export function PianorollVisualizer() {
         style={{ position: 'absolute', top: 'var(--space-2)', right: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', zIndex: 10 }}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <button style={btnStyle} title="Zoom in (time)" aria-label="Zoom in time axis"
+        <button style={btnStyle} title={t('pianoroll.zoomInTime')} aria-label={t('pianoroll.zoomInTime')}
           onClick={() => setZoomX((z) => Math.min(ZOOM_MAX, z * ZOOM_STEP))}>+T</button>
-        <button style={btnStyle} title="Zoom out (time)" aria-label="Zoom out time axis"
+        <button style={btnStyle} title={t('pianoroll.zoomOutTime')} aria-label={t('pianoroll.zoomOutTime')}
           onClick={() => setZoomX((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP))}>−T</button>
         <span aria-hidden="true" style={{ color: 'var(--color-border)', fontSize: 'var(--font-size-xs)' }}>|</span>
-        <button style={btnStyle} title="Zoom in (pitch)" aria-label="Zoom in pitch axis"
+        <button style={btnStyle} title={t('pianoroll.zoomInPitch')} aria-label={t('pianoroll.zoomInPitch')}
           onClick={() => setZoomY((z) => Math.min(ZOOM_MAX, z * ZOOM_STEP))}>+P</button>
-        <button style={btnStyle} title="Zoom out (pitch)" aria-label="Zoom out pitch axis"
+        <button style={btnStyle} title={t('pianoroll.zoomOutPitch')} aria-label={t('pianoroll.zoomOutPitch')}
           onClick={() => setZoomY((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP))}>−P</button>
         <span aria-hidden="true" style={{ color: 'var(--color-border)', fontSize: 'var(--font-size-xs)' }}>|</span>
-        <button style={btnStyle} title="Reset zoom and pan" aria-label="Reset view and velocity overrides"
+        <button style={btnStyle} title={t('pianoroll.resetView')} aria-label={t('pianoroll.resetView')}
           onClick={() => { setZoomX(1); setZoomY(1); setTimeOffset(0); setVelocityOverrides(new Map()); setPitchOverrides(new Map()); }}>↺</button>
       </div>
     </div>

@@ -61,7 +61,8 @@ export function drawPunchcard(
   let minNote = 127;
   let maxNote = 0;
 
-  for (const hap of haps as any[]) {
+  for (const _hap of haps) {
+    const hap = _hap as { whole?: { begin: number }; value?: unknown };
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;
