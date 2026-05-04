@@ -33,7 +33,7 @@ const flashField = StateField.define<DecorationSet>({
         if (effect.value && tr.newDoc.length > 0) {
           return Decoration.set([
             Decoration.mark({
-              attributes: { style: 'background-color: rgba(34, 197, 94, 0.15); transition: background-color 0.5s ease;' },
+              class: 'cm-eval-flash',
             }).range(0, tr.newDoc.length),
           ]);
         }

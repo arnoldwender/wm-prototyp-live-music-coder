@@ -6,6 +6,9 @@
   "main": "out/main/main.cjs",
   "license": "AGPL-3.0-or-later",
   "author": "Arnold Wender <arnold.wender@gmail.com>",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

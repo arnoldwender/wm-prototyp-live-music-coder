@@ -46,7 +46,7 @@ export default defineConfig({
     resolve: {
       /* Force a single superdough instance — Vite may pre-bundle two copies
        * (one from @strudel/web, one standalone) causing a dead audio chain */
-      dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio'],
+      dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio', '@strudel/midi', '@strudel/draw', '@strudel/codemirror'],
     },
     optimizeDeps: {
       /* Force all strudel packages into a single pre-bundle group so

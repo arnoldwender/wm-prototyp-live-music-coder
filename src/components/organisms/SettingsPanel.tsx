@@ -244,7 +244,7 @@ function Toggle({ checked, onChange, 'aria-label': ariaLabel }: { checked: boole
           width: '16px',
           height: '16px',
           borderRadius: '50%',
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           transition: 'var(--transition-fast)',
         }}
       />

@@ -165,6 +165,14 @@ interface AppState {
   setFileEngine: (fileId: string, engine: EngineType) => void
   renameFile: (fileId: string, name: string) => void
   getActiveFile: () => ProjectFile | undefined
+
+  /* Project loading — ensures BPM is always clamped via setBpm */
+  loadProject: (project: {
+    bpm?: number
+    defaultEngine?: EngineType
+    files?: ProjectFile[]
+    layout?: PanelLayout
+  }) => void
 }
 
 /** Load editor settings from localStorage for initial store hydration */
@@ -413,4 +421,20 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   /** Get the currently active file */
   getActiveFile: () => get().files.find((f) => f.active),
+
+  /** Bulk-load a persisted project — BPM goes through setBpm() for clamping,
+   *  other fields are set directly. Partial: any omitted key is left unchanged. */
+  loadProject: (project) => {
+    const { setBpm } = get()
+    set((s) => ({
+      ...(project.files !== undefined && { files: project.files }),
+      ...(project.defaultEngine !== undefined && { defaultEngine: project.defaultEngine }),
+      ...(project.layout !== undefined && { layout: project.layout }),
+      /* bpm intentionally omitted here — applied below via setBpm */
+      /* keep all other state (gamification, editor, synth) intact */
+      isPlaying: s.isPlaying,
+    }))
+    /* Apply BPM last so clamping to [MIN_BPM, MAX_BPM] is always enforced */
+    if (project.bpm !== undefined) setBpm(project.bpm)
+  },
 }))
