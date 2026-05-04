@@ -21,7 +21,10 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   try {
     const sd = await import('@strudel/webaudio');
     const ctx = sd.getAudioContext();
-    if (ctx && ctx.state !== 'closed') {
+    /* Skip suspended contexts — autoplay policy may create a sleeping context
+     * before the user interacts. Connecting on a suspended context locks in a
+     * silent tap; wait until audio is actually running. */
+    if (ctx && ctx.state === 'running') {
       if (!strudelAnalyser || strudelAnalyser.context !== ctx) {
         strudelAnalyser = ctx.createAnalyser();
         strudelAnalyser.fftSize = 2048;
@@ -45,15 +48,9 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
           /* Path 3: controller.master or controller.out */
           if (!tapNode) tapNode = (controller as any)?.master ?? (controller as any)?.out;
 
-          /* Path 4: Strudel's AudioContext destination directly */
-          if (!tapNode && ctx.destination) {
-            /* Last resort: connect analyser to destination via a splitter.
-             * Create a gain node at unity to tap the signal. */
-            const tap = ctx.createGain();
-            tap.gain.value = 1;
-            ctx.destination.connect?.(tap);
-            tapNode = tap;
-          }
+          /* NOTE: No Path 4. AudioDestinationNode is a terminal sink — connecting
+           * FROM it to a GainNode produces no audio flow and silently locks
+           * strudelConnected=true, breaking all visualizers. */
 
           if (tapNode && strudelAnalyser) {
             tapNode.connect(strudelAnalyser);
