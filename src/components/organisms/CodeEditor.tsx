@@ -118,7 +118,9 @@ export function CodeEditor() {
     evaluatorRef.current = createEvaluator(
       async (code) => {
         /* Syntax pre-check — don't evaluate broken code in live mode.
-         * This prevents flooding errors while the user is mid-keystroke. */
+         * This prevents flooding errors while the user is mid-keystroke.
+         * SECURITY: new Function() on user-authored code is self-XSS by design — the user
+         * is the author. Never pass remote/fetched content here. */
         try {
           new Function(code);
         } catch {

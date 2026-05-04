@@ -7,44 +7,14 @@
    ────────────────────────────────────────────────────────── */
 
 import { VIZ_COLORS } from './colors';
-
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-function extractMidi(val: unknown): number {
-  if (typeof val === 'number') return val;
-  if (typeof val === 'string') {
-    const m = val.match(/^([a-g])(s|#|b|f)?(\d)?$/i);
-    if (m) {
-      const name = m[1].toUpperCase();
-      const acc = (m[2] === '#' || m[2] === 's') ? 1 : (m[2] === 'b' || m[2] === 'f') ? -1 : 0;
-      const oct = m[3] ? parseInt(m[3]) : 3;
-      const idx = NOTE_NAMES.indexOf(name);
-      if (idx >= 0) return (oct + 1) * 12 + idx + acc;
-    }
-  }
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.note === 'number') return v.note;
-    if (typeof v.note === 'string') return extractMidi(v.note);
-    if (typeof v.n === 'number') return v.n;
-    if (typeof v.freq === 'number') return Math.round(12 * Math.log2((v.freq as number) / 440) + 69);
-  }
-  return -1;
-}
-
-function extractVelocity(val: unknown): number {
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.gain === 'number') return Math.min(1, Math.max(0, v.gain));
-  }
-  return 0.8;
-}
+import { useAppStore as appStore } from '../store';
+import { extractMidi, extractVelocity } from './midi-utils';
 
 export function drawSpiral(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  _time: number,
+  time: number,
   getRepl: () => any | null,
 ) {
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -64,6 +34,15 @@ export function drawSpiral(
   const cx = width / 2;
   const cy = height / 2;
   const maxRadius = Math.min(cx, cy) - 10;
+
+  /* Beat-sync rotation: phase advances at BPM rate using wall-clock time.
+   * Only active when playing so the display stays stable when paused. */
+  const { bpm, isPlaying } = appStore.getState();
+  const beatPhase = isPlaying
+    ? ((time / 1000) * bpm / 60) * Math.PI * 2
+    : 0;
+  /* Scale down to a subtle rotation — 1/32 of a full cycle per beat */
+  const rotationOffset = (beatPhase / 32) % (Math.PI * 2);
 
   /* Query 4 cycles of history */
   let haps: any[];
@@ -95,9 +74,10 @@ export function drawSpiral(
     const vel = extractVelocity(hap.value);
     const isActive = hap.whole.begin <= now && hap.whole.end > now;
 
-    /* Time → angle: one full rotation per cycle */
+    /* Time → angle: one full rotation per cycle.
+     * rotationOffset adds a subtle BPM-sync drift when playing. */
     const timeDelta = now - hap.whole.begin;
-    const angle = (hap.whole.begin % 1) * Math.PI * 2 - Math.PI / 2;
+    const angle = (hap.whole.begin % 1) * Math.PI * 2 - Math.PI / 2 + rotationOffset;
 
     /* Age → radius: newer events at edge, older toward center */
     const age = Math.min(4, timeDelta);
@@ -127,8 +107,9 @@ export function drawSpiral(
     if (isActive) ctx.restore();
   }
 
-  /* Playhead indicator — line from center to edge at current position */
-  const phAngle = (now % 1) * Math.PI * 2 - Math.PI / 2;
+  /* Playhead indicator — line from center to edge at current position,
+   * rotationOffset keeps it aligned with the note dots. */
+  const phAngle = (now % 1) * Math.PI * 2 - Math.PI / 2 + rotationOffset;
   ctx.save();
   ctx.strokeStyle = VIZ_COLORS.accent;
   ctx.lineWidth = 1.5;

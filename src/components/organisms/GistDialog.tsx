@@ -204,6 +204,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
             onChange={(e) => setToken(e.target.value)}
             placeholder="ghp_..."
             aria-label="GitHub Personal Access Token"
+            autoComplete="off"
             className="w-full rounded"
             style={{ ...inputStyle, marginBottom: 'var(--space-3)' }}
           />

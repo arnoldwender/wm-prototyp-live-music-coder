@@ -7,44 +7,14 @@
    ────────────────────────────────────────────────────────── */
 
 import { VIZ_COLORS } from './colors';
-
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-function extractMidi(val: unknown): number {
-  if (typeof val === 'number') return val;
-  if (typeof val === 'string') {
-    const m = val.match(/^([a-g])(s|#|b|f)?(\d)?$/i);
-    if (m) {
-      const name = m[1].toUpperCase();
-      const acc = (m[2] === '#' || m[2] === 's') ? 1 : (m[2] === 'b' || m[2] === 'f') ? -1 : 0;
-      const oct = m[3] ? parseInt(m[3]) : 3;
-      const idx = NOTE_NAMES.indexOf(name);
-      if (idx >= 0) return (oct + 1) * 12 + idx + acc;
-    }
-  }
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.note === 'number') return v.note;
-    if (typeof v.note === 'string') return extractMidi(v.note);
-    if (typeof v.n === 'number') return v.n;
-    if (typeof v.freq === 'number') return Math.round(12 * Math.log2((v.freq as number) / 440) + 69);
-  }
-  return -1;
-}
-
-function extractVelocity(val: unknown): number {
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.gain === 'number') return Math.min(1, Math.max(0, v.gain));
-  }
-  return 0.8;
-}
+import { useAppStore as appStore } from '../store';
+import { extractMidi, extractVelocity } from './midi-utils';
 
 export function drawPitchwheel(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  _time: number,
+  time: number,
   getRepl: () => any | null,
 ) {
   ctx.fillStyle = VIZ_COLORS.bg;
@@ -131,20 +101,31 @@ export function drawPitchwheel(
     }
   }
 
+  /* Beat-sync pulse: active segments expand ±3% of outerR at beat rate.
+   * Only active when isPlaying — stays static when paused. */
+  const { bpm, isPlaying } = appStore.getState();
+  const beatCycle = (time / 1000) * bpm / 60;
+  /* Raised cosine peaks at 1.0 on the beat, smooth decay between beats */
+  const beatPulse = isPlaying
+    ? Math.max(0, Math.cos(beatCycle * Math.PI * 2)) ** 2
+    : 0;
+  /* Expand outer radius by up to 3% on the beat */
+  const pulsedOuterR = outerR * (1 + beatPulse * 0.03);
+
   /* Light up active segments */
   for (const [pc, data] of activePC) {
     const startAngle = (pc / 12) * Math.PI * 2 - Math.PI / 2;
     const endAngle = ((pc + 1) / 12) * Math.PI * 2 - Math.PI / 2;
 
-    /* Filled arc segment */
+    /* Filled arc segment — uses pulsedOuterR so active notes "breathe" */
     const hue = 260 + pc * 8;
     ctx.save();
     ctx.shadowColor = `hsla(${hue}, 70%, 60%, 0.6)`;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 12 + beatPulse * 6; /* glow intensifies on the beat */
 
     ctx.fillStyle = `hsla(${hue}, 60%, 55%, ${0.3 + data.velocity * 0.5})`;
     ctx.beginPath();
-    ctx.arc(cx, cy, outerR, startAngle, endAngle);
+    ctx.arc(cx, cy, pulsedOuterR, startAngle, endAngle);
     ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
     ctx.closePath();
     ctx.fill();
