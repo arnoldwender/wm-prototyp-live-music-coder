@@ -19,7 +19,7 @@
   [headers.values]
     # unsafe-eval: required by Strudel live-coding engine (new Function / eval) — accepted risk by design
     # unsafe-inline (style-src): required by Tailwind CSS 4 utility classes + React style={{}} props — no nonce alternative
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' blob: data:; script-src-elem 'self' blob: data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com https://freesound.org https://*.freesound.org; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self' data:; worker-src 'self' blob: data:; frame-src 'none'; object-src 'none'; base-uri 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' blob: data:; script-src-elem 'self' blob: data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com https://freesound.org https://*.freesound.org; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self' data:; worker-src 'self' blob: data:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
