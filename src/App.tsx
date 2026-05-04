@@ -81,25 +81,25 @@ function RouteLoader() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: '#09090b',
-        color: '#a1a1aa',
+        background: 'var(--color-bg)',
+        color: 'var(--color-text-muted)',
         fontFamily:
           'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-        gap: '16px',
+        gap: 'var(--space-md)',
       }}
     >
       <div
         aria-hidden="true"
         style={{
-          width: '32px',
-          height: '32px',
-          border: '3px solid #27272a',
-          borderTopColor: '#a855f7',
+          width: 'var(--space-xl)',
+          height: 'var(--space-xl)',
+          border: '3px solid var(--color-border)',
+          borderTopColor: 'var(--color-primary)',
           borderRadius: '50%',
           animation: 'lmc-spin 800ms linear infinite',
         }}
       />
-      <p style={{ fontSize: '14px', margin: 0 }}>Loading editor…</p>
+      <p style={{ fontSize: 'var(--font-size-sm)', margin: 0 }}>Loading editor…</p>
       <style>{`@keyframes lmc-spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   )

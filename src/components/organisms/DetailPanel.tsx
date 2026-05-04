@@ -27,7 +27,8 @@ function SavedGistsList() {
     setLoading(gistId);
     try {
       const project = await loadFromGist(gistId);
-      useAppStore.setState({
+      /* Use loadProject so BPM is clamped through setBpm — fixes D-4 */
+      useAppStore.getState().loadProject({
         bpm: project.bpm,
         defaultEngine: project.defaultEngine,
         files: project.files,

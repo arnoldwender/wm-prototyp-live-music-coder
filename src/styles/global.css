@@ -281,6 +281,13 @@ textarea:focus-visible {
   animation: menu-enter var(--transition-fast) ease-out;
 }
 
+/* CodeMirror eval-flash highlight — uses success color at low opacity.
+   Class-based approach avoids hardcoding rgba() inline on the decoration. */
+.cm-eval-flash {
+  background-color: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transition: background-color var(--transition-slow);
+}
+
 /* --- Playing indicator animation for StrudelEditor --- */
 @keyframes playing-indicator {
   0% { background-position: 0% 50%; }

@@ -16,7 +16,7 @@ export function WaveformVisualizer() {
   const lastNodeRef = useRef<AnalyserNode | null>(null);
   const frameCount = useRef(0);
 
-  const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  const draw = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, _time: number) => {
     frameCount.current++;
 
     /* Reconnect every 15 frames (~250ms) — aggressive reconnection for reliability */
