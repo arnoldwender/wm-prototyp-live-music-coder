@@ -10,7 +10,7 @@ import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawPunchcard } from '../../lib/visualizers/punchcard';
 
 function getRepl() {
-  return (window as any).__strudelRepl ?? null;
+  return window.__strudelRepl ?? null;
 }
 
 export function PunchcardVisualizer() {

@@ -52,6 +52,15 @@ const QWERTY_MAP: Record<string, number> = {
   j: 11, /* B  */
 }
 
+/** Note name lookup — C through B (with sharps) */
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
+
+/** Convert MIDI note number to note name with octave (e.g. 60 → "C4") */
+function midiToNoteName(note: number): string {
+  const octave = Math.floor(note / 12) - 1;
+  return `${NOTE_NAMES[note % 12]}${octave}`;
+}
+
 /** White key dimensions (matched against design system spacing) */
 const WHITE_KEY_WIDTH = 40
 const WHITE_KEY_HEIGHT = 120
@@ -277,7 +286,7 @@ function VirtualKeyboard({
               key={`w-${note}`}
               type="button"
               role="button"
-              aria-label={`White key MIDI ${note}`}
+              aria-label={`Key ${midiToNoteName(note)}`}
               aria-pressed={isActive}
               data-note={note}
               data-key-type="white"
@@ -285,6 +294,8 @@ function VirtualKeyboard({
               onPointerUp={handlePointerUp(note)}
               onPointerLeave={handlePointerLeave(note)}
               onPointerCancel={handlePointerUp(note)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerNoteOn(note, 0.7); } }}
+              onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') { triggerNoteOff(note); } }}
               style={{
                 position: 'absolute',
                 left: `${index * WHITE_KEY_WIDTH}px`,
@@ -313,7 +324,7 @@ function VirtualKeyboard({
               key={`b-${note}`}
               type="button"
               role="button"
-              aria-label={`Black key MIDI ${note}`}
+              aria-label={`Key ${midiToNoteName(note)} (sharp/flat)`}
               aria-pressed={isActive}
               data-note={note}
               data-key-type="black"
@@ -321,6 +332,8 @@ function VirtualKeyboard({
               onPointerUp={handlePointerUp(note)}
               onPointerLeave={handlePointerLeave(note)}
               onPointerCancel={handlePointerUp(note)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerNoteOn(note, 0.7); } }}
+              onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') { triggerNoteOff(note); } }}
               style={{
                 position: 'absolute',
                 left: `${left}px`,

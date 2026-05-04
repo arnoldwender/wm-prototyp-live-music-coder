@@ -210,7 +210,7 @@ export function initClockSync(): void {
 
 function getLeaderBpm(): number {
   try {
-    const repl = (window as any).__strudelRepl;
+    const repl = window.__strudelRepl;
     return repl?.scheduler?.bpm ?? 120;
   } catch {
     return 120;

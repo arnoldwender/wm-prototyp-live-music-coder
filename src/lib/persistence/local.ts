@@ -61,6 +61,18 @@ export function serializeProject(project: Project): string {
   return JSON.stringify(project);
 }
 
+/** JSON.parse with prototype-pollution guard — use for all localStorage reads */
+export function safeJsonParse<T = unknown>(json: string, fallback: T): T {
+  try {
+    return JSON.parse(json, (key, value) => {
+      if (key === '__proto__' || key === 'constructor') throw new Error(`Forbidden key: ${key}`);
+      return value;
+    }) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 /** Valid engine types for input validation */
 const VALID_ENGINES = new Set(['strudel', 'tonejs', 'webaudio', 'midi']);
 

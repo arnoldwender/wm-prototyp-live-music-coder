@@ -114,8 +114,8 @@ export function SidePanel() {
         <button
           type="button"
           onClick={toggleSidePanel}
-          title="Close panel"
-          aria-label="Close panel"
+          title={t('sidePanel.closePanel')}
+          aria-label={t('sidePanel.closePanel')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -498,7 +498,7 @@ oscs.forEach((o, i) => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search samples..."
+          placeholder={t('sidePanel.searchSamples')}
           aria-label={t('sidePanel.searchSamples')}
           style={{
             width: '100%',
@@ -786,7 +786,7 @@ export function ReferencePanel() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search API..."
+          placeholder={t('sidePanel.searchApi')}
           aria-label={t('sidePanel.searchApi')}
           style={{
             width: '100%',
@@ -868,8 +868,8 @@ export function ConsolePanel() {
   /* Install console monkey-patch on mount; restore originals on unmount.
    * Moved from module-level side effect so cleanup is possible and HMR stays clean. */
   useEffect(() => {
-    if ((window as any).__lmcConsolePatched) return;
-    (window as any).__lmcConsolePatched = true;
+    if (window.__lmcConsolePatched) return;
+    window.__lmcConsolePatched = true;
 
     const originalLog = console.log;
     const originalError = console.error;
@@ -893,7 +893,7 @@ export function ConsolePanel() {
       console.log = originalLog;
       console.warn = originalWarn;
       console.error = originalError;
-      (window as any).__lmcConsolePatched = false;
+      window.__lmcConsolePatched = false;
     };
   }, []);
 
@@ -978,7 +978,7 @@ export function SettingsPanel() {
       const { getAudioContext } = await import('@strudel/webaudio');
       const ctx = getAudioContext();
       if (ctx && 'setSinkId' in ctx) {
-        await (ctx as any).setSinkId(deviceId);
+        await (ctx as AudioContext & { setSinkId(id: string): Promise<void> }).setSinkId(deviceId);
       }
     } catch { /* device change failed */ }
   }, []);
@@ -1016,7 +1016,7 @@ export function SettingsPanel() {
           onChange={(e) => handleDeviceChange(e.target.value)}
           style={inputStyle}
         >
-          <option value="">Default</option>
+          <option value="">{t('sidePanel.audioDefault')}</option>
           {devices.map((d) => (
             <option key={d.deviceId} value={d.deviceId}>
               {d.label || `Device ${d.deviceId.slice(0, 8)}`}
@@ -1044,20 +1044,20 @@ export function SettingsPanel() {
 
       {/* Keybinding mode */}
       <div>
-        <label style={labelStyle}>Keybindings</label>
+        <label style={labelStyle}>{t('sidePanel.keybindingsLabel')}</label>
         <select
           value={keybindings}
           onChange={(e) => {
             setKeybindings(e.target.value);
             saveSetting('lmc-keybindings', e.target.value);
           }}
-          aria-label="Keybindings"
+          aria-label={t('sidePanel.keybindingsLabel')}
           style={inputStyle}
         >
-          <option value="default">CodeMirror (Default)</option>
-          <option value="vim">Vim</option>
-          <option value="emacs">Emacs</option>
-          <option value="vscode">VS Code</option>
+          <option value="default">{t('sidePanel.keybindingDefault')}</option>
+          <option value="vim">{t('sidePanel.keybindingVim')}</option>
+          <option value="emacs">{t('sidePanel.keybindingEmacs')}</option>
+          <option value="vscode">{t('sidePanel.keybindingVscode')}</option>
         </select>
       </div>
 

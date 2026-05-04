@@ -128,7 +128,7 @@ export function playOscillatorNote(
  * The React tree imports nothing from this module — it just calls
  * `window.__lmcPlayNote(note, velocity)` after the synth UI fires. */
 if (typeof window !== 'undefined') {
-  (window as any).__lmcPlayNote = playOscillatorNote;
+  window.__lmcPlayNote = playOscillatorNote;
   (window as any).__lmcSetOscillator = setLmcOscillatorType;
   (window as any).__lmcSetFilter = setLmcFilter;
 }
@@ -138,7 +138,7 @@ const attachedDevices = new Set<string>();
 
 /** Get the Strudel REPL reference */
 function getRepl(): any {
-  return (window as any).__strudelRepl;
+  return window.__strudelRepl;
 }
 
 /**

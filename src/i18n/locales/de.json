@@ -637,7 +637,15 @@
     "saving": "Speichern...",
     "loading": "Laden...",
     "clear": "Löschen",
-    "rememberWarning": "Token wird unverschlüsselt im Browser gespeichert"
+    "rememberWarning": "Token wird unverschlüsselt im Browser gespeichert",
+    "loadThisGist": "Diesen Gist laden"
+  },
+  "pianoroll": {
+    "zoomInTime": "Vergrößern (Zeit)",
+    "zoomOutTime": "Verkleinern (Zeit)",
+    "zoomInPitch": "Vergrößern (Tonhöhe)",
+    "zoomOutPitch": "Verkleinern (Tonhöhe)",
+    "resetView": "Ansicht zurücksetzen"
   },
   "legal": {
     "impressum": "Impressum",
@@ -651,7 +659,14 @@
     "settings": "Einstellungen",
     "searchSamples": "Samples durchsuchen",
     "searchApi": "API durchsuchen",
-    "audioOutputDevice": "Audio-Ausgabegerät"
+    "audioOutputDevice": "Audio-Ausgabegerät",
+    "closePanel": "Panel schließen",
+    "audioDefault": "Standard",
+    "keybindingsLabel": "Tastenkürzel",
+    "keybindingDefault": "CodeMirror (Standard)",
+    "keybindingVim": "Vim",
+    "keybindingEmacs": "Emacs",
+    "keybindingVscode": "VS Code"
   },
   "gamification": {
     "achievementUnlocked": "Erfolg freigeschaltet",

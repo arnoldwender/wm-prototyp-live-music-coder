@@ -637,7 +637,15 @@
     "saving": "Guardando...",
     "loading": "Cargando...",
     "clear": "Eliminar",
-    "rememberWarning": "El token se guarda sin cifrar en el navegador"
+    "rememberWarning": "El token se guarda sin cifrar en el navegador",
+    "loadThisGist": "Cargar este gist"
+  },
+  "pianoroll": {
+    "zoomInTime": "Acercar (tiempo)",
+    "zoomOutTime": "Alejar (tiempo)",
+    "zoomInPitch": "Acercar (tono)",
+    "zoomOutPitch": "Alejar (tono)",
+    "resetView": "Restablecer vista"
   },
   "legal": {
     "impressum": "Aviso legal",
@@ -651,7 +659,14 @@
     "settings": "Ajustes",
     "searchSamples": "Buscar samples",
     "searchApi": "Buscar API",
-    "audioOutputDevice": "Dispositivo de salida de audio"
+    "audioOutputDevice": "Dispositivo de salida de audio",
+    "closePanel": "Cerrar panel",
+    "audioDefault": "Predeterminado",
+    "keybindingsLabel": "Atajos de teclado",
+    "keybindingDefault": "CodeMirror (Predeterminado)",
+    "keybindingVim": "Vim",
+    "keybindingEmacs": "Emacs",
+    "keybindingVscode": "VS Code"
   },
   "gamification": {
     "achievementUnlocked": "Logro desbloqueado",

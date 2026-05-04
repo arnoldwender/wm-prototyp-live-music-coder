@@ -17,6 +17,7 @@ import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widg
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
 import SynthPanel from './SynthPanel';
+import { safeJsonParse } from '../../lib/persistence/local';
 /* Side-effect import — registers window.__lmcPlayNote / __lmcSetOscillator */
 import '../../lib/midi/strudel-keys';
 import { Play, Square, Loader2, RotateCcw, Download, Piano, ChevronDown, PenLine, Volume2 } from 'lucide-react';
@@ -243,7 +244,7 @@ export function StrudelEditor() {
         if (!mounted) return;
         replRef.current = repl;
         /* Expose REPL globally for pianoroll and other visualizers */
-        (window as any).__strudelRepl = repl;
+        window.__strudelRepl = repl;
 
         /* Load Dirt-Samples + register synth sounds */
         try {
@@ -286,8 +287,8 @@ export function StrudelEditor() {
         /* Register our custom midikeys/midin that bypass the double-instance bug */
         try {
           const { customMidikeys, customMidin } = await import('../../lib/midi/strudel-keys');
-          (globalThis as any).midikeys = customMidikeys;
-          (globalThis as any).midin = customMidin;
+          window.midikeys = customMidikeys;
+          window.midin = customMidin;
           console.log('[StrudelEditor] Custom midikeys/midin registered (raw MIDI API)');
         } catch (e) {
           console.warn('[StrudelEditor] Custom MIDI registration failed:', e);
@@ -315,10 +316,11 @@ export function StrudelEditor() {
              * 1. Tells the transpiler to detect ._type() calls
              * 2. Adds Pattern.prototype._type = fn (with underscore!)
              * We pass the __pianoroll etc. functions from @strudel/draw. */
+            const drawTyped = draw as unknown as Record<string, unknown>;
             const drawFns: Record<string, unknown> = {
-              pianoroll: (draw as any).__pianoroll ?? (draw as any).drawPianoroll,
-              punchcard: (draw as any).getPunchcardPainter,
-              pitchwheel: (draw as any).pitchwheel,
+              pianoroll: drawTyped.__pianoroll ?? drawTyped.drawPianoroll,
+              punchcard: drawTyped.getPunchcardPainter,
+              pitchwheel: drawTyped.pitchwheel,
             };
             for (const [type, fn] of Object.entries(drawFns)) {
               try {
@@ -334,8 +336,8 @@ export function StrudelEditor() {
             /* Fallback: if _pianoroll still not on Pattern.prototype,
              * alias from the non-underscore version that @strudel/draw adds */
             try {
-              const core = await import('@strudel/web') as any;
-              const proto = core.Pattern?.prototype;
+              const core = await import('@strudel/web') as unknown as Record<string, unknown>;
+              const proto = (core.Pattern as { prototype?: Record<string, unknown> } | undefined)?.prototype;
               for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
                 if (proto[method] && !proto[`_${method}`]) {
                   proto[`_${method}`] = proto[method];
@@ -351,11 +353,11 @@ export function StrudelEditor() {
            * slider(0.5, 0, 1) to sliderWithID("slider_42", 0.5, 0, 1) but
            * sliderWithID must be in the global eval scope. */
           if (strudelCMod?.sliderWithID) {
-            (globalThis as any).sliderWithID = strudelCMod.sliderWithID;
+            window.sliderWithID = strudelCMod.sliderWithID as Window['sliderWithID'];
             console.log('[StrudelEditor] sliderWithID registered globally');
           }
           if (strudelCMod?.slider) {
-            (globalThis as any).slider = strudelCMod.slider;
+            window.slider = strudelCMod.slider as Window['slider'];
           }
         } catch (err) {
           console.warn('[StrudelEditor] @strudel/draw load failed:', err);
@@ -499,8 +501,8 @@ export function StrudelEditor() {
       }
 
       /* Apply font size and word wrap from localStorage (non-reactive settings) */
-      try {
-        const settings = JSON.parse(localStorage.getItem('lmc-editor-settings') || '{}');
+      {
+        const settings = safeJsonParse(localStorage.getItem('lmc-editor-settings') || '{}', {} as Record<string, unknown>);
         if (settings.fontSize && settings.fontSize !== 14) {
           extensions.push(EditorView.theme({
             '.cm-content': { fontSize: `${settings.fontSize}px` },
@@ -509,7 +511,7 @@ export function StrudelEditor() {
         if (settings.wordWrap) {
           extensions.push(EditorView.lineWrapping);
         }
-      } catch { /* settings not available */ }
+      }
 
       /* Add Strudel-specific CM6 extensions if loaded (optional) */
       const strudelCM = strudelExtRef.current;

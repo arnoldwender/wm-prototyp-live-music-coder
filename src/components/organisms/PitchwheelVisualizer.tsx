@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { CanvasVisualizer } from '../atoms/CanvasVisualizer';
 import { drawPitchwheel } from '../../lib/visualizers/pitchwheel';
 
-function getRepl() { return (window as any).__strudelRepl ?? null; }
+function getRepl() { return window.__strudelRepl ?? null; }
 
 export function PitchwheelVisualizer() {
   const draw = useCallback(
