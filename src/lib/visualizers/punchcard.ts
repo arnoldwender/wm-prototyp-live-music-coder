@@ -7,47 +7,16 @@
    ────────────────────────────────────────────────────────── */
 
 import { VIZ_COLORS } from './colors';
+import { useAppStore as appStore } from '../store';
+import { extractMidi, extractVelocity } from './midi-utils';
 
 /* ── Constants ─────────────────────────────────────────── */
 
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const BLACK_KEYS = new Set([1, 3, 6, 8, 10]);
 const KEYS_WIDTH = 30;
 const CYCLES_BACK = 2;
 const CYCLES_FORWARD = 1;
 const PITCH_PADDING = 2;
-
-/* ── MIDI extraction (same as pianoroll) ──────────────── */
-
-function extractMidi(val: unknown): number {
-  if (typeof val === 'number') return val;
-  if (typeof val === 'string') {
-    const m = val.match(/^([a-g])(s|#|b|f)?(\d)?$/i);
-    if (m) {
-      const name = m[1].toUpperCase();
-      const acc = (m[2] === '#' || m[2] === 's') ? 1 : (m[2] === 'b' || m[2] === 'f') ? -1 : 0;
-      const oct = m[3] ? parseInt(m[3]) : 3;
-      const idx = NOTE_NAMES.indexOf(name);
-      if (idx >= 0) return (oct + 1) * 12 + idx + acc;
-    }
-  }
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.note === 'number') return v.note;
-    if (typeof v.note === 'string') return extractMidi(v.note);
-    if (typeof v.n === 'number') return v.n;
-    if (typeof v.freq === 'number') return Math.round(12 * Math.log2((v.freq as number) / 440) + 69);
-  }
-  return -1;
-}
-
-function extractVelocity(val: unknown): number {
-  if (val && typeof val === 'object') {
-    const v = val as Record<string, unknown>;
-    if (typeof v.gain === 'number') return Math.min(1, Math.max(0, v.gain));
-  }
-  return 0.8;
-}
 
 /* ── Main draw function ───────────────────────────────── */
 
@@ -55,7 +24,7 @@ export function drawPunchcard(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  _time: number,
+  time: number,
   getRepl: () => any | null,
 ) {
   /* Background */
@@ -203,13 +172,21 @@ export function drawPunchcard(
     if (isActive) ctx.restore();
   }
 
-  /* Playhead */
+  /* Playhead — pulses brighter on each beat when playing.
+   * beatPulse oscillates 0→1→0 at BPM rate using a raised cosine. */
+  const { bpm, isPlaying } = appStore.getState();
+  const beatCycle = (time / 1000) * bpm / 60;
+  /* Raised cosine: peaks at 1.0 on the beat, fades to 0.0 by mid-cycle */
+  const beatPulse = isPlaying
+    ? Math.max(0, Math.cos(beatCycle * Math.PI * 2)) ** 2
+    : 0;
   const phX = timeX(now);
   ctx.save();
   ctx.shadowColor = VIZ_COLORS.accentGlow;
-  ctx.shadowBlur = 6;
+  ctx.shadowBlur = 6 + beatPulse * 10;  /* subtle glow boost on the beat */
   ctx.strokeStyle = VIZ_COLORS.accent;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.5 + beatPulse * 0.5; /* slight width boost on the beat */
+  ctx.globalAlpha = 0.85 + beatPulse * 0.15;
   ctx.beginPath();
   ctx.moveTo(phX, 0);
   ctx.lineTo(phX, height);

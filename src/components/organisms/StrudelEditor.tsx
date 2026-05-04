@@ -424,6 +424,7 @@ export function StrudelEditor() {
             if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
             const delay = composeModeRef.current ? 300 : 150;
             evalTimerRef.current = setTimeout(async () => {
+              if (!replRef.current) return; // component may have unmounted during debounce
               try {
                 await replRef.current.evaluate(code, true);
                 resetStrudelTap();
