@@ -210,8 +210,8 @@ export function StrudelEditor() {
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } });
     updateFileCode(activeFile.id, code);
     setMidiMenuOpen(false);
-    /* Auto-evaluate after loading */
-    setTimeout(() => handleEvaluate(), 100);
+    /* Auto-evaluate after loading — viewRef guard prevents fire on unmounted component */
+    setTimeout(() => { if (viewRef.current) handleEvaluate(); }, 100);
   }, [activeFile, updateFileCode]);
 
   /* Initialize Strudel REPL + load @strudel/codemirror extensions */
@@ -229,6 +229,7 @@ export function StrudelEditor() {
             if (view && meta) {
               /* Dispatch widgets to CM6 extensions — same as StrudelMirror.afterEval */
               import('../../lib/editor/inline-widgets').then(({ syncWidgetsAfterEval }) => {
+                if (!mounted) return; // component unmounted during the dynamic import
                 /* Write meta into repl.state so syncWidgetsAfterEval can read it */
                 if (replRef.current?.state) {
                   replRef.current.state.widgets = meta.widgets ?? [];
@@ -392,6 +393,12 @@ export function StrudelEditor() {
       replRef.current?.stop();
       /* Stop gamepad RAF loop on unmount to avoid dangling requestAnimationFrame */
       import('../../lib/input/gamepad').then(({ stopGamepadPolling }) => stopGamepadPolling()).catch(() => {});
+      /* A-2: remove keydown listener — prevents duplicate listeners after HMR */
+      /* A-3: close BroadcastChannel + cancel leader-election timeout */
+      import('../../lib/strudel-extensions').then(({ stopKeyListener, stopClockSync }) => {
+        stopKeyListener();
+        stopClockSync();
+      }).catch(() => {});
     };
   }, []);
 

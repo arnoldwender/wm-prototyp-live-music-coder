@@ -7,6 +7,21 @@ import { join } from 'node:path'
 /** Lazy dev check — safe to call after app init */
 function isDev(): boolean { return !app.isPackaged }
 
+/**
+ * F-2 fix: allowlist of valid panel IDs that can be popped out.
+ * Derived from PanelLayout.visiblePanels in src/types/project.ts.
+ * Prevents arbitrary panelId injection into loadURL and window title.
+ */
+const ALLOWED_PANELS = new Set([
+  'waveform',
+  'spectrum',
+  'timeline',
+  'pianoroll',
+  'punchcard',
+  'spiral',
+  'pitchwheel',
+])
+
 // --- Track pop-out windows, max 4 ---
 const popoutWindows = new Map<string, BrowserWindow>()
 
@@ -20,6 +35,9 @@ const MAX_POPOUTS = 4
 export function registerWindowHandlers(mainWindow: BrowserWindow): void {
   // --- Pop out a panel into its own window ---
   ipcMain.on('window:popout', (_event, panelId: string) => {
+    // F-2 fix: reject unknown panel IDs before using panelId in loadURL or title
+    if (!ALLOWED_PANELS.has(panelId)) return
+
     // Already open — focus it instead
     if (popoutWindows.has(panelId)) {
       popoutWindows.get(panelId)!.focus()

@@ -28,7 +28,8 @@ interface GistDialogProps {
 /** Dialog for GitHub Gist save/load with PAT management */
 export function GistDialog({ onClose }: GistDialogProps) {
   const { t } = useTranslation()
-  const [token, setToken] = useState(getStoredToken() ?? '')
+  const [token, setToken] = useState('')
+  const [hasToken, setHasToken] = useState(false)
   const [remember, setRemember] = useState(false)
   const [gistInput, setGistInput] = useState('')
   const [status, setStatus] = useState('')
@@ -38,8 +39,17 @@ export function GistDialog({ onClose }: GistDialogProps) {
     try { return JSON.parse(localStorage.getItem('lmc-saved-gists') || '[]') } catch { return [] }
   })
 
-  const hasToken = !!getStoredToken()
   const backdropRef = useRef<HTMLDivElement>(null)
+
+  /* Load stored token asynchronously on mount — getStoredToken is async (AES-GCM) */
+  useEffect(() => {
+    getStoredToken().then((stored) => {
+      if (stored) {
+        setToken(stored)
+        setHasToken(true)
+      }
+    })
+  }, [])
 
   /* Focus trap — focus first focusable element on mount */
   useEffect(() => {
@@ -74,14 +84,16 @@ export function GistDialog({ onClose }: GistDialogProps) {
 
   /* --- Token management handlers --- */
 
-  const handleSaveToken = () => {
-    setStoredToken(token, remember)
+  const handleSaveToken = async () => {
+    await setStoredToken(token, remember)
+    setHasToken(!!token)
     setStatus(t('gist.tokenSaved'))
   }
 
   const handleClearToken = () => {
     clearStoredToken()
     setToken('')
+    setHasToken(false)
     setStatus(t('gist.tokenCleared'))
   }
 

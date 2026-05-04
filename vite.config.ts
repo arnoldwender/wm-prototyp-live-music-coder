@@ -40,6 +40,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id: string) {
+          if (id.includes('node_modules/@strudel') || id.includes('node_modules/superdough')) return 'vendor-strudel'
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router') || id.includes('node_modules/zustand')) return 'vendor-react'
           if (id.includes('node_modules/@codemirror')) return 'vendor-codemirror'
           if (id.includes('node_modules/@xyflow')) return 'vendor-reactflow'

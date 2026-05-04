@@ -36,21 +36,21 @@ describe('Gist token management', () => {
     clearStoredToken();
   });
 
-  it('stores token in sessionStorage by default', () => {
-    setStoredToken('test-token', false);
-    expect(getStoredToken()).toBe('test-token');
+  it('stores token in sessionStorage by default', async () => {
+    await setStoredToken('test-token', false);
+    expect(await getStoredToken()).toBe('test-token');
     clearStoredToken();
   });
 
-  it('stores token in localStorage when remember=true', () => {
-    setStoredToken('test-token', true);
-    expect(getStoredToken()).toBe('test-token');
+  it('stores token in localStorage when remember=true', async () => {
+    await setStoredToken('test-token', true);
+    expect(await getStoredToken()).toBe('test-token');
     clearStoredToken();
   });
 
-  it('clears token from both storages', () => {
-    setStoredToken('test-token', true);
+  it('clears token from both storages', async () => {
+    await setStoredToken('test-token', true);
     clearStoredToken();
-    expect(getStoredToken()).toBeNull();
+    expect(await getStoredToken()).toBeNull();
   });
 });

@@ -27,7 +27,8 @@
     "share": "Teilen",
     "gist": "Als Gist exportieren",
     "settings": "Einstellungen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "more": "Mehr"
   },
   "engines": {
     "strudel": "Strudel",
@@ -178,7 +179,10 @@
     "catRave": "Rave / Gabba",
     "catWorld": "World / Ethnisch",
     "catRetro": "Retro / Game",
-    "catMisc": "Sonstiges"
+    "catMisc": "Sonstiges",
+    "whatsNew": "Neuigkeiten",
+    "whatsNewMidi": "Verbinde jede MIDI-Tastatur oder jeden Controller — automatisch erkannt mit 19 Geräteprofilen.",
+    "whatsNewCompose": "Compose-Modus — visuelles Mehr-Spur-Arrangement mit Pianorolle und Pattern-Zeitleiste."
   },
   "collection": {
     "title": "Erfolge",

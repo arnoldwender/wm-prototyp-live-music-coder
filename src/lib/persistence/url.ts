@@ -29,6 +29,7 @@ export function decodeFromUrl(hash: string): UrlShareData | null {
   try {
     const json = decompressFromEncodedURIComponent(hash);
     if (!json) return null;
+    if (json.length > 65536) return null; // 64KB cap — prevents memory DoS via crafted compressed payload
     const parsed = JSON.parse(json);
     if (!parsed.code && parsed.code !== '') return null;
     /* Validate engine is a known EngineType — fall back to strudel for unknown values */
