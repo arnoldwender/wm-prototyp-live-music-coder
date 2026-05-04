@@ -353,14 +353,22 @@ export async function customMidin(device: number | string = 0): Promise<(ccNum?:
 
   const { ref } = await import('@strudel/web') as any;
 
+  /* Track active RAF loops per CC number — one loop per CC, never duplicated */
+  const pollMap = new Map<number, { rafId: number; r: any }>();
+
   return (ccNum: number = 0) => {
+    /* Reuse existing ref if already polling this CC number */
+    const existing = pollMap.get(ccNum);
+    if (existing) { existing.r.value = ccValues[ccNum] ?? 0; return existing.r; }
+
     const r = ref(ccValues[ccNum] ?? 0);
-    /* Poll CC value into the ref */
+    const entry: { rafId: number; r: any } = { rafId: 0, r };
     const poll = () => {
       r.value = ccValues[ccNum] ?? 0;
-      requestAnimationFrame(poll);
+      entry.rafId = requestAnimationFrame(poll);
     };
-    poll();
+    entry.rafId = requestAnimationFrame(poll);
+    pollMap.set(ccNum, entry);
     return r;
   };
 }

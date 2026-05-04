@@ -19,6 +19,9 @@ interface GamepadState {
 const gamepads: Map<number, GamepadState> = new Map();
 let polling = false;
 let rafId: number | null = null;
+/* Named listener references — required so removeEventListener can find them */
+let onConnected: ((e: Event) => void) | null = null;
+let onDisconnected: ((e: Event) => void) | null = null;
 
 /** Poll gamepad state every frame */
 function poll() {
@@ -41,21 +44,25 @@ export function startGamepadPolling(): void {
   polling = true;
   rafId = requestAnimationFrame(poll);
 
-  /* Listen for connect/disconnect events */
-  window.addEventListener('gamepadconnected', (e) => {
+  /* Named listeners — stored so stopGamepadPolling() can remove them */
+  onConnected = (e) => {
     console.log(`[Gamepad] Connected: ${(e as GamepadEvent).gamepad.id}`);
-  });
-  window.addEventListener('gamepaddisconnected', (e) => {
+  };
+  onDisconnected = (e) => {
     const idx = (e as GamepadEvent).gamepad.index;
     gamepads.delete(idx);
     console.log(`[Gamepad] Disconnected: ${(e as GamepadEvent).gamepad.id}`);
-  });
+  };
+  window.addEventListener('gamepadconnected', onConnected);
+  window.addEventListener('gamepaddisconnected', onDisconnected);
 }
 
-/** Stop polling */
+/** Stop polling and remove all window event listeners */
 export function stopGamepadPolling(): void {
   polling = false;
-  if (rafId !== null) cancelAnimationFrame(rafId);
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  if (onConnected) { window.removeEventListener('gamepadconnected', onConnected); onConnected = null; }
+  if (onDisconnected) { window.removeEventListener('gamepaddisconnected', onDisconnected); onDisconnected = null; }
 }
 
 /** Get a specific axis value (0-based) for gamepad index */
