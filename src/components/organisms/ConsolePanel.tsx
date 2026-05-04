@@ -113,7 +113,7 @@ export function ConsolePanel() {
         )}
         {messages.map((msg, i) => (
           <div
-            key={i}
+            key={`${msg.timestamp}-${msg.level}-${i}`}
             style={{
               padding: '1px var(--space-3)',
               color: LEVEL_COLORS[msg.level],

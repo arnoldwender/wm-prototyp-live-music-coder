@@ -159,5 +159,6 @@
     "vite": "^8.0.8",
     "vitest": "^4.1.4",
     "wait-on": "^9.0.5"
-  }
+  },
+  "description": "Browser-based live coding music IDE. Write code, hear music instantly."
 }

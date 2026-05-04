@@ -6,7 +6,7 @@
    to show only active panels in a flex row with equal widths.
    ────────────────────────────────────────────────────────── */
 
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../lib/store';
 import { VisualizerPills } from '../molecules/VisualizerPills';
@@ -23,8 +23,9 @@ export function VisualizerDashboard() {
   const { t } = useTranslation();
   const visiblePanels = useAppStore((s) => s.layout.visiblePanels);
 
-  /* Build array of only visible panels — each gets equal flex width */
-  const activePanels = [
+  /* Build array of only visible panels — memoized so canvas components don't re-mount
+   * on unrelated store updates (only rebuilds when visiblePanels changes) */
+  const activePanels = useMemo(() => [
     visiblePanels.waveform && { key: 'waveform', component: <WaveformVisualizer /> },
     visiblePanels.spectrum && { key: 'spectrum', component: <SpectrumVisualizer /> },
     visiblePanels.timeline && { key: 'timeline', component: <PatternTimeline /> },
@@ -32,7 +33,7 @@ export function VisualizerDashboard() {
     visiblePanels.punchcard && { key: 'punchcard', component: <PunchcardVisualizer /> },
     visiblePanels.spiral && { key: 'spiral', component: <SpiralVisualizer /> },
     visiblePanels.pitchwheel && { key: 'pitchwheel', component: <PitchwheelVisualizer /> },
-  ].filter(Boolean) as { key: string; component: ReactNode }[];
+  ].filter(Boolean) as { key: string; component: ReactNode }[], [visiblePanels]);
 
   return (
     <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-bg)' }}>

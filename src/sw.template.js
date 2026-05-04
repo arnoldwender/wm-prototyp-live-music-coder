@@ -49,6 +49,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   if (!request.url.startsWith(self.location.origin)) return;
 
+  /* Skip audio samples — never cache; can be 50–200MB and exhaust Cache Storage quota */
+  if (request.url.includes('/samples/')) return;
+
   /* Hashed assets (JS/CSS) — cache-first (immutable) */
   if (request.url.includes('/assets/')) {
     event.respondWith(

@@ -77,6 +77,7 @@ function handleMessage(e: MIDIMessageEvent): void {
   switch (status) {
     case 0xb0: {
       /* CC message: channel, cc number, value */
+      if (data.length < 3) break; // 2-byte truncated message — data[2] would be undefined
       const cc = data[1];
       const value = data[2] / 127;
       const key = `${channel}:${cc}`;
@@ -86,6 +87,7 @@ function handleMessage(e: MIDIMessageEvent): void {
     }
     case 0x90: {
       /* Note On */
+      if (data.length < 3) break; // 2-byte truncated message
       const note = data[1];
       const velocity = data[2] / 127;
       noteState.set(`${channel}:${note}`, velocity);

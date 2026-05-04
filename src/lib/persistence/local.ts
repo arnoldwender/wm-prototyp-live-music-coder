@@ -66,7 +66,10 @@ const VALID_ENGINES = new Set(['strudel', 'tonejs', 'webaudio', 'midi']);
 
 /** Deserialize JSON to project with defaults for missing fields */
 export function deserializeProject(json: string): Project {
-  const parsed = JSON.parse(json);
+  const parsed = JSON.parse(json, (key, value) => {
+    if (key === '__proto__' || key === 'constructor') throw new Error(`Forbidden key in project JSON: ${key}`);
+    return value;
+  });
 
   /* Validate critical fields to prevent unsafe deserialization */
   if (parsed.files != null && !Array.isArray(parsed.files)) {

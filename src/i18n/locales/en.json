@@ -27,7 +27,8 @@
     "share": "Share",
     "gist": "Export Gist",
     "settings": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "more": "More"
   },
   "engines": {
     "strudel": "Strudel",
@@ -178,7 +179,10 @@
     "catRave": "Rave / Gabba",
     "catWorld": "World / Ethnic",
     "catRetro": "Retro / Game",
-    "catMisc": "Misc"
+    "catMisc": "Misc",
+    "whatsNew": "What's New",
+    "whatsNewMidi": "Connect any MIDI keyboard or controller — auto-detected with 19 device profiles.",
+    "whatsNewCompose": "Compose Mode — visual multi-track arrangement with piano roll and pattern timeline."
   },
   "collection": {
     "title": "Achievements",

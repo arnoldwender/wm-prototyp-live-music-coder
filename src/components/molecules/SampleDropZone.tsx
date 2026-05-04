@@ -68,6 +68,7 @@ export function SampleDropZone({ onImport }: SampleDropZoneProps) {
       onDragEnter={() => setDragging(true)}
       onDragLeave={() => setDragging(false)}
       onClick={() => inputRef.current?.click()}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
       role="button"
       tabIndex={0}
       aria-label="Drop audio files here or click to import"

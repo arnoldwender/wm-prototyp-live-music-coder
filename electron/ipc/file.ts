@@ -1,10 +1,26 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { ipcMain, dialog, shell, BrowserWindow } from 'electron'
+import { ipcMain, dialog, shell, BrowserWindow, app } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
-import { basename } from 'node:path'
+import { basename, resolve } from 'node:path'
 import { appStore, addRecentFile } from '../store'
+
+/**
+ * Validate that a renderer-supplied path resolves within an allowed root.
+ * Accepts paths inside Documents or the user home directory (broad but bounded).
+ * Returns the resolved absolute path on success, or null if the path escapes.
+ */
+function resolveAllowedPath(filePath: string): string | null {
+  const resolved = resolve(filePath)
+  const docsDir = app.getPath('documents')
+  const homeDir = app.getPath('home')
+  if (resolved.startsWith(docsDir + '/') || resolved === docsDir ||
+      resolved.startsWith(homeDir + '/') || resolved === homeDir) {
+    return resolved
+  }
+  return null
+}
 
 /**
  * Register all file-related IPC handlers.
@@ -31,11 +47,15 @@ export function registerFileHandlers(mainWindow: BrowserWindow): void {
 
   // --- Save to known path without dialog ---
   ipcMain.handle('file:save-path', async (_event, json: string, filePath: string) => {
-    await writeFile(filePath, json, 'utf-8')
-    appStore.set('lastSavePath', filePath)
-    addRecentFile(filePath, basename(filePath))
+    // F-1 fix: validate the renderer-supplied path stays within allowed dirs
+    const safe = resolveAllowedPath(filePath)
+    if (!safe) return { error: 'Path outside allowed directories' }
 
-    return { path: filePath }
+    await writeFile(safe, json, 'utf-8')
+    appStore.set('lastSavePath', safe)
+    addRecentFile(safe, basename(safe))
+
+    return { path: safe }
   })
 
   // --- Open project: show dialog, read file, track recent ---
@@ -62,6 +82,9 @@ export function registerFileHandlers(mainWindow: BrowserWindow): void {
 
   // --- Reveal file in system file manager ---
   ipcMain.on('file:reveal', (_event, filePath: string) => {
-    shell.showItemInFolder(filePath)
+    // F-1 fix: same path validation as file:save-path to prevent arbitrary reveal
+    const safe = resolveAllowedPath(filePath)
+    if (!safe) return
+    shell.showItemInFolder(safe)
   })
 }

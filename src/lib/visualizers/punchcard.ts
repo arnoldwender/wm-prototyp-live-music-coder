@@ -25,13 +25,14 @@ export function drawPunchcard(
   width: number,
   height: number,
   time: number,
-  getRepl: () => any | null,
+  getRepl: () => unknown,
 ) {
   /* Background */
   ctx.fillStyle = VIZ_COLORS.bg;
   ctx.fillRect(0, 0, width, height);
 
-  const repl = getRepl();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const repl = getRepl() as any;
   if (!repl?.scheduler || !repl.state?.pattern?.queryArc) {
     ctx.fillStyle = VIZ_COLORS.textDim;
     ctx.font = '11px monospace';

@@ -60,8 +60,8 @@ export interface EngineAdapter {
   createNode(block: EngineBlock): Promise<AudioNodeWrapper>
   connect(source: AudioNodeWrapper, target: AudioNodeWrapper, connection: Connection): void
   disconnect(source: AudioNodeWrapper, target: AudioNodeWrapper): void
-  start(block: EngineBlock): void
-  stop(block: EngineBlock): void
+  start(block?: EngineBlock): void
+  stop(block?: EngineBlock): void
   dispose(): void
   getAnalyserNode(): AnalyserNode | null
   getAnalyserForBlock(blockId: string): AnalyserNode | null

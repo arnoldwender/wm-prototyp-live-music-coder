@@ -280,7 +280,7 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
   console.log(`[midi] Midi enabled! Using "${deviceName}".`);
 
   /* Return function that creates a Pattern from the hap buffer */
-  const kb = (noteLength: number | any = 0.5): any => {
+  const kb = (noteLength: number = 0.5): any => {
     return new Pattern(function queryMidiKeys(state: any) {
       const begin = state.span.begin;
       const end = state.span.end;

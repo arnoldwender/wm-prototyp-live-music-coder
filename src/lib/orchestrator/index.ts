@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* ──────────────────────────────────────────────────────────
    Orchestrator — central manager for engines, audio graph,
    and playback state. Evaluates code from the editor and
@@ -48,8 +47,9 @@ export class Orchestrator {
   /** Evaluate code with the specified engine */
   async evaluate(code: string, engineType: EngineType): Promise<void> {
     const engine = await this.getEngine(engineType)
-    if ('evaluate' in engine && typeof (engine as any).evaluate === 'function') {
-      await (engine as any).evaluate(code)
+    /* EngineAdapter does not mandate evaluate() — delegate only if present */
+    if ('evaluate' in engine && typeof (engine as Record<string, unknown>).evaluate === 'function') {
+      await (engine as unknown as { evaluate(c: string): Promise<void> }).evaluate(code)
     }
   }
 
@@ -57,9 +57,8 @@ export class Orchestrator {
   async start(): Promise<void> {
     await resumeContext()
     for (const engine of this.engines.values()) {
-      /* start() requires an EngineBlock param in the interface,
-       * but engines handle global start with no args */
-      (engine as any).start()
+      /* Call without a block — interface now accepts optional EngineBlock */
+      engine.start()
     }
     this.state = 'playing'
   }
@@ -67,7 +66,7 @@ export class Orchestrator {
   /** Stop playback — stops all active engines */
   stop(): void {
     for (const engine of this.engines.values()) {
-      (engine as any).stop()
+      engine.stop()
     }
     this.state = 'stopped'
   }
@@ -76,8 +75,9 @@ export class Orchestrator {
   setBpm(bpm: number): void {
     this.bpm = bpm
     for (const [type, engine] of this.engines) {
+      /* setBpm is a ToneJS-specific extension — narrow via unknown */
       if (type === 'tonejs' && 'setBpm' in engine) {
-        (engine as any).setBpm(bpm)
+        (engine as unknown as { setBpm(b: number): void }).setBpm(bpm)
       }
     }
   }
@@ -103,11 +103,8 @@ export class Orchestrator {
     const engine = this.engines.get(engineType)
     if (!engine || !this.initializedEngines.has(engineType)) return null
 
-    /* Delegate to the engine's per-block analyser cache */
-    if ('getAnalyserForBlock' in engine && typeof (engine as any).getAnalyserForBlock === 'function') {
-      return (engine as any).getAnalyserForBlock(blockId)
-    }
-    return null
+    /* Delegate to the engine's per-block analyser cache — method is in the interface */
+    return engine.getAnalyserForBlock(blockId)
   }
 
   /** Dispose all engines and clean up */

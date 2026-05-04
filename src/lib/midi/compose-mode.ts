@@ -11,7 +11,7 @@
    - Undo stack for removing last inserted text
    ────────────────────────────────────────────────────────── */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { EditorView } from '@codemirror/view'
 
 /** MIDI note number to Strudel note name */
 const NOTE_NAMES = ['c', 'db', 'd', 'eb', 'e', 'f', 'gb', 'g', 'ab', 'a', 'bb', 'b']
@@ -44,7 +44,7 @@ interface CapturedNote {
 }
 
 let enabled = false
-let viewGetter: (() => any) | null = null
+let viewGetter: (() => EditorView) | null = null
 let capturedNotes: CapturedNote[] = []
 let flushTimer: ReturnType<typeof setTimeout> | null = null
 const undoStack: UndoEntry[] = []
@@ -63,7 +63,7 @@ const NOTES_PER_LINE = 8
 
 /** Enable compose mode. Pass a GETTER function for the EditorView
  * (not the view directly — it changes when the editor rebuilds). */
-export function enableComposeMode(viewGetterFn: (() => any) | any, _options?: {
+export function enableComposeMode(viewGetterFn: (() => EditorView) | EditorView, _options?: {
   quantize?: QuantizeValue
   bpm?: number
   beatsPerBar?: number
@@ -83,7 +83,7 @@ export function disableComposeMode(): void {
   import.meta.env.DEV && console.log('[ComposeMode] Disabled')
 }
 
-export function toggleComposeMode(viewGetterFn: (() => any) | any): boolean {
+export function toggleComposeMode(viewGetterFn: (() => EditorView) | EditorView): boolean {
   if (enabled) { disableComposeMode(); return false }
   enableComposeMode(viewGetterFn)
   return true
@@ -147,12 +147,12 @@ export function composeNoteOn(midiNote: number, velocity: number): void {
 
 /* ── Flush buffer → editor ────────────────────────── */
 
-function flush(view: any): void {
+function flush(view: EditorView): void {
   if (capturedNotes.length === 0) return
 
   /* Re-resolve view in case it changed during the 20ms window */
   const currentView = viewGetter?.() ?? view
-  if (!currentView?.state) {
+  if (!currentView.state) {
     import.meta.env.DEV && console.warn('[ComposeMode] View lost during flush')
     capturedNotes = []
     return
@@ -202,7 +202,7 @@ function flush(view: any): void {
 
 /* ── Pattern template helpers ─────────────────────── */
 
-export function insertPatternTemplate(editorView: any, template: 'melody' | 'chord' | 'drums'): void {
+export function insertPatternTemplate(editorView: (() => EditorView) | EditorView, template: 'melody' | 'chord' | 'drums'): void {
   const view = typeof editorView === 'function' ? editorView() : editorView
   if (!view) return
 

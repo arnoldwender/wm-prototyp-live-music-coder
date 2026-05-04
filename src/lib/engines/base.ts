@@ -18,8 +18,8 @@ export abstract class BaseEngine implements EngineAdapter {
 
   abstract init(): Promise<void>
   abstract createNode(block: EngineBlock): Promise<AudioNodeWrapper>
-  abstract start(block: EngineBlock): void
-  abstract stop(block: EngineBlock): void
+  abstract start(block?: EngineBlock): void
+  abstract stop(block?: EngineBlock): void
 
   /* Connect two AudioNode wrappers at the Web Audio level */
   connect(source: AudioNodeWrapper, target: AudioNodeWrapper): void {

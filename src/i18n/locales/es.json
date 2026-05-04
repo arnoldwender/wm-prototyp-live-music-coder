@@ -27,7 +27,8 @@
     "share": "Compartir",
     "gist": "Exportar Gist",
     "settings": "Ajustes",
-    "language": "Idioma"
+    "language": "Idioma",
+    "more": "Más"
   },
   "engines": {
     "strudel": "Strudel",
@@ -178,7 +179,10 @@
     "catRave": "Rave / Gabba",
     "catWorld": "World / Étnico",
     "catRetro": "Retro / Juego",
-    "catMisc": "Varios"
+    "catMisc": "Varios",
+    "whatsNew": "Novedades",
+    "whatsNewMidi": "Conecta cualquier teclado o controlador MIDI — detección automática con 19 perfiles de dispositivo.",
+    "whatsNewCompose": "Modo Composición — arreglo multipista visual con piano roll y línea de tiempo de patrones."
   },
   "collection": {
     "title": "Logros",

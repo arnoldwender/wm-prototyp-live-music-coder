@@ -72,12 +72,14 @@ export function onKey(key: string, callback: () => void): void {
 
 /** Global key listener — dispatches to registered onKey bindings */
 let keyListenerActive = false;
+/** Stored reference so the same function can be passed to removeEventListener */
+let keyHandler: ((e: KeyboardEvent) => void) | null = null;
 
 export function startKeyListener(): void {
   if (keyListenerActive) return;
   keyListenerActive = true;
 
-  document.addEventListener('keydown', (e) => {
+  keyHandler = (e: KeyboardEvent) => {
     /* Only fire if not typing in an input/textarea */
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
@@ -89,7 +91,18 @@ export function startKeyListener(): void {
       e.preventDefault();
       handler();
     }
-  });
+  };
+
+  document.addEventListener('keydown', keyHandler);
+}
+
+/** Remove the keydown listener and reset state — safe to call multiple times */
+export function stopKeyListener(): void {
+  if (keyHandler) {
+    document.removeEventListener('keydown', keyHandler);
+    keyHandler = null;
+  }
+  keyListenerActive = false;
 }
 
 /** Clear all key bindings — called on code re-evaluation */
@@ -133,6 +146,10 @@ export function getAllParams(): Map<string, number> {
 /** BroadcastChannel for clock sync between tabs */
 let clockChannel: BroadcastChannel | null = null;
 let isClockLeader = false;
+/** Pending leader-election timeout — must be cancelled on cleanup */
+let leaderTimeout: ReturnType<typeof setTimeout> | null = null;
+/** Guards against double-initialization across HMR cycles */
+let clockSyncInitialized = false;
 
 /**
  * Initialize clock sync — the first tab becomes the leader,
@@ -143,6 +160,9 @@ export function initClockSync(): void {
     import.meta.env.DEV && console.warn('[ClockSync] BroadcastChannel not available');
     return;
   }
+  /* Prevent duplicate channels on HMR re-run */
+  if (clockSyncInitialized) return;
+  clockSyncInitialized = true;
 
   clockChannel = new BroadcastChannel('lmc-clock-sync');
 
@@ -177,8 +197,10 @@ export function initClockSync(): void {
     }
   };
 
-  /* Become leader after a short timeout if no leader responds */
-  setTimeout(() => {
+  /* Become leader after a short timeout if no leader responds.
+   * Store ID so stopClockSync() can cancel it before it fires. */
+  leaderTimeout = setTimeout(() => {
+    leaderTimeout = null;
     if (!isClockLeader) {
       isClockLeader = true;
       import.meta.env.DEV && console.log('[ClockSync] This tab is now the clock leader');
@@ -202,11 +224,16 @@ export function broadcastBpm(bpm: number): void {
   }
 }
 
-/** Stop clock sync */
+/** Stop clock sync — closes the channel, cancels pending leader election, resets all state */
 export function stopClockSync(): void {
+  if (leaderTimeout !== null) {
+    clearTimeout(leaderTimeout);
+    leaderTimeout = null;
+  }
   clockChannel?.close();
   clockChannel = null;
   isClockLeader = false;
+  clockSyncInitialized = false;
 }
 
 /* ── _$: label muting — mute patterns with _$: prefix ── */
