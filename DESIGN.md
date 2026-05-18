@@ -111,3 +111,56 @@ When generating UI for this brand, the agent should:
 - DESIGN.md v1.0 auto-expanded from repo introspection 2026-05-13
 - Replaces previous alpha stub
 - Ready for AI-agent consumption + Stitch DESIGN.md spec compliant
+
+## Components (full inventory)
+
+Total: 67 components across atomic layers. Atoms never import from molecules/organisms; molecules never import from organisms; layouts compose organisms; pages compose layouts + organisms.
+
+### Atoms (19)
+
+`ActivityBarButton`, `Badge`, `Button`, `CanvasVisualizer`, `EngineNode`, `ErrorBoundary`, `FilterCurve`, `Icon`, `Knob`, `Knob.test`, `Logo`, `NotFound`, `TabButton`, `Toggle`, `Tooltip`, `VirtualKeyboard`, `VirtualKeyboard.test`, `WaveformBackground`, `WaveformIcon`
+
+### Molecules (21)
+
+`AchievementToast`, `ContentSidebar`, `EngineSelector`, `ErrorBar`, `FeatureCard`, `FileTabs`, `FilterControl`, `FilterControl.test`, `FilterPill`, `HelpPanel`, `LanguageSwitcher`, `MarkdownRenderer`, `NowPlayingIndicator`, `OscillatorSelector`, `OscillatorSelector.test`, `SampleDropZone`, `ShareDialog`, `SortSelect`, `ToolbarGroup`, `VisualizerPills`, `VisualizerToggle`
+
+### Organisms (27)
+
+`ActivityBar`, `CodeEditor`, `ConsolePanel`, `DetailPanel`, `ExampleGallery`, `FeatureGrid`, `GistDialog`, `HeroSection`, `MidiPanel`, `NodeGraph`, `PatternTimeline`, `PianorollVisualizer`, `PitchwheelVisualizer`, `PunchcardVisualizer`, `SettingsPanel`, `SidePanel`, `SiteNav`, `SpectrumVisualizer`, `SpiralVisualizer`, `StatusBar`, `StrudelEditor`, `SynthPanel`, `TemplateSelector`, `TransportBar`, `TutorialOverlay`, `VisualizerDashboard`, `WaveformVisualizer`
+
+## Color Tokens (full CSS inventory)
+
+Total: 26 `--color-*` tokens defined across 1 CSS file(s).
+Frontmatter `colors:` block is a curated subset; this section is the full ground-truth inventory.
+
+### `src/styles/tokens/colors.css` — 26 tokens
+
+```
+--color-backdrop
+--color-bg
+--color-bg-alt
+--color-bg-elevated
+--color-bg-hover
+--color-border
+--color-border-dim
+--color-error
+--color-midi
+--color-midi-dim
+--color-overlay
+--color-overlay-heavy
+--color-primary
+--color-strudel
+--color-strudel-dim
+--color-strudel-highlight-bg
+--color-strudel-highlight-border
+--color-success
+--color-text
+--color-text-muted
+--color-text-secondary
+--color-tonejs
+--color-tonejs-dim
+--color-warning
+--color-webaudio
+--color-webaudio-dim
+```
+
