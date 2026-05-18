@@ -4,7 +4,7 @@
   "version": "1.1.0",
   "type": "module",
   "main": "out/main/main.cjs",
-  "license": "LicenseRef-Proprietary-Wender-Media",
+  "license": "AGPL-3.0-or-later",
   "author": "Arnold Wender <arnold.wender@gmail.com>",
   "engines": {
     "node": ">=22"
