@@ -40,6 +40,14 @@
 
 Or [try it in your browser](https://live-music-coder.pro) — no download required.
 
+## Sprint History
+
+### Sprint 2026-05-18
+
+- DESIGN.md Tier A completeness pass (components, pages, IDs, tokens, hard-rules)
+- Design-DNA baseline audit snapshot
+- License revert confirmed: AGPL-3.0-or-later + MIT dual license intact
+
 ---
 
 ## Features
