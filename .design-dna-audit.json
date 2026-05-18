@@ -1,0 +1,50 @@
+{
+  "repo": "/Users/arnold/Development/wm-prototyp-live-music-coder",
+  "design_md_palette_size": 15,
+  "files_scanned": 94,
+  "files_with_drift": 2,
+  "drift_pct": 2.13,
+  "threshold": 5.0,
+  "passes_threshold": true,
+  "total_findings": 4,
+  "by_type": {
+    "hardcoded_hex": 4
+  },
+  "by_severity": {
+    "high": 4
+  },
+  "findings": [
+    {
+      "type": "hardcoded_hex",
+      "file": "src/components/atoms/FilterCurve.tsx",
+      "line": 126,
+      "value": "#a855f7",
+      "context": "const primary = readCssVar('--color-primary', '#a855f7')",
+      "severity": "high"
+    },
+    {
+      "type": "hardcoded_hex",
+      "file": "src/components/atoms/FilterCurve.tsx",
+      "line": 127,
+      "value": "#3f3f46",
+      "context": "const border = readCssVar('--color-border', '#3f3f46')",
+      "severity": "high"
+    },
+    {
+      "type": "hardcoded_hex",
+      "file": "src/components/atoms/FilterCurve.tsx",
+      "line": 128,
+      "value": "#71717a",
+      "context": "const textMuted = readCssVar('--color-text-muted', '#71717a')",
+      "severity": "high"
+    },
+    {
+      "type": "hardcoded_hex",
+      "file": "src/components/organisms/ConsolePanel.tsx",
+      "line": 22,
+      "value": "#fbbf24",
+      "context": "warn: '#fbbf24',",
+      "severity": "high"
+    }
+  ]
+}
