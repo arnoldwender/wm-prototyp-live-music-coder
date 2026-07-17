@@ -44,7 +44,7 @@ interface CapturedNote {
 }
 
 let enabled = false
-let viewGetter: (() => EditorView) | null = null
+let viewGetter: (() => EditorView | null) | null = null
 let capturedNotes: CapturedNote[] = []
 let flushTimer: ReturnType<typeof setTimeout> | null = null
 const undoStack: UndoEntry[] = []
@@ -63,7 +63,7 @@ const NOTES_PER_LINE = 8
 
 /** Enable compose mode. Pass a GETTER function for the EditorView
  * (not the view directly — it changes when the editor rebuilds). */
-export function enableComposeMode(viewGetterFn: (() => EditorView) | EditorView, _options?: {
+export function enableComposeMode(viewGetterFn: (() => EditorView | null) | EditorView, _options?: {
   quantize?: QuantizeValue
   bpm?: number
   beatsPerBar?: number
@@ -83,7 +83,7 @@ export function disableComposeMode(): void {
   import.meta.env.DEV && console.log('[ComposeMode] Disabled')
 }
 
-export function toggleComposeMode(viewGetterFn: (() => EditorView) | EditorView): boolean {
+export function toggleComposeMode(viewGetterFn: (() => EditorView | null) | EditorView): boolean {
   if (enabled) { disableComposeMode(); return false }
   enableComposeMode(viewGetterFn)
   return true

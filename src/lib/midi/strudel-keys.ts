@@ -88,7 +88,7 @@ function midiToFreq(note: number): number {
  */
 export function playOscillatorNote(
   midiNote: number,
-  velocity: number,
+  velocity = 0.8, /* normalized 0..1; default forte for one-arg audition calls */
   oscType?: OscillatorType
 ): void {
   try {

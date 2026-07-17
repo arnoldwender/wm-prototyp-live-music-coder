@@ -10,6 +10,9 @@ import { VIZ_COLORS } from './colors';
 import { useAppStore as appStore } from '../store';
 import { extractMidi, extractVelocity } from './midi-utils';
 
+/* 12-tone labels for the harmonic circle (sibling visualizers keep their own). */
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
 export function drawPitchwheel(
   ctx: CanvasRenderingContext2D,
   width: number,
