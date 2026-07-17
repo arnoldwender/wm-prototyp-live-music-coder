@@ -338,9 +338,11 @@ export function StrudelEditor() {
             try {
               const core = await import('@strudel/web') as unknown as Record<string, unknown>;
               const proto = (core.Pattern as { prototype?: Record<string, unknown> } | undefined)?.prototype;
-              for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
-                if (proto[method] && !proto[`_${method}`]) {
-                  proto[`_${method}`] = proto[method];
+              if (proto) {
+                for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
+                  if (proto[method] && !proto[`_${method}`]) {
+                    proto[`_${method}`] = proto[method];
+                  }
                 }
               }
               console.log('[StrudelEditor] Inline widget methods registered + aliased');
