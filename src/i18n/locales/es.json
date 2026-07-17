@@ -600,7 +600,8 @@
     "skipToContent": "Saltar al contenido"
   },
   "footer": {
-    "license": "Live Music Coder — Código abierto (AGPL-3.0)"
+    "license": "Live Music Coder — Código abierto (AGPL-3.0)",
+    "aiDisclosure": "Algunas imágenes de este sitio web son generadas por IA."
   },
   "share": {
     "copied": "¡Copiado!",
