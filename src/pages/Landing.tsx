@@ -224,6 +224,10 @@ function Landing() {
         <p style={{ fontSize: 'var(--font-size-xs)' }}>
           {t('footer.license')}
         </p>
+        {/* KI-Kennzeichnung — EU AI Act Art. 50 (2026-08-02) */}
+        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+          {t('footer.aiDisclosure')}
+        </p>
         <p className="flex items-center justify-center gap-2 mt-3" style={{ fontSize: 'var(--font-size-xs)' }}>
           <a
             href="https://arnoldwender.com"
