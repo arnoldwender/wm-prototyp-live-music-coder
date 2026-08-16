@@ -6,6 +6,14 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Self-hosted IBM Plex (see src/styles/fonts.css for the rationale).
+         Only the two regular weights are preloaded — they cover first paint
+         for both the UI chrome and the code editor. The other five load
+         normally via @font-face; preloading every variant would compete
+         with the JS bundle for bandwidth on first visit. -->
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <title>Live Music Coder — Write Code, Hear Music, Live</title>
     <meta name="description" content="Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and instant code sharing. Free, no install." />
     <!-- Canonical URL handled dynamically per page (SPA) -->
@@ -30,7 +38,7 @@
     <!-- Additional SEO -->
     <meta name="author" content="Wender Media" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#a855f7" />
+    <meta name="theme-color" content="#0f0c0a" />
 
     <!-- JSON-LD structured data: WebApplication -->
     <script type="application/ld+json">

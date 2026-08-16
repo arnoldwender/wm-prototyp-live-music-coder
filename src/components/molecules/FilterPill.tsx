@@ -68,13 +68,18 @@ export function FilterPill({ label, active, onClick, count, color, icon }: Filte
       {/* Label text */}
       <span>{label}</span>
 
-      {/* Optional count badge */}
+      {/* Optional count badge.
+          De-emphasised by its TOKEN, not by an opacity multiplier on
+          top of it. Stacking opacity: 0.8 on --color-text-muted
+          composited it down to #86827d, which fails 4.5:1 — the token
+          already encodes "quieter" and already clears AA on every
+          surface. Compounding the two produced the worst measured
+          ratios on /sessions (docs/A11Y-AUDIT P0-2d). */}
       {count !== undefined && (
         <span
           style={{
             fontSize: 'var(--font-size-xs)',
-            color: active ? 'var(--color-bg)' : 'var(--color-text-muted)',
-            opacity: 0.8,
+            color: active ? 'var(--color-on-accent)' : 'var(--color-text-muted)',
           }}
         >
           ({count})

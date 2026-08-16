@@ -73,7 +73,7 @@ export function HeroSection() {
             fontSize: 'var(--font-size-xs)',
             fontWeight: 'var(--font-weight-semibold)',
             fontFamily: 'var(--font-family-mono)',
-            letterSpacing: '0.1em',
+            letterSpacing: 'var(--letter-spacing-legend-wide)',
             textTransform: 'uppercase',
             marginBottom: 'var(--space-10)',
           }}
@@ -82,7 +82,23 @@ export function HeroSection() {
         </span>
       </motion.div>
 
-      {/* Gradient headline */}
+      {/* Headline — solid ink, not a two-hue gradient.
+          The clipped-gradient headline was the single most generic
+          element on the page: a purple-to-blue wash on near-black is
+          the default landing-page treatment, and it is what made the
+          site read as generated rather than designed.
+
+          It was also functionally weak here. Gradient text drops
+          contrast unpredictably along its own length (the midpoint of
+          amber -> cornflower desaturates to a muddy tan), which is the
+          wrong trade for a product whose headline gets read off a
+          projector at the back of a dark room.
+
+          Solid --color-text measures 17.61:1 on --color-bg — the
+          highest-contrast element on the page, which is what a
+          headline should be. The signal colour is spent where it
+          carries meaning instead: the CTA, the badge and the waveform
+          behind this text. */}
       <motion.h1
         {...fadeUp(0.15)}
         style={{
@@ -91,11 +107,9 @@ export function HeroSection() {
           fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
           fontWeight: 'var(--font-weight-bold)',
           lineHeight: 'var(--line-height-tight)',
+          letterSpacing: 'var(--letter-spacing-tight)',
           marginBottom: 'var(--space-8)',
-          background: 'linear-gradient(135deg, var(--color-strudel), var(--color-tonejs))',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          color: 'var(--color-text)',
         }}
       >
         {t('landing.hero')}

@@ -114,7 +114,7 @@ function AccordionSection({ id: _id, title, children, forceOpen }: AccordionProp
           fontSize: 'var(--font-size-ui)',
           fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.05em',
+          letterSpacing: 'var(--letter-spacing-legend)',
           transition: 'var(--transition-fast)',
         }}
       >
@@ -208,7 +208,7 @@ export function DetailPanel() {
         {/* Mobile close button */}
         {isMobile && (
           <div className="flex items-center justify-between shrink-0" style={{ padding: 'var(--space-2) var(--space-3)', borderBottom: '1px solid var(--color-border)' }}>
-            <span style={{ fontSize: 'var(--font-size-ui)', fontWeight: 600, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: 'var(--font-size-ui)', fontWeight: 600, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-legend)' }}>
               {sections.find(s => s.id === activeSection)?.title}
             </span>
             <button

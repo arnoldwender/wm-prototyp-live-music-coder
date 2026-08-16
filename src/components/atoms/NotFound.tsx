@@ -55,7 +55,7 @@ function NotFound() {
           display: 'inline-block',
           padding: 'var(--space-sm) var(--space-lg)',
           background: 'var(--color-primary)',
-          color: 'var(--color-text)',
+          color: 'var(--color-on-accent)',
           borderRadius: 'var(--radius-md)',
           textDecoration: 'none',
           fontWeight: 'var(--font-weight-medium)',

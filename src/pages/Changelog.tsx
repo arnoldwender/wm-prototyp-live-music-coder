@@ -29,8 +29,8 @@ const CATEGORY_COLORS: Record<ChangelogCategory, string> = {
   bugfix: 'var(--color-error)',
   content: 'var(--color-primary)',
   architecture: 'var(--color-warning)',
-  community: 'var(--color-accent, var(--color-primary))',
-  release: 'var(--color-info, var(--color-success))',
+  community: 'var(--color-accent)',
+  release: 'var(--color-info)',
 }
 
 type SortKey = 'date-desc' | 'date-asc'
@@ -106,7 +106,7 @@ export default function Changelog() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
-      <a href="#changelog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-text)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
+      <a href="#changelog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-on-accent)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
         {t('a11y.skipToContent')}
       </a>
 
@@ -124,7 +124,7 @@ export default function Changelog() {
           style={{
             fontSize: 'var(--font-size-sm)',
             color: 'var(--color-primary)',
-            letterSpacing: '0.12em',
+            letterSpacing: 'var(--letter-spacing-legend-wide)',
             textTransform: 'uppercase',
             margin: '0 0 var(--space-3)',
           }}

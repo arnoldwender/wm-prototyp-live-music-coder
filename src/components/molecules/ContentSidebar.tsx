@@ -26,7 +26,7 @@ const SECTION_TITLE_STYLE: React.CSSProperties = {
   fontSize: 'var(--font-size-xs)',
   fontWeight: 'var(--font-weight-bold)',
   textTransform: 'uppercase',
-  letterSpacing: '0.1em',
+  letterSpacing: 'var(--letter-spacing-legend-wide)',
   color: 'var(--color-text-muted)',
   margin: 0,
   marginBottom: 'var(--space-3)',
