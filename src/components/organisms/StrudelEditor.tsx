@@ -35,7 +35,7 @@ const highlightField = StateField.define<DecorationSet>({
           .filter(({ from, to }) => from >= 0 && to <= tr.newDoc.length && from < to)
           .map(({ from, to }) =>
             Decoration.mark({
-              attributes: { style: 'background-color: rgba(168, 85, 247, 0.25); outline: 1px solid rgba(168, 85, 247, 0.5); border-radius: 2px;' },
+              attributes: { style: 'background-color: var(--color-strudel-highlight-bg); outline: 1px solid var(--color-strudel-highlight-border); border-radius: var(--radius-sm);' },
             }).range(from, to)
           );
         decorations = Decoration.set(marks, true);

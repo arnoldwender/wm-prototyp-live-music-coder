@@ -308,8 +308,8 @@ function VirtualKeyboard({
                 cursor: 'pointer',
                 padding: 0,
                 boxShadow: isActive
-                  ? '0 0 8px var(--color-primary), inset 0 -4px 0 rgba(0,0,0,0.1)'
-                  : 'inset 0 -4px 0 rgba(0,0,0,0.1)',
+                  ? 'var(--shadow-glow-signal), var(--shadow-key-bevel)'
+                  : 'var(--shadow-key-bevel)',
                 transition: 'var(--transition-fast)',
               }}
             />
@@ -348,7 +348,7 @@ function VirtualKeyboard({
                 zIndex: 2,
                 boxShadow: isActive
                   ? '0 0 6px var(--color-primary)'
-                  : '0 2px 4px rgba(0,0,0,0.4)',
+                  : 'var(--shadow-key)',
                 transition: 'var(--transition-fast)',
               }}
             />

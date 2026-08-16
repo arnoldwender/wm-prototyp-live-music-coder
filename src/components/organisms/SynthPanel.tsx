@@ -132,7 +132,7 @@ function SynthPanel({
             fontWeight: 'var(--font-weight-medium)',
             color: 'var(--color-text-secondary)',
             fontFamily: 'var(--font-family-mono)',
-            letterSpacing: '0.05em',
+            letterSpacing: 'var(--letter-spacing-legend)',
             textTransform: 'uppercase',
           }}
         >

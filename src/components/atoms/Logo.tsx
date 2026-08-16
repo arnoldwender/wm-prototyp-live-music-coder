@@ -1,27 +1,34 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   Logo atom — audio waveform icon + app name + optional tagline.
-   Used in landing page header and editor transport bar.
+   Logo atom — level-meter mark + app name.
+   Used in the landing page header and the editor transport bar.
+
+   The "by Wender Media" byline was removed (2026-08-16). The
+   `showTagline` prop went with it rather than being left behind as a
+   switch that toggles nothing: it gated the byline and nothing else, so
+   with the string gone the prop had no branch to control. Attribution
+   lives in the footer, /legal and the repo — it does not need to ride
+   along on the product mark in the editor chrome.
    ---------------------------------------------------------- */
 
 import { useTranslation } from 'react-i18next'
 
-/** Size presets for icon, title, and tagline */
+/** Size presets for mark and title */
 const SIZE_MAP = {
-  sm: { icon: 20, title: 'var(--font-size-sm)', tagline: 'var(--font-size-xs)', gap: 'var(--space-2)' },
-  md: { icon: 28, title: 'var(--font-size-base)', tagline: 'var(--font-size-xs)', gap: 'var(--space-3)' },
-  lg: { icon: 36, title: 'var(--font-size-lg)', tagline: 'var(--font-size-sm)', gap: 'var(--space-3)' },
+  sm: { icon: 20, title: 'var(--font-size-sm)', gap: 'var(--space-2)' },
+  md: { icon: 28, title: 'var(--font-size-base)', gap: 'var(--space-3)' },
+  lg: { icon: 36, title: 'var(--font-size-lg)', gap: 'var(--space-3)' },
 } as const
 
 interface Props {
-  /** Show "by Wender Media" tagline below the app name */
-  showTagline?: boolean
   /** Icon and text scale */
   size?: 'sm' | 'md' | 'lg'
 }
 
-/** Audio waveform SVG — 4 vertical bars representing an equalizer */
+/** Level-meter mark — 4 amber bars.
+    The favicon carries the same mark reduced to 3 bars: at 16px, four
+    bars render as 2px bars with 1px gaps and merge. See public/favicon.svg. */
 function WaveformIcon({ size }: { size: number }) {
   return (
     <svg
@@ -32,20 +39,20 @@ function WaveformIcon({ size }: { size: number }) {
       aria-hidden="true"
       style={{ flexShrink: 0 }}
     >
-      {/* Bar 1 — shortest, lightest purple */}
-      <rect x="2" y="10" width="4" rx="2" height="8" fill="var(--color-primary-light, var(--color-primary))" opacity={0.6} />
+      {/* Bar 1 — shortest, brightest amber */}
+      <rect x="2" y="10" width="4" rx="2" height="8" fill="var(--color-primary-light)" opacity={0.6} />
       {/* Bar 2 — medium height */}
       <rect x="8" y="4" width="4" rx="2" height="16" fill="var(--color-primary)" opacity={0.8} />
       {/* Bar 3 — tallest */}
       <rect x="14" y="2" width="4" rx="2" height="20" fill="var(--color-primary)" />
-      {/* Bar 4 — medium, darkest accent */}
-      <rect x="20" y="7" width="4" rx="2" height="12" fill="var(--color-primary-dark, var(--color-primary))" opacity={0.9} />
+      {/* Bar 4 — medium, dimmed amber */}
+      <rect x="20" y="7" width="4" rx="2" height="12" fill="var(--color-primary-dim)" opacity={0.9} />
     </svg>
   )
 }
 
-/** Logo — waveform icon + "Live Music Coder" + optional tagline */
-function Logo({ showTagline = false, size = 'md' }: Props) {
+/** Logo — level-meter mark + "Live Music Coder" */
+function Logo({ size = 'md' }: Props) {
   const { t } = useTranslation()
   const s = SIZE_MAP[size]
 
@@ -54,36 +61,20 @@ function Logo({ showTagline = false, size = 'md' }: Props) {
       className="flex items-center"
       style={{ gap: s.gap }}
     >
-      {/* Waveform equalizer icon */}
+      {/* Level-meter mark */}
       <WaveformIcon size={s.icon} />
 
-      {/* App name + optional tagline */}
-      <div style={{ lineHeight: 'var(--line-height-tight)' }}>
-        <span
-          style={{
-            fontSize: s.title,
-            fontWeight: 'var(--font-weight-bold)',
-            color: 'var(--color-text)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {t('app.name')}
-        </span>
-
-        {showTagline && (
-          <span
-            style={{
-              display: 'block',
-              fontSize: s.tagline,
-              color: 'var(--color-text-muted)',
-              fontWeight: 'var(--font-weight-normal)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            by Wender Media
-          </span>
-        )}
-      </div>
+      <span
+        style={{
+          fontSize: s.title,
+          fontWeight: 'var(--font-weight-bold)',
+          color: 'var(--color-text)',
+          lineHeight: 'var(--line-height-tight)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {t('app.name')}
+      </span>
     </div>
   )
 }

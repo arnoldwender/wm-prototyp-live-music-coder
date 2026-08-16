@@ -4,10 +4,8 @@
 export interface ElectronAPI {
   getAppInfo: () => Promise<{ version: string; platform: NodeJS.Platform; arch: string; isElectron: true }>
   notify: (title: string, body: string) => void
-  quit: () => void
   checkForUpdates: () => void
   saveProject: (json: string) => Promise<{ path: string } | null>
-  saveProjectToPath: (json: string, filePath: string) => Promise<{ path: string }>
   openProject: () => Promise<{ json: string; path: string } | null>
   getRecentFiles: () => Promise<{ path: string; name: string; date: string }[]>
   revealInFinder: (filePath: string) => void

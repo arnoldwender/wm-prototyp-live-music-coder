@@ -93,7 +93,7 @@ function EngineNode({ data }: NodeProps) {
             fontSize: 'var(--font-size-xs)',
             fontWeight: 'var(--font-weight-bold)',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            letterSpacing: 'var(--letter-spacing-legend)',
             color: 'var(--color-bg)',
           }}
         >

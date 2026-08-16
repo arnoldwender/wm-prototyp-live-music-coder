@@ -4,13 +4,21 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // SECURITY: everything exposed here is reachable from evaluated pattern code —
+  // shared links and gists are run through Function() by design, so this surface
+  // is a public API for strangers, not an internal one. Expose the minimum, and
+  // never expose anything that takes a path or performs an irreversible action
+  // without a native dialog in front of it.
   getAppInfo: () => ipcRenderer.invoke('app:info'),
   notify: (title: string, body: string) => ipcRenderer.send('app:notify', title, body),
-  quit: () => ipcRenderer.send('app:quit'),
   checkForUpdates: () => ipcRenderer.send('app:check-update'),
 
+  // `quit` was REMOVED 2026-08-16: it fired app.quit() unconditionally from the
+  // renderer with no unsaved-work guard and had zero callers. In a live-performance
+  // tool with no autosave, a one-line hostile pattern could end a set and discard it.
+
   saveProject: (json: string) => ipcRenderer.invoke('file:save', json),
-  saveProjectToPath: (json: string, filePath: string) => ipcRenderer.invoke('file:save-path', json, filePath),
+  // `saveProjectToPath` was REMOVED 2026-08-16 — see electron/ipc/file.ts.
   openProject: () => ipcRenderer.invoke('file:open'),
   getRecentFiles: () => ipcRenderer.invoke('file:recent'),
   revealInFinder: (filePath: string) => ipcRenderer.send('file:reveal', filePath),

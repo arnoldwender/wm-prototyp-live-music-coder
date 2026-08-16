@@ -33,17 +33,57 @@
   --space-2xl: var(--space-14); /* 48px */
   --space-3xl: var(--space-16); /* 80px */
 
-  /* --- Border radius --- */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
-  --radius-full: 9999px;
+  /* --- Structural sizes ---
+     Extracted from the 164 raw 'NNNpx' string literals counted across
+     src/components + src/pages + src/layouts (docs/A11Y-AUDIT §P3).
+     These are the recurring magic numbers — chrome heights, content
+     measures and touch floors — that belong in one place. */
+  --size-nav: 4rem;                 /* 64px — SiteNav height            */
+  --size-activity-bar: 2.5rem;      /* 40px — ActivityBar rail width    */
+  --size-touch-min: 2.75rem;        /* 44px — WCAG 2.5.5 / Apple HIG    */
+  --size-touch-comfortable: 3rem;   /* 48px — Material, mobile target   */
+
+  /* Content measures. Named by role, not by number, so a layout change
+     is one edit rather than a grep for '1200px'. */
+  --width-content-sm: 60rem;        /* 960px  — prose, docs, legal      */
+  --width-content-md: 75rem;        /* 1200px — listing grids           */
+  --width-content-lg: 80rem;        /* 1280px — landing, wide sections  */
+
+  /* --- Border radius ---
+     "SIGNAL ROOM" runs tight. Rack panels and console strips have
+     small, consistent radii; the softly-rounded-everything of a stock
+     dashboard is part of what this direction rejects. The scale was
+     halved (was 4 / 8 / 16px).
+
+     HONEST STATE OF --radius-full: the intent is that it means a
+     genuine circle (knob, LED, scrollbar thumb, toggle handle), and
+     Badge was moved off it. But ~27 call sites still use it for
+     capsule chips and tags. Sweeping those is a visual change across
+     9 files that was not in scope for this pass — it is a named
+     follow-up in docs/ART-DIRECTION-2026-08-16.md, not a rule this
+     file can currently claim is enforced. */
+  --radius-sm: 0.125rem;  /* 2px — chips, inputs, tight controls */
+  --radius-md: 0.25rem;   /* 4px — buttons, cards                */
+  --radius-lg: 0.5rem;    /* 8px — dialogs, panels               */
+  --radius-full: 9999px;  /* circles — and, for now, legacy pills */
 
   /* --- Shadows (darker for dark UI) --- */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
-  --shadow-glow-strudel: 0 0 12px rgba(168, 85, 247, 0.15);
+  /* Signal glow — the "this is live" lamp. Derived from the brand
+     wash token so it can never drift from --color-primary again
+     (it was still carrying rgba(168,85,247) — the old purple —
+     long after the accent was supposed to have changed). */
+  --shadow-glow-strudel: 0 0 12px var(--color-primary-wash);
+  --shadow-glow-signal: 0 0 10px var(--color-primary-wash-strong);
+  /* Virtual-keyboard keycap shadows — were raw rgba() at
+     VirtualKeyboard.tsx:311,312,351 (docs/A11Y-AUDIT §P3).
+     Values are the ones already in use, tokenised as-is: the keycap
+     bevel is what makes a key look pressable, and re-inventing it
+     would be a visual change nobody asked for. */
+  --shadow-key: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-key-bevel: inset 0 -4px 0 rgba(0, 0, 0, 0.1);
 
   /* --- Transitions --- */
   --transition-fast: 150ms ease;

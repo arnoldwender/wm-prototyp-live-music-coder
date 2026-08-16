@@ -1,0 +1,53 @@
+# License-gate allowlist — wm-prototyp-live-music-coder
+#
+# WHY THIS FILE EXISTS
+# Arnold's STRICT rule is that WM work never carries an OSS license. This repo is
+# the ratified carve-out (~/.claude/CLAUDE.md, "EXCEPCIÓN 2"): it is deliberately
+# published as AGPL-3.0-or-later, because the combined application links the
+# Strudel live-coding library, which is AGPL. That is not drift and must never be
+# "fixed" — see LICENSING.md, LICENSE-AGPL and LICENSE-MIT.
+#
+# Authorised by Arnold in-session 2026-08-17 (gate-integrity GO).
+#
+# THE THREE FALSE POSITIVES THIS RESOLVES
+# 1. Source files carry `SPDX-License-Identifier` headers. Here those are the
+#    CORRECT mechanism, not a violation: they are what makes the file-level
+#    AGPL/MIT split auditable, and AGPL § 4 conveyance depends on them. The
+#    2026-08-16 legal audit verified 186 of 192 source files carry one (the six
+#    gaps are the CSS token files).
+# 2. The audit reports under docs/ ANALYSE this repo's licensing, so they name
+#    AGPL and MIT as subject matter and detect themselves — the same trap as
+#    wm-project-astro-components/LICENSE, which lists OSS licences in order to
+#    DENY them and therefore trips its own falsifier.
+# 3. public/llms.txt states the project's licence as a fact about the product.
+#
+# WHAT THIS IS NOT
+# Not a blanket disable. The gate still runs on every commit and still blocks
+# anything outside these globs — a stray OSS licence in a new location, in a
+# lockfile, or in prose still fails the commit. Never use `git commit
+# --no-verify` to get past this gate: that disables the entire hook chain,
+# including the secret scanner.
+#
+# One path glob per line.
+#
+# Note the first entry: this file has to allowlist ITSELF, because explaining why
+# AGPL and MIT are legitimate here means naming them, which trips the falsifier.
+# Same self-detection as trap 2 above — a document that cites its own verifier
+# matches it.
+
+.license-allowlist.yml
+src/**
+electron/**
+scripts/**
+docs/**
+public/llms.txt
+LICENSE
+LICENSE-AGPL
+LICENSE-MIT
+LICENSING.md
+README.md
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+package.json

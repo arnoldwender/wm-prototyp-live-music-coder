@@ -23,7 +23,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
     backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-text)',
+    color: 'var(--color-on-accent)',
     padding: 'var(--space-4) var(--space-8)',
     borderRadius: 'var(--radius-md)',
   },

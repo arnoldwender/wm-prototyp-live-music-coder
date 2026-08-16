@@ -86,7 +86,7 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'var(--color-backdrop)',
         backdropFilter: 'blur(4px)',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}

@@ -248,7 +248,7 @@ freqs.forEach((freq, i) => {
               color: 'var(--color-warning)',
               padding: 'var(--space-2) var(--space-4)',
               borderTop: '1px solid var(--color-border)',
-              backgroundColor: 'rgba(245, 158, 11, 0.05)',
+              backgroundColor: 'var(--color-warning-wash)',
             }}>
               {t('engines.midiWarning')}
             </div>
