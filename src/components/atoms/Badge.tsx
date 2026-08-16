@@ -21,11 +21,19 @@ function Badge({ children, color = 'var(--color-primary)', className = '' }: Bad
       className={`inline-flex items-center ${className}`}
       style={{
         backgroundColor: color,
-        color: 'var(--color-text)',
+        /* Dark ink on a saturated fill, never --color-text.
+           Light ink here produced the worst contrast ratios in the
+           app (2.06-3.79 measured). This one atom was the sole cause
+           of 28 of the remaining colour-contrast nodes across /blog
+           and /changelog — the Golden Rule working in reverse.
+           --color-on-accent measures 6.74-13.76 on the same fills. */
+        color: 'var(--color-on-accent)',
         fontSize: 'var(--font-size-xs)',
         fontWeight: 'var(--font-weight-medium)',
         padding: 'var(--space-1) var(--space-4)',
-        borderRadius: 'var(--radius-full)',
+        /* Rack-panel legend, not a pill. --radius-full is reserved for
+           genuine circles (knobs, LEDs, thumbs) — see spacing.css. */
+        borderRadius: 'var(--radius-sm)',
         lineHeight: 'var(--line-height-tight)',
       }}
     >

@@ -88,7 +88,7 @@ export default function Blog() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
-      <a href="#blog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-text)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
+      <a href="#blog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-on-accent)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
         {t('a11y.skipToContent')}
       </a>
 
@@ -106,7 +106,7 @@ export default function Blog() {
           style={{
             fontSize: 'var(--font-size-sm)',
             color: 'var(--color-primary)',
-            letterSpacing: '0.12em',
+            letterSpacing: 'var(--letter-spacing-legend-wide)',
             textTransform: 'uppercase',
             margin: '0 0 var(--space-3)',
           }}

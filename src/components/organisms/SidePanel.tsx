@@ -809,7 +809,7 @@ export function ReferencePanel() {
             fontWeight: 'var(--font-weight-semibold)',
             color: 'var(--color-primary)',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            letterSpacing: 'var(--letter-spacing-legend)',
             padding: 'var(--space-1) var(--space-2)',
           }}>
             {sec.title}

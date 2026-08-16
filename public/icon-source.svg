@@ -1,0 +1,23 @@
+<!-- Live Music Coder — PWA / app-icon source. Art direction "SIGNAL ROOM".
+     Renders public/icon-192.png and public/icon-512.png via
+     scripts/render-icons.mjs. Same mark as favicon.svg, different metrics.
+
+     WHY THIS IS A SEPARATE FILE AND NOT JUST favicon.svg SCALED:
+     manifest.json declares these icons purpose="maskable". A maskable icon
+     is cropped by the OS to an arbitrary shape, and only the central circle
+     of 80% diameter is guaranteed visible. favicon.svg is tuned the other
+     way: its bars run wide so they survive 16px in a browser tab, which
+     puts their corners at r=19.29 on a 48u canvas, right on the r=19.2
+     safe-circle boundary. Android could clip them.
+
+     So: same mark, sized to sit inside the safe zone, on a full-bleed
+     carbon ground so the OS always has material to crop.
+     Measured max corner radius here: 17.40 < 19.2. Verified by script,
+     not assumed. Re-run the check if these rects ever move. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 48 48" role="img" aria-label="Live Music Coder">
+  <!-- Full bleed: no corner radius, the OS mask supplies the shape -->
+  <rect width="48" height="48" fill="#1b1815"/>
+  <rect x="9.9"  y="17.4" width="7.2" height="13.2" rx="2.5" fill="#ffa54b"/>
+  <rect x="20.4" y="8.4"  width="7.2" height="31.2" rx="2.5" fill="#ffc476"/>
+  <rect x="30.9" y="13.8" width="7.2" height="20.4" rx="2.5" fill="#ffa54b"/>
+</svg>

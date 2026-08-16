@@ -319,7 +319,7 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 'var(--font-size-2xs)',
     color: 'var(--color-text-muted, var(--color-text-secondary))',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    letterSpacing: 'var(--letter-spacing-legend)',
     userSelect: 'none',
     opacity: 0.6,
   },

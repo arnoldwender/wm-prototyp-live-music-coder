@@ -76,7 +76,7 @@ export function SampleDropZone({ onImport }: SampleDropZoneProps) {
         padding: 'var(--space-4)',
         border: `2px dashed ${dragging ? 'var(--color-primary)' : 'var(--color-border)'}`,
         borderRadius: 'var(--radius-md)',
-        backgroundColor: dragging ? 'rgba(168, 85, 247, 0.08)' : 'var(--color-bg-alt)',
+        backgroundColor: dragging ? 'var(--color-primary-wash-subtle)' : 'var(--color-bg-alt)',
         cursor: 'pointer',
         transition: 'var(--transition-fast)',
         textAlign: 'center',
@@ -108,7 +108,7 @@ export function SampleDropZone({ onImport }: SampleDropZoneProps) {
             : 'Drop audio files or click to browse'}
       </span>
 
-      <span style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)', opacity: 0.6 }}>
+      <span style={{ fontSize: 'var(--font-size-2xs)', color: 'var(--color-text-muted)' }}>
         WAV, MP3, OGG, FLAC, AAC, M4A
       </span>
 

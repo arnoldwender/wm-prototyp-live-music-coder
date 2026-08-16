@@ -4,8 +4,8 @@
   "description": "Browser-based live coding music IDE. Write code, hear music instantly.",
   "start_url": "/editor",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#a855f7",
+  "background_color": "#0f0c0a",
+  "theme_color": "#0f0c0a",
   "orientation": "any",
   "icons": [
     {

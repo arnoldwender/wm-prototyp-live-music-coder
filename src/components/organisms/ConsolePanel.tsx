@@ -18,9 +18,9 @@ import {
 /* Level → color mapping */
 const LEVEL_COLORS: Record<ConsoleMessage['level'], string> = {
   log: 'var(--color-text)',
-  info: 'var(--color-info, #60a5fa)',
-  warn: '#fbbf24',
-  error: 'var(--color-error, #f87171)',
+  info: 'var(--color-info)',
+  warn: 'var(--color-warning)',
+  error: 'var(--color-error)',
 };
 
 const LEVEL_PREFIX: Record<ConsoleMessage['level'], string> = {
@@ -117,7 +117,7 @@ export function ConsolePanel() {
             style={{
               padding: '1px var(--space-3)',
               color: LEVEL_COLORS[msg.level],
-              borderBottom: '1px solid rgba(39, 39, 42, 0.3)',
+              borderBottom: '1px solid color-mix(in srgb, var(--color-border-dim) 30%, transparent)',
               display: 'flex',
               gap: 'var(--space-2)',
               lineHeight: '1.6',
