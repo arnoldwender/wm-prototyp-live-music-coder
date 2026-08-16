@@ -1,25 +1,37 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { ipcMain, dialog, shell, BrowserWindow, app } from 'electron'
+import { ipcMain, dialog, shell, BrowserWindow } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import { appStore, addRecentFile } from '../store'
 
 /**
- * Validate that a renderer-supplied path resolves within an allowed root.
- * Accepts paths inside Documents or the user home directory (broad but bounded).
- * Returns the resolved absolute path on success, or null if the path escapes.
+ * Gate a renderer-supplied path for `file:reveal`.
+ *
+ * The renderer is NOT a trust boundary here: this app evaluates shared,
+ * user-supplied patterns through `Function()` by design, so any code running in
+ * the renderer must be treated as hostile. A directory-prefix allowlist is the
+ * wrong shape for that threat model — the previous `$HOME`-wide check accepted
+ * `~/.zshrc`, `~/.ssh/authorized_keys` and `~/Library/LaunchAgents/*.plist`.
+ *
+ * Instead we validate against USER INTENT: a path may only be revealed if the
+ * user themselves put it there via the native save/open dialog, i.e. it is
+ * already recorded in the recent-files list. Exact string identity against
+ * paths we recorded ourselves needs no separator or traversal handling, which
+ * also removes the `'/'`-hardcoding that silently disabled the old guard on
+ * Windows.
  */
-function resolveAllowedPath(filePath: string): string | null {
+function isUserChosenPath(filePath: string): string | null {
+  if (typeof filePath !== 'string' || filePath.length === 0) return null
   const resolved = resolve(filePath)
-  const docsDir = app.getPath('documents')
-  const homeDir = app.getPath('home')
-  if (resolved.startsWith(docsDir + '/') || resolved === docsDir ||
-      resolved.startsWith(homeDir + '/') || resolved === homeDir) {
-    return resolved
+  const known = new Set<string>()
+  for (const entry of appStore.get('recentFiles') ?? []) {
+    if (entry?.path) known.add(resolve(entry.path))
   }
-  return null
+  const last = appStore.get('lastSavePath')
+  if (last) known.add(resolve(last))
+  return known.has(resolved) ? resolved : null
 }
 
 /**
@@ -45,18 +57,14 @@ export function registerFileHandlers(mainWindow: BrowserWindow): void {
     return { path: result.filePath }
   })
 
-  // --- Save to known path without dialog ---
-  ipcMain.handle('file:save-path', async (_event, json: string, filePath: string) => {
-    // F-1 fix: validate the renderer-supplied path stays within allowed dirs
-    const safe = resolveAllowedPath(filePath)
-    if (!safe) return { error: 'Path outside allowed directories' }
-
-    await writeFile(safe, json, 'utf-8')
-    appStore.set('lastSavePath', safe)
-    addRecentFile(safe, basename(safe))
-
-    return { path: safe }
-  })
+  // NOTE: the `file:save-path` handler (dialog-free write to a renderer-supplied
+  // path) was REMOVED 2026-08-16. It was an unauthenticated arbitrary-file-write
+  // primitive: any evaluated pattern could reach `saveProjectToPath()` and write
+  // attacker-controlled bytes to `~/.zshrc`, `~/.ssh/authorized_keys` or
+  // `~/Library/LaunchAgents/*.plist`, i.e. code execution from a shared link.
+  // It had zero renderer callers — every save goes through the native dialog in
+  // `file:save` above, which is user-chosen and therefore safe by construction.
+  // Do not reintroduce a dialog-free write path.
 
   // --- Open project: show dialog, read file, track recent ---
   ipcMain.handle('file:open', async () => {
@@ -82,8 +90,10 @@ export function registerFileHandlers(mainWindow: BrowserWindow): void {
 
   // --- Reveal file in system file manager ---
   ipcMain.on('file:reveal', (_event, filePath: string) => {
-    // F-1 fix: same path validation as file:save-path to prevent arbitrary reveal
-    const safe = resolveAllowedPath(filePath)
+    // Only reveal a file the user themselves chose through a native dialog.
+    // See isUserChosenPath: a directory allowlist is the wrong shape when the
+    // renderer runs strangers' code by design.
+    const safe = isUserChosenPath(filePath)
     if (!safe) return
     shell.showItemInFolder(safe)
   })

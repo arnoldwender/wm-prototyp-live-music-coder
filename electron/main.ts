@@ -170,6 +170,63 @@ app.whenReady().then(() => {
     })
   })
 
+  /* --- Navigation guard -------------------------------------------------
+     SECURITY (2026-08-16). This app evaluates shared patterns through
+     Function() by design, so renderer-executing code must be assumed hostile.
+     Without this guard a hostile pattern could set `location.href` and
+     navigate the PRELOAD-ATTACHED window to a remote origin — the preload
+     re-runs on the new document, handing an attacker the full electronAPI
+     surface as a persistent, interactive channel.
+
+     Registered on `web-contents-created` rather than on mainWindow so it also
+     covers pop-out windows, which are created with the same preload.
+
+     Note the app uses HashRouter under Electron, so in-app route changes keep
+     the same file path and only vary the fragment — those pass the check. */
+  const devOrigin = process.env['ELECTRON_RENDERER_URL']
+    ? new URL(process.env['ELECTRON_RENDERER_URL']).origin
+    : null
+  const rendererDir = join(__dirname, '../../dist')
+
+  function isOwnAppUrl(rawUrl: string): boolean {
+    let url: URL
+    try { url = new URL(rawUrl) } catch { return false }
+    if (url.protocol === 'file:') {
+      return decodeURIComponent(url.pathname).startsWith(rendererDir)
+    }
+    return devOrigin !== null && url.origin === devOrigin
+  }
+
+  app.on('web-contents-created', (_event, contents) => {
+    contents.on('will-navigate', (event, url) => {
+      if (isOwnAppUrl(url)) return
+      event.preventDefault()
+      log.warn(`[security] blocked navigation to ${url}`)
+    })
+    // Children (pop-outs) inherit the same deny-and-open-externally policy.
+    contents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) {
+        void shell.openExternal(url)
+      }
+      return { action: 'deny' }
+    })
+  })
+
+  /* --- Permission guard --------------------------------------------------
+     SECURITY (2026-08-16). Electron auto-approves every permission request
+     unless a handler is installed. Combined with the signed app's microphone
+     entitlement, that meant an evaluated pattern could call getUserMedia and
+     trigger a TCC prompt attributed to a notarized music application — the
+     most plausible prompt a user of this app will ever see.
+     Nothing in src/ calls getUserMedia (0 hits); MIDI is the only capability
+     the product actually needs, and it is requested with sysex:false. */
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {
+    callback(permission === 'midi' || permission === 'fullscreen')
+  })
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => {
+    return permission === 'midi' || permission === 'fullscreen'
+  })
+
   const mainWindow = createWindow()
 
   // Register all IPC handlers
