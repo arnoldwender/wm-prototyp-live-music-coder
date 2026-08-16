@@ -196,7 +196,7 @@ export default function Sessions() {
           zIndex: 100,
           padding: 'var(--space-2) var(--space-4)',
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-text)',
+          color: 'var(--color-on-accent)',
           borderRadius: 'var(--radius-sm)',
           fontSize: 'var(--font-size-sm)',
         }}
@@ -275,7 +275,7 @@ export default function Sessions() {
           style={{
             fontSize: 'var(--font-size-sm)',
             color: 'var(--color-primary)',
-            letterSpacing: '0.12em',
+            letterSpacing: 'var(--letter-spacing-legend-wide)',
             textTransform: 'uppercase',
             margin: '0 0 var(--space-3)',
           }}
@@ -594,7 +594,7 @@ export default function Sessions() {
                     backgroundColor: 'var(--color-bg-elevated)',
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius-full)',
-                    letterSpacing: '0.05em',
+                    letterSpacing: 'var(--letter-spacing-legend)',
                     textTransform: 'uppercase',
                     whiteSpace: 'nowrap',
                   }}
@@ -634,7 +634,7 @@ export default function Sessions() {
                       color: 'var(--color-primary)',
                       borderRadius: 'var(--radius-full)',
                       fontSize: '10px',
-                      letterSpacing: '0.08em',
+                      letterSpacing: 'var(--letter-spacing-legend-wide)',
                       textTransform: 'uppercase',
                       fontWeight: 'var(--font-weight-medium)',
                     }}

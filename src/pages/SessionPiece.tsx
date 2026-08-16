@@ -79,7 +79,7 @@ export default function SessionPiece() {
           zIndex: 100,
           padding: 'var(--space-2) var(--space-4)',
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-text)',
+          color: 'var(--color-on-accent)',
           borderRadius: 'var(--radius-sm)',
           fontSize: 'var(--font-size-sm)',
         }}
@@ -117,7 +117,7 @@ export default function SessionPiece() {
           style={{
             fontSize: 'var(--font-size-sm)',
             color: 'var(--color-primary)',
-            letterSpacing: '0.12em',
+            letterSpacing: 'var(--letter-spacing-legend-wide)',
             textTransform: 'uppercase',
             margin: '0 0 var(--space-2)',
           }}
@@ -177,7 +177,7 @@ export default function SessionPiece() {
                   color: 'var(--color-primary)',
                   borderRadius: 'var(--radius-full)',
                   fontSize: '10px',
-                  letterSpacing: '0.08em',
+                  letterSpacing: 'var(--letter-spacing-legend-wide)',
                   textTransform: 'uppercase',
                   fontWeight: 'var(--font-weight-medium)',
                 }}
@@ -301,7 +301,7 @@ export default function SessionPiece() {
                     style={{
                       color: 'var(--color-primary)',
                       fontSize: 'var(--font-size-sm)',
-                      letterSpacing: '0.08em',
+                      letterSpacing: 'var(--letter-spacing-legend-wide)',
                       marginRight: 'var(--space-2)',
                       fontWeight: 'var(--font-weight-medium)',
                     }}

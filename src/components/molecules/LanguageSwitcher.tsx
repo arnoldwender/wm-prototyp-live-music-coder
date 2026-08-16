@@ -34,7 +34,7 @@ function LanguageSwitcher() {
             fontSize: 'var(--font-size-xs)',
             fontWeight: 'var(--font-weight-semibold)',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            letterSpacing: 'var(--letter-spacing-legend)',
           }}
         >
           {lang}

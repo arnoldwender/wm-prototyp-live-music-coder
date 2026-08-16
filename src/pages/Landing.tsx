@@ -77,7 +77,7 @@ function Landing() {
           zIndex: 100,
           padding: 'var(--space-2) var(--space-4)',
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-text)',
+          color: 'var(--color-on-accent)',
           borderRadius: 'var(--radius-sm)',
           fontSize: 'var(--font-size-sm)',
         }}
@@ -171,7 +171,7 @@ function Landing() {
           fontSize: 'var(--font-size-xs)',
           color: 'var(--color-text-muted)',
           marginTop: 'var(--space-4)',
-          letterSpacing: '0.02em',
+          letterSpacing: 'var(--letter-spacing-normal)',
         }}>
           macOS (Apple Silicon + Intel) — Windows &amp; Linux coming soon
         </p>
@@ -188,7 +188,7 @@ function Landing() {
         {/* Powered-by line with engine color dots */}
         <p
           className="flex items-center justify-center gap-3 mb-4"
-          style={{ fontSize: 'var(--font-size-xs)', letterSpacing: '0.05em' }}
+          style={{ fontSize: 'var(--font-size-xs)', letterSpacing: 'var(--letter-spacing-legend)' }}
         >
           {t('landing.poweredBy')}
           <EngineDot color="var(--color-strudel)" />

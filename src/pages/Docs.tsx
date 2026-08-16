@@ -152,7 +152,7 @@ function Docs() {
           zIndex: 100,
           padding: 'var(--space-2) var(--space-4)',
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-text)',
+          color: 'var(--color-on-accent)',
           borderRadius: 'var(--radius-sm)',
           fontSize: 'var(--font-size-sm)',
         }}
@@ -181,7 +181,7 @@ function Docs() {
             style={{ textDecoration: 'none', color: 'inherit' }}
             aria-label={t('nav.backToHome')}
           >
-            <Logo showTagline size="sm" />
+            <Logo size="sm" />
           </Link>
 
           {/* Back to home text link */}

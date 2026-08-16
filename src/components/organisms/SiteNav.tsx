@@ -65,7 +65,7 @@ export function SiteNav() {
         style={{ textDecoration: 'none', color: 'inherit' }}
         aria-label={t('nav.backToHome')}
       >
-        <Logo showTagline size="sm" />
+        <Logo size="sm" />
       </Link>
 
       {/* Right: language switcher + nav links + primary CTA */}

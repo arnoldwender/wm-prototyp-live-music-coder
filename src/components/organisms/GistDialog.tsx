@@ -339,7 +339,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         {/* --- Saved gists history --- */}
         {savedGists.length > 0 && (
           <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)' }}>
-            <div style={{ fontSize: 'var(--font-size-2xs)', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-2)' }}>
+            <div style={{ fontSize: 'var(--font-size-2xs)', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-legend)', marginBottom: 'var(--space-2)' }}>
               Saved Gists
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxHeight: '120px', overflowY: 'auto' }}>

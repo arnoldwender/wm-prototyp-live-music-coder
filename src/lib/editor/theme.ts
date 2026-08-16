@@ -1,9 +1,18 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   CodeMirror 6 dark theme — matches our design tokens.
-   Background zinc-950, purple accents for caret/brackets,
-   syntax colors tuned for music coding readability.
+   CodeMirror 6 default theme — art direction "SIGNAL ROOM".
+
+   Previously this file held 35 raw hex literals plus '14px' and
+   '2px', which made the editor a second, undocumented palette that
+   drifted from the app's tokens. EditorView.theme() and
+   HighlightStyle.define() both accept CSS custom properties, so
+   every value here is now a var(--…) resolved from
+   src/styles/tokens/. One palette, two surfaces.
+
+   Contrast: every syntax role measures >= 4.5:1 against both
+   --color-bg (the editor field) and --color-bg-alt (the active line).
+   See src/styles/tokens/colors.css for the measured ratios.
    ────────────────────────────────────────────────────────── */
 
 import { EditorView } from '@codemirror/view';
@@ -13,73 +22,76 @@ import { tags } from '@lezer/highlight';
 /** Dark editor chrome — backgrounds, gutters, cursor, selection */
 export const darkTheme = EditorView.theme({
   '&': {
-    backgroundColor: '#09090b',
-    color: '#fafafa',
+    backgroundColor: 'var(--color-bg)',
+    color: 'var(--color-text)',
     height: '100%',
   },
   '.cm-content': {
-    fontFamily: "'JetBrains Mono', 'Fira Code', ui-monospace, monospace",
-    fontSize: '14px',
-    lineHeight: '1.6',
-    caretColor: '#a855f7',
+    fontFamily: 'var(--font-family-mono)',
+    fontSize: 'var(--font-size-code)',
+    lineHeight: 'var(--line-height-code)',
+    caretColor: 'var(--color-editor-accent)',
   },
   '.cm-cursor': {
-    borderLeftColor: '#a855f7',
+    borderLeftColor: 'var(--color-editor-accent)',
     borderLeftWidth: '2px',
   },
   '.cm-activeLine': {
-    backgroundColor: '#18181b',
+    backgroundColor: 'var(--color-bg-alt)',
   },
   '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    backgroundColor: '#3f3f46 !important',
+    backgroundColor: 'var(--color-bg-hover) !important',
   },
   '.cm-gutters': {
-    backgroundColor: '#09090b',
-    color: '#71717a',
-    borderRight: '1px solid #27272a',
+    backgroundColor: 'var(--color-bg)',
+    color: 'var(--color-text-muted)',
+    borderRight: '1px solid var(--color-border-dim)',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: '#18181b',
-    color: '#a1a1aa',
+    backgroundColor: 'var(--color-bg-alt)',
+    color: 'var(--color-text-secondary)',
   },
   '.cm-foldGutter': {
-    color: '#71717a',
+    color: 'var(--color-text-muted)',
   },
   '.cm-matchingBracket': {
-    backgroundColor: '#3f3f46',
-    outline: '1px solid #a855f7',
+    backgroundColor: 'var(--color-bg-hover)',
+    outline: '1px solid var(--color-editor-accent)',
   },
   '.cm-searchMatch': {
-    backgroundColor: '#854d0e44',
+    backgroundColor: 'var(--color-editor-search-match)',
   },
   '.cm-tooltip': {
-    backgroundColor: '#27272a',
-    color: '#fafafa',
-    border: '1px solid #3f3f46',
+    backgroundColor: 'var(--color-bg-elevated)',
+    color: 'var(--color-text)',
+    border: '1px solid var(--color-border)',
   },
   '.cm-tooltip-autocomplete': {
-    backgroundColor: '#27272a',
+    backgroundColor: 'var(--color-bg-elevated)',
   },
   '.cm-completionIcon': {
-    color: '#a855f7',
+    color: 'var(--color-editor-accent)',
   },
 }, { dark: true });
 
-/** Syntax highlighting — purple keywords, green strings, yellow numbers */
+/** Syntax highlighting — syntax roles mapped onto the product palette.
+    Restraint is the point: variables stay plain text so that the
+    coloured tokens (what makes sound, what sets time) actually read
+    as signal instead of decoration. */
 export const darkHighlight = syntaxHighlighting(HighlightStyle.define([
-  { tag: tags.keyword, color: '#c084fc' },
-  { tag: tags.string, color: '#86efac' },
-  { tag: tags.number, color: '#fbbf24' },
-  { tag: tags.bool, color: '#fbbf24' },
-  { tag: tags.null, color: '#71717a' },
-  { tag: tags.comment, color: '#71717a', fontStyle: 'italic' },
-  { tag: tags.variableName, color: '#93c5fd' },
-  { tag: tags.function(tags.variableName), color: '#c4b5fd' },
-  { tag: tags.definition(tags.variableName), color: '#67e8f9' },
-  { tag: tags.propertyName, color: '#fca5a5' },
-  { tag: tags.operator, color: '#a1a1aa' },
-  { tag: tags.punctuation, color: '#71717a' },
-  { tag: tags.typeName, color: '#67e8f9' },
-  { tag: tags.className, color: '#67e8f9' },
-  { tag: tags.regexp, color: '#fca5a5' },
+  { tag: tags.keyword, color: 'var(--color-syntax-keyword)' },
+  { tag: tags.string, color: 'var(--color-syntax-string)' },
+  { tag: tags.number, color: 'var(--color-syntax-number)' },
+  { tag: tags.bool, color: 'var(--color-syntax-number)' },
+  { tag: tags.null, color: 'var(--color-syntax-comment)' },
+  { tag: tags.comment, color: 'var(--color-syntax-comment)', fontStyle: 'italic' },
+  { tag: tags.variableName, color: 'var(--color-syntax-variable)' },
+  { tag: tags.function(tags.variableName), color: 'var(--color-syntax-function)' },
+  { tag: tags.definition(tags.variableName), color: 'var(--color-syntax-definition)' },
+  { tag: tags.propertyName, color: 'var(--color-syntax-property)' },
+  { tag: tags.operator, color: 'var(--color-syntax-operator)' },
+  { tag: tags.punctuation, color: 'var(--color-syntax-punctuation)' },
+  { tag: tags.typeName, color: 'var(--color-syntax-definition)' },
+  { tag: tags.className, color: 'var(--color-syntax-definition)' },
+  { tag: tags.regexp, color: 'var(--color-syntax-property)' },
 ]));

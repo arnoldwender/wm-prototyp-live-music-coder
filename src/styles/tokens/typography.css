@@ -1,12 +1,46 @@
 /* ──────────────────────────────────────────────────────────
-   Typography tokens — mono-first for a code editor IDE
-   JetBrains Mono for code, Inter for UI chrome.
+   Typography tokens — art direction "SIGNAL ROOM"
+
+   THE PAIRING DECISION: don't pair — unify.
+
+   The previous stack was JetBrains Mono + Inter, which is two
+   unrelated skeletons (a humanist mono and a Helvetica-descendant
+   neo-grotesk) that share nothing but popularity. Neither was ever
+   actually loaded, so the real shipped stack was "whatever the OS
+   had". That is an unexamined default twice over.
+
+   This project's hero surface IS the code. So the chrome should be
+   a sibling of the code face, not a stranger to it. IBM Plex Mono
+   and IBM Plex Sans come from ONE superfamily (Bold Monday for IBM,
+   2017): shared skeleton, shared proportions, shared vertical
+   metrics. Labels sit on the same rhythm as the code they label.
+
+   Why Plex specifically, over the safe JetBrains Mono default:
+   - It is an INSTITUTIONAL/engineering face, not a startup face.
+     Its grotesk skeleton with clipped terminals reads as instrument
+     panel and engineering drawing — the visual culture of the studio
+     rack, not the SaaS dashboard.
+   - Large apertures and a tall x-height survive projection at
+     distance in a dark room, which is a functional requirement here
+     (this app is used projected, at gigs).
+   - Genuinely distinctive letterforms (single-storey 'a' in italic,
+     the 'g', the flag on the 'l') — legible at a glance from the
+     back of a room and unmistakable in a screenshot.
+
+   Loaded self-hosted from src/styles/fonts.css. Fallbacks are the
+   platform mono/sans so nothing breaks before swap.
    ────────────────────────────────────────────────────────── */
 :root {
   /* --- Font families --- */
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-family-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-family-body: var(--font-family-sans);
+
+  /* Panel-legend voice — the screen-printed label on a rack unit.
+     Mono, uppercase, tracked out. Used for section headers, status
+     readouts and any micro-label. Pair with --letter-spacing-legend
+     and text-transform: uppercase at the call site. */
+  --font-family-legend: var(--font-family-mono);
 
   /* --- Font sizes --- */
   --font-size-2xs: 0.625rem;  /* 10px — status bar, metadata labels */
@@ -19,6 +53,10 @@
   --font-size-2xl: 1.5rem;    /* 24px */
   --font-size-3xl: 2rem;      /* 32px */
 
+  /* Code face size — was hardcoded as '14px' in three editor themes.
+     Tokenised so the editor and the app share one source of truth. */
+  --font-size-code: 0.875rem; /* 14px */
+
   /* --- Font weights --- */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -29,4 +67,23 @@
   --line-height-tight: 1.2;
   --line-height-base: 1.5;
   --line-height-loose: 1.75;
+  /* Code needs more air than prose at the same size — descenders and
+     bracket stacks collide at 1.5 in a mono grid. */
+  --line-height-code: 1.6;
+
+  /* --- Letter spacing ---
+     Tracking is a deliberate signal here, not decoration: tracked-out
+     uppercase mono is how hardware legends are set, and it is what
+     separates a "label" from "text" at a glance in the UI.
+
+     Values are the ones the codebase already used as raw literals in
+     ~10 components (0.05em micro-labels, 0.1em section headers,
+     0.15em the error banner). Tokenised at their established values,
+     so this is a pure refactor with zero visual delta — the idiom was
+     already native here, it just had no name. */
+  --letter-spacing-tight: -0.01em;       /* large display headings      */
+  --letter-spacing-normal: 0;
+  --letter-spacing-legend: 0.05em;       /* uppercase micro-labels      */
+  --letter-spacing-legend-wide: 0.1em;   /* uppercase section headers   */
+  --letter-spacing-legend-alarm: 0.15em; /* the error banner legend     */
 }

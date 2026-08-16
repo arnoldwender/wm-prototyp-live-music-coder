@@ -1,8 +1,10 @@
 /* ──────────────────────────────────────────────────────────
    Global styles — Tailwind CSS v4 + design token imports
-   Dark-mode-only music production aesthetic.
+   Art direction "SIGNAL ROOM" — see docs/ART-DIRECTION-2026-08-16.md
+   Dark-only: this is an instrument surface read in a dark room.
    ────────────────────────────────────────────────────────── */
 @import "tailwindcss";
+@import './fonts.css';
 @import './tokens/index.css';
 
 /* --- Base element styles --- */
@@ -102,7 +104,7 @@ pre,
   border-radius: var(--radius-full);
   background: var(--color-primary);
   border: 2px solid var(--color-bg);
-  box-shadow: 0 0 6px rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 6px var(--color-primary-wash-strong);
   transition: transform 100ms ease, box-shadow 100ms ease;
 }
 
@@ -112,17 +114,17 @@ pre,
   border-radius: var(--radius-full);
   background: var(--color-primary);
   border: 2px solid var(--color-bg);
-  box-shadow: 0 0 6px rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 6px var(--color-primary-wash-strong);
 }
 
 .cm-editor input[type="range"]:hover::-webkit-slider-thumb {
   transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+  box-shadow: var(--shadow-glow-signal);
 }
 
 .cm-editor input[type="range"]:active::-webkit-slider-thumb {
-  background: var(--color-primary-light, #c084fc);
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.9);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 14px var(--color-primary-wash-strong);
 }
 
 /* Strudel inline block widgets (._pianoroll, ._scope, etc.) */
@@ -228,7 +230,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 0 2px var(--color-primary-ring);
   outline: none;
 }
 

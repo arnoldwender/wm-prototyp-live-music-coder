@@ -123,9 +123,9 @@ function FilterCurve({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
     /* Resolve design tokens once per draw — tokens can change with theme */
-    const primary = readCssVar('--color-primary', '#a855f7')
-    const border = readCssVar('--color-border', '#3f3f46')
-    const textMuted = readCssVar('--color-text-muted', '#71717a')
+    const primary = readCssVar('--color-primary', '#ffa54b')
+    const border = readCssVar('--color-border', '#3f3a35')
+    const textMuted = readCssVar('--color-text-muted', '#9e9a95')
 
     /* Background fill — matches the surrounding panel */
     ctx.clearRect(0, 0, width, height)

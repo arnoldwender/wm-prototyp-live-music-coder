@@ -54,10 +54,10 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
         <span style={{
           color: 'var(--color-error)',
           fontWeight: 'var(--font-weight-bold)',
-          letterSpacing: '0.15em',
+          letterSpacing: 'var(--letter-spacing-legend-alarm)',
           textTransform: 'uppercase',
           fontSize: 'var(--font-size-2xs)',
-          textShadow: '0 0 8px rgba(239,68,68,0.6), 2px 0 rgba(239,68,68,0.3), -2px 0 rgba(59,130,246,0.3)', /* overlay — no token equivalent */
+          textShadow: '0 0 8px rgba(250,106,87,0.6), 2px 0 rgba(250,106,87,0.3), -2px 0 rgba(132,186,255,0.3)', /* CRT chromatic aberration — literal channels required, no token equivalent. Mirrors --color-error rgb(250,106,87) + --color-tonejs rgb(132,186,255). */
           flexShrink: 0,
         }}>
           ERR
@@ -100,7 +100,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
               padding: '2px var(--space-2)',
               flexShrink: 0,
               fontFamily: 'var(--font-family-mono)',
-              letterSpacing: '0.05em',
+              letterSpacing: 'var(--letter-spacing-legend)',
               transition: 'var(--transition-fast)',
             }}
           >
@@ -173,7 +173,7 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
             <summary style={{
               cursor: 'pointer',
               fontSize: 'var(--font-size-2xs)',
-              letterSpacing: '0.05em',
+              letterSpacing: 'var(--letter-spacing-legend)',
               textTransform: 'uppercase',
               userSelect: 'none',
             }}>
@@ -185,7 +185,6 @@ export function ErrorBar({ error, onDismiss }: ErrorBarProps) {
               wordBreak: 'break-all',
               color: 'var(--color-text-muted)',
               padding: 'var(--space-2) 0',
-              opacity: 0.7,
             }}>
               {error}
             </code>
