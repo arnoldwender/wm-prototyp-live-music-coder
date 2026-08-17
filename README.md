@@ -90,7 +90,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **MIDI Compose Mode** — Play notes on a connected MIDI keyboard and have them convert to Strudel mini-notation in real time inside the editor. Quantize, auto-insert, and build patterns by playing.
 
-**MIDI Learn** — Map any MIDI CC knob or fader to app parameters with a visual learn workflow. Connect hardware to software controls without editing code.
+**MIDI Learn (preview)** — Start Learn from the USB menu and move a knob; the CC number is captured and stored against the `lpf` parameter. Choosing the target parameter, and applying a stored mapping to a running pattern, are not implemented yet. Live CC control works today through `midin()` in your code.
 
 **Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI CC value mapping, keyboard bindings via `onKey()`.
 
@@ -100,7 +100,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Solo/Mute** — Ctrl+1..9 to solo a layer, Shift+Ctrl+1..9 to mute one. Both toggle the `_` prefix in your code, which is the mechanism Strudel itself honours (`_$:` returns silence), so the state stays visible in the source.
 
-**Clock Sync** — Multi-tab synchronization via BroadcastChannel (leader election, BPM broadcast).
+**Clock Sync (preview)** — Leader election across tabs via BroadcastChannel. Tempo adoption is not implemented yet: the leader is chosen, but followers do not yet lock to its clock.
 
 **Synth Mode** — Virtual on-screen keyboard (2 octaves, QWERTY mapping, velocity from Y position) with oscillator selector (sine/sawtooth/square/triangle), SVG knob controls, and a real-time biquad filter with frequency response curve. Shares the same audio path as the physical MIDI keyboard via `window.__lmcPlayNote`.
 
@@ -194,7 +194,7 @@ Recorder    Visualizers (Canvas 2D)
 | Audio | Strudel, Tone.js, Web Audio API, WebMidi.js |
 | Visualizers | Canvas 2D + requestAnimationFrame |
 | i18n | i18next + react-i18next |
-| Persistence | IndexedDB (idb), lz-string, Octokit |
+| Persistence | IndexedDB (idb) session autosave + crash recovery, lz-string share links, Octokit Gists |
 | Animation | Framer Motion 12 |
 | Icons | Lucide React |
 | Testing | Vitest 4 + Testing Library |
@@ -247,7 +247,7 @@ netlify deploy --prod --dir=dist
 | Status | Feature | Description |
 |--------|---------|-------------|
 | Done | **MIDI Composition Mode** | Play notes on a connected MIDI keyboard and have them convert to Strudel code in real time inside the editor |
-| Done | **MIDI Learn** | Map any MIDI CC knob or fader to app parameters with a visual learn workflow |
+| In progress | **MIDI Learn** | Captures a CC against a fixed parameter; target picker and pattern application still to build |
 | Done | **19 MIDI Device Profiles** | Factory CC mappings for MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more |
 | Done | **Developer Blog + Changelog** | In-app blog and changelog pages with Markdown rendering |
 | Planned | **Strudel Sound Library Browser** | Browse and audition all Strudel sounds (Dirt-Samples, synths, soundfonts) directly from the MIDI keyboard |
