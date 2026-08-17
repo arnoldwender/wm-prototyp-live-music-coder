@@ -7,6 +7,7 @@
 
 import { openDB, type IDBPDatabase } from 'idb';
 import type { Project } from '../../types/project';
+import { DEFAULT_LAYOUT } from '../constants';
 
 const DB_NAME = 'live-music-coder';
 const DB_VERSION = 1;
@@ -105,9 +106,15 @@ export function deserializeProject(json: string): Project {
     defaultEngine: parsed.defaultEngine ?? 'strudel',
     files: parsed.files ?? [{ id: 'file_1', name: 'main.js', engine: 'strudel', code: '', active: true }],
     graph: parsed.graph ?? { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
+    /* Fall back to the real DEFAULT_LAYOUT rather than a hand-written copy.
+       The literal that used to sit here listed only 4 visiblePanels while
+       DEFAULT_LAYOUT defines 7, so any .lmc file or gist without a layout came
+       back with punchcard, spiral and pitchwheel undefined. tsc did not catch it
+       because `parsed` is any. Deep-copy visiblePanels so a restored project
+       cannot alias the module-level default and mutate it. */
     layout: parsed.layout ?? {
-      editorWidth: 50, graphWidth: 50, visualizerHeight: 30, showGraph: false,
-      visiblePanels: { waveform: true, spectrum: true, timeline: true, pianoroll: false },
+      ...DEFAULT_LAYOUT,
+      visiblePanels: { ...DEFAULT_LAYOUT.visiblePanels },
     },
   };
 }
