@@ -13,7 +13,11 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [1.2.0] - 2026-08-17
+
+### security
+
+- **Security release — arbitrary file write, navigation and permission guards** — SECURITY: every previous desktop build could be made to write an attacker-
 
 ### Added
 

@@ -25,6 +25,9 @@ import { useScrollablePage } from '../lib/useScrollablePage'
 
 /* Category colors for badges */
 const CATEGORY_COLORS: Record<ChangelogCategory, string> = {
+  /* Security reads as a warning, not as another feature colour: it is the one
+     badge a user should stop on. */
+  security: 'var(--color-error)',
   feature: 'var(--color-success)',
   bugfix: 'var(--color-error)',
   content: 'var(--color-primary)',
