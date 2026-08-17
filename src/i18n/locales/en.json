@@ -211,8 +211,9 @@
     "done": "Let's go!"
   },
   "graph": {
-    "singleNodeTitle": "Single Pattern Node",
-    "singleNodeDesc": "Strudel patterns are typically one expression. Use Tone.js or Web Audio files for multi-node graphs with complex routing."
+    "emptyTitle": "No pattern yet",
+    "emptyDesc": "Write a pattern in the editor and its signal flow appears here — one lane per voice, one node per chained call.",
+    "viewOnly": "View only — edit the code"
   },
   "completions": {
     "strudel": {

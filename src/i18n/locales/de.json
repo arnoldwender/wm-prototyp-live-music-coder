@@ -211,8 +211,9 @@
     "done": "Los geht's!"
   },
   "graph": {
-    "singleNodeTitle": "Einzelner Pattern-Knoten",
-    "singleNodeDesc": "Strudel-Patterns sind typischerweise ein einziger Ausdruck. Nutze Tone.js oder Web Audio für Multi-Knoten-Graphen mit komplexem Routing."
+    "emptyTitle": "Noch kein Pattern",
+    "emptyDesc": "Schreibe ein Pattern im Editor, und sein Signalfluss erscheint hier — eine Spur pro Stimme, ein Knoten pro verketteten Aufruf.",
+    "viewOnly": "Nur Ansicht — im Code bearbeiten"
   },
   "completions": {
     "strudel": {

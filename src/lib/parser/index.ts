@@ -2,6 +2,7 @@
    Copyright (c) 2026 Arnold Wender / Wender Media
    ────────────────────────────────────────────────────────── */
 import type { EngineType, EngineBlock, Connection } from '../../types/engine';
+import { buildStrudelGraph } from './strudel-graph';
 
 interface ParseResult {
   blocks: EngineBlock[];
@@ -22,18 +23,12 @@ export function parseCode(code: string, engine: EngineType): ParseResult {
 }
 
 function parseStrudel(code: string): ParseResult {
-  /* Strudel code is typically one pattern expression per file.
-   * Treat the entire code as a single source block. */
-  const blocks: EngineBlock[] = [{
-    id: 'strudel_main',
-    engine: 'strudel',
-    type: 'source',
-    code,
-    params: {},
-    inputs: [],
-    outputs: [{ id: 'out', label: 'Output', type: 'audio' }],
-  }];
-  return { blocks, connections: [] };
+  /* A Strudel file is one expression per voice, not one expression per file:
+   * `$:` voices run in parallel, `.lpf().room()` is an ordered chain, and
+   * `stack(a, b)` mixes independent branches. That structure is the graph.
+   * See strudel-graph.ts for why this is a pattern graph and not a Web Audio
+   * routing graph. */
+  return buildStrudelGraph(code);
 }
 
 /* Tone.js source constructors */
