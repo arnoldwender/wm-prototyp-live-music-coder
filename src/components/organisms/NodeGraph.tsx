@@ -22,22 +22,31 @@ import type { Connection as RFConnection, Node, Edge, EdgeChange } from '@xyflow
 import '@xyflow/react/dist/style.css'
 
 import { parseCode } from '../../lib/parser'
+import { layoutGraph } from '../../lib/parser/layout'
 import { generateCode } from '../../lib/codegen'
 import { EngineNode } from '../atoms'
 import { ENGINE_COLORS } from '../../lib/constants'
 import { useAppStore } from '../../lib/store'
-import type { EngineBlock, Connection } from '../../types/engine'
+import type { EngineBlock, Connection, EngineType } from '../../types/engine'
 
 /* Node type registry — must be defined OUTSIDE the component
    so React Flow doesn't re-register on every render */
 const nodeTypes = { engineNode: EngineNode }
 
-/** Convert parsed engine blocks to React Flow nodes with grid layout */
-function blocksToNodes(blocks: EngineBlock[]): Node[] {
-  return blocks.map((block, i) => ({
+/* Engines whose codegen round-trips: their blocks are declarations and their
+   edges are .connect() calls, so a graph edit can be written back as code.
+   Strudel and MIDI are single expressions — generateCode would join the node
+   snippets with newlines and destroy the pattern, so their graph is a view. */
+const EDITABLE_ENGINES: readonly EngineType[] = ['tonejs', 'webaudio']
+
+/** Convert parsed engine blocks to React Flow nodes, laid out by signal depth */
+function blocksToNodes(blocks: EngineBlock[], connections: Connection[]): Node[] {
+  const positions = layoutGraph(blocks, connections)
+
+  return blocks.map((block) => ({
     id: block.id,
     type: 'engineNode',
-    position: { x: i * 220, y: 50 + (i % 3) * 120 },
+    position: positions.get(block.id) ?? { x: 0, y: 0 },
     data: {
       label: block.code.slice(0, 40),
       engine: block.engine,
@@ -110,14 +119,22 @@ export default function NodeGraph() {
     }
 
     const { blocks, connections } = parseCode(activeFile.code, activeFile.engine)
-    setNodes(blocksToNodes(blocks))
+    setNodes(blocksToNodes(blocks, connections))
     setEdges(connectionsToEdges(connections))
   }, [activeFile?.code, activeFile?.engine, activeFile?.id, setNodes, setEdges])
+
+  /* Whether an edit in the canvas can be written back as code for this engine */
+  const graphIsEditable = activeFile
+    ? EDITABLE_ENGINES.includes(activeFile.engine)
+    : false
 
   /** Regenerate code from current graph state and push it to the active file */
   const syncGraphToCode = useCallback(
     (currentNodes: Node[], currentEdges: Edge[]) => {
       if (!activeFile) return
+      /* Never write back for an engine whose codegen cannot rebuild the file —
+         it would replace a working pattern with its own node snippets. */
+      if (!EDITABLE_ENGINES.includes(activeFile.engine)) return
       const blocks = nodesToBlocks(currentNodes)
       const connections = edgesToConnections(currentEdges)
       const newCode = generateCode(blocks, connections, activeFile.engine)
@@ -165,9 +182,8 @@ export default function NodeGraph() {
     return 'var(--color-text-muted)'
   }, [])
 
-  /* When only 0-1 nodes exist (typical for single Strudel expressions),
-     show a helpful info message instead of a lonely node */
-  const showEmptyState = nodes.length <= 1
+  /* Nothing parsed — an empty file, or code with no pattern in it yet */
+  const showEmptyState = nodes.length === 0
 
   return (
     <div
@@ -189,17 +205,33 @@ export default function NodeGraph() {
               className="text-sm font-medium mb-2"
               style={{ color: 'var(--color-text)' }}
             >
-              {t('graph.singleNodeTitle')}
+              {t('graph.emptyTitle')}
             </div>
             <p
               className="text-xs leading-relaxed"
               style={{ color: 'var(--color-text-secondary)' }}
             >
-              {t('graph.singleNodeDesc')}
+              {t('graph.emptyDesc')}
             </p>
           </div>
         </div>
       )}
+
+      {/* Say so when the canvas is a view, rather than letting a drag that
+          silently does nothing read as a broken editor */}
+      {!showEmptyState && !graphIsEditable && (
+        <div
+          className="absolute top-2 right-2 z-10 px-2 py-1 rounded text-xs"
+          style={{
+            backgroundColor: 'var(--color-bg-elevated)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          {t('graph.viewOnly')}
+        </div>
+      )}
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -207,6 +239,10 @@ export default function NodeGraph() {
         onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        nodesConnectable={graphIsEditable}
+        /* null disables deletion: removing a node from a view-only graph would
+           desync it from the code it is derived from */
+        deleteKeyCode={graphIsEditable ? undefined : null}
         proOptions={{ hideAttribution: true }}
         fitView
       >

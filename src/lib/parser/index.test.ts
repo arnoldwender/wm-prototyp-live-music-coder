@@ -11,13 +11,20 @@ describe('parseCode', () => {
     expect(result.connections).toEqual([]);
   });
 
-  it('extracts a Strudel pattern as a source block', () => {
-    const code = 'note("c3 e3 g3").s("sawtooth")';
-    const result = parseCode(code, 'strudel');
-    expect(result.blocks.length).toBe(1);
-    expect(result.blocks[0].engine).toBe('strudel');
+  it('extracts a Strudel pattern as a chain, not as one opaque block', () => {
+    /* This used to assert a single block holding the whole file, which is why
+       the panel could only draw an empty state. Chain structure is the graph —
+       see strudel-graph.test.ts for the full contract. */
+    const result = parseCode('note("c3 e3 g3").s("sawtooth")', 'strudel');
+
+    expect(result.blocks.map((b) => b.code)).toEqual([
+      'note("c3 e3 g3")',
+      's("sawtooth")',
+      'output',
+    ]);
+    expect(result.blocks.every((b) => b.engine === 'strudel')).toBe(true);
     expect(result.blocks[0].type).toBe('source');
-    expect(result.blocks[0].code).toBe(code);
+    expect(result.connections).toHaveLength(2);
   });
 
   it('extracts Tone.js synth creation', () => {

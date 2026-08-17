@@ -211,8 +211,9 @@
     "done": "¡Vamos!"
   },
   "graph": {
-    "singleNodeTitle": "Nodo de Patrón Único",
-    "singleNodeDesc": "Los patrones de Strudel son típicamente una sola expresión. Usa Tone.js o Web Audio para grafos multi-nodo con enrutamiento complejo."
+    "emptyTitle": "Aún no hay patrón",
+    "emptyDesc": "Escribe un patrón en el editor y su flujo de señal aparece aquí — un carril por voz, un nodo por cada llamada encadenada.",
+    "viewOnly": "Solo vista — edita el código"
   },
   "completions": {
     "strudel": {
