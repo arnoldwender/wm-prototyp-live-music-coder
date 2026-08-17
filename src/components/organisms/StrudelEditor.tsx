@@ -958,8 +958,22 @@ export function StrudelEditor() {
                             unsub();
                           }
                         });
-                        startMidiLearn('lpf');
-                        setMidiLearning(true);
+                        /* The target used to be hardcoded to 'lpf', so every
+                           Learn produced the same mapping regardless of intent.
+                           Offer the parameters the user has actually created,
+                           falling back to lpf when there are none yet. */
+                        void import('../../lib/strudel-extensions').then(({ listParamNames }) => {
+                          const names = listParamNames();
+                          const target = names.length
+                            ? (window.prompt(
+                                `Map the knob to which parameter?\n\n${names.join(', ')}`,
+                                names[0],
+                              ) ?? '').trim()
+                            : 'lpf';
+                          if (!target) { unsub(); setMidiLearning(false); return; }
+                          startMidiLearn(target);
+                          setMidiLearning(true);
+                        });
                       });
                     }
                   }}

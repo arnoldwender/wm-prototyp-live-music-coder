@@ -497,7 +497,7 @@
       "onkeyHeading": "onKey() — Atajos de Teclado",
       "onkeyText": "Asigna teclas a acciones con onKey(tecla, callback). Funciona cuando el editor no tiene foco.",
       "paramsHeading": "createParams() — Parámetros Nombrados",
-      "paramsText": "Crea parámetros nombrados con createParams(nombre, predeterminado). Cámbialos con setParam() o mapeo MIDI CC."
+      "paramsText": "Crea parámetros con nombre usando createParams(name, default). El valor es live: setParam(), o un knob asignado con MIDI Learn, cambia un patrón en ejecución sin volver a evaluarlo."
     },
     "visualizers": {
       "title": "Visualizadores",

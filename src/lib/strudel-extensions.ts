@@ -119,11 +119,41 @@ const customParams = new Map<string, number>();
  * Create a named parameter accessible from patterns.
  * Usage: `createParams('cutoff', 1000)` then use `param('cutoff')` in patterns.
  */
-export function createParams(name: string, defaultValue = 0): number {
+/* Strudel's ref() primitive, captured when the extensions load.
+   ref(accessor) builds a pattern that calls the accessor at QUERY time, which is
+   what makes a parameter live. Held in a module variable because createParams is
+   synchronous — user code calls it inside an evaluated pattern and cannot await. */
+let strudelRef: ((accessor: () => unknown) => unknown) | null = null;
+
+/**
+ * Create a named parameter.
+ *
+ * Returns a Strudel ref, not a number. It used to return
+ * `customParams.get(name)` — a plain snapshot taken at evaluation time — so
+ * setParam() changed a Map that the already-evaluated pattern never read again.
+ * The shipped documentation said "Change them with setParam() or via MIDI CC
+ * mapping"; neither did anything until the user re-evaluated.
+ *
+ * With ref() the accessor runs on every query, so setParam and a MIDI CC land on
+ * a running pattern. Falls back to the number when ref is unavailable (extensions
+ * not loaded yet), which preserves the old behaviour rather than throwing.
+ */
+export function createParams(name: string, defaultValue = 0): unknown {
   if (!customParams.has(name)) {
     customParams.set(name, defaultValue);
   }
-  return customParams.get(name)!;
+  if (!strudelRef) return customParams.get(name)!;
+  return strudelRef(() => customParams.get(name) ?? defaultValue);
+}
+
+/** Names of every parameter created this session, for the MIDI Learn target picker. */
+export function listParamNames(): string[] {
+  return [...customParams.keys()];
+}
+
+/** Read the current value of a named parameter as a plain number. */
+export function getParamValue(name: string): number | undefined {
+  return customParams.get(name);
 }
 
 /** Set a parameter value (called from UI controls or MIDI mapping) */
@@ -336,6 +366,40 @@ export async function loadAllExtensions(): Promise<void> {
     };
   } catch {
     /* Gamepad API unavailable — gamepad() stays undefined, same as before. */
+  }
+
+  /* Apply learned MIDI CC mappings to named parameters.
+   *
+   * midi-learn stored a paramName -> ccNumber map that NOTHING read: getMidiMapping
+   * and getAllMappings had no consumers, so a user could complete the Learn flow
+   * and the knob still controlled nothing. The shipped docs said parameters are
+   * changeable "via MIDI CC mapping"; this is the half that was missing.
+   *
+   * Listening on the same lmc-midi-cc event the synth panel uses keeps one source
+   * of CC truth. Values arrive normalised 0-1; setParam stores them, and because
+   * createParams now returns a ref the running pattern picks them up on its next
+   * query without re-evaluation. */
+  if (typeof window !== 'undefined') {
+    window.addEventListener('lmc-midi-cc', (event) => {
+      const { cc, value } = (event as CustomEvent<{ cc: number; value: number }>).detail;
+      void import('./midi/midi-learn').then(({ getAllMappings }) => {
+        for (const [paramName, mappedCc] of Object.entries(getAllMappings())) {
+          if (mappedCc === cc) setParam(paramName, value);
+        }
+      }).catch(() => { /* midi-learn unavailable — CC still reaches the synth panel */ });
+    });
+  }
+
+  /* Capture ref() so createParams can return a live parameter rather than a
+     snapshot. Imported from @strudel/web because that is what the shipped REPL
+     resolves; @strudel/core cannot be imported directly here. */
+  try {
+    const core = await import('@strudel/web') as unknown as {
+      ref?: (accessor: () => unknown) => unknown
+    };
+    if (typeof core.ref === 'function') strudelRef = core.ref;
+  } catch {
+    /* ref unavailable — createParams keeps returning a number, as before. */
   }
 
   /* Expose functions globally for use in Strudel code */
