@@ -60,7 +60,7 @@
      Badge was moved off it. But ~27 call sites still use it for
      capsule chips and tags. Sweeping those is a visual change across
      9 files that was not in scope for this pass — it is a named
-     follow-up in docs/ART-DIRECTION-2026-08-16.md, not a rule this
+     follow-up in
      file can currently claim is enforced. */
   --radius-sm: 0.125rem;  /* 2px — chips, inputs, tight controls */
   --radius-md: 0.25rem;   /* 4px — buttons, cards                */
