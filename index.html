@@ -2,6 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Content-Security-Policy for the PACKAGED DESKTOP BUILD.
+         electron/main.ts delivers a CSP via webRequest.onHeadersReceived, but
+         that never applies under file://, which is how the packaged app loads
+         (main.ts uses loadFile). Proof by contradiction: if it did apply, its
+         `script-src 'self'` would evaluate 'self' against an opaque origin and
+         block file:///…/assets/index-*.js — every shipped build would be a black
+         screen, and they are not. So until today the desktop app ran with NO
+         policy at all, and an evaluated pattern could fetch() any host.
+
+         This policy is derived from the WEB one in netlify.toml, deliberately —
+         NOT from the string in main.ts, which is materially weaker (it allows
+         `ws:`/`wss:` to any host and `img-src https:`, i.e. exactly the
+         exfiltration the web build blocks, and omits form-action, object-src,
+         base-uri and frame-ancestors entirely).
+
+         Deltas from the web header, each intentional:
+         · `file:` added — required for the packaged renderer to load its own
+           assets. Harmless on web: the Netlify header also applies there and a
+           browser enforces the INTERSECTION of header and meta, so the web build
+           stays exactly as tight as netlify.toml.
+         · `ws://localhost:8080` added for the @strudel/osc bridge. It only takes
+           effect on desktop; on web the header intersection still refuses it,
+           which is correct — the OSC bridge is a local process.
+         · `freesound.org` REMOVED. It was allowlisted for code that does not
+           exist (0 references in src/), and a dead allowlist entry is a live
+           exfiltration destination — freesound.org accepts authenticated uploads.
+         · `form-action 'self'` added. It was absent everywhere, so an injected
+           form could POST the stored GitHub PAT to any host. CSP cannot stop
+           top-level navigation, but it can stop this.
+
+         'unsafe-eval' is required and non-negotiable: evaluating user patterns
+         through Function() is the product. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' file:; script-src 'self' file: 'unsafe-eval' blob: data:; script-src-elem 'self' file: blob: data:; style-src 'self' file: 'unsafe-inline'; connect-src 'self' file: https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com ws://localhost:8080 ws://127.0.0.1:8080; img-src 'self' file: data: blob:; media-src 'self' file: blob: data:; font-src 'self' file: data:; worker-src 'self' file: blob: data:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
