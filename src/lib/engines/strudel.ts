@@ -38,11 +38,16 @@ export class StrudelEngine extends BaseEngine {
     if (!this.replInstance) throw new Error('Strudel not initialized')
 
     try {
-      /* Strip REPL-style $: prefix that users copy from Strudel REPL */
-      const cleanCode = code.replace(/^\$\s*:\s*/gm, '')
-      if (!cleanCode.trim()) return
+      /* Pass the code through unmodified.
+       *
+       * This used to delete leading `$:` labels, on the theory that they were
+       * REPL noise users had pasted in. They are not: Strudel's transpiler
+       * compiles `$: pat` into `pat.p('$')` and the REPL stacks every such
+       * registration, so removing them collapses a multi-layer pattern down to
+       * whichever layer happened to be last. See src/lib/dollar-label.test.ts. */
+      if (!code.trim()) return
 
-      await this.replInstance.evaluate(cleanCode)
+      await this.replInstance.evaluate(code)
     } catch (err) {
       console.error('[Strudel] Evaluation error:', err)
       throw err

@@ -303,53 +303,28 @@ export function StrudelEditor() {
           console.warn('[StrudelEditor] @strudel/codemirror extensions not available:', err);
         }
 
-        /* Load @strudel/draw and register inline widget methods on Pattern.prototype.
-         * @strudel/draw exports pianoroll/punchcard/spiral/pitchwheel as background
-         * painters (Pattern.prototype.pianoroll). The _underscore versions (_pianoroll)
-         * are inline CM6 widgets — they need registerWidget from @strudel/codemirror. */
+        /* Inline widgets (_pianoroll, _punchcard, _scope, _spiral, _pitchwheel,
+         * _spectrum) need NO registration here: @strudel/codemirror registers all
+         * six at import time.
+         *
+         * A previous version called registerWidget() with the NON-underscore
+         * names, believing — as its comment said — that registerWidget "adds
+         * Pattern.prototype._type = fn (with underscore!)". It does not. It
+         * assigns Pattern.prototype[type], the plain name, so instead of adding
+         * inline widgets it OVERWROTE the genuine background painters from
+         * @strudel/draw, whose signature is a single options object rather than
+         * (id, options).
+         *
+         * The consequence was not subtle: @strudel/codemirror's own _pianoroll
+         * calls pat.tag(id).pianoroll({...}), which then hit the overwritten
+         * wrapper with the options object in the `id` slot, leaving `haps`
+         * undefined and throwing. Five shipped examples use ._pianoroll().
+         *
+         * See src/lib/widget-registration.test.ts, which also asserts the library
+         * still registers the underscore variants — that is what makes leaving
+         * this out safe rather than merely less broken. */
         try {
-          const draw = await import('@strudel/draw');
           const strudelCMod = strudelExtRef.current;
-          if (strudelCMod?.registerWidget && draw) {
-            /* Register inline widget methods with their draw functions.
-             * registerWidget(type, fn) does TWO things:
-             * 1. Tells the transpiler to detect ._type() calls
-             * 2. Adds Pattern.prototype._type = fn (with underscore!)
-             * We pass the __pianoroll etc. functions from @strudel/draw. */
-            const drawTyped = draw as unknown as Record<string, unknown>;
-            const drawFns: Record<string, unknown> = {
-              pianoroll: drawTyped.__pianoroll ?? drawTyped.drawPianoroll,
-              punchcard: drawTyped.getPunchcardPainter,
-              pitchwheel: drawTyped.pitchwheel,
-            };
-            for (const [type, fn] of Object.entries(drawFns)) {
-              try {
-                if (fn) strudelCMod.registerWidget(type, fn);
-                else strudelCMod.registerWidget(type);
-              } catch { /* already registered */ }
-            }
-            /* Also register types without draw functions (transpiler-only) */
-            for (const type of ['scope', 'spiral', 'spectrum']) {
-              try { strudelCMod.registerWidget(type); } catch {}
-            }
-
-            /* Fallback: if _pianoroll still not on Pattern.prototype,
-             * alias from the non-underscore version that @strudel/draw adds */
-            try {
-              const core = await import('@strudel/web') as unknown as Record<string, unknown>;
-              const proto = (core.Pattern as { prototype?: Record<string, unknown> } | undefined)?.prototype;
-              if (proto) {
-                for (const method of ['pianoroll', 'punchcard', 'scope', 'spiral', 'pitchwheel', 'spectrum']) {
-                  if (proto[method] && !proto[`_${method}`]) {
-                    proto[`_${method}`] = proto[method];
-                  }
-                }
-              }
-              console.log('[StrudelEditor] Inline widget methods registered + aliased');
-            } catch {
-              console.log('[StrudelEditor] Widget types registered (transpiler only)');
-            }
-          }
 
           /* Expose sliderWithID and slider globally — the transpiler rewrites
            * slider(0.5, 0, 1) to sliderWithID("slider_42", 0.5, 0, 1) but
@@ -628,8 +603,19 @@ export function StrudelEditor() {
         if (ctx?.state === 'suspended') await ctx.resume();
       } catch { /* AudioContext resume failed — Strudel will handle it */ }
 
-      /* Pre-process code: handle _$: muted patterns before evaluation */
-      let code = view.state.doc.toString().replace(/^\$\s*:\s*/gm, '');
+      /* Pre-process code: handle _$: muted patterns before evaluation.
+       *
+       * The document is passed RAW. A previous version deleted every leading
+       * `$:` label here, which silently dropped every layer but the last: the
+       * transpiler turns `$: pat` into `pat.p('$')` and the REPL stacks those
+       * registrations, so without the labels they become bare expressions and
+       * only the final one is returned. Run therefore played one layer of a
+       * session that defines four, while the debounced live-eval path at :440 —
+       * which always passed the raw document — played all of them.
+       *
+       * Note processMutedLabels below operates on `_$:`, which is a different
+       * prefix and still works on the raw text. See src/lib/dollar-label.test.ts. */
+      let code = view.state.doc.toString();
       try {
         const { processMutedLabels, clearKeyBindings } = await import('../../lib/strudel-extensions');
         code = processMutedLabels(code);
