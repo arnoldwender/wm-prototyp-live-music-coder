@@ -16,7 +16,13 @@ export type UpdateFailureKind =
   | 'feed'
   /** The download arrived but did not match the checksum in the feed. */
   | 'integrity'
-  /** Network, permissions, anything else — usually transient. */
+  /** Squirrel could not stage the update: the app is somewhere it cannot be
+   *  replaced — a read-only volume, a quarantined copy running translocated, or
+   *  a directory the user does not own. Measured, not theorised: a 1.2.0 build
+   *  run from a temp directory downloads 1.3.0, verifies it, and then fails with
+   *  "Could not create temporary directory: Permission denied". */
+  | 'staging'
+  /** Network, or anything not otherwise recognised. */
   | 'other'
 
 /* Matched against the error message electron-updater surfaces. The signature
@@ -37,11 +43,40 @@ const FEED_PATTERNS = [
 
 const INTEGRITY_PATTERNS = [/checksum mismatch/i, /sha512/i]
 
+/* Squirrel reports these in the SYSTEM language, so matching English text alone
+   would miss every non-English machine — the failure that produced this list
+   arrived as "Zugriff verweigert" on a German system. The stable half of the
+   message is the part Squirrel writes itself, so match on that and treat the
+   localised suffix as unmatchable. */
+const STAGING_PATTERNS = [
+  /Could not create temporary directory/i,
+  /Could not (?:copy|move|replace)/i,
+  /read-?only file system/i,
+  /ENOENT|EACCES|EPERM|EROFS/,
+]
+
 export function classifyUpdateError(message: string): UpdateFailureKind {
   if (SIGNATURE_PATTERNS.some((p) => p.test(message))) return 'signature'
   if (FEED_PATTERNS.some((p) => p.test(message))) return 'feed'
   if (INTEGRITY_PATTERNS.some((p) => p.test(message))) return 'integrity'
+  if (STAGING_PATTERNS.some((p) => p.test(message))) return 'staging'
   return 'other'
+}
+
+/**
+ * Whether the user has to be told, given how far the update had already got.
+ *
+ * The category alone is not enough. Once "Version X downloaded — restart now?"
+ * has been shown, the app has made a promise, and ANY later error breaks it —
+ * including an unrecognised one. Staying quiet then reproduces exactly the
+ * failure this module exists to end: a Restart button that does nothing and
+ * explains nothing.
+ *
+ * Before that promise, an unrecognised error is a background check that failed,
+ * and interrupting someone every four hours over it would be its own bug.
+ */
+export function shouldNotify(kind: UpdateFailureKind, updateWasOffered: boolean): boolean {
+  return kind !== 'other' || updateWasOffered
 }
 
 /**
@@ -59,9 +94,9 @@ export function isTerminal(kind: UpdateFailureKind): boolean {
 /**
  * The message shown to the user.
  *
- * Only written for failures worth interrupting someone over. A transient
- * network error during a background check is not one — it returns null and
- * stays in the log.
+ * Returns null only when there is nothing worth interrupting for — see
+ * shouldNotify for when that is, which depends on whether the app already
+ * promised the user an update.
  */
 export function failureMessage(
   kind: UpdateFailureKind,
@@ -70,6 +105,14 @@ export function failureMessage(
   const target = version ? `Version ${version}` : 'The update'
 
   switch (kind) {
+    case 'staging':
+      return (
+        `${target} was downloaded and verified, but it could not replace this ` +
+        'copy of the app. That usually means the app is running from a place it ' +
+        'cannot be updated in — a disk image, a read-only volume, or a folder ' +
+        'owned by someone else. Move the app to your Applications folder and ' +
+        'open it from there, or download the latest release and replace it.'
+      )
     case 'signature':
       return (
         `${target} was downloaded, but macOS will not let it replace this copy: ` +
@@ -89,6 +132,9 @@ export function failureMessage(
         'You can download the latest release manually.'
       )
     case 'other':
-      return null
+      return (
+        `${target} could not be installed. The details are in the app log; ` +
+        'downloading the latest release and replacing this copy always works.'
+      )
   }
 }

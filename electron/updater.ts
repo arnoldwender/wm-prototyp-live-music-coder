@@ -5,7 +5,7 @@ import { app, dialog, shell, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 
-import { classifyUpdateError, isTerminal, failureMessage } from './update-failure'
+import { classifyUpdateError, isTerminal, shouldNotify, failureMessage } from './update-failure'
 
 // --- Where a user is sent when the app cannot update itself ---
 const RELEASES_URL =
@@ -81,6 +81,13 @@ export function initUpdater(mainWindow: BrowserWindow): void {
       autoUpdater.autoInstallOnAppQuit = false
       autoUpdater.autoDownload = false
     }
+
+    /* An unrecognised error only interrupts once the app has already promised an
+       update. Measured on a real 1.2.0 -> 1.3.0 run: Squirrel failed to stage
+       with a message in the SYSTEM language, after the "restart now?" prompt had
+       been shown. Keying the dialog on the category alone left that silent —
+       which is the exact failure this handler exists to end. */
+    if (!shouldNotify(kind, offeredVersion !== null)) return
 
     const message = failureMessage(kind, offeredVersion)
     if (!message || failureReported || mainWindow.isDestroyed()) return
