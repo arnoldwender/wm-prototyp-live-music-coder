@@ -74,9 +74,11 @@ export class Orchestrator {
   /** Set BPM across all engines that support it */
   setBpm(bpm: number): void {
     this.bpm = bpm
-    for (const [type, engine] of this.engines) {
-      /* setBpm is a ToneJS-specific extension — narrow via unknown */
-      if (type === 'tonejs' && 'setBpm' in engine) {
+    for (const [, engine] of this.engines) {
+      /* Forward to every engine that implements setBpm. This used to be gated on
+         type === 'tonejs', which meant the transport BPM control did nothing for
+         'strudel' — the DEFAULT engine (see DEFAULT_ENGINE in ../constants). */
+      if ('setBpm' in engine) {
         (engine as unknown as { setBpm(b: number): void }).setBpm(bpm)
       }
     }

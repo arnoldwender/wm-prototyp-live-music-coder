@@ -578,8 +578,8 @@
       "mutingText": "Añade _$: como prefijo a un patrón para silenciarlo sin borrar el código. Elimina el prefijo para recuperarlo. Útil para preparar un patrón mientras el actual suena.",
       "soloMuteHeading": "Atajos de Solo / Mute",
       "soloMuteText": "Etiqueta los patrones con $d1:, $d2:, etc. para usar atajos de teclado durante la actuación:",
-      "altSolo": "Alt+1…9 — poner en solo el patrón $d1 hasta $d9 (todos los demás silenciados)",
-      "shiftAltMute": "Shift+Alt+1…9 — activar/desactivar silencio en el patrón $d1 hasta $d9",
+      "altSolo": "Ctrl+1…9 — solo de la capa N (las demás capas etiquetadas se silencian)",
+      "shiftAltMute": "Shift+Ctrl+1…9 — alterna el silencio de la capa N",
       "stackingHeading": "Capas con Etiquetas",
       "stackingText": "Usa patrones etiquetados ($d1:, $d2:, $d3:) en lugar de stack() durante las actuaciones en vivo. Las etiquetas permiten poner en solo y silenciar capas individuales con atajos de teclado. Usa stack() para piezas terminadas."
     },
@@ -594,7 +594,8 @@
       "downloadText": "La barra de herramientas incluye un botón de descarga que guarda tu código actual como archivo .js. Útil para hacer copias de seguridad de patrones o compartirlos fuera de la app.",
       "sessionsHeading": "Biblioteca de Sesiones",
       "sessionsText": "La página /sessions contiene 49 piezas curadas compuestas por IA en 15 géneros (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi y más). Abre cualquier sesión en el editor con un clic. Las sesiones son un excelente punto de partida para explorar lo que Strudel puede hacer."
-    }
+    },
+    "shortcutsSoloMute": "Ctrl+1..9 — solo de la capa N · Shift+Ctrl+1..9 — silenciar la capa N (alterna el prefijo _ en tu código)"
   },
   "a11y": {
     "skipToContent": "Saltar al contenido"
