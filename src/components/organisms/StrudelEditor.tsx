@@ -172,6 +172,10 @@ export function StrudelEditor() {
   const [composeMode, setComposeMode] = useState(false);
   const composeModeRef = useRef(false);
   composeModeRef.current = composeMode;
+  /* handleStop is defined below the editor effect that registers the Ctrl+.
+     keybinding, so the keymap reaches it through a ref rather than closing over
+     a stale value. Assigned right after the callback is created. */
+  const handleStopRef = useRef<(() => void) | null>(null);
   const [midiLearning, setMidiLearning] = useState(false);
   const midiMenuRef = useRef<HTMLDivElement>(null);
 
@@ -224,6 +228,9 @@ export function StrudelEditor() {
          * afterEval receives { code, pattern, meta } where meta contains
          * widgets and miniLocations from the transpiler. */
         const { initStrudel } = await import('@strudel/web');
+        /* Put superdough on the app's shared AudioContext before the REPL is built.
+         * Without this the app runs separate contexts and recording captures silence. */
+        await (await import('../../lib/audio/context')).adoptSharedContextForStrudel();
         const repl = await initStrudel({
           afterEval: ({ meta }: { meta?: { widgets?: unknown[]; miniLocations?: unknown[] } }) => {
             const view = viewRef.current;
@@ -431,6 +438,23 @@ export function StrudelEditor() {
           key: 'Ctrl-Enter',
           mac: 'Cmd-Enter',
           run: () => { handleEvaluate(); return true; },
+        },
+        {
+          /* Documented in the in-app shortcuts list as "Ctrl+. — stop all audio"
+             since before it existed. No binding was ever registered. */
+          key: 'Ctrl-.',
+          mac: 'Cmd-.',
+          run: () => { handleStopRef.current?.(); return true; },
+        },
+        {
+          /* The compose-mode banner tells the user "ESC to exit". Until now only
+             clicking the banner worked, so the instruction on screen was wrong. */
+          key: 'Escape',
+          run: () => {
+            if (!composeModeRef.current) return false; /* let CM6 handle it */
+            setComposeMode(false);
+            return true;
+          },
         },
         /* Solo/Mute shortcuts — Alt+1..9 to solo, Shift+Alt+1..9 to mute */
         ...Array.from({ length: 9 }, (_, i) => ({
@@ -664,6 +688,7 @@ export function StrudelEditor() {
       togglePlay();
     }
   }, [isPlaying, togglePlay]);
+  handleStopRef.current = handleStop;
 
   /* Double-click to clear: first click arms, second click within 2s clears */
   const clearArmedRef = useRef(false);

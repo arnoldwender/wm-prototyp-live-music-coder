@@ -7,6 +7,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { getSharedContext, getMasterGain } from './context'
+import { getStrudelOutputNode } from './strudel-tap'
 
 /** Records audio from the master gain node and exports as WebM download. */
 export class AudioRecorder {
@@ -15,11 +16,34 @@ export class AudioRecorder {
   private stream: MediaStream | null = null
   private destination: MediaStreamAudioDestinationNode | null = null
 
-  /** Start recording — taps master gain into a MediaStreamDestination */
+  /** Node tapped in addition to masterGain, kept so stop() can disconnect it. */
+  private strudelTap: AudioNode | null = null
+
+  /**
+   * Start recording — taps master gain into a MediaStreamDestination.
+   *
+   * Strudel is tapped SEPARATELY and deliberately. superdough terminates at
+   * `audioContext.destination`, not at masterGain, so a recording that only
+   * tapped the master bus captured silence for the default engine — which is
+   * every session in the library. adoptSharedContextForStrudel() puts both on
+   * the same context, which is what makes a single MediaStreamDestination able
+   * to receive both.
+   */
   start(): void {
     const ctx = getSharedContext()
     this.destination = ctx.createMediaStreamDestination()
     getMasterGain().connect(this.destination)
+
+    /* Fire-and-forget: superdough's controller only exists once a note has
+     * played. If it is not up yet the recording still captures Tone.js and
+     * WebAudio; if it comes up during the take, it joins from that point. */
+    void getStrudelOutputNode().then((node) => {
+      if (!node || !this.destination) return
+      if (node.context !== this.destination.context) return
+      node.connect(this.destination)
+      this.strudelTap = node
+    })
+
     this.stream = this.destination.stream
 
     this.chunks = []
@@ -84,7 +108,17 @@ export class AudioRecorder {
       } catch {
         /* Already disconnected — safe to ignore */
       }
+      if (this.strudelTap) {
+        try {
+          /* Disconnect only this edge, not every consumer of superdough's
+             output — the visualizer analyser hangs off the same node. */
+          this.strudelTap.disconnect(this.destination)
+        } catch {
+          /* Already disconnected — safe to ignore */
+        }
+      }
     }
+    this.strudelTap = null
     this.mediaRecorder = null
     this.destination = null
     this.stream = null

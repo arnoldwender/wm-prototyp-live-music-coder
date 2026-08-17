@@ -57,6 +57,34 @@ export async function resumeContext(): Promise<void> {
   }
 }
 
+/**
+ * Points Strudel/superdough at the shared AudioContext.
+ *
+ * MUST be called before any initStrudel(). Until 2026-08-17 nothing ever called
+ * superdough's setAudioContext, so the app ran THREE contexts: this one, the one
+ * superdough created for itself, and a third in src/lib/midi/strudel-keys.ts.
+ * Consequences, all real: recording a Strudel session captured silence, because
+ * AudioRecorder taps this context while Strudel played into another one; and
+ * setMasterVolume could never reach Strudel.
+ *
+ * webaudioRepl resolves its context as `options.audioContext ?? getAudioContext()`,
+ * so setting it first is enough — no patching required.
+ *
+ * Note this unifies the CONTEXT, not the bus: superdough still terminates at
+ * `audioContext.destination` (superdoughoutput.mjs:148), bypassing masterGain.
+ * That is why the recorder taps its output node separately rather than assuming
+ * one master bus — see getStrudelOutputNode() in ./strudel-tap.
+ */
+export async function adoptSharedContextForStrudel(): Promise<void> {
+  const ctx = getSharedContext()
+  try {
+    const { setAudioContext, getAudioContext } = await import('@strudel/webaudio')
+    if (getAudioContext() !== ctx) setAudioContext(ctx)
+  } catch {
+    /* @strudel/webaudio unavailable — the non-Strudel engines still work. */
+  }
+}
+
 /** Sets master volume (0 = silent, 1 = full) */
 export function setMasterVolume(volume: number): void {
   const gain = getMasterGain()
