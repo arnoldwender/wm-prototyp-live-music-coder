@@ -497,7 +497,7 @@
       "onkeyHeading": "onKey() — Tastenbelegung",
       "onkeyText": "Binden Sie Tasten an Aktionen mit onKey(taste, callback). Funktioniert nur, wenn der Editor nicht fokussiert ist.",
       "paramsHeading": "createParams() — Benannte Parameter",
-      "paramsText": "Erstellen Sie benannte Parameter mit createParams(name, standard). Ändern Sie sie mit setParam() oder über MIDI-CC-Mapping."
+      "paramsText": "Benannte Parameter mit createParams(name, default) anlegen. Der Wert ist live: setParam() oder ein per MIDI Learn zugewiesener Regler ändert ein laufendes Pattern, ohne es neu auszuwerten."
     },
     "visualizers": {
       "title": "Visualisierer",

@@ -90,7 +90,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **MIDI Compose Mode** — Play notes on a connected MIDI keyboard and have them convert to Strudel mini-notation in real time inside the editor. Quantize, auto-insert, and build patterns by playing.
 
-**MIDI Learn (preview)** — Start Learn from the USB menu and move a knob; the CC number is captured and stored against the `lpf` parameter. Choosing the target parameter, and applying a stored mapping to a running pattern, are not implemented yet. Live CC control works today through `midin()` in your code.
+**MIDI Learn** — Start Learn from the USB menu, pick which named parameter to map, and move a knob. The CC is captured and applied to a *running* pattern from then on: `createParams()` returns a live reference, so the value changes without re-evaluating. `midin()` remains available for mapping CCs directly in code.
 
 **Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI CC value mapping, keyboard bindings via `onKey()`.
 
@@ -247,7 +247,7 @@ netlify deploy --prod --dir=dist
 | Status | Feature | Description |
 |--------|---------|-------------|
 | Done | **MIDI Composition Mode** | Play notes on a connected MIDI keyboard and have them convert to Strudel code in real time inside the editor |
-| In progress | **MIDI Learn** | Captures a CC against a fixed parameter; target picker and pattern application still to build |
+| Done | **MIDI Learn** | Pick a parameter, move a knob, and the CC drives it live |
 | Done | **19 MIDI Device Profiles** | Factory CC mappings for MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more |
 | Done | **Developer Blog + Changelog** | In-app blog and changelog pages with Markdown rendering |
 | Planned | **Strudel Sound Library Browser** | Browse and audition all Strudel sounds (Dirt-Samples, synths, soundfonts) directly from the MIDI keyboard |

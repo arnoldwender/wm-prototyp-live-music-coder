@@ -497,7 +497,7 @@
       "onkeyHeading": "onKey() — Keyboard Bindings",
       "onkeyText": "Bind keyboard keys to actions with onKey(key, callback). Works when the editor is not focused.",
       "paramsHeading": "createParams() — Named Parameters",
-      "paramsText": "Create named parameters with createParams(name, default). Change them with setParam() or via MIDI CC mapping."
+      "paramsText": "Create named parameters with createParams(name, default). The value is live: setParam(), or a knob mapped with MIDI Learn, changes a running pattern without re-evaluating it."
     },
     "visualizers": {
       "title": "Visualizers",
