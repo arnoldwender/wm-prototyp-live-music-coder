@@ -23,7 +23,8 @@
     "electron:build:mac": "unset ELECTRON_RUN_AS_NODE && electron-vite build && electron-builder --mac",
     "electron:build:win": "unset ELECTRON_RUN_AS_NODE && electron-vite build && electron-builder --win",
     "electron:build:linux": "unset ELECTRON_RUN_AS_NODE && electron-vite build && electron-builder --linux",
-    "verify:release": "node scripts/verify-release.mjs"
+    "verify:release": "node scripts/verify-release.mjs",
+    "finalize:yml": "node scripts/finalize-mac-yml.mjs"
   },
   "build": {
     "appId": "com.wendermedia.live-music-coder",
