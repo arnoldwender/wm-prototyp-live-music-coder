@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const PW = process.env.PLAYWRIGHT_PATH
-  ?? '/Users/arnold/Development/wm-brand-wendermedia-org/node_modules/playwright/index.mjs'
+  ?? '~/Development/wm-brand-wendermedia-org/node_modules/playwright/index.mjs'
 const { chromium } = await import(PW)
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')

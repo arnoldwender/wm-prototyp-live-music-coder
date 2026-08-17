@@ -77,12 +77,12 @@ src/components/
 
 ## Global Rules
 
-(Inherited from global `/Users/arnold/Development/GEMINI.md`)
+(Inherited from global `~/Development/GEMINI.md`)
 
 # Gemini (Antigravity) Workspace Configuration
 
 **Owner:** Arnold Wender (arnold.wender@gmail.com)  
-**Workspace:** `/Users/arnold/Development`
+**Workspace:** `~/Development`
 
 This file is the authoritative source of instructions for Gemini (Antigravity IDE) operating in Arnold's workspace. It synthesizes rules from `CLAUDE.md` and `instructions.md`.
 

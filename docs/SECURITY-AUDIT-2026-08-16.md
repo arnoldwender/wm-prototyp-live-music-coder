@@ -1,5 +1,5 @@
 # Live Music Coder — Backend/Application Security Audit
-**Date:** 2026-08-16 · **Repo:** `/Users/arnold/Development/wm-prototyp-live-music-coder` (public, AGPL-3.0-or-later — deliberate, not drift) · **Targets:** web build at `https://live-music-coder.pro` + signed/notarized Electron 41 desktop app v1.1.0 · **Method:** read-only source audit + live header probe + shipped-bundle inspection (`codesign -d`), every candidate adversarially refuted before reporting.
+**Date:** 2026-08-16 · **Repo:** `.` (public, AGPL-3.0-or-later — deliberate, not drift) · **Targets:** web build at `https://live-music-coder.pro` + signed/notarized Electron 41 desktop app v1.1.0 · **Method:** read-only source audit + live header probe + shipped-bundle inspection (`codesign -d`), every candidate adversarially refuted before reporting.
 
 ## Verdict
 
@@ -75,7 +75,7 @@ Two ingest channels carry it: the lz-string URL hash (`src/lib/persistence/url.t
 
 **Falsifier:** launch the packaged app with `open -a "Live Music Coder" --args --lmc-debug`, then in the DevTools console:
 ```js
-await window.electronAPI.saveProjectToPath('AUDIT-MARKER', require('os')?.homedir?.() ?? '/Users/arnold/lmc-audit-marker.txt')
+await window.electronAPI.saveProjectToPath('AUDIT-MARKER', require('os')?.homedir?.() ?? '~/lmc-audit-marker.txt')
 // then, in a shell:  cat ~/lmc-audit-marker.txt
 ```
 Refuted only if it returns `{error:'Path outside allowed directories'}` for a path inside `$HOME`.
@@ -346,7 +346,7 @@ Present in **both** plists and confirmed in the shipped signature. The instinct 
 - **Share-payload hardening** — `decodeFromUrl` (`url.ts:28-47`) caps the decompressed payload at 64 KB and allowlists `EngineType`. BPM is clamped through `setBpm` on every load path (`store.ts:441`).
 - **macOS code-signing posture is correct** — Developer ID `Jorge Arnold Wender González (B56AY3K74V)`, hardened runtime flag set, `notarize: true`, `allow-unsigned-executable-memory` correctly removed, **`disable-library-validation` correctly absent**, no camera entitlement.
 - **`build/entitlements.mac.inherit.plist` keeps `allow-jit`.** This is right and the comment documenting the v1.0.1 black-screen regression is right. **The `.wm-electron-audit.md` S2 recommendation must never be re-applied.**
-- **`SECURITY.md` is honest** — private vulnerability reporting, and it explicitly declines to promise a response time it cannot meet. Keep it exactly as written.
+- **`.github/SECURITY.md` is honest** — private vulnerability reporting, and it explicitly declines to promise a response time it cannot meet. Keep it exactly as written.
 - **Sandbox-relevant hygiene:** no `<webview>`, no iframes, no source maps in `dist/`, no `.env` tracked, `sysex:false` everywhere, `release/`+`out/`+`dist/` all correctly gitignored.
 
 ---
@@ -372,6 +372,6 @@ Present in **both** plists and confirmed in the shipped signature. The instinct 
 8. **Guard the SW cache** — verify `response.ok` before `cache.put`, and add an integrity check or drop cache-first in favour of stale-while-revalidate for `/assets/`. Reduces W1; note that a determined same-origin attacker can still write to Cache Storage, so this is mitigation, not elimination — the real fix for W1 is not executing hostile code, which the product cannot promise.
 9. **Add `.github/workflows/ci.yml`** running `tsc --noEmit && vitest run && eslint . && npm audit --audit-level=high`, and add `electron` to a type-checked tsconfig (`electron/` is currently invisible to `npm run build`, so a type error in the IPC layer ships silently).
 
-**Files that carry the confirmed risk:** `/Users/arnold/Development/wm-prototyp-live-music-coder/electron/ipc/file.ts` · `electron/preload.ts` · `electron/main.ts` · `electron/ipc/app.ts` · `electron/ipc/audio.ts` · `build/entitlements.mac.plist` · `build/entitlements.mac.inherit.plist` · `package.json` · `src/lib/persistence/gist.ts` · `src/sw.template.js` · `src/pages/Editor.tsx` · `src/components/organisms/GistDialog.tsx` · `src/components/organisms/DetailPanel.tsx` · `netlify.toml` · `src/data/legal.ts`
+**Files that carry the confirmed risk:** `electron/ipc/file.ts` · `electron/preload.ts` · `electron/main.ts` · `electron/ipc/app.ts` · `electron/ipc/audio.ts` · `build/entitlements.mac.plist` · `build/entitlements.mac.inherit.plist` · `package.json` · `src/lib/persistence/gist.ts` · `src/sw.template.js` · `src/pages/Editor.tsx` · `src/components/organisms/GistDialog.tsx` · `src/components/organisms/DetailPanel.tsx` · `netlify.toml` · `src/data/legal.ts`
 
 Sources: [Electron Security docs](https://www.electronjs.org/docs/latest/tutorial/security) · [GHSA-h7rp-cf8h-j98x / CVE-2026-70601](https://advisories.gitlab.com/npm/electron/CVE-2026-70601/) · [Electron 41.6.1 release](https://github.com/electron/electron/releases/tag/v41.6.1) · [CSP under file:// in Electron](https://blog.coding.kiwi/electron-csp-local/)

@@ -1,6 +1,6 @@
 ## Verdict: **BLOCK** — shipped copy asserts capabilities the code does not implement, across every public surface and all three locales
 
-I did **not** create `docs/CLAIM-AUDIT-2026-08-16.md` — my harness forbids writing report/analysis `.md` files; the full audit is below and is the deliverable. If you want it persisted, that content goes to `/Users/arnold/Development/wm-prototyp-live-music-coder/docs/CLAIM-AUDIT-2026-08-16.md` verbatim. Read-only respected: zero edits to source or copy.
+I did **not** create `docs/CLAIM-AUDIT-2026-08-16.md` — my harness forbids writing report/analysis `.md` files; the full audit is below and is the deliverable. If you want it persisted, that content goes to `docs/CLAIM-AUDIT-2026-08-16.md` verbatim. Read-only respected: zero edits to source or copy.
 
 **Locale parity note:** `de.json`, `en.json`, `es.json` are byte-parallel — every cited line number is identical in all three files. Every false claim therefore ships ×3.
 

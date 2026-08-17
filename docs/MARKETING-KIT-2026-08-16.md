@@ -642,7 +642,7 @@ This is the most concrete growth lever available and it costs one afternoon. Fro
 | Replace `ConsolePanel.tsx:22` raw hex with `var(--color-warning)` | §5.41 | Ideal first contribution |
 | Add missing routes to `sitemap.xml` | §5.36 | Mechanical, high SEO value |
 
-`CONTRIBUTING.md` already exists and is genuinely good — it is specific, it explains *why* changes get accepted, and it includes the line *"Nothing invented: no benchmark, citation, or capability claim that cannot be checked from the repository itself."* That sentence is a positioning asset. **Quote it in the README.**
+`.github/CONTRIBUTING.md` already exists and is genuinely good — it is specific, it explains *why* changes get accepted, and it includes the line *"Nothing invented: no benchmark, citation, or capability claim that cannot be checked from the repository itself."* That sentence is a positioning asset. **Quote it in the README.**
 
 > ⚠️ **Prerequisite: `npm run lint` is red** (~45 errors + 10 warnings across ~16 files) **and nothing gates it** — `npm run build` runs neither lint nor tests, and there is no CI workflow. Inviting contributors into a repo whose checks fail on a clean checkout wastes their goodwill on your mess. **Fix lint and add CI before publishing a single good-first-issue.**
 

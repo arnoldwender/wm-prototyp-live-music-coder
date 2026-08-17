@@ -20,7 +20,7 @@ anwaltliche Freigabe.
 | Stack | Vite + React 19 SPA, statisch auf Netlify; zusätzlich Electron-Desktop-App über GitHub Releases |
 | Sprachen | DE / EN / ES (i18next, Browser-Erkennung) |
 | Lizenz | AGPL-3.0-or-later (kombinierte App) + MIT (Eigenanteile) — **ratifiziert, kein Drift** |
-| Vorgutachten | `LEGAL-AUDIT-REPORT-DE-2026-05-09.md` (3 Monate alt) |
+| Vorgutachten | `docs/LEGAL-AUDIT-REPORT-DE-2026-05-09.md` (3 Monate alt) |
 
 ### Prüfmethode (Falsifikate, nicht Annahmen)
 
@@ -987,7 +987,7 @@ Damit der Bericht ehrlich bleibt und niemand Arbeit an Nicht-Problemen verschwen
 
 ## 6 · Musterschreiben für die organisatorischen Lücken
 
-Pfad: `/Users/arnold/Development/Knowledge/e-Recht 24 Musterschreiben/`
+Pfad: `~/Development/Knowledge/e-Recht 24 Musterschreiben/`
 
 | Lücke | Muster | Konkreter nächster Schritt |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Live Music Coder (Pro) — Canonical Architecture Reference
 
-**Repo:** `/Users/arnold/Development/wm-prototyp-live-music-coder`
+**Repo:** `.`
 **Stack:** React 19 + Vite 8 + Tailwind v4 + Zustand + CodeMirror 6 + Strudel (`@strudel/{core,web,webaudio,transpiler,codemirror,midi,osc,serial,soundfonts,tonal,xen,draw}`) + Tone.js + WebMIDI, shipped both as a Netlify SPA and as an Electron 41 desktop app (`electron-vite` + `electron-builder`).
 **Licence:** AGPL-3.0-or-later (`LICENSING.md`, `LICENSE-AGPL`, `LICENSE-MIT`) — a deliberate OSS exception for this repo. Not drift; do not "fix".
 
@@ -1029,7 +1029,7 @@ Two accurate refinements (do not change the verdict): (a) the orchestrator memoi
 **Falsifier run.**
 
 ```bash
-cd /Users/arnold/Development/wm-prototyp-live-music-coder && rg -n "initStrudel" src --glob '!*.d.ts' && rg -n "getOrchestrator|orch\.evaluate|activeFile.engine" src/components/organisms/TransportBar.tsx && sed -n '242,253p' src/components/organisms/CodeEditor.tsx && sed -n '30,45p' src/lib/orchestrator/index.ts && sed -n '86,102p' node_modules/@strudel/web/web.mjs && sed -n '58,92p' node_modules/@strudel/core/repl.mjs && cat > src/__falsify.test.ts <<'EOF'
+cd . && rg -n "initStrudel" src --glob '!*.d.ts' && rg -n "getOrchestrator|orch\.evaluate|activeFile.engine" src/components/organisms/TransportBar.tsx && sed -n '242,253p' src/components/organisms/CodeEditor.tsx && sed -n '30,45p' src/lib/orchestrator/index.ts && sed -n '86,102p' node_modules/@strudel/web/web.mjs && sed -n '58,92p' node_modules/@strudel/core/repl.mjs && cat > src/__falsify.test.ts <<'EOF'
 import { describe, it, expect } from 'vitest'
 class FakeParam { value = 0; setValueAtTime() {} linearRampToValueAtTime() {} }
 class FakeNode { gain = new FakeParam(); frequency = new FakeParam(); detune = new FakeParam(); connect() { return this } disconnect() {} start() {} stop() {} }
@@ -1059,7 +1059,7 @@ npx vitest run src/__falsify.test.ts --reporter=verbose; rm -f src/__falsify.tes
 - `grep -rn "will-navigate|will-redirect|will-attach-webview|web-contents-created|setPermissionRequestHandler|setPermissionCheckHandler"` over the repo (excl. node_modules) returns ZERO hits in `electron/` — the only 4 hits are prose inside `docs/ARCHITECTURE-2026-08-16.md` (the doc the claim came from).
 - `grep -c "will-navigate" out/main/main.cjs` → `0`; `grep -o "setWindowOpenHandler|setPermissionRequestHandler" out/main/main.cjs | sort | uniq -c` → `1 setWindowOpenHandler`, zero permission handler. So the packaged main process (`package.json` `"main": "out/main/main.cjs"`) really ships without them.
 
-2) Line/file cited are exact. `/Users/arnold/Development/wm-prototyp-live-music-coder/electron/main.ts:97`:
+2) Line/file cited are exact. `electron/main.ts:97`:
 `  mainWindow.webContents.setWindowOpenHandler(({ url }) => {`
 It is the ONLY `setWindowOpenHandler` in the repo, bound to `mainWindow` only. Pop-out children created at `electron/ipc/window.ts:50` (`new BrowserWindow({... preload: '../preload/preload.cjs', contextIsolation: true, sandbox: true }`) get no such handler at all — the claim if anything understates this.
 
@@ -1096,7 +1096,7 @@ cd /private/tmp/.../navtest && env -u ELECTRON_RUN_AS_NODE node_modules/.bin/ele
 
 **Evidence.**
 
-Both halves are forced by the code. File: /Users/arnold/Development/wm-prototyp-live-music-coder/electron/ipc/file.ts
+Both halves are forced by the code. File: electron/ipc/file.ts
 
 HALF 1 — $HOME-wide write, lines 14-23 (line numbers in the claim are exact):
   14  function resolveAllowedPath(filePath: string): string | null {
@@ -1109,7 +1109,7 @@ HALF 1 — $HOME-wide write, lines 14-23 (line numbers in the claim are exact):
   21    }
   22    return null
   23  }
-The only bound is "somewhere under $HOME". Falsifier output (POSIX): `/Users/arnold/.zshrc`, `/Users/arnold/.ssh/authorized_keys`, `/Users/arnold/Library/LaunchAgents/x.plist` all return the resolved path, i.e. PASS the guard. Line 54 then writes renderer-supplied content verbatim with no extension/type filter:
+The only bound is "somewhere under $HOME". Falsifier output (POSIX): `~/.zshrc`, `~/.ssh/authorized_keys`, `~/Library/LaunchAgents/x.plist` all return the resolved path, i.e. PASS the guard. Line 54 then writes renderer-supplied content verbatim with no extension/type filter:
   49  ipcMain.handle('file:save-path', async (_event, json: string, filePath: string) => {
   51    const safe = resolveAllowedPath(filePath)
   52    if (!safe) return { error: 'Path outside allowed directories' }
@@ -1125,7 +1125,7 @@ One precision note that does not change the verdict: "always returns null" on Wi
 ```bash
 node -e "
 const path=require('path');
-const home='/Users/arnold', docs=home+'/Documents';
+const home=os.homedir(), docs=home+'/Documents';
 const guard=(p,sep,h,d)=>{const r=(sep==='/'?path.posix:path.win32).resolve(p);
   return (r.startsWith(d+'/')||r===d||r.startsWith(h+'/')||r===h)?r:null;};
 for (const p of [home+'/.zshrc', home+'/.ssh/authorized_keys', home+'/Library/LaunchAgents/x.plist'])
@@ -1201,7 +1201,7 @@ Only imprecision found, not material: the claim's "lines 1104-1289" describes th
 
 ```bash
 cat > /tmp/probe.ts <<'EOF'
-import { EXAMPLE_LIBRARY, TOTAL_EXAMPLE_COUNT } from '/Users/arnold/Development/wm-prototyp-live-music-coder/src/data/example-library'
+import { EXAMPLE_LIBRARY, TOTAL_EXAMPLE_COUNT } from 'src/data/example-library'
 console.log('TOTAL_EXAMPLE_COUNT =', TOTAL_EXAMPLE_COUNT)
 console.log('EXAMPLE_LIBRARY.length =', EXAMPLE_LIBRARY.length)
 EOF
@@ -1225,12 +1225,12 @@ netlify.toml:8-10 → `[build]` / `command = "npm run build"` / `publish = "dist
 `ls .github/workflows` → `ls: .github/workflows: No such file or directory`.
 `find .github -type f` → exactly two files: `.github/FUNDING.yml`, `.github/PULL_REQUEST_TEMPLATE.md`. Zero workflow files. (The directory itself is NOT empty — but it holds no CI, which is what the claim asserts.)
 
-4) No other gate catches it: the only non-sample git hook is `.git/hooks/pre-commit -> /Users/arnold/.claude/hooks/pre-commit-wm.sh`, whose chain is license-gate / secret-scan / jsonld-lint (Astro-only); `grep -n 'lint\|eslint\|vitest'` on it shows no eslint and no vitest invocation.
+4) No other gate catches it: the only non-sample git hook is `.git/hooks/pre-commit -> ~/.claude/hooks/pre-commit-wm.sh`, whose chain is license-gate / secret-scan / jsonld-lint (Astro-only); `grep -n 'lint\|eslint\|vitest'` on it shows no eslint and no vitest invocation.
 
 **Falsifier run.**
 
 ```bash
-cd /Users/arnold/Development/wm-prototyp-live-music-coder && npm run lint > /tmp/lint.txt 2>&1; echo "EXIT=$?"; tail -2 /tmp/lint.txt; grep -c '^/Users/arnold.*[^0-9]$' /tmp/lint.txt; node -e "const p=require('./package.json');console.log(JSON.stringify({prebuild:p.scripts.prebuild,build:p.scripts.build,postbuild:p.scripts.postbuild}))"; ls .github/workflows; find .github -type f
+cd . && npm run lint > /tmp/lint.txt 2>&1; echo "EXIT=$?"; tail -2 /tmp/lint.txt; grep -c '^'"$PWD"'.*[^0-9]; node -e "const p=require('./package.json');console.log(JSON.stringify({prebuild:p.scripts.prebuild,build:p.scripts.build,postbuild:p.scripts.postbuild}))"; ls .github/workflows; find .github -type f
 ```
 
 ### ✅ `pwa-force-reload` — CONFIRMED (P1)
@@ -1239,7 +1239,59 @@ cd /Users/arnold/Development/wm-prototyp-live-music-coder && npm run lint > /tmp
 
 MAIN CLAIM — CONFIRMED verbatim.
 
-/Users/arnold/Development/wm-prototyp-live-music-coder/src/sw.template.js:19-24
+src/sw.template.js:19-24
+  self.addEventListener('install', (event) => {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+    );
+    self.skipWaiting();
+  });
+
+src/sw.template.js:29-42 (activate)
+  .then(() => self.clients.claim())
+  .then(() =>
+    self.clients.matchAll({ type: 'window' }).then((clients) =>
+      clients.forEach((client) => client.navigate(client.url))
+    )
+  )
+No prompt, no postMessage handshake, no SKIP_WAITING message channel anywhere — grep for "skipWaiting" returns exactly one hit (line 23, unconditional on install). Ordering holds: clients.claim() resolves before matchAll, so previously-uncontrolled tabs are also returned and navigated. Scope is '/' (sw.js served from root), so every same-origin window is hit.
+
+It is actually registered (so this is live behaviour, not dead code):
+src/main.tsx:31-40 — `navigator.serviceWorker.register('/sw.js')`, guarded by `!import.meta.env.DEV && (location.protocol === 'http:' || 'https:')` — i.e. active in every deployed/preview build, skipped only in `npm run dev` and packaged Electron (file://). dist/sw.js exists on disk (2690 bytes).
+
+"kills the session / no autosave to recover from" — CONFIRMED:
+- src/lib/persistence/local.ts:116 `export function setupAutosave(...)` — `rg -n "setupAutosave" src/` returns ONE line: the definition itself. Zero callers, not even in local.test.ts.
+- src/lib/store.ts:194-207 — `files: [{ ...DEFAULT_FILE }]` is plain initial state; the only localStorage hydration is `loadEditorSettingsForStore()` (store.ts:179-195), which reads `lmc-editor-settings` and returns ONLY `{ editorTheme, vimMode }`. `rg -n "setItem\('lmc-(files|code|project)" src/` → empty. Editor code lives in memory only, so `client.navigate()` discards it and tears down the AudioContext.
+
+SUB-CLAIM 1 — cache.addAll(APP_SHELL) is all-or-nothing: CONFIRMED. Spec behaviour (Cache.addAll rejects and adds NO entries if any request fails), and the shell list (sw.template.js:9-16) includes '/editor', an SPA route that only resolves via the Netlify rewrite `from = "/*" to = "/index.html" status = 200` (netlify.toml:30-33) — App.tsx:121 confirms `/editor` is a client-side React Router route with no physical file in dist/. On any host without that rewrite the addAll rejects, install fails, and the SW silently never activates.
+
+SUB-CLAIM 2 — public/_headers has no rule for /sw.js: CONFIRMED. Full file is 7 lines, two rules only: `/assets/*` (immutable, 1yr) and `/*.html` (max-age=0, must-revalidate). `grep -nE "sw\.js" public/_headers netlify.toml` → zero hits. netlify.toml [[headers]] `for = "/*"` applies CSP/HSTS/etc. to /sw.js but sets no Cache-Control, so /sw.js falls to Netlify's default caching with no explicit revalidation directive.
+
+**Falsifier run.**
+
+```bash
+grep -nE "skipWaiting|client\.navigate|addAll" src/sw.template.js; grep -nE "sw\.js" public/_headers netlify.toml; rg -n "setupAutosave" src/; rg -n "setItem\('lmc-(files|code|project)" src/
+```
+
+### ⚠️ Post-hoc correction not in the original claim set — repo-local skills
+
+The map originally stated that `.claude/skills/{lmc-pro,lmc-synth-ui,strudel-feature-parity}/` **never activate** because they carry a lowercase `skill.md`. **That was wrong and is corrected in §5 above.** Measured live on 2026-08-16: all four repo-local skills loaded in a session. This machine`s root volume is APFS *case-insensitive* (`diskutil info /`), so `skill.md` resolves as `SKILL.md`. The real defect is portability — on a case-sensitive volume the three directories become invisible to the loader.
+
+```bash
+[ -f .claude/skills/lmc-pro/SKILL.md ] && echo "resolves (case-insensitive)" || echo "absent (case-sensitive)"
+ls .claude/skills/*/   # shows the bytes actually on disk
+```
+
+ /tmp/lint.txt; node -e "const p=require('./package.json');console.log(JSON.stringify({prebuild:p.scripts.prebuild,build:p.scripts.build,postbuild:p.scripts.postbuild}))"; ls .github/workflows; find .github -type f
+```
+
+### ✅ `pwa-force-reload` — CONFIRMED (P1)
+
+**Evidence.**
+
+MAIN CLAIM — CONFIRMED verbatim.
+
+src/sw.template.js:19-24
   self.addEventListener('install', (event) => {
     event.waitUntil(
       caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))

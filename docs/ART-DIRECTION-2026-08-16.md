@@ -1,6 +1,6 @@
 # Live Music Coder — Art Direction: "SIGNAL ROOM"
 
-**Repo:** `/Users/arnold/Development/wm-prototyp-live-music-coder`
+**Repo:** `.`
 **Live:** https://live-music-coder.pro · **Date:** 2026-08-16
 **Companion to:** [`A11Y-AUDIT-2026-08-16.md`](./A11Y-AUDIT-2026-08-16.md) · [`ARCHITECTURE-2026-08-16.md`](./ARCHITECTURE-2026-08-16.md)
 
