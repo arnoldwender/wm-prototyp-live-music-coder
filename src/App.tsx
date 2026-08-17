@@ -16,6 +16,7 @@ import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
 import Landing from './pages/Landing'
 import { NotFound, ErrorBoundary } from './components/atoms'
 import { isElectron, isElectronMac, TITLEBAR_HEIGHT } from './lib/platform'
+import { useMenuActions } from './lib/useMenuActions'
 
 /* Lazy-load non-landing pages — reduces initial bundle for first-visit perf */
 const Editor = lazy(() => import('./pages/Editor'))
@@ -105,11 +106,18 @@ function RouteLoader() {
   )
 }
 
+/** Subscribes to the Electron menu. Must live INSIDE Router — it navigates. */
+function MenuActions() {
+  useMenuActions()
+  return null
+}
+
 function App() {
   return (
     <ErrorBoundary>
       {isElectronMac && <TitleBar />}
       <Router>
+        <MenuActions />
         <Suspense fallback={<RouteLoader />}>
         <Routes>
           {/* Both web and Electron show the Landing page at /.
