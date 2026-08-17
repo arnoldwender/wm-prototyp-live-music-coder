@@ -17,12 +17,18 @@
          for the matching v8 crash trace. -->
     <key>com.apple.security.cs.allow-jit</key>
     <true/>
-    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-    <true/>
-    <key>com.apple.security.device.audio-input</key>
-    <true/>
-    <key>com.apple.security.device.microphone</key>
-    <true/>
+    <!-- REMOVED 2026-08-17, all three unused:
+         · device.microphone + device.audio-input — nothing in src/ ever calls
+           getUserMedia (0 hits). Keeping them meant a hostile evaluated pattern
+           could trigger a TCC prompt attributed to a notarized MUSIC app, which
+           is the most plausible prompt a user of this app will ever accept.
+           src/lib/audio/recorder.ts taps the internal graph, never an input device.
+         · cs.allow-dyld-environment-variables — unnecessary for Electron. Not a
+           live hole (disable-library-validation is absent and the hardened
+           runtime is on, so injection is still rejected), but it is privilege
+           nobody asked for.
+         Removing device.microphone also lets NSMicrophoneUsageDescription go
+         from the Info.plist once the next release is cut. -->
     <key>com.apple.security.inherit</key>
     <true/>
 </dict>

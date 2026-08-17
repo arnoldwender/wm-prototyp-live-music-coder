@@ -19,6 +19,10 @@ declare module '@strudel/webaudio' {
   export function initAudioOnFirstClick(): void
   export function webaudioOutput(...args: unknown[]): unknown
   export function getAudioContext(): AudioContext
+  /* Re-exported from superdough via `export * from 'superdough'`.
+     Calling this before initStrudel is what keeps the app on ONE AudioContext;
+     webaudioRepl resolves its context as `options.audioContext ?? getAudioContext()`. */
+  export function setAudioContext(context: AudioContext | null): void
   export function samples(
     sampleMap: string | Record<string, unknown>,
     baseUrl?: string,
