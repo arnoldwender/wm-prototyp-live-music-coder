@@ -589,7 +589,7 @@
       "urlHeading": "Per URL teilen",
       "urlText": "Das Teilen-Icon in der Toolbar anklicken, um eine komprimierte URL mit dem aktuellen Code zu generieren. Die URL nutzt lz-string-Komprimierung — Patterns bis zu mehreren Kilobytes passen in einen einzigen Link. Jeder, der den Link öffnet, sieht deinen genauen Code, bereit zum Ausführen.",
       "gistHeading": "GitHub Gists",
-      "gistText": "Das Gists-Panel öffnen (Lesezeichen-Icon in der Seitenleiste) und einen GitHub Personal Access Token eingeben. Beliebige Tabs als neuen Gist speichern, gespeicherte Gists laden und Patterns sitzungsübergreifend organisieren. Gists sind standardmäßig öffentlich — bei Bedarf als geheim markieren.",
+      "gistText": "Das Gists-Panel öffnen (Lesezeichen-Icon in der Seitenleiste) und einen GitHub Personal Access Token eingeben. Beliebige Tabs als neuen Gist speichern, gespeicherte Gists laden und Patterns sitzungsübergreifend organisieren. Gists werden standardmäßig als geheime Gists angelegt: nicht auffindbar, aber für jeden mit dem Link lesbar. Vor dem Speichern „Öffentlich machen“ ankreuzen, um stattdessen einen öffentlichen anzulegen — GitHub legt die Sichtbarkeit bei der Erstellung fest, sie lässt sich danach nicht mehr ändern.",
       "downloadHeading": "Als .js herunterladen",
       "downloadText": "Die Toolbar enthält einen Download-Button, der den aktuellen Code als .js-Datei speichert. Nützlich für Backups oder zum Teilen außerhalb der App.",
       "sessionsHeading": "Sessions-Bibliothek",
@@ -638,8 +638,9 @@
     "saving": "Speichern...",
     "loading": "Laden...",
     "clear": "Löschen",
-    "rememberWarning": "Token wird unverschlüsselt im Browser gespeichert",
-    "loadThisGist": "Diesen Gist laden"
+    "rememberWarning": "Token bleibt im Browser gespeichert. Auf diesem Gerät durch Skripte auslesbar — nur Token mit Gist-Scope verwenden.",
+    "loadThisGist": "Diesen Gist laden",
+    "makePublic": "Öffentlich machen"
   },
   "pianoroll": {
     "zoomInTime": "Vergrößern (Zeit)",

@@ -589,7 +589,7 @@
       "urlHeading": "Compartir por URL",
       "urlText": "Haz clic en el icono de compartir en la barra de herramientas para generar una URL comprimida con tu código actual. La URL usa compresión lz-string — patrones de hasta varios kilobytes caben en un solo enlace. Cualquiera que abra el enlace verá tu código exacto, listo para ejecutar.",
       "gistHeading": "GitHub Gists",
-      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) e ingresa tu token de acceso personal de GitHub. Puedes guardar cualquier pestaña como un nuevo Gist, cargar Gists guardados anteriormente y organizar tus patrones entre sesiones. Los Gists son públicos por defecto — márcalos como secretos si prefieres.",
+      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) e ingresa tu token de acceso personal de GitHub. Puedes guardar cualquier pestaña como un nuevo Gist, cargar Gists guardados anteriormente y organizar tus patrones entre sesiones. Los Gists se crean como secretos por defecto: no aparecen en búsquedas, pero cualquiera con el enlace puede leerlos. Marca “Hacer público” antes de guardar para crear uno público — GitHub fija la visibilidad al crearlo y no se puede cambiar después.",
       "downloadHeading": "Descargar como .js",
       "downloadText": "La barra de herramientas incluye un botón de descarga que guarda tu código actual como archivo .js. Útil para hacer copias de seguridad de patrones o compartirlos fuera de la app.",
       "sessionsHeading": "Biblioteca de Sesiones",
@@ -638,8 +638,9 @@
     "saving": "Guardando...",
     "loading": "Cargando...",
     "clear": "Eliminar",
-    "rememberWarning": "El token se guarda sin cifrar en el navegador",
-    "loadThisGist": "Cargar este gist"
+    "rememberWarning": "El token permanece en el navegador. Legible por scripts en este dispositivo — usa solo un token con alcance gist.",
+    "loadThisGist": "Cargar este gist",
+    "makePublic": "Hacer público"
   },
   "pianoroll": {
     "zoomInTime": "Acercar (tiempo)",
