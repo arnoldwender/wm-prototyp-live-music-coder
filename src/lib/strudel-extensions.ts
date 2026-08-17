@@ -183,16 +183,11 @@ export function initClockSync(): void {
         }
         break;
       case 'sync':
-        /* Receive clock sync from leader */
-        if (!isClockLeader) {
-          import.meta.env.DEV && console.log('[ClockSync] Synced to leader');
-        }
-        break;
       case 'bpm':
-        /* BPM change from leader */
-        if (!isClockLeader) {
-          console.log(`[ClockSync] BPM updated to ${e.data.bpm}`);
-        }
+        /* Adopt the leader's tempo. Both cases used to only log, so the feature
+           elected a leader and then ignored it — README called that "BPM
+           broadcast". Followers now set their own scheduler. */
+        if (!isClockLeader) applyLeaderBpm(e.data.bpm);
         break;
     }
   };
@@ -206,6 +201,26 @@ export function initClockSync(): void {
       import.meta.env.DEV && console.log('[ClockSync] This tab is now the clock leader');
     }
   }, 500);
+}
+
+/**
+ * Set this tab's Strudel tempo from a leader broadcast.
+ *
+ * Strudel is cycle-based: setcpm(140/4) is 140 bpm in 4/4, so cpm = bpm / 4.
+ * BARS_PER_CYCLE is named here for the same reason it is named in
+ * src/lib/engines/strudel.ts — it is an assumption, not a constant of nature.
+ */
+function applyLeaderBpm(bpm: unknown): void {
+  if (typeof bpm !== 'number' || !Number.isFinite(bpm) || bpm <= 0) return;
+  const BARS_PER_CYCLE = 4;
+  const cpm = bpm / BARS_PER_CYCLE;
+  try {
+    const repl = window.__strudelRepl;
+    if (typeof repl?.setCpm === 'function') { repl.setCpm(cpm); return; }
+    if (typeof repl?.setCps === 'function') repl.setCps(cpm / 60);
+  } catch {
+    /* No REPL in this tab yet — it will pick up the next broadcast. */
+  }
 }
 
 function getLeaderBpm(): number {

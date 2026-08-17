@@ -19,6 +19,9 @@ export class AudioRecorder {
   /** Node tapped in addition to masterGain, kept so stop() can disconnect it. */
   private strudelTap: AudioNode | null = null
 
+  /** The most recent finished take, kept so Export Audio has something to write. */
+  private lastTake: Blob | null = null
+
   /**
    * Start recording — taps master gain into a MediaStreamDestination.
    *
@@ -69,6 +72,7 @@ export class AudioRecorder {
 
       this.mediaRecorder.onstop = () => {
         const blob = new Blob(this.chunks, { type: 'audio/webm' })
+        this.lastTake = blob
         this.cleanup()
         resolve(blob)
       }
@@ -124,6 +128,11 @@ export class AudioRecorder {
     this.stream = null
     this.chunks = []
   }
+
+  /** The last finished take, or null if nothing has been recorded this session. */
+  getLastTake(): Blob | null {
+    return this.lastTake
+  }
 }
 
 /* Singleton recorder instance — one recorder per app */
@@ -132,4 +141,50 @@ let recorderInstance: AudioRecorder | null = null
 export function getRecorder(): AudioRecorder {
   if (!recorderInstance) recorderInstance = new AudioRecorder()
   return recorderInstance
+}
+
+/**
+ * Export the last finished take as a WAV through the Electron main process.
+ *
+ * The Export Audio menu item and toolbar button previously only explained
+ * themselves, because until recording actually captured Strudel there was
+ * nothing to export but silence.
+ *
+ * Decoding happens HERE, not in main: the IPC handler takes raw float32 PCM, and
+ * shipping a WebM container across the bridge would put a demuxer in the
+ * privileged process.
+ *
+ * Returns null when there is no take or when not running under Electron.
+ */
+export async function exportLastTakeAsWav(): Promise<
+  { path: string } | { error: string } | null
+> {
+  const take = getRecorder().getLastTake()
+  if (!take) return null
+
+  const api = (window as unknown as {
+    electronAPI?: {
+      exportWav?: (
+        buffer: ArrayBuffer,
+        sampleRate: number,
+        channels: number,
+      ) => Promise<{ path: string } | { error: string } | null>
+    }
+  }).electronAPI
+  if (!api?.exportWav) return null
+
+  const ctx = getSharedContext()
+  const decoded = await ctx.decodeAudioData(await take.arrayBuffer())
+
+  /* Interleave into the shape encodeWav expects, capped at stereo — the IPC
+     handler rejects anything wider. */
+  const channels = Math.min(2, decoded.numberOfChannels)
+  const frames = decoded.length
+  const interleaved = new Float32Array(frames * channels)
+  for (let c = 0; c < channels; c++) {
+    const data = decoded.getChannelData(c)
+    for (let i = 0; i < frames; i++) interleaved[i * channels + c] = data[i]
+  }
+
+  return (await api.exportWav(interleaved.buffer, decoded.sampleRate, channels)) ?? null
 }
