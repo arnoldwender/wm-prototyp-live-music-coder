@@ -622,7 +622,11 @@
     "virtualKeyboard": "Virtual Keyboard",
     "collapse": "Collapse",
     "expand": "Expand",
-    "settingsSavedAutomatically": "Settings are saved automatically"
+    "settingsSavedAutomatically": "Settings are saved automatically",
+    "recoverTitle": "Unsaved session found",
+    "recoverBody": "A previous session was autosaved before this tab reloaded. Restore it, or discard it and start fresh.",
+    "recoverRestore": "Restore",
+    "recoverDiscard": "Discard"
   },
   "templates": {
     "title": "Choose a starter template",
