@@ -22,9 +22,13 @@ export type ChangelogCategory =
   | 'architecture'
   | 'community'
   | 'release'
+  /* Added 2026-08-17: a security release is not a bugfix, and burying it under
+     one hides the only category a user must not skip. */
+  | 'security'
 
 /** Ordered list of categories for UI display. */
 export const CHANGELOG_CATEGORIES: ChangelogCategory[] = [
+  'security',
   'release',
   'feature',
   'content',
@@ -65,6 +69,85 @@ export interface ChangelogEntry {
    ══════════════════════════════════════════════════════════ */
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: '1.2.0',
+    date: '2026-08-17',
+    title: 'Security release — arbitrary file write, navigation and permission guards',
+    category: 'security',
+    body: [
+      'SECURITY: every previous desktop build could be made to write an attacker-',
+      'chosen file anywhere under the home directory. This app evaluates shared',
+      'patterns by design, so a share link plus one Run was enough to drop a',
+      'payload into a shell profile or a launch agent. All earlier release',
+      'binaries have been withdrawn; update to 1.2.0.',
+      '',
+      'Removed the dialog-free write path entirely — it had no callers, and every',
+      'real save already goes through the native dialog. Reveal-in-Finder now',
+      'validates against paths the user actually chose rather than a directory',
+      'prefix, which also fixes a guard that was inert on Windows.',
+      '',
+      'Added a will-navigate guard so evaluated code cannot hand the preload',
+      'bridge to a remote origin, and a permission handler that allows only MIDI',
+      'and fullscreen. Dropped the microphone and dyld entitlements, which nothing',
+      'used. Electron 41.2.0 to 41.10.5, closing a context-isolation bypass that',
+      'specifically affects apps exposing promise-returning contextBridge methods.',
+      '',
+      'The packaged app also shipped with no Content-Security-Policy at all: the',
+      'header-based policy never applied under file://. It now ships as a meta tag',
+      'derived from the web policy.',
+      '',
+      'Playback fixes in the same release: Run played only the last layer of any',
+      'multi-layer session, five bundled examples threw on load, and recording a',
+      'Strudel session captured silence. Adds session autosave with crash',
+      'recovery, a working application menu, .lmc file association, transport BPM',
+      'for the Strudel engine, working solo/mute shortcuts, automatic MIDI device',
+      'profiles, and audio export.',
+    ].join('\n'),
+    i18n: {
+      de: {
+        title: 'Sicherheitsrelease — beliebiger Dateizugriff, Navigations- und Berechtigungsschutz',
+        body: [
+          'SICHERHEIT: Alle bisherigen Desktop-Builds konnten dazu gebracht werden,',
+          'eine vom Angreifer gewählte Datei irgendwo im Benutzerverzeichnis zu',
+          'schreiben. Die App wertet geteilte Patterns bauartbedingt aus, ein',
+          'Share-Link plus ein Klick auf Run genügte. Alle älteren Release-Binaries',
+          'wurden zurückgezogen; bitte auf 1.2.0 aktualisieren.',
+          '',
+          'Der dialogfreie Schreibpfad wurde entfernt, ein will-navigate-Schutz und',
+          'ein Berechtigungs-Handler ergänzt, ungenutzte Mikrofon-Entitlements',
+          'gestrichen und Electron auf 41.10.5 aktualisiert. Der paketierte Build',
+          'hatte zudem gar keine CSP — die Header-Variante greift unter file:// nicht.',
+          '',
+          'Ebenfalls behoben: Run spielte nur die letzte Ebene mehrschichtiger',
+          'Sessions, fünf mitgelieferte Beispiele brachen ab, und Aufnahmen einer',
+          'Strudel-Session waren stumm. Neu: Autosave mit Wiederherstellung,',
+          'funktionierendes Anwendungsmenü, .lmc-Dateizuordnung, BPM für die',
+          'Strudel-Engine, Solo/Mute-Kürzel, MIDI-Geräteprofile und Audio-Export.',
+        ].join('\n'),
+      },
+      es: {
+        title: 'Versión de seguridad — escritura arbitraria de ficheros, guardas de navegación y permisos',
+        body: [
+          'SEGURIDAD: todas las versiones de escritorio anteriores podían ser',
+          'inducidas a escribir un fichero elegido por un atacante en cualquier',
+          'punto del directorio del usuario. La app evalúa patrones compartidos por',
+          'diseño, así que bastaba un enlace y un clic en Run. Todos los binarios',
+          'anteriores fueron retirados; actualiza a 1.2.0.',
+          '',
+          'Se eliminó la ruta de escritura sin diálogo, se añadió una guarda',
+          'will-navigate y un gestor de permisos, se quitaron entitlements de',
+          'micrófono sin uso y se actualizó Electron a 41.10.5. El build empaquetado',
+          'además no llevaba ninguna CSP: la vía por cabecera no aplica bajo file://.',
+          '',
+          'También corregido: Run reproducía sólo la última capa de las sesiones',
+          'multicapa, cinco ejemplos incluidos fallaban, y grabar una sesión de',
+          'Strudel capturaba silencio. Nuevo: autoguardado con recuperación, menú de',
+          'aplicación funcional, asociación de ficheros .lmc, BPM para el motor',
+          'Strudel, atajos de solo/mute, perfiles MIDI y exportación de audio.',
+        ].join('\n'),
+      },
+    },
+  },
 
   /* ── Synth UI: Phase 1 + Phase 2 ────────────────────── */
 
