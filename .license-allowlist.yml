@@ -15,10 +15,10 @@
 #    AGPL/MIT split auditable, and AGPL § 4 conveyance depends on them. The
 #    2026-08-16 legal audit verified 186 of 192 source files carry one (the six
 #    gaps are the CSS token files).
-# 2. The audit reports under docs/ ANALYSE this repo's licensing, so they name
-#    AGPL and MIT as subject matter and detect themselves — the same trap as
-#    wm-project-astro-components/LICENSE, which lists OSS licences in order to
-#    DENY them and therefore trips its own falsifier.
+# 2. Any document that ANALYSES this repo's licensing names AGPL and MIT as its
+#    subject matter and therefore detects itself. A proprietary licence that
+#    enumerates OSS licences in order to DENY them trips the same falsifier —
+#    the check cannot tell a claim from a description of one.
 # 3. public/llms.txt states the project's licence as a fact about the product.
 #
 # WHAT THIS IS NOT
