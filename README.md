@@ -98,7 +98,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Settings Panel** — 4 editor themes (Purple, Amber, Cyan, Matrix), font size, vim mode, word wrap, zen mode.
 
-**Solo/Mute** — Alt+1..9 to solo patterns, Shift+Alt+1..9 to mute. `_$:` prefix in code mutes patterns.
+**Solo/Mute** — Ctrl+1..9 to solo a layer, Shift+Ctrl+1..9 to mute one. Both toggle the `_` prefix in your code, which is the mechanism Strudel itself honours (`_$:` returns silence), so the state stays visible in the source.
 
 **Clock Sync** — Multi-tab synchronization via BroadcastChannel (leader election, BPM broadcast).
 

@@ -71,6 +71,28 @@ export class StrudelEngine extends BaseEngine {
     return wrapper
   }
 
+  /**
+   * Set the tempo.
+   *
+   * Strudel is cycle-based, not beat-based: setcpm(140/4) is 140 bpm in 4/4, so
+   * cpm = bpm / BARS_PER_CYCLE. Four is the assumption baked into every example
+   * and session in this repo; it is named here rather than left as a magic 4.
+   *
+   * Targets window.__strudelRepl first because THAT is the REPL that plays. The
+   * orchestrator holds its own StrudelEngine instance, but the shipped editor
+   * path builds its own REPL in StrudelEditor and publishes it globally — so an
+   * engine that only ever set its own replInstance would move a tempo nobody
+   * hears. this.replInstance is the fallback for the orchestrator-only path.
+   */
+  setBpm(bpm: number): void {
+    const BARS_PER_CYCLE = 4
+    const cpm = bpm / BARS_PER_CYCLE
+    const live = window.__strudelRepl
+    if (typeof live?.setCpm === 'function') { live.setCpm(cpm); return }
+    if (typeof live?.setCps === 'function') { live.setCps(cpm / 60); return }
+    this.replInstance?.setCpm?.(cpm)
+  }
+
   start(): void {
     this.replInstance?.start()
   }
