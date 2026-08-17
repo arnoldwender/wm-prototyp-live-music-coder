@@ -150,6 +150,10 @@ function TransportBar() {
     const newBpm = Number(e.target.value)
     setBpm(newBpm)
     getOrchestrator().setBpm(newBpm)
+    /* Propagate to other tabs. broadcastBpm no-ops unless this tab is the clock
+       leader, so followers cannot fight each other for the tempo. It had zero
+       callers, which is why multi-tab sync elected a leader and then ignored it. */
+    void import("../../lib/strudel-extensions").then(({ broadcastBpm }) => broadcastBpm(newBpm))
   }
 
   /* Undo/Redo — dispatch keyboard shortcuts to active CodeMirror editor */
@@ -371,7 +375,20 @@ function TransportBar() {
                   </Tooltip>
                   <Tooltip content={`Export Audio (${isMac ? '⌘E' : 'Ctrl+E'})`}>
                     <Button variant="ghost" onClick={() => {
-                      electronAPI?.notify('Export', 'Use the recording feature first, then export.')
+                      void import('../../lib/audio/recorder')
+                        .then(({ exportLastTakeAsWav }) => exportLastTakeAsWav())
+                        .then((result) => {
+                          if (result === null) {
+                            electronAPI?.notify('Nothing to export', 'Record a take first, then export.')
+                          } else if ('error' in result) {
+                            electronAPI?.notify('Export failed', result.error)
+                          }
+                          /* Success is its own feedback: the save dialog closed
+                             and the file is on disk. A toast would be noise. */
+                        })
+                        .catch(() => {
+                          electronAPI?.notify('Export failed', 'Could not decode the recording.')
+                        })
                     }}>
                       <Download size={16} />
                     </Button>

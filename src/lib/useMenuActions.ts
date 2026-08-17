@@ -103,12 +103,16 @@ export function useMenuActions(): void {
           await api.saveProject?.(currentProjectJson());
           break;
 
-        case 'export-audio':
-          api.notify?.(
-            'Nothing to export',
-            'Record a take first — the transport bar has the record button.',
-          );
+        case 'export-audio': {
+          const { exportLastTakeAsWav } = await import('./audio/recorder');
+          const result = await exportLastTakeAsWav();
+          if (result === null) {
+            api.notify?.('Nothing to export', 'Record a take first — the transport bar has the record button.');
+          } else if ('error' in result) {
+            api.notify?.('Export failed', result.error);
+          }
           break;
+        }
 
         case 'toggle-play':
           store.togglePlay();

@@ -56,7 +56,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Interactive Controls** — `slider(value, min, max, step)` creates draggable inline widgets. `onKey()` binds keyboard shortcuts. `createParams()` creates named parameters controllable via MIDI CC.
 
-**Visual Node Graph** — React Flow canvas showing audio routing as draggable, connectable nodes. Auto-derived from code in real time.
+**Visual Node Graph** — React Flow canvas showing audio routing as draggable, connectable nodes, auto-derived from your code in real time. Available for the Tone.js and Web Audio engines; the Strudel engine shows an empty state, because a Strudel pattern is a single expression rather than a routing graph. Node positions are not persisted yet.
 
 **4 Audio Engines + Extensions**
 
