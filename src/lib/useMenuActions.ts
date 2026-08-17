@@ -150,6 +150,34 @@ export function useMenuActions(): void {
       }
     };
 
-    return api.onMenuAction((action: string) => void handle(action));
+    const offMenu = api.onMenuAction((action: string) => void handle(action));
+
+    /* .lmc files handed over by the OS — double-click, "Open With", or a path on
+       the command line. package.json has declared the association all along, so
+       until the main process started forwarding these the file was silently
+       dropped and the user landed in an empty editor.
+
+       Receive-only: the renderer cannot request a file through this channel, so
+       there is no path for it to supply and nothing to validate beyond the JSON
+       itself, which deserializeProject already guards. */
+    const offFile = api.onFileOpened?.(({ json }) => {
+      try {
+        const project = deserializeProject(json);
+        navigate('/editor');
+        useAppStore.getState().loadProject({
+          bpm: project.bpm,
+          defaultEngine: project.defaultEngine,
+          files: project.files,
+          layout: project.layout,
+        });
+      } catch {
+        api.notify?.('Open failed', 'That file is not a readable Live Music Coder project.');
+      }
+    });
+
+    return () => {
+      offMenu?.();
+      offFile?.();
+    };
   }, [navigate]);
 }

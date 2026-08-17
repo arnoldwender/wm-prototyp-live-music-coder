@@ -41,6 +41,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => { ipcRenderer.removeListener('window:popout-closed', handler) }
   },
 
+  /* Fired when the OS hands us a .lmc file — double-click, "Open With", or a
+     path on the command line. Receive-only: the renderer cannot ask for a file
+     this way, so there is no path for it to supply. */
+  onFileOpened: (callback: (payload: { json: string; path: string }) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, payload: { json: string; path: string }) =>
+      callback(payload)
+    ipcRenderer.on('file:opened', handler)
+    return () => { ipcRenderer.removeListener('file:opened', handler) }
+  },
+
   onMenuAction: (callback: (action: string) => void) => {
     const handler = (_event: Electron.IpcRendererEvent, action: string) => callback(action)
     ipcRenderer.on('menu:action', handler)

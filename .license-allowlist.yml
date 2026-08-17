@@ -1,13 +1,13 @@
 # License-gate allowlist — wm-prototyp-live-music-coder
 #
 # WHY THIS FILE EXISTS
-# Arnold's STRICT rule is that WM work never carries an OSS license. This repo is
+# House rule: Wender Media work never carries an OSS license. This repo is
 # the ratified carve-out (~/.claude/CLAUDE.md, "EXCEPCIÓN 2"): it is deliberately
 # published as AGPL-3.0-or-later, because the combined application links the
 # Strudel live-coding library, which is AGPL. That is not drift and must never be
 # "fixed" — see LICENSING.md, LICENSE-AGPL and LICENSE-MIT.
 #
-# Authorised by Arnold in-session 2026-08-17 (gate-integrity GO).
+# Reviewed and authorised by the maintainer, 2026-08-17.
 #
 # THE THREE FALSE POSITIVES THIS RESOLVES
 # 1. Source files carry `SPDX-License-Identifier` headers. Here those are the
@@ -45,9 +45,10 @@ LICENSE
 LICENSE-AGPL
 LICENSE-MIT
 LICENSING.md
+GEMINI.md
 README.md
-CONTRIBUTING.md
-SECURITY.md
+.github/CONTRIBUTING.md
+.github/SECURITY.md
 CHANGELOG.md
-CODE_OF_CONDUCT.md
+.github/CODE_OF_CONDUCT.md
 package.json
