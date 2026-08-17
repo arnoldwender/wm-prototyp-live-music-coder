@@ -55,3 +55,20 @@ agents.md
 instructions.md
 docs/superpowers/
 docs/development/
+GEMINI.md
+
+# Generated audit, architecture and strategy documents. Same rule as above:
+# this repo is public, and these carry unfixed security findings, legal-risk
+# assessments, analytics figures and internal review notes. They stay on disk.
+docs/*-AUDIT-*.md
+docs/ARCHITECTURE-2*.md
+docs/ART-DIRECTION-*.md
+docs/CLAIM-AUDIT-*.md
+docs/IMPLEMENT-CLAIMED-*.md
+docs/MARKETING-KIT-*.md
+docs/AEO-LLMSTXT-*.md
+docs/ANTI-FEATURE-DRIFT-*.md
+docs/LEGAL-AUDIT-*.md
+docs/.design-dna-audit.json
+
+

@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────────────────
    Global styles — Tailwind CSS v4 + design token imports
-   Art direction "SIGNAL ROOM" — see docs/ART-DIRECTION-2026-08-16.md
+   Art direction "SIGNAL ROOM" —
    Dark-only: this is an instrument surface read in a dark room.
    ────────────────────────────────────────────────────────── */
 @import "tailwindcss";
