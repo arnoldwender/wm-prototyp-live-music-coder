@@ -13,6 +13,12 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.0] - 2026-08-17
+
+### Added
+
+- **Named parameters are live, MIDI Learn drives them, and Strudel gets a real graph** — createParams() returned a plain number snapshotted at evaluation time, so
+
 ## [1.2.0] - 2026-08-17
 
 ### security
