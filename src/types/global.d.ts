@@ -16,7 +16,14 @@ declare global {
       setCps?: (cps: number) => unknown;
       /** Cycles per minute. setcpm(140/4) is 140 bpm in 4/4. */
       setCpm?: (cpm: number) => unknown;
-      scheduler?: { cps?: number; [key: string]: unknown };
+      /** `now()` is the Cyclist clock the visualizers sample every frame. */
+      scheduler?: { now(): number; cps?: number; [key: string]: unknown };
+      /** Live REPL state. `pattern` is null until the first successful
+       *  evaluation, which is why every draw loop guards on it. */
+      state?: {
+        pattern?: { queryArc(begin: number, end: number): unknown[] } | null;
+        [key: string]: unknown;
+      };
       [key: string]: unknown;
     };
     /** Prevents double-patching console.log in ConsolePanel */

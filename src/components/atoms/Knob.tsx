@@ -115,9 +115,11 @@ function Knob({
   const startYRef = useRef(0)
   const startValueRef = useRef(value)
   const shiftRef = useRef(false)
-  /* Latest onChange — avoids stale closures inside the document listeners */
+  /* Latest onChange — avoids stale closures inside the document listeners.
+   * Written from an effect, not during render: pointermove only fires after
+   * paint, by which time the effect has already run. */
   const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
+  useEffect(() => { onChangeRef.current = onChange }, [onChange])
 
   /* Local hover flag for the focus/hover outline — purely cosmetic */
   const [, setIsDragging] = useState(false)
@@ -133,28 +135,36 @@ function Knob({
     onChangeRef.current(next)
   }, [])
 
-  /* Pointer up — stop tracking and remove document listeners */
-  const handleDocPointerUp = useCallback(() => {
+  /* One AbortController per drag. Every document listener is registered with
+   * its signal, so a single abort() detaches all three at once.
+   *
+   * The previous teardown had the pointerup handler remove itself BY NAME from
+   * inside its own useCallback body. That only worked while its identity
+   * happened to stay stable across renders — the day a dependency changed,
+   * removeEventListener would have been handed a different function object and
+   * the knob would have kept following the pointer after release. */
+  const dragAbortRef = useRef<AbortController | null>(null)
+
+  /* Pointer up — stop tracking and detach the document listeners */
+  const endDrag = useCallback(() => {
     draggingRef.current = false
     setIsDragging(false)
-    document.documentElement.removeEventListener('pointermove', handleDocPointerMove)
-    document.documentElement.removeEventListener('pointerup', handleDocPointerUp)
-    document.documentElement.removeEventListener('pointercancel', handleDocPointerUp)
-  }, [handleDocPointerMove])
+    dragAbortRef.current?.abort()
+    dragAbortRef.current = null
+  }, [])
 
-  /* Clean up any leaked listeners on unmount */
-  useEffect(() => {
-    return () => {
-      document.documentElement.removeEventListener('pointermove', handleDocPointerMove)
-      document.documentElement.removeEventListener('pointerup', handleDocPointerUp)
-      document.documentElement.removeEventListener('pointercancel', handleDocPointerUp)
-    }
-  }, [handleDocPointerMove, handleDocPointerUp])
+  /* Clean up listeners still attached when the knob unmounts mid-drag */
+  useEffect(() => () => dragAbortRef.current?.abort(), [])
 
   /* Pointer down on the SVG — capture + register doc listeners */
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<SVGSVGElement>) => {
       e.preventDefault()
+      /* A second pointerdown without an intervening pointerup would otherwise
+       * strand the previous drag's listeners on documentElement */
+      dragAbortRef.current?.abort()
+      const controller = new AbortController()
+      dragAbortRef.current = controller
       draggingRef.current = true
       setIsDragging(true)
       startYRef.current = e.clientY
@@ -165,11 +175,13 @@ function Knob({
       try {
         ;(e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId)
       } catch { /* not all browsers support capture on SVG — ignore */ }
-      document.documentElement.addEventListener('pointermove', handleDocPointerMove)
-      document.documentElement.addEventListener('pointerup', handleDocPointerUp)
-      document.documentElement.addEventListener('pointercancel', handleDocPointerUp)
+      const root = document.documentElement
+      const opts = { signal: controller.signal }
+      root.addEventListener('pointermove', handleDocPointerMove, opts)
+      root.addEventListener('pointerup', endDrag, opts)
+      root.addEventListener('pointercancel', endDrag, opts)
     },
-    [value, handleDocPointerMove, handleDocPointerUp]
+    [value, handleDocPointerMove, endDrag]
   )
 
   /* Track shift key during drag so live-switching precision mid-drag works */

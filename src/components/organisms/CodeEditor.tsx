@@ -67,23 +67,34 @@ export function CodeEditor() {
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const isPlaying = useAppStore((s) => s.isPlaying);
   const activeFile = files.find((f) => f.active);
+  /* Primitive slices of the active file. The evaluate callbacks below close over
+   * these instead of the file object: declaring `[activeFile?.code]` as a
+   * dependency while the body reads `activeFile` is a claim React cannot verify
+   * from the source, so the memoization gets discarded rather than trusted. */
+  const activeFileId = activeFile?.id;
+  const activeFileCode = activeFile?.code;
+  const activeFileEngine = activeFile?.engine;
 
-  /* Refs to avoid stale closures in CM6 updateListener */
-  const isPlayingRef = useRef(isPlaying);
-  isPlayingRef.current = isPlaying;
+  /* Live-mode flag read from inside the CM6 updateListener. That listener is
+   * built once per file, so reading `autoUpdate` directly would freeze it at
+   * the value from that render — hence the ref. Written in an effect and not
+   * during render: a render-phase ref write is not safe under concurrent
+   * rendering, and React may discard the render that performed it.
+   * (An isPlayingRef used to live here too — declared, written every render,
+   * and never read by anything.) */
   const autoUpdateRef = useRef(autoUpdate);
-  autoUpdateRef.current = autoUpdate;
+  useEffect(() => { autoUpdateRef.current = autoUpdate; }, [autoUpdate]);
 
   /** Manually evaluate the current code — works regardless of play state */
   const handleManualEvaluate = useCallback(async () => {
-    if (!activeFile) return;
+    if (activeFileCode === undefined || activeFileEngine === undefined) return;
     const orch = getOrchestrator();
     try {
       setEvalError(null);
       /* Resume AudioContext IMMEDIATELY in the click handler — no dynamic import
        * that could lose the user gesture context in some browsers */
       await resumeContext();
-      await orch.evaluate(activeFile.code, activeFile.engine);
+      await orch.evaluate(activeFileCode, activeFileEngine);
       setIsRunning(true);
       /* Flash highlight on successful evaluate */
       if (viewRef.current) {
@@ -95,13 +106,13 @@ export function CodeEditor() {
       /* Track evaluation for session stats */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
-      evalStore.trackEngine(activeFile.engine);
+      evalStore.trackEngine(activeFileEngine);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[CodeEditor] Manual eval error:', msg);
       setEvalError(msg);
     }
-  }, [activeFile?.id, activeFile?.code, activeFile?.engine]);
+  }, [activeFileCode, activeFileEngine]);
 
   const handleClear = useCallback(() => {
     const view = viewRef.current;
@@ -112,7 +123,10 @@ export function CodeEditor() {
 
   /** Set up evaluator for live code changes */
   const setupEvaluator = useCallback(() => {
-    if (!activeFile) return;
+    /* activeFileId is read, not just declared: its identity is what makes this
+     * callback change on a file switch, which is what cancels the pending
+     * debounce of the file being left behind. */
+    if (activeFileId === undefined || activeFileEngine === undefined) return;
     evaluatorRef.current?.cancel();
     const orch = getOrchestrator();
     evaluatorRef.current = createEvaluator(
@@ -127,7 +141,7 @@ export function CodeEditor() {
           return; /* Silently skip — user is still typing */
         }
         await resumeContext();
-        await orch.evaluate(code, activeFile.engine);
+        await orch.evaluate(code, activeFileEngine);
       },
       800, /* Longer debounce for live mode — less aggressive */
       (err) => {
@@ -135,7 +149,7 @@ export function CodeEditor() {
       },
       () => setEvalError(null),
     );
-  }, [activeFile?.id, activeFile?.engine]);
+  }, [activeFileId, activeFileEngine]);
 
   /** Create or recreate the CM6 editor when active file changes */
   useEffect(() => {

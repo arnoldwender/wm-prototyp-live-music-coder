@@ -9,6 +9,7 @@
 import { VIZ_COLORS } from './colors';
 import { useAppStore as appStore } from '../store';
 import { extractMidi, extractVelocity } from './midi-utils';
+import type { VisualizerRepl, VisualizerHap } from './repl-source';
 
 /* ── Constants ─────────────────────────────────────────── */
 
@@ -25,14 +26,13 @@ export function drawPunchcard(
   width: number,
   height: number,
   time: number,
-  getRepl: () => unknown,
+  getRepl: () => VisualizerRepl | null,
 ) {
   /* Background */
   ctx.fillStyle = VIZ_COLORS.bg;
   ctx.fillRect(0, 0, width, height);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const repl = getRepl() as any;
+  const repl = getRepl();
   if (!repl?.scheduler || !repl.state?.pattern?.queryArc) {
     ctx.fillStyle = VIZ_COLORS.textDim;
     ctx.font = '11px monospace';
@@ -61,8 +61,7 @@ export function drawPunchcard(
   let minNote = 127;
   let maxNote = 0;
 
-  for (const _hap of haps) {
-    const hap = _hap as { whole?: { begin: number }; value?: unknown };
+  for (const hap of haps as VisualizerHap[]) {
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;

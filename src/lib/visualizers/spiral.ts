@@ -9,19 +9,19 @@
 import { VIZ_COLORS } from './colors';
 import { useAppStore as appStore } from '../store';
 import { extractMidi, extractVelocity } from './midi-utils';
+import type { VisualizerRepl, VisualizerHap } from './repl-source';
 
 export function drawSpiral(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
   time: number,
-  getRepl: () => unknown,
+  getRepl: () => VisualizerRepl | null,
 ) {
   ctx.fillStyle = VIZ_COLORS.bg;
   ctx.fillRect(0, 0, width, height);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const repl = getRepl() as any;
+  const repl = getRepl();
   if (!repl?.scheduler || !repl.state?.pattern?.queryArc) {
     ctx.fillStyle = VIZ_COLORS.textDim;
     ctx.font = '11px monospace';
@@ -46,7 +46,7 @@ export function drawSpiral(
   const rotationOffset = (beatPhase / 32) % (Math.PI * 2);
 
   /* Query 4 cycles of history */
-  let haps: any[];
+  let haps: unknown[];
   try {
     haps = repl.state.pattern.queryArc(Math.max(0, now - 4), now + 0.5);
   } catch { return; }
@@ -68,7 +68,7 @@ export function drawSpiral(
   ctx.fill();
 
   /* Plot notes on spiral */
-  for (const hap of haps) {
+  for (const hap of haps as VisualizerHap[]) {
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;

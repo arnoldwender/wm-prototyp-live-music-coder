@@ -16,7 +16,7 @@ const MIDI_NOTE_NAME = (n: number): string =>
   ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][n % 12] + String(Math.floor(n / 12) - 1);
 
 function getRepl() {
-  return (window as unknown as { __strudelRepl?: unknown }).__strudelRepl ?? null;
+  return window.__strudelRepl ?? null;
 }
 
 const btnStyle: React.CSSProperties = {
@@ -43,7 +43,12 @@ export function PianorollVisualizer() {
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
   const [timeOffset, setTimeOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  /* Which drag is in flight, not merely whether one is. The cursor used to be
+   * derived by reading pitchDragRef/velDragRef during render; refs are invisible
+   * to React, so the style depended on a value that could not trigger the
+   * re-render that would apply it. The kind is state because the cursor renders
+   * from it. */
+  const [dragKind, setDragKind] = useState<'pan' | 'vertical' | null>(null);
   const dragRef = useRef<{ startX: number; startOffset: number } | null>(null);
   const [velocityOverrides, setVelocityOverrides] = useState<Map<string, number>>(new Map());
   const [pitchOverrides, setPitchOverrides] = useState<Map<string, number>>(new Map());
@@ -73,7 +78,7 @@ export function PianorollVisualizer() {
     (ctx: CanvasRenderingContext2D, width: number, height: number, time: number) => {
       drawPianoroll(
         ctx, width, height, time,
-        getRepl as Parameters<typeof drawPianoroll>[4],
+        getRepl,
         zoomX, zoomY, timeOffset,
         velocityOverridesRef.current, pitchOverridesRef.current,
         eventSinkRef.current,
@@ -153,7 +158,7 @@ export function PianorollVisualizer() {
         const hit = findVelNote(e.clientX, canvas);
         if (hit) {
           velDragRef.current = { key: hit.key, startY: e.clientY, startVel: hit.vel };
-          setIsDragging(true);
+          setDragKind('vertical');
           return;
         }
       } else if (isInNoteLane(canvas, e.clientY)) {
@@ -162,13 +167,13 @@ export function PianorollVisualizer() {
           /* Audition the note immediately on click via the global play hook */
           (window as unknown as { __lmcPlayNote?: (n: number) => void }).__lmcPlayNote?.(hit.note);
           pitchDragRef.current = { key: hit.key, origNote: hit.note, startY: e.clientY };
-          setIsDragging(true);
+          setDragKind('vertical');
           return;
         }
       }
     }
     dragRef.current = { startX: e.clientX, startOffset: timeOffset };
-    setIsDragging(true);
+    setDragKind('pan');
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -214,7 +219,7 @@ export function PianorollVisualizer() {
     velDragRef.current = null;
     pitchDragRef.current = null;
     setDragLabel(null);
-    setIsDragging(false);
+    setDragKind(null);
   };
 
   return (
@@ -223,9 +228,7 @@ export function PianorollVisualizer() {
       style={{
         backgroundColor: 'var(--color-bg)',
         /* ns-resize for pitch/velocity vertical drags; grabbing for timeline pan; grab at rest */
-        cursor: isDragging
-          ? (pitchDragRef.current || velDragRef.current ? 'ns-resize' : 'grabbing')
-          : 'grab',
+        cursor: dragKind === 'vertical' ? 'ns-resize' : dragKind === 'pan' ? 'grabbing' : 'grab',
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

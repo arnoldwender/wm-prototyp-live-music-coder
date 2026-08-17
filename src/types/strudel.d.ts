@@ -13,6 +13,10 @@ declare module '@strudel/core' {
   }
   /** Injects module exports into globalThis + strudelScope for REPL eval access */
   export function evalScope(...modules: (Promise<unknown> | Record<string, unknown>)[]): Promise<unknown[]>
+  /** Applies a transform to every currently active pattern. Only present in
+   *  recent @strudel/core, hence the `| undefined` — ensureAllFunction() probes
+   *  for it and registers nothing when the installed version predates it. */
+  export const all: ((transform: unknown) => unknown) | undefined
 }
 
 declare module '@strudel/webaudio' {
@@ -34,6 +38,14 @@ declare module '@strudel/webaudio' {
       channelMerger: ChannelMergerNode | null;
     };
     connectToDestination: (node: AudioNode, channels?: number[]) => void;
+    /* Pre-SuperdoughOutput layouts, where the output node hung directly off the
+       controller. Declared optional so the version fallback in
+       lib/audio/strudel-tap.ts can probe for them without an `any` cast; the
+       package ships no types of its own, so this shim is the only description
+       of the shape that exists. */
+    destinationGain?: GainNode | null;
+    master?: GainNode | null;
+    out?: GainNode | null;
   } | null
 }
 
@@ -149,6 +161,14 @@ declare module 'superdough' {
       channelMerger: ChannelMergerNode | null;
     };
     connectToDestination: (node: AudioNode, channels?: number[]) => void;
+    /* Pre-SuperdoughOutput layouts, where the output node hung directly off the
+       controller. Declared optional so the version fallback in
+       lib/audio/strudel-tap.ts can probe for them without an `any` cast; the
+       package ships no types of its own, so this shim is the only description
+       of the shape that exists. */
+    destinationGain?: GainNode | null;
+    master?: GainNode | null;
+    out?: GainNode | null;
   } | null
   export function getAnalyserById(id: string | number, fftSize?: number, smoothing?: number): AnalyserNode
 }

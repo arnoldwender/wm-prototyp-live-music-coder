@@ -9,6 +9,7 @@
 import { VIZ_COLORS } from './colors';
 import { useAppStore as appStore } from '../store';
 import { extractMidi, extractVelocity } from './midi-utils';
+import type { VisualizerRepl, VisualizerHap } from './repl-source';
 
 /* 12-tone labels for the harmonic circle (sibling visualizers keep their own). */
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -18,7 +19,7 @@ export function drawPitchwheel(
   width: number,
   height: number,
   time: number,
-  getRepl: () => unknown,
+  getRepl: () => VisualizerRepl | null,
 ) {
   ctx.fillStyle = VIZ_COLORS.bg;
   ctx.fillRect(0, 0, width, height);
@@ -66,8 +67,7 @@ export function drawPitchwheel(
   ctx.stroke();
 
   /* Query active notes */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const repl = getRepl() as any;
+  const repl = getRepl();
   if (!repl?.scheduler || !repl.state?.pattern?.queryArc) {
     ctx.fillStyle = VIZ_COLORS.textDim;
     ctx.font = '11px monospace';
@@ -78,7 +78,7 @@ export function drawPitchwheel(
   }
 
   const now = repl.scheduler.now();
-  let haps: any[];
+  let haps: unknown[];
   try {
     haps = repl.state.pattern.queryArc(Math.max(0, now - 0.25), now + 0.125);
   } catch { return; }
@@ -86,7 +86,7 @@ export function drawPitchwheel(
   /* Collect active pitch classes with max velocity */
   const activePC: Map<number, { velocity: number; octaves: number[] }> = new Map();
 
-  for (const hap of haps) {
+  for (const hap of haps as VisualizerHap[]) {
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;

@@ -10,42 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { EDITOR_THEMES } from '../../lib/editor/themes';
 import { useAppStore } from '../../lib/store';
-
-/* ── Settings type ────────────────────────────────────── */
-
-export interface EditorSettings {
-  themeId: string;
-  fontSize: number;
-  vimMode: boolean;
-  zenMode: boolean;
-  lineNumbers: boolean;
-  wordWrap: boolean;
-}
-
-const STORAGE_KEY = 'lmc-editor-settings';
-
-const DEFAULT_SETTINGS: EditorSettings = {
-  themeId: 'purple',
-  fontSize: 14,
-  vimMode: false,
-  zenMode: false,
-  lineNumbers: true,
-  wordWrap: false,
-};
-
-/** Load settings from localStorage */
-export function loadSettings(): EditorSettings {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch { /* corrupted storage */ }
-  return { ...DEFAULT_SETTINGS };
-}
-
-/** Save settings to localStorage */
-export function saveSettings(settings: EditorSettings): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-}
+import { loadSettings, saveSettings, type EditorSettings } from '../../lib/editor/settings';
 
 /* ── Component ────────────────────────────────────────── */
 

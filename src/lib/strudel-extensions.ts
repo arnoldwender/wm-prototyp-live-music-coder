@@ -7,6 +7,12 @@
    Strudel evaluation context.
    ────────────────────────────────────────────────────────── */
 
+/* The scope Strudel's REPL evaluates against. Its `Function()` context resolves
+   free identifiers off globalThis, so "registering a helper" means assigning a
+   property here. One typed view of that object keeps every registration below
+   free of per-assignment casts. */
+const evalScopeGlobal = globalThis as unknown as Record<string, unknown>;
+
 /* ── Package loaders ──────────────────────────────────── */
 
 /** Load @strudel/xen for microtonal/xenharmonic support */
@@ -306,12 +312,12 @@ export function processMutedLabels(code: string): string {
 export function ensureAllFunction(): void {
   try {
     /* Check if `all` is already globally available */
-    if (typeof (globalThis as any).all === 'function') return;
+    if (typeof evalScopeGlobal.all === 'function') return;
 
     /* Try to get it from @strudel/core */
-    import('@strudel/core').then((core: any) => {
+    import('@strudel/core').then((core) => {
       if (typeof core.all === 'function') {
-        (globalThis as any).all = core.all;
+        evalScopeGlobal.all = core.all;
         if (import.meta.env.DEV) console.log('[Strudel] all() function registered globally');
       }
     }).catch(() => {});
@@ -351,7 +357,7 @@ export async function loadAllExtensions(): Promise<void> {
      match how every other optional extension in this file is wired. */
   try {
     const gp = await import('./input/gamepad');
-    (globalThis as unknown as Record<string, unknown>).gamepad = (padIndex = 0) => {
+    evalScopeGlobal.gamepad = (padIndex = 0) => {
       gp.startGamepadPolling();
       return {
         get x() { return gp.getLeftX(padIndex); },
@@ -403,10 +409,10 @@ export async function loadAllExtensions(): Promise<void> {
   }
 
   /* Expose functions globally for use in Strudel code */
-  (globalThis as any).onKey = onKey;
-  (globalThis as any).createParams = createParams;
-  (globalThis as any).setParam = setParam;
-  (globalThis as any).getParam = getParam;
+  evalScopeGlobal.onKey = onKey;
+  evalScopeGlobal.createParams = createParams;
+  evalScopeGlobal.setParam = setParam;
+  evalScopeGlobal.getParam = getParam;
 
   if (import.meta.env.DEV) console.log('[Strudel] All extensions loaded');
 }

@@ -15,6 +15,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { VIZ_COLORS } from './colors';
+import type { VisualizerRepl, VisualizerHap } from './repl-source';
 
 /* ── Constants ─────────────────────────────────────────── */
 
@@ -355,10 +356,7 @@ export function drawPianoroll(
   width: number,
   height: number,
   _time: number,
-  getRepl: () => {
-    scheduler: { now(): number };
-    state: { pattern: { queryArc(a: number, b: number): unknown[] } | null };
-  } | null,
+  getRepl: () => VisualizerRepl | null,
   zoomX = 1,
   zoomY = 1,
   timeOffset = 0,
@@ -403,11 +401,11 @@ export function drawPianoroll(
   let minNote = Infinity;
   let maxNote = -Infinity;
 
-  for (const hap of haps as Record<string, unknown>[]) {
+  for (const hap of haps as VisualizerHap[]) {
     if (!hap.whole) continue;
     const midi = extractMidi(hap.value);
     if (midi < 0 || midi > 127) continue;
-    const whole = hap.whole as { begin: number; end: number };
+    const whole = hap.whole;
     events.push({
       note: midi,
       start: whole.begin,

@@ -16,14 +16,16 @@ import { loadFromGist } from '../../lib/persistence/gist';
 import { safeJsonParse } from '../../lib/persistence/local';
 
 /* Saved Gists list — reads from localStorage */
-function SavedGistsList() {
-  const [gists, setGists] = useState<{ id: string; url: string; date: string }[]>([]);
-  const [loading, setLoading] = useState<string | null>(null);
+interface SavedGist { id: string; url: string; date: string }
 
-  useEffect(() => {
-    const raw = localStorage.getItem('lmc-saved-gists') || '[]';
-    setGists(safeJsonParse(raw, []) as { id: string; url: string; date: string }[]);
-  }, []);
+function SavedGistsList() {
+  /* Read during the initial render rather than from an effect: the effect
+   * version painted the "no saved gists yet" empty state for one frame and
+   * then replaced it, which reads as a flash on every open. */
+  const [gists] = useState<SavedGist[]>(
+    () => safeJsonParse(localStorage.getItem('lmc-saved-gists') || '[]', []) as SavedGist[],
+  );
+  const [loading, setLoading] = useState<string | null>(null);
 
   const handleLoad = async (gistId: string) => {
     setLoading(gistId);
@@ -88,10 +90,16 @@ interface AccordionProps {
 function AccordionSection({ id: _id, title, children, forceOpen }: AccordionProps) {
   const [open, setOpen] = useState(forceOpen ?? false);
 
-  /* Auto-open when activity bar selects this section */
-  useEffect(() => {
+  /* Auto-open when the activity bar selects this section.
+   * Adjusted while rendering instead of in an effect (React: "Adjusting some
+   * state when a prop changes") — an effect renders the section collapsed once
+   * and then re-renders it open. Only the RISING edge of forceOpen opens it, so
+   * the user can still collapse the section that is currently selected. */
+  const [prevForceOpen, setPrevForceOpen] = useState(forceOpen);
+  if (forceOpen !== prevForceOpen) {
+    setPrevForceOpen(forceOpen);
     if (forceOpen) setOpen(true);
-  }, [forceOpen]);
+  }
 
   const toggle = () => setOpen(!open);
 

@@ -43,10 +43,10 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
           let tapNode = controller?.output?.destinationGain;
 
           /* Path 2: controller.destinationGain (some versions) */
-          if (!tapNode) tapNode = (controller as any)?.destinationGain;
+          if (!tapNode) tapNode = controller?.destinationGain;
 
           /* Path 3: controller.master or controller.out */
-          if (!tapNode) tapNode = (controller as any)?.master ?? (controller as any)?.out;
+          if (!tapNode) tapNode = controller?.master ?? controller?.out;
 
           /* NOTE: No Path 4. AudioDestinationNode is a terminal sink — connecting
            * FROM it to a GainNode produces no audio flow and silently locks

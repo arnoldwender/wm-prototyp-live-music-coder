@@ -28,7 +28,10 @@ const TABS: { id: TabId; Icon: typeof Music }[] = [
 export function SidePanel() {
   const { t } = useTranslation();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [activeTab, setActiveTab] = useState<TabId | null>(null);
+  /* Starts on the first tab instead of null-plus-an-effect: the panel renders
+   * nothing while closed, so the null state was never visible — it only cost a
+   * second render every time the panel opened. */
+  const [activeTab, setActiveTab] = useState<TabId>('samples');
   /* SidePanel is deprecated — replaced by ActivityBar + DetailPanel.
      Kept only for sub-component exports (SampleBrowser, ReferencePanel, etc.) */
   const showSidePanel = useAppStore((s) => s.activeDetailSection !== null);
@@ -43,11 +46,6 @@ export function SidePanel() {
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [showSidePanel, toggleSidePanel]);
-
-  /* Auto-select first tab when panel opens */
-  useEffect(() => {
-    if (showSidePanel && !activeTab) setActiveTab('samples');
-  }, [showSidePanel, activeTab]);
 
   if (!showSidePanel) return null;
 
@@ -148,7 +146,7 @@ export function SidePanel() {
             fontWeight: 'var(--font-weight-semibold)',
             color: 'var(--color-text)',
           }}>
-            {activeTab && t(`sidePanel.${activeTab}`)}
+            {t(`sidePanel.${activeTab}`)}
           </span>
         </div>
 
