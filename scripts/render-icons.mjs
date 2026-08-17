@@ -18,8 +18,13 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-const PW = process.env.PLAYWRIGHT_PATH
-  ?? '~/Development/wm-brand-wendermedia-org/node_modules/playwright/index.mjs'
+/* Playwright is not a dependency of this project — it is only needed to render
+   the icon set, which happens rarely and on one machine. Point PLAYWRIGHT_PATH at
+   an installation, or run `npx playwright install` first. There is deliberately
+   no fallback path: the one that used to be here was a private checkout on the
+   author machine, which is both useless to anyone else and a leak in a public
+   repository. */
+const PW = process.env.PLAYWRIGHT_PATH ?? 'playwright'
 const { chromium } = await import(PW)
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
