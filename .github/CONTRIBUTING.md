@@ -38,4 +38,4 @@ If you have found a bug but not a fix, open an issue with what you did, what you
 and what happened. A reproduction is worth more than a description.
 
 For anything with security implications, do **not** open a public issue — see
-[SECURITY.md](SECURITY.md).
+[SECURITY.md](../.github/SECURITY.md).

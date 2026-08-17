@@ -14,6 +14,7 @@ export interface ElectronAPI {
   setFullscreen: (enabled: boolean) => void
   onFullscreenChanged: (callback: (enabled: boolean) => void) => () => void
   onPopoutClosed: (callback: (panelId: string) => void) => () => void
+  onFileOpened: (callback: (payload: { json: string; path: string }) => void) => () => void
   onMenuAction: (callback: (action: string) => void) => () => void
 }
 

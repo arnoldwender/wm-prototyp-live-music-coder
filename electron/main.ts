@@ -3,6 +3,7 @@
 
 import { app, BrowserWindow, session, shell } from 'electron'
 import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import log from 'electron-log'
 import { appStore } from './store'
 import { registerFileHandlers } from './ipc/file'
@@ -142,6 +143,61 @@ function createWindow(): BrowserWindow {
   return mainWindow
 }
 
+/* ── .lmc file association ──────────────────────────────────────────
+   package.json declares the association, so double-clicking a .lmc file
+   launches the app — and until now nothing handled it, so the file was
+   silently dropped and the user got an empty editor. Three OS paths:
+
+     macOS   -> app.on('open-file'), which can fire BEFORE whenReady
+     Windows -> the path arrives in process.argv of a NEW process
+     Linux   -> same as Windows, plus second-instance when one is running
+
+   requestSingleInstanceLock is what makes the Windows/Linux paths work at
+   all: without it, opening a second file spawns a second copy of the app
+   instead of handing the path to the running one. */
+
+/** Path captured before the window exists; delivered once the renderer is up. */
+let pendingOpenPath: string | null = null
+
+/** Pull the first .lmc argument out of an argv vector. */
+function lmcPathFromArgv(argv: string[]): string | null {
+  const hit = argv.find((a) => a.toLowerCase().endsWith('.lmc'))
+  return hit ?? null
+}
+
+/** Hand a project file to the renderer, or hold it until one exists. */
+function deliverOpenPath(filePath: string, mainWindow: BrowserWindow | null): void {
+  if (!mainWindow || mainWindow.webContents.isLoading()) {
+    pendingOpenPath = filePath
+    return
+  }
+  readFile(filePath, 'utf-8')
+    .then((json) => mainWindow.webContents.send('file:opened', { json, path: filePath }))
+    .catch((err) => log.error(`[open-file] ${filePath}: ${err.message}`))
+}
+
+/* macOS delivers this event, and may do so before whenReady resolves. */
+app.on('open-file', (event, filePath) => {
+  event.preventDefault()
+  deliverOpenPath(filePath, BrowserWindow.getAllWindows()[0] ?? null)
+})
+
+/* Windows / Linux: a second launch hands its argv to the first instance. */
+const gotLock = app.requestSingleInstanceLock()
+if (!gotLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (_event, argv) => {
+    const win = BrowserWindow.getAllWindows()[0]
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    }
+    const filePath = lmcPathFromArgv(argv)
+    if (filePath) deliverOpenPath(filePath, win ?? null)
+  })
+}
+
 // --- App initialization ---
 app.whenReady().then(() => {
   // Set app user model ID for Windows
@@ -228,6 +284,14 @@ app.whenReady().then(() => {
   })
 
   const mainWindow = createWindow()
+
+  /* Flush whatever arrived before the window existed: an argv path from a cold
+     launch, or a macOS open-file event that beat whenReady. */
+  mainWindow.webContents.once('did-finish-load', () => {
+    const queued = pendingOpenPath ?? lmcPathFromArgv(process.argv)
+    pendingOpenPath = null
+    if (queued) deliverOpenPath(queued, mainWindow)
+  })
 
   // Register all IPC handlers
   registerAppHandlers()
