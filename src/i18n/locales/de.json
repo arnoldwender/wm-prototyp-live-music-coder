@@ -578,8 +578,8 @@
       "mutingText": "Pattern mit _$: präfixen, um es stumm zu schalten, ohne den Code zu löschen. Präfix entfernen, um es zurückzubringen. Nützlich, um ein Pattern vorzubereiten, während das aktuelle läuft.",
       "soloMuteHeading": "Solo / Mute Tastenkürzel",
       "soloMuteText": "Patterns mit $d1:, $d2: usw. beschriften, um Tastenkürzel während der Performance zu nutzen:",
-      "altSolo": "Alt+1…9 — Pattern $d1 bis $d9 solo schalten (alle anderen stumm)",
-      "shiftAltMute": "Shift+Alt+1…9 — Stummschaltung für Pattern $d1 bis $d9 umschalten",
+      "altSolo": "Strg+1…9 — Ebene N solo schalten (alle anderen markierten Ebenen stumm)",
+      "shiftAltMute": "Umschalt+Strg+1…9 — Stummschaltung für Ebene N umschalten",
       "stackingHeading": "Schichten mit Labels",
       "stackingText": "Beschriftete Patterns ($d1:, $d2:, $d3:) statt stack() für Live-Performances verwenden. Labels ermöglichen Solo und Mute einzelner Schichten per Tastenkürzel. stack() für fertige Stücke nutzen."
     },
@@ -594,7 +594,8 @@
       "downloadText": "Die Toolbar enthält einen Download-Button, der den aktuellen Code als .js-Datei speichert. Nützlich für Backups oder zum Teilen außerhalb der App.",
       "sessionsHeading": "Sessions-Bibliothek",
       "sessionsText": "Die Seite /sessions enthält 49 kuratierte KI-komponierte Stücke aus 15 Genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi u. a.). Jede Session mit einem Klick im Editor öffnen. Sessions sind ein idealer Einstiegspunkt, um zu erkunden, was Strudel kann."
-    }
+    },
+    "shortcutsSoloMute": "Strg+1..9 — Ebene N solo · Umschalt+Strg+1..9 — Ebene N stummschalten (setzt das _ Präfix im Code)"
   },
   "a11y": {
     "skipToContent": "Zum Inhalt springen"

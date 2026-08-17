@@ -326,7 +326,44 @@ export async function customMidikeys(device: number | string = 0): Promise<(note
  * This one works fine from @strudel/midi since CC reading doesn't need
  * getIsStarted(). But we provide a fallback just in case.
  */
-export async function customMidin(device: number | string = 0): Promise<(ccNum?: number) => any> {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export async function customMidin(device?: number | string): Promise<(ccNum?: number) => any>;
+export async function customMidin(cc: number, min: number, max: number): Promise<any>;
+/**
+ * midin — CC knob reader, in two shapes.
+ *
+ *   await midin(device)            -> (ccNum) => ref        [original]
+ *   await midin(cc, min, max)      -> ref already ranged    [added 2026-08-17]
+ *
+ * The three-argument form is what the shipped in-app documentation has always
+ * described ("midin(cc, min, max) reads a MIDI CC value and maps it to a
+ * range"), while only the one-argument form existed — so following the docs
+ * threw or mis-bound. Rather than correct the sentence, build what it says.
+ *
+ * Arity disambiguates, so the original call sites are untouched: one argument
+ * is still a device, three is a CC plus a range on device 0. Two is rejected
+ * loudly rather than guessed at.
+ */
+export async function customMidin(
+  device: number | string = 0,
+  min?: number,
+  max?: number,
+): Promise<any> {
+  if (min !== undefined || max !== undefined) {
+    if (typeof device !== 'number' || min === undefined || max === undefined) {
+      throw new Error('midin(cc, min, max) needs a numeric CC and both range bounds');
+    }
+    const cc = await customMidin(0);
+    const value = cc(device);
+    if (typeof value?.range !== 'function') {
+      throw new Error('midin: this Strudel build has no .range() on the CC ref');
+    }
+    return value.range(min, max);
+  }
+  return customMidinForDevice(device);
+}
+
+async function customMidinForDevice(device: number | string = 0): Promise<(ccNum?: number) => any> {
   /* Try @strudel/midi's midin first — CC reading doesn't have the isStarted bug */
   try {
     const { midin } = await import('@strudel/midi') as any;

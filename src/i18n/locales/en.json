@@ -578,8 +578,8 @@
       "mutingText": "Prefix a pattern with _$: to silence it without deleting the code. Remove the prefix to bring it back. This is useful for preparing a pattern while the current one plays.",
       "soloMuteHeading": "Solo / Mute Shortcuts",
       "soloMuteText": "Label patterns with $d1:, $d2:, etc. to use keyboard shortcuts during performance:",
-      "altSolo": "Alt+1…9 — solo pattern $d1 through $d9 (all others muted)",
-      "shiftAltMute": "Shift+Alt+1…9 — toggle mute on pattern $d1 through $d9",
+      "altSolo": "Ctrl+1…9 — solo layer N (all other labelled layers muted)",
+      "shiftAltMute": "Shift+Ctrl+1…9 — toggle mute on layer N",
       "stackingHeading": "Layering with Labels",
       "stackingText": "Use labeled patterns ($d1:, $d2:, $d3:) instead of stack() during live performance. Labels let you solo and mute individual layers with keyboard shortcuts. Use stack() for finished pieces."
     },
@@ -594,7 +594,8 @@
       "downloadText": "The toolbar includes a download button that saves your current code as a .js file. Useful for backing up patterns or sharing them outside the app.",
       "sessionsHeading": "Sessions Library",
       "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
-    }
+    },
+    "shortcutsSoloMute": "Ctrl+1..9 — solo layer N · Shift+Ctrl+1..9 — mute layer N (toggles the _ prefix in your code)"
   },
   "a11y": {
     "skipToContent": "Skip to content"

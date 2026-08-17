@@ -13,6 +13,7 @@ import { useAppStore } from '../../lib/store';
 import { getBaseExtensions } from '../../lib/editor/setup';
 import { getEngineExtensions } from '../../lib/editor/extensions';
 import { resetStrudelTap } from '../../lib/audio/strudel-tap';
+import { toggleLayerMute, toggleLayerSolo } from '../../lib/audio/layer-mute';
 import { setStrudelCM, syncWidgetsAfterEval } from '../../lib/editor/inline-widgets';
 import { Button, Tooltip } from '../atoms';
 import { ErrorBar } from '../molecules/ErrorBar';
@@ -188,7 +189,27 @@ export function StrudelEditor() {
       const checkDevices = () => {
         const inputs = [...midi.inputs.values()];
         setMidiConnected(inputs.length > 0);
-        setMidiDeviceName(inputs[0]?.name ?? '');
+        const name = inputs[0]?.name ?? '';
+        setMidiDeviceName(name);
+
+        /* Load the factory CC profile for the connected device.
+         *
+         * The in-app docs have always said the profile "is loaded
+         * automatically", and src/data/midi-devices.ts has carried 19 tested
+         * profiles — with no importer anywhere outside its own test. The data
+         * and both helpers were finished; only this call was missing.
+         *
+         * Published on window rather than into React state because Strudel
+         * patterns read it from the eval scope, and midimaps is how @strudel/midi
+         * expects to receive it. */
+        if (!name) return;
+        void import('../../data/midi-devices').then(({ detectDeviceProfile, generateStrudelMidimap }) => {
+          const profile = detectDeviceProfile(name);
+          const midimap = generateStrudelMidimap(profile);
+          (globalThis as any).midimaps = { ...(globalThis as any).midimaps, [profile.id]: midimap };
+          (globalThis as any).__lmcMidiProfile = profile.id;
+          console.log(`[midi] profile "${profile.id}" loaded for "${name}"`, midimap);
+        }).catch(() => { /* profile data unavailable — MIDI still works raw */ });
       };
       checkDevices();
       midi.onstatechange = checkDevices;
@@ -456,24 +477,38 @@ export function StrudelEditor() {
             return true;
           },
         },
-        /* Solo/Mute shortcuts — Alt+1..9 to solo, Shift+Alt+1..9 to mute */
+        /* Solo / mute layer N.
+         *
+         * Ctrl, not Alt. Alt+1..9 was dead on macOS — the primary platform:
+         * CodeMirror explicitly refuses the keyCode fallback on mac+Alt, so the
+         * real event arrives as key "¡" and the binding never fires. Eighteen
+         * shortcuts that could not work. Playwright's synthetic Alt+1 reports a
+         * false PASS because it does not reproduce macOS's Option-key character
+         * substitution, so any falsifier for this must assert on a real event.
+         *
+         * These edit the DOCUMENT rather than a Set. The mute that works in this
+         * app is textual: processMutedLabels rewrites a leading _$: into a
+         * comment, and Strudel returns silence for _-prefixed ids. Editing the
+         * text also makes the state visible in the user's own code. */
         ...Array.from({ length: 9 }, (_, i) => ({
-          key: `Alt-${i + 1}`,
-          run: () => {
-            import('../../lib/audio/solo-mute').then(({ toggleSolo }) => {
-              toggleSolo(`d${i + 1}`);
-              console.log(`[Solo] Toggle d${i + 1}`);
-            });
+          key: `Ctrl-${i + 1}`,
+          run: (view: EditorView) => {
+            const code = view.state.doc.toString();
+            const next = toggleLayerMute(code, i);
+            if (next === code) return true; /* no such layer — swallow the key */
+            view.dispatch({ changes: { from: 0, to: code.length, insert: next } });
+            handleEvaluate();
             return true;
           },
         })),
         ...Array.from({ length: 9 }, (_, i) => ({
-          key: `Shift-Alt-${i + 1}`,
-          run: () => {
-            import('../../lib/audio/solo-mute').then(({ toggleMute }) => {
-              toggleMute(`d${i + 1}`);
-              console.log(`[Mute] Toggle d${i + 1}`);
-            });
+          key: `Shift-Ctrl-${i + 1}`,
+          run: (view: EditorView) => {
+            const code = view.state.doc.toString();
+            const next = toggleLayerSolo(code, i);
+            if (next === code) return true;
+            view.dispatch({ changes: { from: 0, to: code.length, insert: next } });
+            handleEvaluate();
             return true;
           },
         })),

@@ -211,7 +211,7 @@ export function initClockSync(): void {
 function getLeaderBpm(): number {
   try {
     const repl = window.__strudelRepl;
-    return repl?.scheduler?.bpm ?? 120;
+    return (repl?.scheduler?.cps != null ? repl.scheduler.cps * 60 * 4 : undefined) ?? 120;
   } catch {
     return 120;
   }
@@ -294,6 +294,34 @@ export async function loadAllExtensions(): Promise<void> {
   startKeyListener();
   ensureAllFunction();
   initClockSync();
+
+  /* gamepad(padIndex) — documented in the in-app API reference
+     (SidePanel.tsx) since before anything registered it, so typing gamepad(0)
+     in a pattern threw ReferenceError. src/lib/input/gamepad.ts had the readers
+     all along; only the eval-scope binding was missing.
+
+     Returns a live accessor rather than a snapshot: a pattern reads it every
+     cycle, so frozen numbers would be useless. Polling starts on first use, so
+     a user who never touches a gamepad pays no rAF loop. Loaded dynamically to
+     match how every other optional extension in this file is wired. */
+  try {
+    const gp = await import('./input/gamepad');
+    (globalThis as unknown as Record<string, unknown>).gamepad = (padIndex = 0) => {
+      gp.startGamepadPolling();
+      return {
+        get x() { return gp.getLeftX(padIndex); },
+        get y() { return gp.getLeftY(padIndex); },
+        get rx() { return gp.getRightX(padIndex); },
+        get ry() { return gp.getRightY(padIndex); },
+        get l2() { return gp.getLeftTrigger(padIndex); },
+        get r2() { return gp.getRightTrigger(padIndex); },
+        axis: (i: number) => gp.getAxis(padIndex, i),
+        button: (i: number) => gp.getButton(padIndex, i),
+      };
+    };
+  } catch {
+    /* Gamepad API unavailable — gamepad() stays undefined, same as before. */
+  }
 
   /* Expose functions globally for use in Strudel code */
   (globalThis as any).onKey = onKey;
