@@ -33,8 +33,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4) | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.1.0-arm64.dmg) |
-| macOS | Intel | [Download .dmg](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest/download/Live.Music.Coder-1.1.0.dmg) |
+| macOS | Apple Silicon (M1/M2/M3/M4) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Intel | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
@@ -139,7 +139,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `npm run test:watch` | Watch mode |
 | `npm run lint` | ESLint |
 | `npm run preview` | Preview production build |
-| `npx tsc --noEmit` | Type check only |
+| `npx tsc -b` | Type check. **Not** `--noEmit`: the root tsconfig is solution-style (`files: []` + references), so `--noEmit` compiles zero files and exits 0 no matter what is broken |
 
 ## Routes
 

@@ -32,6 +32,7 @@ const { owner, repo } = pkg.build.publish
 
 const failures = []
 const notes = []
+let verifiedHashes = 0
 
 function fail(message) {
   failures.push(message)
@@ -124,18 +125,28 @@ for (const entry of entries) {
   ]
   const found = candidates.find((p) => existsSync(p))
 
+  /* An unverified hash is a FAILURE, not a note. The whole point of this script
+     is that a stale hash silently strands the installed base, and a run that
+     checked nothing used to print "can serve an auto-update" and exit 0 — the
+     exact false green it exists to prevent. */
   if (!found) {
-    notes.push(`${label}: no local copy found, hash not verified`)
+    fail(`${label}: no local copy in release/, so the published hash was never checked`)
     continue
   }
 
   if (statSync(found).size !== entry.size) {
-    notes.push(`${label}: local copy is a different build (${statSync(found).size} bytes), hash not verified`)
+    fail(
+      `${label}: local copy is a different build (${statSync(found).size} bytes vs ${entry.size}), ` +
+        'so the published hash was never checked',
+    )
     continue
   }
 
   const digest = sha512Base64(found)
-  if (digest === entry.sha512) pass(`${label}: size and sha512 match`)
+  if (digest === entry.sha512) {
+    verifiedHashes += 1
+    pass(`${label}: size and sha512 match`)
+  }
   else fail(`${label}: sha512 mismatch — the asset changed after the yml was written (stapling does this)`)
 }
 
@@ -152,6 +163,12 @@ if (hasIntel) pass('x64 zip present')
 else fail('no x64 zip in the yml — Intel cannot auto-update')
 
 for (const note of notes) console.log(`  note  ${note}`)
+
+/* Guard the guard: reaching the end having verified nothing is the failure mode
+   this script was written after, so it cannot be allowed to pass silently. */
+if (verifiedHashes === 0) {
+  fail('no hash was verified — this run proves nothing about the published assets')
+}
 
 console.log(
   failures.length === 0

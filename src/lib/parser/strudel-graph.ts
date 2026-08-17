@@ -34,6 +34,24 @@ const COMBINATORS = new Set([
   'randcat',
 ]);
 
+/* Statements that configure the session or load assets. They are legal at the top
+   level and they make no sound, so drawing them as a source wired to the speakers
+   claims something false: `setcps(0.5)` is a tempo setting, and `samples(url)`
+   fetches a sample map. Skipping them leaves the graph showing signal flow only. */
+const NON_SOUNDING = new Set([
+  'setcps',
+  'setCps',
+  'setcpm',
+  'setCpm',
+  'setbpm',
+  'setBpm',
+  'samples',
+  'hush',
+  'initHydra',
+  'registerSynthSounds',
+  'registerSamples',
+]);
+
 const AUDIO_IN: PortDefinition[] = [{ id: 'in', label: 'Input', type: 'audio' }];
 const AUDIO_OUT: PortDefinition[] = [{ id: 'out', label: 'Output', type: 'audio' }];
 
@@ -48,8 +66,12 @@ const DECLARATION = /^(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([\s\S]+)$/;
 /** Matches `$: …` and `name: …` — a labelled voice. */
 const LABELLED_VOICE = /^(\$|[A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/;
 
-/** Matches a bare identifier — a reference to something declared earlier. */
-const BARE_IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+/** Matches a reference to something declared earlier, called or not.
+ *  `kb()` and `kb` both point at the same declaration — the MIDI examples use the
+ *  called form (`const kb = await midikeys(0)` then `$: kb().s("sine")`), which
+ *  without the optional parens produced a phantom source named `kb()` while the
+ *  real node sat orphaned with no edges. */
+const BARE_IDENTIFIER = /^([A-Za-z_$][\w$]*)(?:\(\s*\))?$/;
 
 /** Matches the function name of a call expression. */
 const CALL_HEAD = /^([A-Za-z_$][\w$]*)\s*\(/;
@@ -91,9 +113,15 @@ export function buildStrudelGraph(code: string): StrudelGraph {
     return id;
   }
 
+  let edgeCounter = 0;
+
   function connect(fromId: string, toId: string): void {
+    /* The ordinal is not decoration: `stack(kick, kick)` produces the same pair
+       twice, and React Flow keys edges by id, so the duplicate was dropped and
+       the graph showed one input where the pattern has two. */
+    edgeCounter += 1;
     connections.push({
-      id: `conn_${fromId}_${toId}`,
+      id: `conn_${edgeCounter}_${fromId}_${toId}`,
       sourceBlockId: fromId,
       sourcePortId: 'out',
       targetBlockId: toId,
@@ -111,8 +139,16 @@ export function buildStrudelGraph(code: string): StrudelGraph {
     const { head, links } = splitChain(expression.trim());
     if (!head) return null;
 
+    /* `await` is ordinary in Strudel top-level code (`await samples(...)`). It is
+       not part of what the expression IS, so it is stripped before classifying
+       and kept in the code the node displays. */
+    const classifiable = head.replace(/^await\s+/, '');
+    const callName = classifiable.match(CALL_HEAD)?.[1];
+
+    if (callName && NON_SOUNDING.has(callName)) return null;
+
     let tailId: string;
-    const callName = head.match(CALL_HEAD)?.[1];
+    const reference = classifiable.match(BARE_IDENTIFIER)?.[1];
 
     if (callName && COMBINATORS.has(callName) && head.endsWith(')')) {
       /* A combinator is a mixer: one incoming edge per argument. */
@@ -122,9 +158,9 @@ export function buildStrudelGraph(code: string): StrudelGraph {
         const branchId = buildExpression(argument, depth + 1);
         if (branchId) connect(branchId, tailId);
       }
-    } else if (BARE_IDENTIFIER.test(head) && declared.has(head)) {
+    } else if (reference && declared.has(reference)) {
       /* Reference to a declared pattern — branch off the existing node. */
-      tailId = declared.get(head)!;
+      tailId = declared.get(reference)!;
     } else {
       tailId = addBlock('source', head);
     }

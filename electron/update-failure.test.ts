@@ -88,8 +88,20 @@ describe('shouldNotify', () => {
 })
 
 describe('failureMessage', () => {
-  it('tells a stranded user where the app has to live', () => {
-    expect(failureMessage('staging', '1.3.0')).toMatch(/Applications folder/)
+  it('names the leftover updater folder, which is what actually blocked it', () => {
+    /* The first diagnosis — "move it to Applications" — was refuted by
+       measurement: the app WAS in ~/Applications and still failed. The blocker
+       was a root-owned ShipIt cache. */
+    const message = failureMessage('staging', '1.3.0')
+    expect(message).toMatch(/ShipIt/)
+    expect(message).toMatch(/sudo rm -rf/)
+  })
+
+  it('does not call a blocked network connection a staging failure', () => {
+    /* Node reports a firewall-blocked outbound as "connect EACCES <ip>:443" — a
+       network problem wearing a filesystem errno. Sending that user to delete a
+       cache directory is the wrong fix. */
+    expect(classifyUpdateError('connect EACCES 140.82.121.4:443')).toBe('other')
   })
 
   it('never returns null, so a notified failure always has something to say', () => {

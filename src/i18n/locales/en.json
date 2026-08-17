@@ -724,7 +724,7 @@
   "changelog": {
     "eyebrow": "What's new",
     "title": "Changelog",
-    "subtitle": "Every feature, fix, and improvement — documented.",
+    "subtitle": "Release notes, newest first. Two early releases are missing — see the note at the top of CHANGELOG.md.",
     "metaDescription": "Public changelog for Live Music Coder — features, fixes, and improvements.",
     "searchPlaceholder": "Search changelog...",
     "clearFilters": "Clear filters",

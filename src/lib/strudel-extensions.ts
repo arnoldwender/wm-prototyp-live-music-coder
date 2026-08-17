@@ -13,10 +13,10 @@
 export async function loadXen(): Promise<boolean> {
   try {
     await import('@strudel/xen');
-    import.meta.env.DEV && console.log('[Strudel] @strudel/xen loaded (microtonal)');
+    if (import.meta.env.DEV) console.log('[Strudel] @strudel/xen loaded (microtonal)');
     return true;
   } catch {
-    import.meta.env.DEV && console.warn('[Strudel] @strudel/xen not available');
+    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/xen not available');
     return false;
   }
 }
@@ -25,10 +25,10 @@ export async function loadXen(): Promise<boolean> {
 export async function loadSoundfonts(): Promise<boolean> {
   try {
     await import('@strudel/soundfonts');
-    import.meta.env.DEV && console.log('[Strudel] @strudel/soundfonts loaded');
+    if (import.meta.env.DEV) console.log('[Strudel] @strudel/soundfonts loaded');
     return true;
   } catch {
-    import.meta.env.DEV && console.warn('[Strudel] @strudel/soundfonts not available');
+    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/soundfonts not available');
     return false;
   }
 }
@@ -37,10 +37,10 @@ export async function loadSoundfonts(): Promise<boolean> {
 export async function loadOSC(): Promise<boolean> {
   try {
     await import('@strudel/osc');
-    import.meta.env.DEV && console.log('[Strudel] @strudel/osc loaded');
+    if (import.meta.env.DEV) console.log('[Strudel] @strudel/osc loaded');
     return true;
   } catch {
-    import.meta.env.DEV && console.warn('[Strudel] @strudel/osc not available');
+    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/osc not available');
     return false;
   }
 }
@@ -49,10 +49,10 @@ export async function loadOSC(): Promise<boolean> {
 export async function loadSerial(): Promise<boolean> {
   try {
     await import('@strudel/serial');
-    import.meta.env.DEV && console.log('[Strudel] @strudel/serial loaded');
+    if (import.meta.env.DEV) console.log('[Strudel] @strudel/serial loaded');
     return true;
   } catch {
-    import.meta.env.DEV && console.warn('[Strudel] @strudel/serial not available');
+    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/serial not available');
     return false;
   }
 }
@@ -187,7 +187,7 @@ let clockSyncInitialized = false;
  */
 export function initClockSync(): void {
   if (typeof BroadcastChannel === 'undefined') {
-    import.meta.env.DEV && console.warn('[ClockSync] BroadcastChannel not available');
+    if (import.meta.env.DEV) console.warn('[ClockSync] BroadcastChannel not available');
     return;
   }
   /* Prevent duplicate channels on HMR re-run */
@@ -228,7 +228,7 @@ export function initClockSync(): void {
     leaderTimeout = null;
     if (!isClockLeader) {
       isClockLeader = true;
-      import.meta.env.DEV && console.log('[ClockSync] This tab is now the clock leader');
+      if (import.meta.env.DEV) console.log('[ClockSync] This tab is now the clock leader');
     }
   }, 500);
 }
@@ -312,7 +312,7 @@ export function ensureAllFunction(): void {
     import('@strudel/core').then((core: any) => {
       if (typeof core.all === 'function') {
         (globalThis as any).all = core.all;
-        import.meta.env.DEV && console.log('[Strudel] all() function registered globally');
+        if (import.meta.env.DEV) console.log('[Strudel] all() function registered globally');
       }
     }).catch(() => {});
   } catch {
@@ -408,5 +408,5 @@ export async function loadAllExtensions(): Promise<void> {
   (globalThis as any).setParam = setParam;
   (globalThis as any).getParam = getParam;
 
-  import.meta.env.DEV && console.log('[Strudel] All extensions loaded');
+  if (import.meta.env.DEV) console.log('[Strudel] All extensions loaded');
 }
