@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to [Live Music Coder](https://live-music-coder.pro) are documented here.
+Notable changes to [Live Music Coder](https://live-music-coder.pro).
+
+Coverage gap: releases v1.0.3 ("Piano Roll, MIDI & Fixes") and v1.1.0 ("Security
+hardening, a11y, type safety") shipped without entries in the source library, so
+they are absent below. The header used to claim every notable change was
+documented here; it does not, and inventing entries after the fact would be
+worse than saying so.
 
 This file is auto-generated from `src/data/changelog-library.ts` — do not edit manually.
 Run `npx tsx scripts/sync-changelog.ts` to regenerate.
@@ -27,6 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 - **7 visualizers: punchcard, spiral, pitchwheel added** ([#21](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/21)) — The visualizer dashboard now has 7 Canvas 2D renderers:
 - **Settings panel with 4 themes, vim mode, zen mode** ([#22](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/22)) — New settings panel with 4 editor themes, configurable font size,
 - **Console panel, sample import, gamepad API** ([#20](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/20)) — Added three new modules: a console panel for `console.log` output
+- **i18n: Sessions pages translated to DE/EN/ES** — All hardcoded strings in the Sessions listing and detail pages
 
 ### Content
 
@@ -36,20 +43,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Fixed
 
 - **CSP fix for AudioWorklet and inline widgets** ([#30](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/30)) — Fixed Content Security Policy to allow `data:` URIs required by
-
-## [1.0.2] - 2026-04-09
+- **Editor handoff fix — router state replaces URL hash** — HashRouter was clobbering the code fragment when navigating from
 
 ### Release
 
 - **v1.0.2 — Sessions, i18n, Electron UX fixes** — Sessions collection with curated AI-composed live coding pieces.
-
-### Added
-
-- **i18n: Sessions pages translated to DE/EN/ES** — All hardcoded strings in the Sessions listing and detail pages
-
-### Fixed
-
-- **Editor handoff fix — router state replaces URL hash** — HashRouter was clobbering the code fragment when navigating from
 
 ## [1.0.1] - 2026-04-09
 
