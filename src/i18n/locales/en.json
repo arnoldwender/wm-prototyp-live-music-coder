@@ -543,7 +543,7 @@
       "visualizersHeading": "Visualizer Panel",
       "visualizersText": "The right panel shows real-time audio visualizations: Waveform, Spectrum, Timeline, Piano Roll, Punchcard, Spiral, and Pitchwheel. Switch between them with the icons at the top. Resize the panel by dragging the divider.",
       "sidebarHeading": "Sidebar Panels",
-      "sidebarSamples": "Samples (waveform icon) — browse 218 Dirt-Samples by category. Click to copy the name, drag to insert.",
+      "sidebarSamples": "Samples (waveform icon) — browse 196 Dirt-Samples by category. Click to copy the name, drag to insert.",
       "sidebarMidi": "MIDI (USB icon) — connected device list, real-time CC activity monitor with value bars.",
       "sidebarSettings": "Settings (gear icon) — editor theme, font size, vim mode, word wrap, zen mode.",
       "sidebarConsole": "Console (terminal icon) — live log output from your code. Color-coded by level.",
@@ -593,7 +593,7 @@
       "downloadHeading": "Download as .js",
       "downloadText": "The toolbar includes a download button that saves your current code as a .js file. Useful for backing up patterns or sharing them outside the app.",
       "sessionsHeading": "Sessions Library",
-      "sessionsText": "The /sessions page contains 43 curated AI-composed pieces across 10 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
+      "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
     }
   },
   "a11y": {

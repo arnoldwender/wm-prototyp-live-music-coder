@@ -543,7 +543,7 @@
       "visualizersHeading": "Visualisierungs-Panel",
       "visualizersText": "Das rechte Panel zeigt Echtzeit-Audio-Visualisierungen: Waveform, Spectrum, Timeline, Piano Roll, Punchcard, Spiral und Pitchwheel. Mit den Icons oben wechseln. Panel-Breite durch Ziehen des Trenners anpassen.",
       "sidebarHeading": "Seitenleisten-Panels",
-      "sidebarSamples": "Samples (Waveform-Icon) — 218 Dirt-Samples nach Kategorie durchsuchen. Klicken zum Kopieren, Ziehen zum Einfügen.",
+      "sidebarSamples": "Samples (Waveform-Icon) — 196 Dirt-Samples nach Kategorie durchsuchen. Klicken zum Kopieren, Ziehen zum Einfügen.",
       "sidebarMidi": "MIDI (USB-Icon) — Liste verbundener Geräte, Echtzeit-CC-Aktivitätsmonitor mit Wertbalken.",
       "sidebarSettings": "Einstellungen (Zahnrad-Icon) — Editor-Theme, Schriftgröße, Vim-Modus, Zeilenumbruch, Zen-Modus.",
       "sidebarConsole": "Konsole (Terminal-Icon) — Live-Log-Ausgabe deines Codes. Farbcodiert nach Level.",
@@ -593,7 +593,7 @@
       "downloadHeading": "Als .js herunterladen",
       "downloadText": "Die Toolbar enthält einen Download-Button, der den aktuellen Code als .js-Datei speichert. Nützlich für Backups oder zum Teilen außerhalb der App.",
       "sessionsHeading": "Sessions-Bibliothek",
-      "sessionsText": "Die Seite /sessions enthält 43 kuratierte KI-komponierte Stücke aus 10 Genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi u. a.). Jede Session mit einem Klick im Editor öffnen. Sessions sind ein idealer Einstiegspunkt, um zu erkunden, was Strudel kann."
+      "sessionsText": "Die Seite /sessions enthält 49 kuratierte KI-komponierte Stücke aus 15 Genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi u. a.). Jede Session mit einem Klick im Editor öffnen. Sessions sind ein idealer Einstiegspunkt, um zu erkunden, was Strudel kann."
     }
   },
   "a11y": {
