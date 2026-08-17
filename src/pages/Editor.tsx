@@ -18,6 +18,8 @@ import type { UrlShareData } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
 import { usePageMeta } from '../lib/usePageMeta'
+import { startAutosave, readAutosave, clearAutosave } from '../lib/persistence/autosave'
+import type { Project } from '../types/project'
 
 function Editor() {
   const { t } = useTranslation()
@@ -25,6 +27,7 @@ function Editor() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const [showSharedWarning, setShowSharedWarning] = useState(false)
+  const [recovered, setRecovered] = useState<Project | null>(null)
 
   const files = useAppStore((s) => s.files)
   const updateFileCode = useAppStore((s) => s.updateFileCode)
@@ -82,6 +85,63 @@ function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /* Autosave + crash recovery.
+   *
+   * The service worker calls skipWaiting() on install and navigates every open
+   * client on activate, so a deploy reloads a live-coding session mid-set. Until
+   * this existed there was nothing to come back to: the whole IndexedDB layer
+   * shipped with zero consumers.
+   *
+   * The restore is OFFERED, never applied silently — the user may have opened
+   * the editor deliberately empty, and overwriting their buffer with a previous
+   * session would be its own kind of data loss. */
+  useEffect(() => {
+    const snapshot = (): Project => {
+      const s = useAppStore.getState()
+      const now = new Date().toISOString()
+      return {
+        id: 'autosave',
+        name: 'Autosave',
+        version: 1,
+        created: now,
+        updated: now,
+        bpm: s.bpm,
+        defaultEngine: s.defaultEngine,
+        files: s.files,
+        graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
+        layout: s.layout,
+      }
+    }
+
+    /* Offer recovery only when there is something to recover AND the current
+       buffer is untouched, so we never talk over work in progress. */
+    void readAutosave().then((saved) => {
+      if (!saved) return
+      const current = useAppStore.getState().files
+      const currentIsEmpty = current.every((f) => f.code.trim() === '')
+      const savedHasCode = saved.files?.some((f) => f.code.trim() !== '')
+      if (currentIsEmpty && savedHasCode) setRecovered(saved)
+    })
+
+    return startAutosave(useAppStore.subscribe, snapshot)
+  }, [])
+
+  const acceptRecovery = useCallback(() => {
+    if (!recovered) return
+    useAppStore.getState().loadProject({
+      bpm: recovered.bpm,
+      defaultEngine: recovered.defaultEngine,
+      files: recovered.files,
+      layout: recovered.layout,
+    })
+    setRecovered(null)
+  }, [recovered])
+
+  const declineRecovery = useCallback(() => {
+    setRecovered(null)
+    void clearAutosave()
+  }, [])
+
   /* Stop all audio when leaving the editor page + show session summary */
   useEffect(() => {
     return () => {
@@ -113,6 +173,79 @@ function Editor() {
   return (
     <>
       {/* Security warning modal when code was loaded from a shared URL */}
+      {/* Crash-recovery offer. Non-modal by design: the shared-code warning is a
+          security gate and blocks, this is a convenience and must not stand
+          between the user and an empty editor. */}
+      {recovered && (
+        <div
+          role="dialog"
+          aria-label={t('editor.recoverTitle')}
+          style={{
+            position: 'fixed',
+            bottom: 'var(--space-4)',
+            right: 'var(--space-4)',
+            zIndex: 900,
+            maxWidth: '360px',
+            backgroundColor: 'var(--color-bg-elevated)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-4)',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+        >
+          <div style={{
+            fontSize: 'var(--font-size-sm)',
+            fontWeight: 'var(--font-weight-semibold)',
+            color: 'var(--color-text)',
+            marginBottom: 'var(--space-2)',
+          }}>
+            {t('editor.recoverTitle')}
+          </div>
+          <div style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-text-secondary)',
+            marginBottom: 'var(--space-3)',
+            lineHeight: 'var(--line-height-base)',
+          }}>
+            {t('editor.recoverBody')}
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={declineRecovery}
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-text-secondary)',
+                background: 'transparent',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                minHeight: 'var(--size-touch, 44px)',
+              }}
+            >
+              {t('editor.recoverDiscard')}
+            </button>
+            <button
+              type="button"
+              onClick={acceptRecovery}
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-bg)',
+                background: 'var(--color-primary)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                minHeight: 'var(--size-touch, 44px)',
+              }}
+            >
+              {t('editor.recoverRestore')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {showSharedWarning && (
         <div
           style={{

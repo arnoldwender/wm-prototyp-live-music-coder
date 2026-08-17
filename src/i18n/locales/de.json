@@ -622,7 +622,11 @@
     "virtualKeyboard": "Virtuelle Tastatur",
     "collapse": "Einklappen",
     "expand": "Ausklappen",
-    "settingsSavedAutomatically": "Einstellungen werden automatisch gespeichert"
+    "settingsSavedAutomatically": "Einstellungen werden automatisch gespeichert",
+    "recoverTitle": "Nicht gespeicherte Sitzung gefunden",
+    "recoverBody": "Eine frühere Sitzung wurde automatisch gespeichert, bevor dieser Tab neu geladen wurde. Wiederherstellen oder verwerfen und neu beginnen.",
+    "recoverRestore": "Wiederherstellen",
+    "recoverDiscard": "Verwerfen"
   },
   "templates": {
     "title": "Wähle eine Startvorlage",
