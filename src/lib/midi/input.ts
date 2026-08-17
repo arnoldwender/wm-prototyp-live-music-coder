@@ -25,7 +25,7 @@ let initialized = false;
 export async function initMidiInput(): Promise<boolean> {
   if (initialized) return true;
   if (!navigator.requestMIDIAccess) {
-    import.meta.env.DEV && console.warn('[MidiInput] Web MIDI not supported');
+    if (import.meta.env.DEV) console.warn('[MidiInput] Web MIDI not supported');
     return false;
   }
 

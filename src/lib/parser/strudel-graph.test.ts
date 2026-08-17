@@ -154,6 +154,44 @@ describe('buildStrudelGraph', () => {
     expect(hasEdge(graph, 's("hh")', 'output')).toBe(true);
   });
 
+
+  it('resolves a called reference to the pattern it was declared from', () => {
+    /* The MIDI examples use the called form. Without the optional parens this
+       produced a phantom source named `kb()` while the real node sat orphaned. */
+    const graph = buildStrudelGraph('const kb = await midikeys(0)\n$: kb().s("sine")');
+
+    expect(graph.blocks.some((b) => b.code === 'kb()')).toBe(false);
+    expect(hasEdge(graph, 'await midikeys(0)', 's("sine")')).toBe(true);
+  });
+
+  it('gives every edge a unique id when a pattern is used twice', () => {
+    /* React Flow keys edges by id, so `stack(kick, kick)` silently lost one of
+       its two inputs and the graph showed a mixer with a single feed. */
+    const graph = buildStrudelGraph('const kick = s("bd")\n$: stack(kick, kick)');
+    const ids = graph.connections.map((c) => c.id);
+
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.length).toBe(3);
+  });
+
+  it('leaves a tempo setting out of the signal flow', () => {
+    /* setcps makes no sound; drawing it as a source into the speakers is a lie. */
+    const graph = buildStrudelGraph('setcps(120/120/2)\n$: s("bd*4")');
+
+    expect(graph.blocks.some((b) => b.code.startsWith('setcps'))).toBe(false);
+    expect(graph.blocks.map((b) => b.code)).toEqual(['s("bd*4")', 'output']);
+  });
+
+  it('leaves a sample-map load out of the signal flow', () => {
+    const graph = buildStrudelGraph('await samples("github:tidalcycles/dirt-samples")\n$: s("bd")');
+
+    expect(graph.blocks.map((b) => b.code)).toEqual(['s("bd")', 'output']);
+  });
+
+  it('returns an empty graph when every statement is configuration', () => {
+    expect(buildStrudelGraph('setcps(0.5)\nhush()')).toEqual({ blocks: [], connections: [] });
+  });
+
   it('gives every block a unique id', () => {
     const graph = buildStrudelGraph('$: s("bd").lpf(400)\n$: s("hh").lpf(400)');
     const ids = graph.blocks.map((b) => b.id);

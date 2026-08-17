@@ -16,11 +16,14 @@ export type UpdateFailureKind =
   | 'feed'
   /** The download arrived but did not match the checksum in the feed. */
   | 'integrity'
-  /** Squirrel could not stage the update: the app is somewhere it cannot be
-   *  replaced — a read-only volume, a quarantined copy running translocated, or
-   *  a directory the user does not own. Measured, not theorised: a 1.2.0 build
-   *  run from a temp directory downloads 1.3.0, verifies it, and then fails with
-   *  "Could not create temporary directory: Permission denied". */
+  /** Squirrel could not stage the update. Measured twice on 2026-08-17, and the
+   *  first diagnosis was WRONG: moving the app from a temp directory into
+   *  ~/Applications changed nothing. The actual blocker was
+   *  ~/Library/Caches/<bundleid>.ShipIt left owned by root — without the execute
+   *  bit for the user, Squirrel cannot create its temp dir inside it and EVERY
+   *  future update of that app dies, however correct the feed is. Removing that
+   *  directory (which needs sudo) fixed it and the update then completed. The
+   *  app's own location is a second, independent cause. */
   | 'staging'
   /** Network, or anything not otherwise recognised. */
   | 'other'
@@ -52,7 +55,12 @@ const STAGING_PATTERNS = [
   /Could not create temporary directory/i,
   /Could not (?:copy|move|replace)/i,
   /read-?only file system/i,
-  /ENOENT|EACCES|EPERM|EROFS/,
+  /* Bare errno codes are NOT matched on their own: Node reports a blocked
+     outbound connection as "connect EACCES <ip>:443", which is a network problem
+     wearing a filesystem code, and telling that user their app cannot be replaced
+     sends them to the wrong fix. Require the errno to sit next to a filesystem
+     verb. */
+  /(?:director|copy|move|replace|write|bundle)[^]{0,40}(?:ENOENT|EACCES|EPERM|EROFS)/i,
 ]
 
 export function classifyUpdateError(message: string): UpdateFailureKind {
@@ -107,11 +115,15 @@ export function failureMessage(
   switch (kind) {
     case 'staging':
       return (
-        `${target} was downloaded and verified, but it could not replace this ` +
-        'copy of the app. That usually means the app is running from a place it ' +
-        'cannot be updated in — a disk image, a read-only volume, or a folder ' +
-        'owned by someone else. Move the app to your Applications folder and ' +
-        'open it from there, or download the latest release and replace it.'
+        `${target} was downloaded and verified, but the installer could not ` +
+        'replace this copy of the app.\n\n' +
+        'The usual cause is a leftover updater folder owned by another user. In ' +
+        'Terminal:\n\n' +
+        '    sudo rm -rf ~/Library/Caches/com.wendermedia.live-music-coder.ShipIt\n\n' +
+        'then reopen the app. If that does not help, the app is somewhere it ' +
+        'cannot be replaced — running from a disk image or a read-only volume — ' +
+        'so move it to your Applications folder first. Downloading the latest ' +
+        'release and replacing this copy by hand always works.'
       )
     case 'signature':
       return (

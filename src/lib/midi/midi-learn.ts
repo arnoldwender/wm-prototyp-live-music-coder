@@ -8,7 +8,6 @@
    bound to "cutoff". Mappings persist in localStorage.
    ────────────────────────────────────────────────────────── */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { safeJsonParse } from '../persistence/local'
 
 /** Reactive state exposed to consumers */
@@ -103,7 +102,7 @@ function attachInput(input: MIDIInput): void {
 async function ensureMidiAccess(): Promise<void> {
   if (midiAccess) return
   if (!navigator.requestMIDIAccess) {
-    import.meta.env.DEV && console.warn('[MidiLearn] Web MIDI not supported')
+    if (import.meta.env.DEV) console.warn('[MidiLearn] Web MIDI not supported');
     return
   }
 
@@ -146,7 +145,7 @@ export function stopMidiLearn(): void {
   state.learning = false
   state.targetParam = null
   notify()
-  import.meta.env.DEV && console.log('[MidiLearn] Cancelled')
+  if (import.meta.env.DEV) console.log('[MidiLearn] Cancelled');
 }
 
 /** Get the CC number mapped to a parameter, or undefined */
