@@ -622,7 +622,11 @@
     "virtualKeyboard": "Teclado virtual",
     "collapse": "Colapsar",
     "expand": "Expandir",
-    "settingsSavedAutomatically": "La configuración se guarda automáticamente"
+    "settingsSavedAutomatically": "La configuración se guarda automáticamente",
+    "recoverTitle": "Se encontró una sesión sin guardar",
+    "recoverBody": "Una sesión anterior se guardó automáticamente antes de que esta pestaña se recargara. Restáurala, o descártala y empieza de cero.",
+    "recoverRestore": "Restaurar",
+    "recoverDiscard": "Descartar"
   },
   "templates": {
     "title": "Elige una plantilla inicial",

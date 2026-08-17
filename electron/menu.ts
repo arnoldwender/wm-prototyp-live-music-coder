@@ -137,34 +137,15 @@ export function createMenu(mainWindow: BrowserWindow): void {
         { type: 'separator' },
         {
           label: 'Toggle Graph',
-          accelerator: 'CmdOrCtrl+G',
+          /* No accelerator. CmdOrCtrl+G is CodeMirror's find-next (searchKeymap
+             Mod-g, live via src/lib/editor/setup.ts), and a menu accelerator is
+             consumed before the web layer ever sees the key. */
           click: () => sendAction(mainWindow, 'toggle-graph'),
         },
         {
           label: 'Toggle Visualizers',
           accelerator: 'CmdOrCtrl+Shift+V',
           click: () => sendAction(mainWindow, 'toggle-visualizers'),
-        },
-        {
-          label: 'Pop Out',
-          submenu: [
-            {
-              label: 'Code Editor',
-              click: () => sendAction(mainWindow, 'popout-editor'),
-            },
-            {
-              label: 'Node Graph',
-              click: () => sendAction(mainWindow, 'popout-graph'),
-            },
-            {
-              label: 'Visualizers',
-              click: () => sendAction(mainWindow, 'popout-visualizers'),
-            },
-            {
-              label: 'Timeline',
-              click: () => sendAction(mainWindow, 'popout-timeline'),
-            },
-          ],
         },
         { type: 'separator' },
         { role: 'zoomIn' },
