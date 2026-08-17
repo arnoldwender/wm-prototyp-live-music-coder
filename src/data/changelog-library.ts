@@ -70,6 +70,30 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.3.1',
+    date: '2026-08-17',
+    title: 'A failed update always says so now',
+    category: 'bugfix',
+    body: [
+      '1.3.0 added a dialog for updates that fail after being announced, but it',
+      'decided whether to speak from the CATEGORY of the error. An end-to-end run',
+      'found the hole: the app downloaded 1.3.0, verified it, offered the restart,',
+      'and then could not replace itself — an error nobody had enumerated, so it',
+      'fell through and the user was told nothing. Exactly the silence 1.3.0 was',
+      'meant to end.',
+      '',
+      'The decision now depends on how far the update got. Once the restart has',
+      'been offered, any later failure is reported, recognised or not.',
+      '',
+      'Being unable to replace the app is now its own case with its own advice,',
+      'because the cause is specific: the app is on a read-only volume, running',
+      'from a disk image, or in a folder it does not own. Moving it to',
+      'Applications and opening it from there fixes it. The message is matched on',
+      'the part the system writes in English, since the rest arrives in the',
+      'system language.',
+    ].join('\n'),
+  },
+  {
     version: '1.3.0',
     date: '2026-08-17',
     title: 'Named parameters are live, MIDI Learn drives them, and Strudel gets a real graph',

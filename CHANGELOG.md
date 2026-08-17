@@ -13,6 +13,12 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.1] - 2026-08-17
+
+### Fixed
+
+- **A failed update always says so now** — 1.3.0 added a dialog for updates that fail after being announced, but it
+
 ## [1.3.0] - 2026-08-17
 
 ### Added
