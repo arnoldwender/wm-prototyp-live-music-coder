@@ -45,6 +45,8 @@ export function useInlinePlayer() {
       if (engine === 'strudel') {
         if (!replRef.current) {
           const { initStrudel } = await import('@strudel/web');
+          /* Put superdough on the app's shared AudioContext before the REPL is built. */
+          await (await import('./audio/context')).adoptSharedContextForStrudel();
           replRef.current = await initStrudel();
           try {
             await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);

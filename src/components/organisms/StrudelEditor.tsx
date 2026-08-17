@@ -224,6 +224,9 @@ export function StrudelEditor() {
          * afterEval receives { code, pattern, meta } where meta contains
          * widgets and miniLocations from the transpiler. */
         const { initStrudel } = await import('@strudel/web');
+        /* Put superdough on the app's shared AudioContext before the REPL is built.
+         * Without this the app runs separate contexts and recording captures silence. */
+        await (await import('../../lib/audio/context')).adoptSharedContextForStrudel();
         const repl = await initStrudel({
           afterEval: ({ meta }: { meta?: { widgets?: unknown[]; miniLocations?: unknown[] } }) => {
             const view = viewRef.current;
