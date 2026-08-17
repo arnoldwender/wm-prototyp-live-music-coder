@@ -543,7 +543,7 @@
       "visualizersHeading": "Panel de Visualizadores",
       "visualizersText": "El panel derecho muestra visualizaciones de audio en tiempo real: Waveform, Spectrum, Timeline, Piano Roll, Punchcard, Spiral y Pitchwheel. Cambia entre ellos con los iconos de arriba. Redimensiona el panel arrastrando el divisor.",
       "sidebarHeading": "Paneles de la Barra Lateral",
-      "sidebarSamples": "Samples (icono de onda) — explora 218 Dirt-Samples por categoría. Clic para copiar el nombre, arrastra para insertar.",
+      "sidebarSamples": "Samples (icono de onda) — explora 196 Dirt-Samples por categoría. Clic para copiar el nombre, arrastra para insertar.",
       "sidebarMidi": "MIDI (icono USB) — lista de dispositivos conectados, monitor de actividad CC en tiempo real con barras de valor.",
       "sidebarSettings": "Ajustes (icono de engranaje) — tema del editor, tamaño de fuente, modo vim, ajuste de línea, modo zen.",
       "sidebarConsole": "Consola (icono de terminal) — salida de registro en vivo de tu código. Con código de colores por nivel.",
@@ -589,11 +589,11 @@
       "urlHeading": "Compartir por URL",
       "urlText": "Haz clic en el icono de compartir en la barra de herramientas para generar una URL comprimida con tu código actual. La URL usa compresión lz-string — patrones de hasta varios kilobytes caben en un solo enlace. Cualquiera que abra el enlace verá tu código exacto, listo para ejecutar.",
       "gistHeading": "GitHub Gists",
-      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) e ingresa tu token de acceso personal de GitHub. Puedes guardar cualquier pestaña como un nuevo Gist, cargar Gists guardados anteriormente y organizar tus patrones entre sesiones. Los Gists son públicos por defecto — márcalos como secretos si prefieres.",
+      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) e ingresa tu token de acceso personal de GitHub. Puedes guardar cualquier pestaña como un nuevo Gist, cargar Gists guardados anteriormente y organizar tus patrones entre sesiones. Los Gists se crean como secretos por defecto: no aparecen en búsquedas, pero cualquiera con el enlace puede leerlos. Marca “Hacer público” antes de guardar para crear uno público — GitHub fija la visibilidad al crearlo y no se puede cambiar después.",
       "downloadHeading": "Descargar como .js",
       "downloadText": "La barra de herramientas incluye un botón de descarga que guarda tu código actual como archivo .js. Útil para hacer copias de seguridad de patrones o compartirlos fuera de la app.",
       "sessionsHeading": "Biblioteca de Sesiones",
-      "sessionsText": "La página /sessions contiene 43 piezas curadas compuestas por IA en 10 géneros (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi y más). Abre cualquier sesión en el editor con un clic. Las sesiones son un excelente punto de partida para explorar lo que Strudel puede hacer."
+      "sessionsText": "La página /sessions contiene 49 piezas curadas compuestas por IA en 15 géneros (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi y más). Abre cualquier sesión en el editor con un clic. Las sesiones son un excelente punto de partida para explorar lo que Strudel puede hacer."
     }
   },
   "a11y": {
@@ -638,8 +638,9 @@
     "saving": "Guardando...",
     "loading": "Cargando...",
     "clear": "Eliminar",
-    "rememberWarning": "El token se guarda sin cifrar en el navegador",
-    "loadThisGist": "Cargar este gist"
+    "rememberWarning": "El token permanece en el navegador. Legible por scripts en este dispositivo — usa solo un token con alcance gist.",
+    "loadThisGist": "Cargar este gist",
+    "makePublic": "Hacer público"
   },
   "pianoroll": {
     "zoomInTime": "Acercar (tiempo)",

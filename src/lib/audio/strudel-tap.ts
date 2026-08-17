@@ -73,6 +73,34 @@ export async function getStrudelAnalyser(): Promise<AnalyserNode | null> {
   return null;
 }
 
+/**
+ * Returns superdough's output node, or null if it has not initialised yet.
+ *
+ * superdough terminates at `audioContext.destination` rather than at the app's
+ * masterGain, so anything that needs Strudel's signal — the recorder, an export
+ * — has to tap this node directly. The controller only exists after the first
+ * note plays, hence the null return rather than a throw.
+ *
+ * The three lookup paths mirror getStrudelAnalyser above: superdough has moved
+ * this node between releases. There is deliberately no fallback to
+ * `ctx.destination`: an AudioDestinationNode is a terminal sink, so connecting
+ * FROM it yields no signal while looking like success.
+ */
+export async function getStrudelOutputNode(): Promise<AudioNode | null> {
+  try {
+    const sd = await import('@strudel/webaudio');
+    const controller = sd.getSuperdoughAudioController();
+    const node =
+      controller?.output?.destinationGain ??
+      (controller as unknown as { destinationGain?: AudioNode })?.destinationGain ??
+      (controller as unknown as { master?: AudioNode; out?: AudioNode })?.master ??
+      (controller as unknown as { out?: AudioNode })?.out;
+    return (node as AudioNode | undefined) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Reset connection state — call after evaluate to force reconnect. */
 export function resetStrudelTap(): void {
   strudelConnected = false;

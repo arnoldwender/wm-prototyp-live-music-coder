@@ -80,6 +80,8 @@ export function ExampleGallery() {
         /* Lazy-init Strudel REPL */
         if (!replRef.current) {
           const { initStrudel } = await import('@strudel/web')
+          /* Put superdough on the app's shared AudioContext before the REPL is built. */
+          await (await import('../../lib/audio/context')).adoptSharedContextForStrudel()
           replRef.current = await initStrudel()
           try {
             await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false)

@@ -1082,8 +1082,6 @@ export function getExamplesByDifficulty(difficulty: ExampleEntry['difficulty']):
   return EXAMPLE_LIBRARY.filter(e => e.difficulty === difficulty);
 }
 
-/** Total example count */
-export const TOTAL_EXAMPLE_COUNT = EXAMPLE_LIBRARY.length;
 
 /* ═══════════════════════════════════════════════════════
    TONE.JS EXAMPLES (50)
@@ -1580,3 +1578,12 @@ $: note("<c3 g3 c4 e4 g4 c5>*4")
     tags: ['piano roll', 'zoom', 'pan', 'visualizer', 'navigation'],
   },
 );
+
+/** Total example count.
+ *
+ * MUST stay at the end of this file. It used to sit partway up, before roughly
+ * 154 further entries were pushed onto EXAMPLE_LIBRARY, so it froze at 65 while
+ * the array held 219 — and Examples.tsx renders this constant as the header
+ * count above a list built from the array itself. Guarded by
+ * example-library.count.test.ts. */
+export const TOTAL_EXAMPLE_COUNT = EXAMPLE_LIBRARY.length;

@@ -36,6 +36,9 @@ export function GistDialog({ onClose }: GistDialogProps) {
   const [status, setStatus] = useState('')
   const [gistUrl, setGistUrl] = useState('')
   const [saving, setSaving] = useState(false)
+  /* Secret by default. The GitHub API fixes visibility at creation time, so this
+     applies to NEW gists only — it is not an editable property afterwards. */
+  const [isPublic, setIsPublic] = useState(false)
   const [savedGists, setSavedGists] = useState<{ id: string; url: string; date: string }[]>(() => {
     const raw = localStorage.getItem('lmc-saved-gists') || '[]';
     return safeJsonParse(raw, [])
@@ -119,7 +122,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         graph: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
         layout: store.layout,
       }
-      const result = await saveToGist(project)
+      const result = await saveToGist(project, undefined, isPublic)
       const url = `https://gist.github.com/${result.id}`
       setGistUrl(url)
       setStatus('Saved!')
@@ -265,6 +268,23 @@ export function GistDialog({ onClose }: GistDialogProps) {
 
         {/* --- Save to Gist section --- */}
         <section style={{ marginBottom: 'var(--space-4)' }}>
+          <label
+            className="flex items-center gap-2"
+            style={{
+              marginBottom: 'var(--space-2)',
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              disabled={saving}
+            />
+            <span>{t('gist.makePublic')}</span>
+          </label>
           <Button
             variant="primary"
             onClick={handleSave}

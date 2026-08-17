@@ -26,6 +26,9 @@ export class StrudelEngine extends BaseEngine {
      * This is the official way to embed Strudel. */
     const { initStrudel } = await import('@strudel/web')
 
+    /* Put superdough on the app's shared AudioContext before the REPL is built. */
+    await (await import('../audio/context')).adoptSharedContextForStrudel()
+
     this.replInstance = await initStrudel()
 
     import.meta.env.DEV && console.log('[Strudel] Engine initialized via initStrudel()')

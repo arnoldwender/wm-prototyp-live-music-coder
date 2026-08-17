@@ -131,10 +131,19 @@ async function getOctokit(): Promise<Octokit | null> {
   return new Octokit({ auth: token });
 }
 
-/** Save project as a GitHub Gist (create or update) */
+/**
+ * Save project as a GitHub Gist (create or update).
+ *
+ * `isPublic` defaults to false. Secret gists are not listed or searchable, but
+ * anyone holding the link can read them — the shipped docs string used to claim
+ * the opposite ("Gists are public by default — make them secret if you prefer"),
+ * describing both the default and a toggle that did not exist. The toggle now
+ * exists; the string was corrected to match.
+ */
 export async function saveToGist(
   project: Project,
   gistId?: string,
+  isPublic = false,
 ): Promise<{ id: string; url: string }> {
   const octokit = await getOctokit();
   if (!octokit) throw new Error('No GitHub token configured');
@@ -163,7 +172,10 @@ export async function saveToGist(
     /* Create new gist */
     const response = await octokit.gists.create({
       description: `Live Music Coder: ${project.name}`,
-      public: false,
+      /* Visibility is fixed at creation: the GitHub API cannot flip an existing
+         gist between public and secret, which is why the update branch above
+         does not take this parameter. */
+      public: isPublic,
       files,
     });
     if (!response.data.id || !response.data.html_url) {
