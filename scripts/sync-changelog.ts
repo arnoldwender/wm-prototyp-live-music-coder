@@ -27,8 +27,17 @@ const sorted = [...CHANGELOG].sort((a, b) => b.date.localeCompare(a.date))
 
 for (const entry of sorted) {
   if (entry.version) {
-    currentGroup = { version: entry.version, date: entry.date, entries: [entry] }
-    groups.push(currentGroup)
+    /* Reuse the group when this version already has one. Opening a new group per
+       versioned ENTRY produced duplicate headers whenever two entries carried the
+       same version — 1.0.2 appeared twice, with different dates. */
+    const existing = groups.find((g) => g.version === entry.version)
+    if (existing) {
+      existing.entries.push(entry)
+      currentGroup = existing
+    } else {
+      currentGroup = { version: entry.version, date: entry.date, entries: [entry] }
+      groups.push(currentGroup)
+    }
   } else if (currentGroup) {
     currentGroup.entries.push(entry)
   } else {
@@ -51,7 +60,13 @@ const CATEGORY_LABEL: Record<string, string> = {
 /* Generate markdown */
 let md = `# Changelog
 
-All notable changes to [Live Music Coder](https://live-music-coder.pro) are documented here.
+Notable changes to [Live Music Coder](https://live-music-coder.pro).
+
+Coverage gap: releases v1.0.3 ("Piano Roll, MIDI & Fixes") and v1.1.0 ("Security
+hardening, a11y, type safety") shipped without entries in the source library, so
+they are absent below. The header used to claim every notable change was
+documented here; it does not, and inventing entries after the fact would be
+worse than saying so.
 
 This file is auto-generated from \`src/data/changelog-library.ts\` — do not edit manually.
 Run \`npx tsx scripts/sync-changelog.ts\` to regenerate.
