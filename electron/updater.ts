@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { app, dialog, BrowserWindow } from 'electron'
+import { app, dialog, shell, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
+
+import { classifyUpdateError, isTerminal, failureMessage } from './update-failure'
+
+// --- Where a user is sent when the app cannot update itself ---
+const RELEASES_URL =
+  'https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest'
 
 // --- Check interval: every 4 hours ---
 const CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000
@@ -32,9 +38,21 @@ export function initUpdater(mainWindow: BrowserWindow): void {
     }
   })
 
+  /* The version we last told the user was ready. On macOS electron-updater
+     emits update-downloaded BEFORE Squirrel.Mac has validated the bundle, so
+     by the time a validation error arrives the user has already been promised
+     an update — and clicking Restart did nothing. Remembering the version lets
+     the error dialog name it instead of appearing out of nowhere. */
+  let offeredVersion: string | null = null
+
+  /* One interruption per session. A failing update check repeats every four
+     hours, and a dialog on each one would be its own bug. */
+  let failureReported = false
+
   // --- Update downloaded: prompt user to restart ---
   autoUpdater.on('update-downloaded', (info) => {
     log.info(`Update downloaded: ${info.version}`)
+    offeredVersion = info.version
     dialog
       .showMessageBox(mainWindow, {
         type: 'info',
@@ -54,6 +72,32 @@ export function initUpdater(mainWindow: BrowserWindow): void {
   // --- Error handling ---
   autoUpdater.on('error', (error) => {
     log.error('Auto-updater error:', error)
+
+    const kind = classifyUpdateError(error?.message ?? String(error))
+
+    /* A stranded signature can never install. Leaving this armed would retry
+       the impossible install on every quit, forever, without ever saying so. */
+    if (isTerminal(kind)) {
+      autoUpdater.autoInstallOnAppQuit = false
+      autoUpdater.autoDownload = false
+    }
+
+    const message = failureMessage(kind, offeredVersion)
+    if (!message || failureReported || mainWindow.isDestroyed()) return
+    failureReported = true
+
+    dialog
+      .showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'Update Failed',
+        message,
+        buttons: ['Open Downloads', 'Close'],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      .then(({ response }) => {
+        if (response === 0) void shell.openExternal(RELEASES_URL)
+      })
   })
 
   // --- Check on launch with delay ---
