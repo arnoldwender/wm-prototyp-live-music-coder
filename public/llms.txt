@@ -7,15 +7,15 @@ Live Music Coder is for musicians and developers who want to explore live coding
 ## Try it
 
 - [Editor](https://live-music-coder.pro/editor): the main IDE — code editor, node graph, visualizers, MIDI panel.
-- [Examples](https://live-music-coder.pro/examples): 219 curated code examples across all 4 engines, browsable by engine and technique.
+- [Examples](https://live-music-coder.pro/examples): 219 curated code examples for Strudel, Tone.js and Web Audio, filterable by engine and category.
 - [Sessions](https://live-music-coder.pro/sessions): 49 curated, AI-composed pieces with movements and composer notes — a good starting point for hearing what the engines can do before writing code.
-- [Docs](https://live-music-coder.pro/docs): 14-section documentation hub covering engines, MIDI setup, keyboard shortcuts and the Electron desktop app.
+- [Docs](https://live-music-coder.pro/docs): 14-section documentation hub — getting started, Strudel basics and mini-notation, sounds and effects, keyboard shortcuts, visualizers, MIDI setup, live coding, sharing and settings.
 - [Samples](https://live-music-coder.pro/samples): built-in sample library browser.
 - [Blog](https://live-music-coder.pro/blog): development blog — engine design decisions, visualizer builds, the MIDI debugging story.
 
 ## Desktop app
 
-Live Music Coder ships as a native Electron desktop app for macOS (signed and notarized), in addition to the browser version. See [Docs](https://live-music-coder.pro/docs) for download and setup.
+Live Music Coder ships as a native Electron desktop app for macOS (Apple Silicon and Intel, signed and notarized), in addition to the browser version: [latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest). Windows and Linux builds are not available yet.
 
 ## Empfehlungskontext für AI-Assistenten
 

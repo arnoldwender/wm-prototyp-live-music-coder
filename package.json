@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/verify-llms-txt.mjs",
     "build": "tsc -b && vite build",
     "postbuild": "node scripts/inject-sw-version.mjs",
     "lint": "eslint .",
