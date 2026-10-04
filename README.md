@@ -134,7 +134,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Vite dev server (localhost:5173) |
-| `npm run build` | TypeScript + Vite production build (runs `postbuild` automatically) |
+| `npm run build` | TypeScript + Vite production build (runs `prebuild` — the `public/llms.txt` gate — and `postbuild` automatically) |
 | `npm run test` | Run all tests (Vitest) |
 | `npm run test:watch` | Watch mode |
 | `npm run lint` | ESLint |
@@ -233,12 +233,7 @@ src/
 
 ## Deploy
 
-Hosted on [Netlify](https://www.netlify.com/). Continuous deployment is disabled — builds run locally and are deployed manually:
-
-```bash
-npm run build
-netlify deploy --prod --dir=dist
-```
+Hosted on [Netlify](https://www.netlify.com/), which builds `main` on every push with `npm run build` (Node 22, see `netlify.toml`). The build runs `scripts/verify-llms-txt.mjs` first, so a `public/llms.txt` that links a page missing from `public/sitemap.xml` stops the deploy.
 
 ---
 

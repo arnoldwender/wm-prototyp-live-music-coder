@@ -1,9 +1,9 @@
 # Netlify build configuration for Vite SPA
 # ──────────────────────────────────────────────────────────────────────
-# CONTINUOUS DEPLOYMENT IS DISABLED (manually disabled 2026-04-13)
-# Reason: production builds run locally with NODE_OPTIONS=--max-old-space-size=8192
-# and are deployed via: netlify deploy --prod --dir=dist
-# The build command below is kept for reference but is NOT triggered on push.
+# Netlify builds `main` from GitHub on every push with the command below (checked 2026-10-04 in
+# the Netlify API: repository linked, builds not stopped, the published deploy came from git).
+# The note that stood here — continuous deployment disabled on 2026-04-13, production deployed by
+# hand — no longer held. `npm run build` runs scripts/verify-llms-txt.mjs first (prebuild).
 # ──────────────────────────────────────────────────────────────────────
 [build]
   command = "npm run build"
