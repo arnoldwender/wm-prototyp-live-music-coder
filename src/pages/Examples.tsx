@@ -335,10 +335,12 @@ function Examples() {
     await play(id, code, engine)
   }
 
-  /* Per-page SEO meta tags */
+  /* Per-page SEO meta tags. The count comes from the data, like the page
+     header: until 2026-10-05 the description said "165+" while the library
+     holds TOTAL_EXAMPLE_COUNT patterns (219 that day). */
   usePageMeta({
     title: 'Code Examples — Live Music Coder',
-    description: '165+ curated live coding patterns for Strudel, Tone.js, and Web Audio. Browse by category and difficulty, then load directly into the editor.',
+    description: `${TOTAL_EXAMPLE_COUNT} curated live coding patterns for Strudel, Tone.js, and Web Audio. Browse by category and difficulty, then load directly into the editor.`,
     path: '/examples',
   })
 
