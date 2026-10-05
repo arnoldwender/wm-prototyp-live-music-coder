@@ -134,7 +134,9 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Vite dev server (localhost:5173) |
-| `npm run build` | TypeScript + Vite production build (runs `prebuild` — the `public/llms.txt` gate — and `postbuild` automatically) |
+| `npm run build` | TypeScript + Vite production build, then a server build that prerenders every route of `public/sitemap.xml` into its own HTML file (`scripts/prerender.mjs`). Runs `prebuild` — the `public/llms.txt` gate — and `postbuild` automatically |
+| `npm run verify:hydration` | After a build: loads every prerendered route in Chromium and fails on a hydration mismatch or any console error (`--url <origin>` checks a deployment) |
+| `bash scripts/mutate-prerender.sh` | Breaks each prerender mechanism on purpose and checks that its test catches it (needs a clean tree) |
 | `npm run test` | Run all tests (Vitest) |
 | `npm run test:watch` | Watch mode |
 | `npm run lint` | ESLint |
@@ -234,6 +236,8 @@ src/
 ## Deploy
 
 Hosted on [Netlify](https://www.netlify.com/), which builds `main` on every push with `npm run build` (Node 22, see `netlify.toml`). The build runs `scripts/verify-llms-txt.mjs` first, so a `public/llms.txt` that links a page missing from `public/sitemap.xml` stops the deploy.
+
+Each route of `public/sitemap.xml` is served as prerendered HTML — `/` from `index.html`, `/docs` from `docs.html` and so on — with its own title, description and canonical link, so search engines and AI assistants that do not run JavaScript can read the page; the app then takes over in the browser. The build stops if a route renders without exactly one `<h1>`, without its metadata or with a loading fallback instead of the page. Any other path (for example `/sessions/<slug>`) gets the plain app shell, `spa.html`.
 
 ---
 
