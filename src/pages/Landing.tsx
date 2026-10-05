@@ -99,15 +99,17 @@ function Landing() {
         <>
           <SectionDivider />
 
-          {/* Feature highlights grid with Lucide icons */}
-          <section id="features">
+          {/* Feature highlights grid with Lucide icons.
+              The ids live on the components' own <section>s — repeating them
+              here put two #features and two #examples in the page. */}
+          <section>
             <FeatureGrid />
           </section>
 
           <SectionDivider />
 
           {/* Pre-built example demos */}
-          <section id="examples">
+          <section>
             <ExampleGallery />
           </section>
 

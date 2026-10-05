@@ -269,10 +269,12 @@ function Samples() {
     setPlayingName('')
   }
 
-  /* Per-page SEO meta tags */
+  /* Per-page SEO meta tags. The count comes from the data, like the page
+     header: until 2026-10-05 the description said 218 while the library
+     holds BASE_SAMPLE_COUNT base samples (196 that day). */
   usePageMeta({
     title: 'Sample Library — Live Music Coder',
-    description: 'Browse 218 Dirt-Samples for live coding music. Filter by category, search by name, and load samples directly into the editor.',
+    description: `Browse ${BASE_SAMPLE_COUNT} Dirt-Samples for live coding music. Filter by category, search by name, and load samples directly into the editor.`,
     path: '/samples',
   })
 

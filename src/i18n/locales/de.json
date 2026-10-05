@@ -615,6 +615,8 @@
     "playing": "Wiedergabe",
     "ready": "Bereit",
     "loading": "Laden...",
+    "placeholderTitle": "Musik-Editor für Live-Coding",
+    "placeholderText": "Schreibe Strudel-, Tone.js- oder Web-Audio-Code und höre das Ergebnis schon beim Tippen. Ein Node-Graph zeigt, wie der Klang geführt wird, und Echtzeit-Visualizer zeigen Wellenform, Spektrum und Noten. Alles läuft im Browser, ohne Installation.",
     "evaluating": "Auswerten...",
     "liveMode": "Live-Modus",
     "sharedCodeWarning": "Dieser Code wurde aus einer geteilten URL geladen. Bitte vor dem Ausführen überprüfen.",

@@ -17,7 +17,6 @@ import { readShareFromUrl } from '../lib/persistence/url'
 import type { UrlShareData } from '../lib/persistence/url'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
-import { usePageMeta } from '../lib/usePageMeta'
 import { startAutosave, readAutosave, clearAutosave } from '../lib/persistence/autosave'
 import type { Project } from '../types/project'
 
@@ -35,12 +34,8 @@ function Editor() {
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const checkStreak = useAppStore((s) => s.checkStreak)
 
-  /* Per-page SEO meta tags */
-  usePageMeta({
-    title: 'Editor — Live Music Coder',
-    description: 'Live coding music editor with 4 audio engines, visual node graph, real-time waveform and spectrum visualizers.',
-    path: '/editor',
-  })
+  /* The page's title, description and canonical are set by the route wrapper,
+     src/pages/EditorPage.tsx, which the prerender renders without this IDE. */
 
   /* On mount: check streak, load shared code, or show template selector.
    *
@@ -172,6 +167,11 @@ function Editor() {
 
   return (
     <>
+      {/* The page's heading for assistive technology — the IDE has no visible
+          title bar, and EditorPage's placeholder (which it replaces) carries the
+          same text as a visible <h1>. */}
+      <h1 className="sr-only">{t('editor.placeholderTitle')}</h1>
+
       {/* Security warning modal when code was loaded from a shared URL */}
       {/* Crash-recovery offer. Non-modal by design: the shared-code warning is a
           security gate and blocks, this is a convenience and must not stand

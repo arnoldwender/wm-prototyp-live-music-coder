@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { Play } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button, Icon, WaveformBackground } from '../atoms'
+import { useIsClient } from '../../lib/useIsClient'
 
 /** Inline keyframes for the CTA pulse glow */
 const pulseGlowCSS = `
@@ -20,9 +21,13 @@ const pulseGlowCSS = `
 }
 `
 
-/** Staggered fade-in for child elements */
-const fadeUp = (delay: number) => ({
-  initial: { opacity: 0, y: 24 },
+/** Staggered fade-in for child elements.
+ *  `animateIn` is false in the prerender and the hydration pass: framer-motion
+ *  writes the `initial` style into the server HTML, so a fade-in would ship the
+ *  hero at opacity 0 until the JavaScript arrives. With `initial={false}` it
+ *  ships visible; client-side navigations to / still fade in. */
+const fadeUp = (delay: number, animateIn: boolean) => ({
+  initial: animateIn ? { opacity: 0, y: 24 } : (false as const),
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.6, delay, ease: 'easeOut' as const },
 })
@@ -31,6 +36,7 @@ const fadeUp = (delay: number) => ({
 export function HeroSection() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const animateIn = useIsClient()
 
   return (
     <section
@@ -61,7 +67,7 @@ export function HeroSection() {
       <style>{pulseGlowCSS}</style>
 
       {/* App name badge */}
-      <motion.div {...fadeUp(0)} style={{ position: 'relative', zIndex: 1 }}>
+      <motion.div {...fadeUp(0, animateIn)} style={{ position: 'relative', zIndex: 1 }}>
         <span
           style={{
             display: 'inline-block',
@@ -100,7 +106,7 @@ export function HeroSection() {
           carries meaning instead: the CTA, the badge and the waveform
           behind this text. */}
       <motion.h1
-        {...fadeUp(0.15)}
+        {...fadeUp(0.15, animateIn)}
         style={{
           position: 'relative',
           zIndex: 1,
@@ -117,7 +123,7 @@ export function HeroSection() {
 
       {/* Subtitle */}
       <motion.p
-        {...fadeUp(0.3)}
+        {...fadeUp(0.3, animateIn)}
         className="max-w-2xl"
         style={{
           position: 'relative',
@@ -132,7 +138,7 @@ export function HeroSection() {
       </motion.p>
 
       {/* Pulsing CTA button */}
-      <motion.div {...fadeUp(0.45)} style={{ position: 'relative', zIndex: 1 }}>
+      <motion.div {...fadeUp(0.45, animateIn)} style={{ position: 'relative', zIndex: 1 }}>
         <Button
           variant="primary"
           onClick={() => navigate('/editor')}
