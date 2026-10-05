@@ -21,6 +21,13 @@ export default defineConfig({
      * and duplicate @strudel/core state (the double-instance MIDI bug) */
     dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio', '@strudel/midi', '@strudel/draw', '@strudel/codemirror'],
   },
+  ssr: {
+    /* Only the prerender's server bundle (vite build --ssr, scripts/prerender.mjs).
+     * Vite leaves dependencies external there, and Node's ESM loader cannot read
+     * the named exports of a CommonJS package: `import { compressToEncodedURIComponent }
+     * from 'lz-string'` fails with "Named export … not found". Bundling it fixes that. */
+    noExternal: ['lz-string'],
+  },
   optimizeDeps: {
     /* Pre-bundle all strudel packages together */
     include: [

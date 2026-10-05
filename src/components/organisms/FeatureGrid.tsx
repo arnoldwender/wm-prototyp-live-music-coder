@@ -10,6 +10,7 @@ import { Music, GitBranch, Activity, Code, Share2, Globe } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Icon } from '../atoms'
 import { FeatureCard } from '../molecules/FeatureCard'
+import { useIsClient } from '../../lib/useIsClient'
 
 /** Feature definition with Lucide icon, accent color, and i18n key */
 interface FeatureDef {
@@ -32,6 +33,8 @@ const features: FeatureDef[] = [
 /** Feature highlights grid on landing page */
 export function FeatureGrid() {
   const { t } = useTranslation()
+  /* No fade-in in the prerender and the hydration pass — see fadeUp in HeroSection */
+  const animateIn = useIsClient()
 
   return (
     <section id="features" className="px-4 py-16 max-w-6xl mx-auto">
@@ -39,7 +42,7 @@ export function FeatureGrid() {
         {features.map((f, i) => (
           <motion.div
             key={f.titleKey}
-            initial={{ opacity: 0, y: 20 }}
+            initial={animateIn ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 + i * 0.1, ease: 'easeOut' }}
           >

@@ -26,8 +26,13 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# SPA redirect — all routes to index.html
+# SPA fallback — every path without a file of its own gets the bare app shell.
+# The routes of public/sitemap.xml have their own prerendered file since 2026-10-05
+# (scripts/prerender.mjs: / → index.html, /docs → docs.html …), and a real file wins
+# over this non-forced rule. Not index.html any more: that is now the prerendered
+# home page, and serving it for /sessions/<slug> would show the home page's content
+# until the app replaced it. spa.html is the untouched template, written by the same script.
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/spa.html"
   status = 200

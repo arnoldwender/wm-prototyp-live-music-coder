@@ -13,6 +13,7 @@ import { Play, Square } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { STARTER_TEMPLATES, getCategories, getTemplatesByCategory } from '../../data/templates'
 import { encodeToUrl } from '../../lib/persistence/url'
+import { useIsClient } from '../../lib/useIsClient'
 import { Icon } from '../atoms'
 
 const ENGINE_DOT_COLORS: Record<string, string> = {
@@ -29,6 +30,8 @@ export function ExampleGallery() {
   const [activeCategory, setActiveCategory] = useState(categories[0])
   const [playingId, setPlayingId] = useState<string | null>(null)
   const replRef = useRef<any>(null)
+  /* No fade-in in the prerender and the hydration pass — see fadeUp in HeroSection */
+  const animateIn = useIsClient()
 
   const handleTryExample = (template: (typeof STARTER_TEMPLATES)[0]) => {
     /* Stop any playing pattern first */
@@ -133,7 +136,7 @@ export function ExampleGallery() {
       <motion.h2
         className="text-2xl font-bold text-center mb-8"
         style={{ color: 'var(--color-text)' }}
-        initial={{ opacity: 0, y: 16 }}
+        initial={animateIn ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >

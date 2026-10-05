@@ -615,6 +615,8 @@
     "playing": "Reproduciendo",
     "ready": "Listo",
     "loading": "Cargando...",
+    "placeholderTitle": "Editor para programar música en vivo",
+    "placeholderText": "Escribe código de Strudel, Tone.js o Web Audio y escucha el resultado mientras tecleas. Un grafo de nodos muestra cómo se enruta el sonido y los visualizadores en tiempo real muestran la forma de onda, el espectro y las notas. Todo funciona en el navegador, sin instalar nada.",
     "evaluating": "Evaluando...",
     "liveMode": "Modo en vivo",
     "sharedCodeWarning": "Este código fue cargado desde una URL compartida. Revísalo antes de ejecutarlo.",

@@ -11,13 +11,23 @@ import { LanguageSwitcher } from '../components/molecules';
 import { IMPRESSUM_HTML, DATENSCHUTZ_HTML } from '../data/legal';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useScrollablePage } from '../lib/useScrollablePage';
+import { useIsClient } from '../lib/useIsClient';
+
+type LegalTab = 'impressum' | 'datenschutz';
 
 function Legal() {
   const { t } = useTranslation();
   const location = useLocation();
-  const [tab, setTab] = useState<'impressum' | 'datenschutz'>(
-    location.hash === '#datenschutz' ? 'datenschutz' : 'impressum'
-  );
+  const isClient = useIsClient();
+
+  /* Until the visitor picks a tab, the tab follows the URL hash. The hash
+     never reaches a server, so the prerendered /legal and the hydration pass
+     show the Impressum; for /legal#datenschutz the Datenschutz tab takes over
+     right after hydration (reading the hash earlier would make the browser's
+     first render differ from the prerendered HTML). */
+  const [pickedTab, setTab] = useState<LegalTab | null>(null);
+  const hashTab: LegalTab = isClient && location.hash === '#datenschutz' ? 'datenschutz' : 'impressum';
+  const tab = pickedTab ?? hashTab;
 
   /* Per-page SEO meta tags */
   usePageMeta({

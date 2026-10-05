@@ -5,13 +5,6 @@
    Priority: localStorage → browser language → English
    ────────────────────────────────────────────────────────── */
 
-/* Suppress i18next promotional console.log about Locize */
-const _origLog = console.log
-console.log = (...args: unknown[]) => {
-  if (typeof args[0] === 'string' && args[0].includes('i18next')) return
-  _origLog(...args)
-}
-
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from './locales/en.json'
@@ -23,6 +16,12 @@ const STORAGE_KEY = 'lmc-lang'
 
 /** Detect initial language from localStorage or browser setting */
 function detectLanguage(): string {
+  /* Build-time prerender (src/entry-server.tsx): no window, no visitor —
+     always English. Node has a `navigator.language` of its own (the build
+     machine's locale), which would make the prerendered language depend on
+     where the build ran; src/main.tsx only hydrates English pages. */
+  if (typeof window === 'undefined') return 'en'
+
   /* Check saved preference first */
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -57,17 +56,23 @@ i18n
       /* React already escapes output */
       escapeValue: false,
     },
-    /* Suppress promotional messages in console */
     debug: false,
+    /* i18next 25 prints a Locize notice with console.info unless this is false.
+       A console.log override used to stand here and never caught it. */
+    showSupportNotice: false,
   })
 
-/* Restore console.log after i18next init */
-console.log = _origLog
+/* The <html lang> of index.html is "en"; match the language the app starts in.
+   Until 2026-10-05 it was only updated on a later switch, so a visitor whose
+   browser picked German or Spanish got German or Spanish text marked as English. */
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = i18n.language
+}
 
 /* Persist language choice and sync document lang attribute on change */
 i18n.on('languageChanged', (lng) => {
   try { localStorage.setItem(STORAGE_KEY, lng) } catch { /* unavailable */ }
-  document.documentElement.lang = lng
+  if (typeof document !== 'undefined') document.documentElement.lang = lng
 })
 
 export default i18n

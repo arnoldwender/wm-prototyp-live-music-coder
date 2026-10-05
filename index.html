@@ -32,12 +32,16 @@
          · `form-action 'self'` added. It was absent everywhere, so an injected
            form could POST the stored GitHub PAT to any host. CSP cannot stop
            top-level navigation, but it can stop this.
+         · `frame-ancestors` left out. Browsers ignore it in a <meta> policy and
+           log a console error on every page load ("…is ignored when delivered via
+           a <meta> element"); it only works as a header. On the web the
+           netlify.toml header carries it, with X-Frame-Options DENY.
 
          'unsafe-eval' is required and non-negotiable: evaluating user patterns
          through Function() is the product. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' file:; script-src 'self' file: 'unsafe-eval' blob: data:; script-src-elem 'self' file: blob: data:; style-src 'self' file: 'unsafe-inline'; connect-src 'self' file: https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com ws://localhost:8080 ws://127.0.0.1:8080; img-src 'self' file: data: blob:; media-src 'self' file: blob: data:; font-src 'self' file: data:; worker-src 'self' file: blob: data:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self' file:; script-src 'self' file: 'unsafe-eval' blob: data:; script-src-elem 'self' file: blob: data:; style-src 'self' file: 'unsafe-inline'; connect-src 'self' file: https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com ws://localhost:8080 ws://127.0.0.1:8080; img-src 'self' file: data: blob:; media-src 'self' file: blob: data:; font-src 'self' file: data:; worker-src 'self' file: blob: data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -54,7 +58,9 @@
     <link rel="preload" href="/fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <title>Live Music Coder — Write Code, Hear Music, Live</title>
     <meta name="description" content="Browser-based live coding music IDE. Write code, hear music instantly. 4 audio engines, visual node graph, real-time visualizers, and instant code sharing. Free, no install." />
-    <!-- Canonical URL handled dynamically per page (SPA) -->
+    <!-- Canonical URL: scripts/prerender.mjs writes one into every prerendered route and
+         replaces the title, description, og:* and twitter:* tags below with the route's own.
+         The SPA shell (dist/spa.html, for deep links) gets it from usePageMeta at runtime. -->
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />

@@ -9,26 +9,22 @@
    requires a URL origin. Under file:// in packaged Electron it
    always resolves to the app root and breaks navigation.
    See .wm-electron-audit.md R1.
+
+   AppContent is everything inside the Router. The build-time
+   prerender (src/entry-server.tsx) wraps it in a StaticRouter,
+   the browser in the router below: the routers render no DOM,
+   so both produce the same markup and hydrateRoot can adopt it.
    ────────────────────────────────────────────────────────── */
 
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Landing from './pages/Landing'
+import EditorPage from './pages/EditorPage'
 import { NotFound, ErrorBoundary } from './components/atoms'
 import { isElectron, isElectronMac, TITLEBAR_HEIGHT } from './lib/platform'
 import { useMenuActions } from './lib/useMenuActions'
-
-/* Lazy-load non-landing pages — reduces initial bundle for first-visit perf */
-const Editor = lazy(() => import('./pages/Editor'))
-const Docs = lazy(() => import('./pages/Docs'))
-const Samples = lazy(() => import('./pages/Samples'))
-const Examples = lazy(() => import('./pages/Examples'))
-const Legal = lazy(() => import('./pages/Legal'))
-const Sessions = lazy(() => import('./pages/Sessions'))
-const SessionPiece = lazy(() => import('./pages/SessionPiece'))
-const Changelog = lazy(() => import('./pages/Changelog'))
-const Blog = lazy(() => import('./pages/Blog'))
-const BlogPost = lazy(() => import('./pages/BlogPost'))
+import { LAZY_PAGES } from './routes'
 
 /* Electron needs HashRouter under file:// because HTML5 history
    can't distinguish file:// paths. `isElectron` is imported from
@@ -72,6 +68,8 @@ function TitleBar() {
    BrowserWindow.backgroundColor. A null fallback would be invisible and
    manifests as the v1.0.1 "black screen" symptom. */
 function RouteLoader() {
+  const { t } = useTranslation()
+
   return (
     <main
       role="status"
@@ -100,7 +98,8 @@ function RouteLoader() {
           animation: 'lmc-spin 800ms linear infinite',
         }}
       />
-      <p style={{ fontSize: 'var(--font-size-sm)', margin: 0 }}>Loading editor…</p>
+      {/* Every lazy route passes through here, not only the editor */}
+      <p style={{ fontSize: 'var(--font-size-sm)', margin: 0 }}>{t('editor.loading')}</p>
       <style>{`@keyframes lmc-spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   )
@@ -112,13 +111,12 @@ function MenuActions() {
   return null
 }
 
-function App() {
+/** Everything inside the Router — shared by the browser and the prerender */
+export function AppContent() {
   return (
-    <ErrorBoundary>
-      {isElectronMac && <TitleBar />}
-      <Router>
-        <MenuActions />
-        <Suspense fallback={<RouteLoader />}>
+    <>
+      <MenuActions />
+      <Suspense fallback={<RouteLoader />}>
         <Routes>
           {/* Both web and Electron show the Landing page at /.
               In Electron, Landing renders a slim version (hero + footer only)
@@ -126,21 +124,25 @@ function App() {
               CTA navigates to /editor. */}
           <Route path="/" element={<Landing />} />
           <Route path="/landing" element={<Landing />} />
-          <Route path="/editor" element={<Editor />} />
-          <Route path="/docs" element={<Docs />} />
-          <Route path="/docs/:sectionId" element={<Docs />} />
-          <Route path="/samples" element={<Samples />} />
-          <Route path="/examples" element={<Examples />} />
-          <Route path="/sessions" element={<Sessions />} />
-          <Route path="/sessions/:slug" element={<SessionPiece />} />
-          <Route path="/changelog" element={<Changelog />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/legal" element={<Legal />} />
+          <Route path="/editor" element={<EditorPage />} />
+          {/* Lazy pages — one table with preloadRoute() (src/routes.ts) */}
+          {LAZY_PAGES.map(({ path, route }) => (
+            <Route key={path} path={path} element={<route.Page />} />
+          ))}
           {/* Catch-all — any unmatched path renders the 404 page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        </Suspense>
+      </Suspense>
+    </>
+  )
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      {isElectronMac && <TitleBar />}
+      <Router>
+        <AppContent />
       </Router>
     </ErrorBoundary>
   )
