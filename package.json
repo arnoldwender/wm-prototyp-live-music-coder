@@ -165,5 +165,8 @@
     "vitest": "^5.0.5",
     "wait-on": "^9.0.5"
   },
-  "description": "Browser-based live coding music IDE. Write code, hear music instantly."
+  "description": "Browser-based live coding music IDE. Write code, hear music instantly.",
+  "overrides": {
+    "ws": "^8.21.0"
+  }
 }
