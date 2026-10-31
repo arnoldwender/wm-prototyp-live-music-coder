@@ -65,7 +65,7 @@ E-Mail: info@wendermedia.com</p>
 <h3>Beschwerde&shy;recht bei der zust&auml;ndigen Aufsichts&shy;beh&ouml;rde</h3> <p>Im Falle von Verst&ouml;&szlig;en gegen die DSGVO steht den Betroffenen ein Beschwerderecht bei einer Aufsichtsbeh&ouml;rde, insbesondere in dem Mitgliedstaat ihres gew&ouml;hnlichen Aufenthalts, ihres Arbeitsplatzes oder des Orts des mutma&szlig;lichen Versto&szlig;es zu. Das Beschwerderecht besteht unbeschadet anderweitiger verwaltungsrechtlicher oder gerichtlicher Rechtsbehelfe.</p>
 <p><strong>Die f&uuml;r uns zust&auml;ndige Aufsichtsbeh&ouml;rde ist:</strong><br />
 Landesbeauftragte f&uuml;r den Datenschutz Sachsen-Anhalt<br />
-Leiterstra&szlig;e 9, 39104 Magdeburg<br />
+Otto-von-Guericke-Stra&szlig;e 34a, 39104 Magdeburg<br />
 Telefon: +49 391 81803-0<br />
 E-Mail: <a href="mailto:poststelle@lfd.sachsen-anhalt.de">poststelle@lfd.sachsen-anhalt.de</a><br />
 Web: <a href="https://datenschutz.sachsen-anhalt.de" rel="noopener" target="_blank">datenschutz.sachsen-anhalt.de</a></p>
