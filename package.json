@@ -15,6 +15,7 @@
     "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "postbuild": "node scripts/inject-sw-version.mjs",
     "verify:hydration": "node scripts/verify-hydration.mjs",
+    "verify:ai-labels": "node scripts/verify-ai-labels.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
