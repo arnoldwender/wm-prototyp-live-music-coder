@@ -19,6 +19,11 @@ E-Mail: info@wendermedia.com</p>
 <p>Umsatzsteuer-Identifikationsnummer gem&auml;&szlig; &sect; 27 a Umsatzsteuergesetz:<br />
 DE-253389445</p>
 
+<h2>Verantwortlich f&uuml;r den Inhalt nach &sect; 18 Abs. 2 MStV</h2>
+<p>Arnold Wender<br />
+Franckestra&szlig;e 3a<br />
+06110 Halle (Saale)</p>
+
 <h2>Verbraucher&shy;streit&shy;beilegung/Universal&shy;schlichtungs&shy;stelle</h2>
 <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
 
