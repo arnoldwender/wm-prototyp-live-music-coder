@@ -20,37 +20,44 @@ Files marked with `SPDX-License-Identifier: MIT` may be extracted and used under
 
 | Module | Path | Description |
 |--------|------|-------------|
+| Desktop Shell | `electron/` | Electron main process, preload, IPC handlers, encrypted `safeStorage` Gist store, updater, URL guard, WAV encoder, tray, menu |
 | Audio Architecture | `src/lib/audio/context.ts`, `analyzer.ts`, `recorder.ts`, `worklet.ts` | Shared AudioContext, beat detection, recording |
 | Engine Orchestrator | `src/lib/orchestrator/` | Multi-engine management, DAG audio graph |
 | Engine Adapters | `src/lib/engines/base.ts`, `tonejs.ts`, `webaudio.ts`, `midi.ts` | Tone.js, WebAudio, MIDI adapters |
 | Parser/Codegen | `src/lib/parser/`, `src/lib/codegen/` | Code-to-graph and graph-to-code |
-| Visualizers | `src/lib/visualizers/` | Canvas 2D waveform, spectrum, timeline |
-| Persistence | `src/lib/persistence/` | IndexedDB, URL sharing, GitHub Gist |
+| Audio Visualizers (non-Strudel) | `src/lib/visualizers/waveform.ts`, `spectrum.ts`, `timeline.ts`, `colors.ts`, `midi-utils.ts` | Canvas 2D waveform, spectrum, timeline, color palette, MIDI utilities |
+| Local & URL Persistence | `src/lib/persistence/local.ts`, `url.ts` | IndexedDB storage and `lz-string` URL sharing |
 | State Management | `src/lib/store.ts`, `src/lib/history.ts` | Zustand store, undo/redo |
-| UI Components | `src/components/` | All React components (atoms, molecules, organisms) |
+| UI Components (non-Strudel) | `src/components/atoms/`, `src/components/molecules/`, `src/components/organisms/` *(except Strudel-coupled organisms listed below)* | Reusable React UI components |
 | Layouts | `src/layouts/` | Editor layout |
-| Pages | `src/pages/` | Landing, Editor, Docs, Samples, Examples, Legal |
-| Data | `src/data/` | Templates, docs, examples, sample catalog |
-| Types | `src/types/engine.ts`, `src/types/project.ts` | TypeScript type definitions |
-| i18n | `src/i18n/` | Translations (DE/EN/ES) |
+| Pages | `src/pages/` | Landing, Editor, EditorPage, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal |
+| Data (non-Strudel) | `src/data/` *(except `sessions-library.ts`)* | Templates, docs, examples, sample catalog, MIDI device profiles, blog posts, changelog |
+| Types | `src/types/engine.ts`, `src/types/project.ts`, `src/types/global.d.ts` | TypeScript type definitions |
+| i18n | `src/i18n/` | Translations and lazy locale loader (DE/EN/ES) |
 | Styles | `src/styles/` | Design tokens and global CSS |
 | Workers | `src/workers/` | Web Workers |
 
 ### AGPL-only Files (Strudel Integration)
 
-These files import from `@strudel/*` packages and are licensed under AGPL-3.0-or-later:
+These files integrate with `@strudel/*` packages or Strudel pattern/REPL structures and carry `SPDX-License-Identifier: AGPL-3.0-or-later`:
 
 | File | Purpose |
 |------|---------|
 | `src/lib/engines/strudel.ts` | Strudel engine adapter |
+| `src/lib/strudel-extensions.ts` | Lazy registration of Strudel extension packages |
 | `src/lib/audio/strudel-tap.ts` | Strudel audio analysis bridge |
-| `src/lib/editor/extensions.ts` | Strudel CodeMirror extensions |
-| `src/components/organisms/StrudelEditor.tsx` | Strudel-specific UI |
+| `src/lib/audio/defaultSamples.ts` | First-party Dirt-Samples loader for Strudel |
+| `src/lib/audio/solo-mute.ts`, `layer-mute.ts` | Strudel `$:` layer solo/mute helpers |
+| `src/lib/midi/strudel-keys.ts` | Strudel MIDI keyboard (`midikeys` / `midin`) integration |
+| `src/lib/editor/extensions.ts`, `inline-widgets.ts` | Strudel CodeMirror extensions and inline widgets |
+| `src/lib/visualizers/repl-source.ts`, `pianoroll.ts`, `punchcard.ts`, `spiral.ts`, `pitchwheel.ts` | Strudel REPL hap-driven Canvas 2D visualizers |
+| `src/components/organisms/StrudelEditor.tsx` | Strudel-specific CodeMirror UI |
+| `src/components/organisms/PianorollVisualizer.tsx`, `PunchcardVisualizer.tsx`, `SpiralVisualizer.tsx`, `PitchwheelVisualizer.tsx` | Strudel pattern visualizer organisms |
+| `src/components/organisms/ExampleGallery.tsx`, `SidePanel.tsx` | Inline Strudel pattern/sample auditioning |
+| `src/lib/persistence/gist.ts`, `autosave.ts` | Gist & session autosave helpers coupled to editor state |
+| `src/lib/useInlinePlayer.ts`, `useMenuActions.ts` | Inline audio preview and menu evaluation hooks |
+| `src/data/sessions-library.ts` | Curated Strudel sessions library |
 | `src/types/strudel.d.ts` | Strudel type declarations |
-| `src/components/organisms/ExampleGallery.tsx` | Inline play via Strudel |
-| `src/components/organisms/SidePanel.tsx` | Sample preview via Strudel |
-| `src/components/organisms/PianorollVisualizer.tsx` | Strudel pattern visualization |
-| `src/lib/useInlinePlayer.ts` | Inline audio preview hook |
 
 ## Copyright
 

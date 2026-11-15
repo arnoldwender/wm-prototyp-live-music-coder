@@ -16,12 +16,20 @@ request. That applies to the maintainer too.
 
 ## Before you open the PR
 
-- Run whatever checks the repository ships. If there is a `scripts/` directory with a
-  check in it, run that; if there is a CI workflow, it will run the same thing on your PR.
-- Match the surrounding style rather than introducing a new one. A formatting-only rewrite
-  of untouched code makes a change hard to read.
-- Commit messages use `[Action] Brief description` — for example `[Fix] Handle empty pool`,
-  `[Docs] Clarify install step`. Keep the subject line short and the body for the why.
+- Run the verification gates enforced by `.github/workflows/ci.yml`:
+  ```bash
+  npx tsc -b
+  npx tsc --noEmit -p tsconfig.node.json
+  npm run lint
+  npm test
+  npm run build
+  npm run verify:hydration
+  npm run verify:ai-labels
+  ```
+- Preserve `SPDX-License-Identifier` headers (`MIT` or `AGPL-3.0-or-later`) on every source file — see [LICENSING.md](../LICENSING.md).
+- If you add or rename a session, blog post, or documentation section, regenerate `public/sitemap.xml` (`npm run generate:sitemap`) and keep `public/llms.txt` counts in sync.
+- Match the surrounding style (design tokens in CSS, Atomic Design boundaries, all 3 locales `en` / `de` / `es` updated together) rather than introducing a new one. A formatting-only rewrite of untouched code makes a change hard to read.
+- Commit messages use `[Action] Brief description` — for example `[Fix] Handle empty pool`, `[Docs] Clarify install step`. Keep the subject line short and the body for the why.
 
 ## What makes a change easy to accept
 
