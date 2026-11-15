@@ -1,0 +1,86 @@
+
+ Sorry - 330006563
+Server inaccessibility
+503 - Backend fetch failedStatus ID: 78037e81/ Request ID: 330006563
+ bg
+ Сървърът е временно недостъпен
+ Извиняваме се за неудобството. Моля, опитайте пак по-късно.
+ cs
+ Server je dočasně nedostupný
+ Omlouváme se za způsobené nepříjemnosti. Zkuste to prosím znovu později.
+ da
+ Serveren er midlertidigt utilgængelig
+ Vi undskylder ulejligheden. Prøv igen senere.
+ de
+ Der Server ist vorübergehend nicht verfügbar
+ Wir entschuldigen uns für etwaige Unannehmlichkeiten. Bitte
+ versuchen Sie es später noch einmal.
+ el
+ Ο διακομιστής δεν είναι διαθέσιμος προσωρινά
+ Ζητούμε συγγνώμη για τυχόν προβλήματα. Δοκιμάστε ξανά αργότερα.
+ en
+ The server is temporarily unavailable
+ We apologise for any inconvenience. Please try again later.
+ es
+ El servidor no está disponible temporalmente
+ Le rogamos disculpe las molestias. Vuelva a intentarlo más
+ tarde.
+ et
+ Server ei ole ajutiselt kättesaadav
+ Palume vabandust tekkinud ebamugavuste pärast. Palun proovige
+ hiljem uuesti.
+ fi
+ Palvelin on väliaikaisesti poissa käytöstä
+ Pahoittelemme mahdollista haittaa. Yritä myöhemmin uudelleen.
+ fr
+ Le serveur est temporairement indisponible
+ Veuillez nous excuser pour ce désagrément. Merci de réessayer
+ plus tard.
+ ga
+ Níl fáil ar an bhfreastalaí i láthair na huaire
+ Is oth linn an chiotaí. Bain triail as arís ar ball.
+ hr
+ Poslužitelj je privremeno nedostupan
+ Ispričavamo se zbog neugodnosti. Pokušajte ponovno kasnije.
+ hu
+ A szerver átmenetileg nem érhető el, kérjük, próbálkozzon újra
+ később
+ Az esetleges kellemetlenségekért elnézését kérjük.
+ it
+ Il server è temporaneamente non disponibile
+ Ci scusiamo per il disagio arrecato. Riprovare più tardi.
+ lt
+ Serveris laikinai neveikia
+ Atsiprašome už nepatogumus. Bandykite dar kartą vėliau.
+ lv
+ Serveris pagaidām nav pieejams
+ Atvainojamies par neērtībām. Mēģiniet vēlreiz vēlāk.
+ mt
+ Is-server mhux disponibbli temporanjament
+ Niskużaw ruħna għal kwalunkwe inkonvenjenza. Jekk jogħġbok erġa’
+ pprova aktar tard.
+ nl
+ De server is tijdelijk niet beschikbaar
+ Onze excuses voor het ongemak. Probeer het later nog een keer.
+ pl
+ Serwer jest tymczasowo niedostępny
+ Przepraszamy za wszelkie niedogodności. Proszę spróbować
+ później.
+ pt
+ O servidor está temporariamente indisponível
+ Pedimos desculpa pelo incómodo. Volte a tentar mais tarde.
+ ro
+ Serverul este temporar indisponibil
+ Ne cerem scuze pentru eventualele inconveniente. Vă rugăm să
+ reîncercați mai târziu.
+ sk
+ Server je dočasne nedostupný
+ Ospravedlňujeme sa za prípadné problémy, ktoré môžu v dôsledku
+ toho vzniknúť.
+ sl
+ Strežnik je začasno nedosegljiv
+ Opravičujemo se za morebitne nevšečnosti. Poskusite ponovno
+ pozneje.
+ sv
+ Servern är inte tillgänglig för tillfället
+ Vi ber om ursäkt för besväret. Försök igen senare.

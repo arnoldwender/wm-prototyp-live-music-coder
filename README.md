@@ -95,7 +95,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Audio Recording** — Record button in transport bar, exports as WebM (and native WAV save dialog in the desktop app).
 
-**Settings Panel** — 4 editor themes (Purple, Amber, Cyan, Matrix), font size, vim mode, word wrap, zen mode.
+**Settings Panel** — 4 editor themes (Signal, Sodium, Scope, Phosphor), font size, vim mode, word wrap, zen mode.
 
 **Solo/Mute** — Ctrl+1..9 to solo a layer, Shift+Ctrl+1..9 to mute one. Both toggle the `_` prefix in your code, which is the mechanism Strudel itself honours (`_$:` returns silence), so the state stays visible in the source.
 
@@ -113,7 +113,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Internationalization** — Full DE / EN / ES support (`en` bundled synchronously for SSR hydration; `de` and `es` lazy-loaded on demand).
 
-**Dark Mode** — Music production aesthetic powered by a complete design token system.
+**Dark Mode ("Signal Room")** — Studio instrument aesthetic powered by OKLCH design tokens, Okabe-Ito CVD-safe engine accents, self-hosted IBM Plex typography, and deterministic SVG-to-raster icon recipes (documented in [`docs/design/README.md`](docs/design/README.md)).
 
 ---
 
@@ -239,6 +239,9 @@ src/
   i18n/             # DE, EN, ES translations + lazy locale loader
   styles/tokens/    # colors.css, typography.css, spacing.css
   types/            # TypeScript type definitions
+docs/
+  design/           # Signal Room branding, OKLCH color matrix, IBM Plex typography & asset recipes
+  research/         # Dated primary-source regulatory & technical verification archives
 scripts/            # Prerender, sitemap generator, hydration & AI-label gates, Electron fuse & release scripts
 ```
 

@@ -1,0 +1,100 @@
+
+ The European accessibility standard EN 301 549 has been updated - AccessibleEU
+ Skip to main content
+en
+Select your languageClose
+bgбългарски
+esespañol
+csčeština
+dadansk
+deDeutsch
+eteesti
+elελληνικά
+enEnglish
+frfrançais
+gaGaeilge
+hrhrvatski
+ititaliano
+lvlatviešu
+ltlietuvių
+humagyar
+mtMalti
+nlNederlands
+plpolski
+ptportuguês
+roromână
+skslovenčina
+slslovenščina
+fisuomi
+svsvenska
+SearchSearch
+AccessibleEU
+Menu
+Close
+MenuBackPrevious itemsNext items
+Home
+About AccessibleEU
+Content Corner
+News
+Events
+Digital Library
+Good Practices
+Multimedia Content
+See all
+Accessibility Monitoring
+Guidelines and Support Materials
+Featured Research
+Contact Us 
+Home
+…
+Content Corner
+News
+The European accessibility standard EN 301 549 has been updated
+The European accessibility standard EN 301 549 has been updated
+The update adds six new accessibility requirements from WCAG 2.2, removes the obsolete 4.1.1 Parsing criterion, and requires websites and documents to better respect users' accessibility preferences.
+News article
+7 September 2026
+AccessibleEU
+2 min read
+A new version of the European accessibility standard, EN 301 549 v4.1.1, was published in September 2026. The biggest change is that it adopts WCAG 2.2 as the accessibility benchmark for websites, software and digital documents, replacing WCAG 2.1.
+However, organisations should be aware that the new version is not yet the legal reference standard for demonstrating compliance with the European Accessibility Act (EAA) or the EU Web Accessibility Directive (WAD).
+Until the European Commission formally cites EN 301 549 v4.1.1 in the Official Journal of the European Union, the current reference remains EN 301 549 v3.2.1 (2021), which is based on WCAG 2.1 Level AA.
+Although there is no immediate legal requirement to comply with the new version, its publication confirms that WCAG 2.2 is the future direction for accessibility in Europe and provides organisations with a clear target for future compliance efforts.
+The new release is also the first version of EN 301 549 developed specifically with the European Accessibility Act in mind. It includes a new annex that links the standard's requirements directly to the EAA, helping organisations demonstrate how they meet the Act's accessibility requirements.
+Once the standard is formally cited, meeting EN 301 549 v4.1.1 will give organisations a presumption of conformity with both the European Accessibility Act and the Web Accessibility Directive.
+What should organisations do now?
+While there is no new compliance deadline linked to this publication, organisations should start preparing by:
+Reviewing websites and digital documents against WCAG 2.2.
+Updating accessibility testing processes and audit checklists.
+Reviewing procurement processes and supplier requirements.
+Ensuring PDFs, Office documents and other digital content meet the new accessibility expectations.
+With WCAG 2.2 now confirmed as the future accessibility baseline in Europe, organisations that prepare early will be better placed to manage the transition when EN 301 549 v4.1.1 becomes the official legal reference standard.
+Publication date
+7 September 2026
+Author
+AccessibleEU 
+Disclaimer
+All data collected in this website will be managed according to the following data protection clause: protection of your personal data
+AccessibleEU
+This site is managed by:
+Directorate-General for Justice and Consumers
+Facebook
+Linkedin
+X
+YouYube
+ About us 
+Sign-up for AccessibleEU Newsletter
+Follow the European Commission
+Mastodon
+LinkedIn
+Bluesky
+Facebook
+Youtube
+Other
+Contact us
+Report an IT vulnerability
+Languages on our websites
+Cookies
+Privacy policy
+Legal notice
+Accessibility
