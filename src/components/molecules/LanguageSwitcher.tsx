@@ -7,10 +7,11 @@
 
 import { useTranslation } from 'react-i18next'
 import { Globe } from 'lucide-react'
+import { switchLanguage, type SupportedLocale } from '../../i18n'
 import { Button, Icon } from '../atoms'
 
 /** Supported locale codes */
-const LANGUAGES = ['de', 'en', 'es'] as const
+const LANGUAGES: readonly SupportedLocale[] = ['de', 'en', 'es']
 
 /** Language switcher with globe icon and locale buttons */
 function LanguageSwitcher() {
@@ -27,7 +28,7 @@ function LanguageSwitcher() {
           key={lang}
           variant="ghost"
           active={i18n.language === lang}
-          onClick={() => i18n.changeLanguage(lang)}
+          onClick={() => { void switchLanguage(lang) }}
           aria-label={lang.toUpperCase()}
           style={{
             padding: 'var(--space-2) var(--space-3)',

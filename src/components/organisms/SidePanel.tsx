@@ -860,7 +860,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export function ConsolePanel() {
-  const [, forceUpdate] = useState(0);
+  const [logVersion, setLogVersion] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   /* Install console monkey-patch on mount; restore originals on unmount.
@@ -896,7 +896,7 @@ export function ConsolePanel() {
   }, []);
 
   useEffect(() => {
-    const listener = () => forceUpdate((n) => n + 1);
+    const listener = () => setLogVersion((n) => n + 1);
     logListeners.push(listener);
     return () => { logListeners = logListeners.filter((l) => l !== listener); };
   }, []);
@@ -906,7 +906,7 @@ export function ConsolePanel() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [logBuffer.length]);
+  }, [logVersion]);
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto" style={{ padding: 'var(--space-2)', fontFamily: 'var(--font-family-mono)', fontSize: 'var(--font-size-ui)' }}>
@@ -936,7 +936,7 @@ export function ConsolePanel() {
       <Button
         variant="ghost"
         className="!text-xs mt-2"
-        onClick={() => { logBuffer = []; forceUpdate((n) => n + 1); }}
+        onClick={() => { logBuffer = []; setLogVersion((n) => n + 1); }}
       >
         Clear
       </Button>

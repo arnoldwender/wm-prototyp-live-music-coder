@@ -52,6 +52,7 @@
   --font-size-xl: 1.25rem;    /* 20px */
   --font-size-2xl: 1.5rem;    /* 24px */
   --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: clamp(2rem, 4vw, 2.75rem); /* 32–44px — page display titles */
 
   /* Code face size — was hardcoded as '14px' in three editor themes.
      Tokenised so the editor and the app share one source of truth. */
