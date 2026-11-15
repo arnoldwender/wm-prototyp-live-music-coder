@@ -23,7 +23,7 @@ export interface DocSection {
   content: DocBlock[];
 }
 
-/* --- All 7 documentation sections --- */
+/* --- All 14 documentation sections --- */
 export const docSections: DocSection[] = [
   /* 1. Getting Started */
   {

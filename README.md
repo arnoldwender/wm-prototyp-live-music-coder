@@ -6,8 +6,20 @@
 
 <p align="center">
   <strong>Write code. Hear music. Instantly.</strong><br>
-  A browser-based live coding music IDE with 4 audio engines, visual node graph, and real-time visualizers.
+  A browser-based and native macOS live coding music IDE with 4 audio engines, visual node graph, and real-time visualizers.
 </p>
+
+| | |
+| --- | --- |
+| **Status** | Live (`v1.3.2`, web + signed/notarized macOS `arm64` & `x64`, measured 2026-11-15) |
+| **Domain** | https://live-music-coder.pro |
+| **Stack** | React 19 · TypeScript 5.9 (`strict`) · Vite 8 · Tailwind CSS 4 · Electron 43 |
+| **Hosting & CI** | Netlify Edge (auto-deploy on `main`) · GitHub Actions (`.github/workflows/ci.yml`) · GitHub Releases (desktop) |
+| **Languages** | EN (default / SSR canonical) · DE · ES |
+| **Local port** | `5173` |
+| **Gate** | `npx tsc -b && npx tsc --noEmit -p tsconfig.node.json && npm run lint && npm test && npm run build && npm run verify:hydration && npm run verify:ai-labels` |
+
+> **Before touching anything:** `npx tsc --noEmit` compiles zero files because the root `tsconfig.json` uses solution-style project references (`files: []`); run `npx tsc -b` for `src/` and `npx tsc --noEmit -p tsconfig.node.json` for `electron/`.
 
 <p align="center">
   <a href="https://live-music-coder.pro"><strong>Try it live</strong></a>&nbsp;&nbsp;|&nbsp;&nbsp;
@@ -19,11 +31,6 @@
 
 <p align="center">
   <a href="https://app.netlify.com/projects/wm-prototyp-live-music-coder/deploys"><img src="https://api.netlify.com/api/v1/badges/a03cf0e5-f018-4d4e-bc11-5c973fb071fc/deploy-status" alt="Netlify Status"></a>
-  <img src="https://img.shields.io/badge/react-19-blue?logo=react" alt="React 19">
-  <img src="https://img.shields.io/badge/typescript-5.9-blue?logo=typescript" alt="TypeScript 5.9">
-  <img src="https://img.shields.io/badge/vite-8-purple?logo=vite" alt="Vite 8">
-  <img src="https://img.shields.io/badge/license-AGPL--3.0-green" alt="License AGPL-3.0">
-  <img src="https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES-orange" alt="i18n DE EN ES">
   <a href="https://github.com/sponsors/arnoldwender"><img src="https://img.shields.io/badge/sponsor-arnoldwender-ea4aaa?logo=github-sponsors" alt="Sponsor"></a>
 </p>
 
@@ -33,20 +40,12 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
-| macOS | Intel | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Apple Silicon (M1/M2/M3/M4, signed & notarized `v1.3.2`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Intel (`x64`, signed & notarized `v1.3.2`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
 Or [try it in your browser](https://live-music-coder.pro) — no download required.
-
-## Sprint History
-
-### Sprint 2026-05-18
-
-- docs/DESIGN.md Tier A completeness pass (components, pages, IDs, tokens, hard-rules)
-- Design-DNA baseline audit snapshot
-- License revert confirmed: AGPL-3.0-or-later + MIT dual license intact
 
 ---
 
@@ -80,13 +79,13 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
 
-**49 Curated Sessions** — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Deep House, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
+**49 Curated Sessions** *(measured 2026-11-15)* — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Deep House, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
 
-**219 Code Examples** — Including interactive controls (slider, onKey, createParams), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, advanced patterns (euclidean, polymetric, FM), and synthesis techniques.
+**219 Code Examples** *(measured 2026-11-15)* — Including interactive controls (`slider`, `onKey`, `createParams`), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, advanced patterns (euclidean, polymetric, FM), and synthesis techniques.
 
-**Sample Library** — Browse 196 Dirt-Samples with categories, drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
+**Sample Library** — Browse 196 Dirt-Samples *(measured 2026-11-15)* served via a pinned first-party manifest (`/samples/dirt-samples.json`) and `/dirt-samples/*` edge proxy (no unconsented third-party network calls), plus drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
 
-**MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. 19 device profiles (MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more) with factory CC mappings. Works with any USB MIDI device.
+**MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. 19 device profiles *(measured 2026-11-15)* (MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more) with factory CC mappings. Works with any USB MIDI device.
 
 **MIDI Compose Mode** — Play notes on a connected MIDI keyboard and have them convert to Strudel mini-notation in real time inside the editor. Quantize, auto-insert, and build patterns by playing.
 
@@ -94,7 +93,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Input Devices** — Gamepad API (analog sticks, buttons, triggers), MIDI CC value mapping, keyboard bindings via `onKey()`.
 
-**Audio Recording** — Record button in transport bar, exports as WebM.
+**Audio Recording** — Record button in transport bar, exports as WebM (and native WAV save dialog in the desktop app).
 
 **Settings Panel** — 4 editor themes (Purple, Amber, Cyan, Matrix), font size, vim mode, word wrap, zen mode.
 
@@ -106,13 +105,13 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **MIDI Panel** — Connected device list with hot-plug detection, live CC grid (one row per CC with name map, value bar, 0–127 readout), clear button, usage hints. Accessible via USB icon in sidebar.
 
-**Code Sharing** — Share via compressed URLs (lz-string), save/load GitHub Gists, download code as .js file.
+**Code Sharing** — Share via compressed URLs (`lz-string`, with explicit confirmation prompt before evaluating external code), save/load GitHub Gists (ephemeral in-memory PAT on web; encrypted OS Keychain via `safeStorage` + confirmation dialog on desktop), or download code as a `.js` file.
 
 **Console Panel** — In-editor log output with color-coded levels and timestamps.
 
 **Live Coding** — 150ms debounce in live mode for near-instant feedback. Clear button with confirmation dialog.
 
-**Internationalization** — Full DE / EN / ES support.
+**Internationalization** — Full DE / EN / ES support (`en` bundled synchronously for SSR hydration; `de` and `es` lazy-loaded on demand).
 
 **Dark Mode** — Music production aesthetic powered by a complete design token system.
 
@@ -133,32 +132,41 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Vite dev server (localhost:5173) |
-| `npm run build` | TypeScript + Vite production build, then a server build that prerenders every route of `public/sitemap.xml` into its own HTML file (`scripts/prerender.mjs`). Runs `prebuild` — the `public/llms.txt` gate — and `postbuild` automatically |
-| `npm run verify:hydration` | After a build: loads every prerendered route in Chromium and fails on a hydration mismatch or any console error (`--url <origin>` checks a deployment) |
+| `npm run dev` | Vite dev server (`localhost:5173`) |
+| `npm run generate:sitemap` | Regenerates `public/sitemap.xml` (78 routes, measured 2026-11-15) from `SESSIONS_LIBRARY`, `BLOG_POSTS`, and `docSections` |
+| `npm run build` | Runs `prebuild` (`scripts/verify-llms-txt.mjs`), `tsc -b`, client Vite build, SSR Vite build, `scripts/prerender.mjs` (all 78 sitemap routes + `dist/404.html`), and `postbuild` (`scripts/inject-sw-version.mjs`) |
+| `npm run verify:hydration` | Loads every prerendered route in Chromium and fails on hydration mismatches or console/page errors (`--url <origin>` checks a live deployment) |
+| `npm run verify:ai-labels` | Verifies in Chromium that all 49 AI-composed sessions display EU AI Act Art. 50 labels in EN/DE/ES and no route renders unclassified images |
+| `npm run sync:changelog` | Regenerates `CHANGELOG.md` from `src/data/changelog-library.ts` |
 | `bash scripts/mutate-prerender.sh` | Breaks each prerender mechanism on purpose and checks that its test catches it (needs a clean tree) |
-| `npm run test` | Run all tests (Vitest) |
+| `npm run test` | Run all unit/integration tests (Vitest 5) |
 | `npm run test:watch` | Watch mode |
-| `npm run lint` | ESLint |
+| `npm run lint` | ESLint (`--max-warnings=0`) |
 | `npm run preview` | Preview production build |
-| `npx tsc -b` | Type check. **Not** `--noEmit`: the root tsconfig is solution-style (`files: []` + references), so `--noEmit` compiles zero files and exits 0 no matter what is broken |
+| `npx tsc -b` | Type check `src/`. **Not** `--noEmit`: the root tsconfig is solution-style (`files: []` + references) |
+| `npx tsc --noEmit -p tsconfig.node.json` | Type check `electron/` and Node configs |
+| `npm run electron:dev` | Launch Electron desktop app in development mode |
+| `npm run electron:build:mac` | Build, sign, and notarize macOS `.app` (`arm64` + `x64`), `.dmg`, and `-mac.zip` (`afterPack` burns Electron V1 fuses) |
+| `npm run finalize:yml` | Rewrites `release/latest-mac.yml` with GitHub-normalized dotted asset names and post-staple SHA-512 hashes |
+| `npm run verify:release` | Verifies `/releases/latest` on GitHub against `release/latest-mac.yml` and local SHA-512 / byte sizes |
 
 ## Routes
 
 | Path | Page |
 |------|------|
-| `/` | Landing page with hero, features, and examples |
+| `/` | Landing page with hero, features, and examples (`/landing` redirects `301 -> /`) |
 | `/editor` | Main IDE: code editor, node graph, visualizers |
 | `/docs` | Documentation hub |
-| `/docs/:id` | Individual doc section |
+| `/docs/:id` | Individual doc section (14 prerendered routes) |
 | `/samples` | Sample library browser |
 | `/examples` | Curated code examples per engine |
 | `/sessions` | Curated AI-composed pieces — listing |
-| `/sessions/:slug` | Individual session piece (code, movements, composer notes) |
+| `/sessions/:slug` | Individual session piece (49 prerendered routes: code, movements, composer notes) |
 | `/changelog` | Project changelog |
 | `/blog` | Developer blog — listing |
-| `/blog/:slug` | Individual blog post |
-| `/legal` | Impressum, Datenschutz |
+| `/blog/:slug` | Individual blog post (6 prerendered routes) |
+| `/legal` | Impressum & Datenschutz (`/impressum` and `/datenschutz` resolve directly to their respective tabs) |
+| `*` | Prerendered `404.html` (`NotFound` view, served with HTTP status `404`) |
 
 ---
 
@@ -167,7 +175,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 ```
 Code Editor (source of truth)
     |
-    v  500ms debounce
+    v  150ms debounce (live mode)
 Engine Orchestrator ──> Strudel / Tone.js / WebAudio / MIDI
     |
     v  shared AudioContext
@@ -195,27 +203,29 @@ Recorder    Visualizers (Canvas 2D)
 | Node Graph | React Flow |
 | Audio | Strudel, Tone.js, Web Audio API, WebMidi.js |
 | Visualizers | Canvas 2D + requestAnimationFrame |
-| i18n | i18next + react-i18next |
-| Persistence | IndexedDB (idb) session autosave + crash recovery, lz-string share links, Octokit Gists |
+| i18n | i18next + react-i18next (EN eager, DE/ES lazy-loaded) |
+| Persistence | IndexedDB (`idb`) session autosave + crash recovery, `lz-string` share links, Octokit Gists |
+| Desktop | Electron 43 (`electron-vite` + `electron-builder`, hardened runtime + `@electron/fuses`) |
 | Animation | Framer Motion 12 |
 | Icons | Lucide React |
-| Testing | Vitest 4 + Testing Library |
-| Deploy | Netlify |
+| Testing | Vitest 5 + Testing Library + Playwright |
+| CI & Deploy | GitHub Actions (`.github/workflows/ci.yml`) + Netlify Edge |
 
 ### Project Structure
 
 ```
+electron/           # Native desktop shell (main, preload, IPC handlers, safeStorage Gist store, updater, tray)
 src/
   components/
-    atoms/          # Button, Icon, Toggle, Badge, Tooltip, ...
-    molecules/      # EngineSelector, FileTabs, ShareDialog, ...
+    atoms/          # Button, Icon, Toggle, Badge, Tooltip, NotFound, ErrorBoundary, ...
+    molecules/      # EngineSelector, FileTabs, ShareDialog, ExternalCodePrompt, ...
     organisms/      # TransportBar, CodeEditor, NodeGraph, SiteNav, Visualizers, ...
   layouts/          # EditorLayout (resizable 3-zone IDE)
-  pages/            # Landing, Editor, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal
+  pages/            # Landing, Editor, EditorPage, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal
   lib/
     orchestrator/   # Multi-engine management + DAG audio graph
     engines/        # Strudel, Tone.js, WebAudio, MIDI adapters
-    audio/          # Shared AudioContext, analyser, recorder
+    audio/          # Shared AudioContext, analyser, recorder, first-party defaultSamples
     editor/         # CodeMirror theme, setup, extensions, inline-widgets, 4 themes
     input/          # Gamepad API polling
     midi/           # MIDI input, compose mode, MIDI learn, strudel-keys, device profiles
@@ -226,18 +236,24 @@ src/
     store.ts        # Zustand global state
     history.ts      # Undo/redo (100-entry cap)
   data/             # Templates, docs, examples, sessions, sample catalog, midi-devices, blog, changelog
-  i18n/             # DE, EN, ES translations
+  i18n/             # DE, EN, ES translations + lazy locale loader
   styles/tokens/    # colors.css, typography.css, spacing.css
   types/            # TypeScript type definitions
+scripts/            # Prerender, sitemap generator, hydration & AI-label gates, Electron fuse & release scripts
 ```
 
 ---
 
-## Deploy
+## Deploy & Known Gotchas
 
-Hosted on [Netlify](https://www.netlify.com/), which builds `main` on every push with `npm run build` (Node 22, see `netlify.toml`). The build runs `scripts/verify-llms-txt.mjs` first, so a `public/llms.txt` that links a page missing from `public/sitemap.xml` stops the deploy.
+Hosted on [Netlify](https://www.netlify.com/), which builds `main` on every push with `npm run build` (Node 22, see `netlify.toml`), gated by GitHub Actions CI (`.github/workflows/ci.yml`). The build runs `scripts/verify-llms-txt.mjs` first, so a `public/llms.txt` that links a page missing from `public/sitemap.xml` stops the deploy.
 
-Each route of `public/sitemap.xml` is served as prerendered HTML — `/` from `index.html`, `/docs` from `docs.html` and so on — with its own title, description and canonical link, so search engines and AI assistants that do not run JavaScript can read the page; the app then takes over in the browser. The build stops if a route renders without exactly one `<h1>`, without its metadata or with a loading fallback instead of the page. Any other path (for example `/sessions/<slug>`) gets the plain app shell, `spa.html`.
+Every route in `public/sitemap.xml` (78 routes, generated by `npm run generate:sitemap`) is prerendered into its own static HTML file — `/` as `dist/index.html`, `/docs` as `dist/docs.html`, `/sessions/<slug>` as `dist/sessions/<slug>.html`, `/blog/<slug>` as `dist/blog/<slug>.html`, `/docs/<id>` as `dist/docs/<id>.html` — with its own `<title>`, meta description, Open Graph tags, canonical URL, and single `<h1>`. Unknown paths are served `dist/404.html` with a genuine HTTP `404` status (no Soft-404 SPA fallback). Built-in Dirt-Samples audio files are proxied first-party under `/dirt-samples/*` pinned to upstream commit `c74fc80f8db8038f6a33648ffef5ac00a07ad402`.
+
+**Known gotchas:**
+- **Generated files:** `public/sitemap.xml` (`npm run generate:sitemap`) and `CHANGELOG.md` (`npm run sync:changelog`) are generated from `src/data/*` — update the data files and re-run the generator instead of hand-editing the output.
+- **Strudel string quotes:** Strudel's transpiler rewrites double-quoted strings (`"..."`) into mini-notation `m("...")`; non-pattern URLs passed inside evaluated Strudel code (such as `samples('/samples/dirt-samples.json', '/dirt-samples/')`) must use single quotes (`'...'`).
+- **Desktop builds overwrite `dist/`:** `electron-vite build` writes an unprerendered HashRouter bundle into `dist/`; always re-run `npm run build` if deploying or inspecting web output after a desktop build.
 
 ---
 
