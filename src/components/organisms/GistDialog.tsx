@@ -8,17 +8,20 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Upload, Download, Trash2 } from 'lucide-react'
+import { X, Upload, Download, Trash2, ShieldCheck } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import {
+  hasStoredToken,
   getStoredToken,
   setStoredToken,
   clearStoredToken,
+  clearEphemeralWebToken,
   saveToGist,
   loadFromGist,
   parseGistId,
 } from '../../lib/persistence/gist'
 import { safeJsonParse } from '../../lib/persistence/local'
+import { isElectron } from '../../lib/platform'
 import { Button } from '../atoms'
 import type { Project } from '../../types/project'
 
@@ -26,37 +29,49 @@ interface GistDialogProps {
   onClose: () => void
 }
 
-/** Dialog for GitHub Gist save/load with PAT management */
+/** Dialog for GitHub Gist save/load with isolated PAT management */
 export function GistDialog({ onClose }: GistDialogProps) {
   const { t } = useTranslation()
   const [token, setToken] = useState('')
   const [hasToken, setHasToken] = useState(false)
-  const [remember, setRemember] = useState(false)
   const [gistInput, setGistInput] = useState('')
   const [status, setStatus] = useState('')
   const [gistUrl, setGistUrl] = useState('')
   const [saving, setSaving] = useState(false)
+  const [loadingGist, setLoadingGist] = useState(false)
   /* Secret by default. The GitHub API fixes visibility at creation time, so this
      applies to NEW gists only — it is not an editable property afterwards. */
   const [isPublic, setIsPublic] = useState(false)
   const [savedGists, setSavedGists] = useState<{ id: string; url: string; date: string }[]>(() => {
-    const raw = localStorage.getItem('lmc-saved-gists') || '[]';
-    return safeJsonParse(raw, [])
+    try {
+      const raw = localStorage.getItem('lmc-saved-gists') || '[]'
+      return safeJsonParse(raw, [])
+    } catch {
+      return []
+    }
   })
 
   const backdropRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  /* Load stored token asynchronously on mount — getStoredToken is async (AES-GCM) */
+  /* Check token presence on mount; wipe ephemeral web token + restore focus on unmount */
   useEffect(() => {
-    getStoredToken().then((stored) => {
-      if (stored) {
-        setToken(stored)
-        setHasToken(true)
-      }
+    previousFocusRef.current = document.activeElement as HTMLElement | null
+
+    void Promise.all([hasStoredToken(), getStoredToken()]).then(([configured, webTok]) => {
+      setHasToken(configured)
+      if (webTok) setToken(webTok)
     })
+
+    return () => {
+      if (!isElectron) {
+        clearEphemeralWebToken()
+      }
+      previousFocusRef.current?.focus?.()
+    }
   }, [])
 
-  /* Focus trap — focus first focusable element on mount */
+  /* Focus first focusable element inside the modal on mount */
   useEffect(() => {
     const container = backdropRef.current
     if (!container) return
@@ -66,7 +81,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
     if (focusable.length > 0) focusable[0].focus()
   }, [])
 
-  /* Focus trap — keep Tab cycling within the dialog */
+  /* Keep Tab cycling inside the dialog and allow Escape to close */
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') { onClose(); return }
     if (e.key !== 'Tab') return
@@ -90,9 +105,18 @@ export function GistDialog({ onClose }: GistDialogProps) {
   /* --- Token management handlers --- */
 
   const handleSaveToken = async () => {
-    await setStoredToken(token, remember)
-    setHasToken(!!token)
-    setStatus(t('gist.tokenSaved'))
+    try {
+      await setStoredToken(token)
+      const configured = await hasStoredToken()
+      setHasToken(configured)
+      if (isElectron) {
+        /* Never keep plaintext PAT in renderer state once stored in OS Keychain */
+        setToken('')
+      }
+      setStatus(configured ? t('gist.tokenSaved') : t('gist.tokenCleared'))
+    } catch (err) {
+      setStatus(t('gist.errorPrefix', { message: err instanceof Error ? err.message : 'Unknown' }))
+    }
   }
 
   const handleClearToken = () => {
@@ -108,6 +132,12 @@ export function GistDialog({ onClose }: GistDialogProps) {
     setSaving(true)
     setStatus(t('gist.saving'))
     try {
+      /* If user typed a token without clicking Save Token first, apply it now */
+      if (token.trim() && !hasToken) {
+        await setStoredToken(token)
+        setHasToken(true)
+        if (isElectron) setToken('')
+      }
       const store = useAppStore.getState()
       const now = new Date().toISOString()
       const project: Project = {
@@ -123,45 +153,52 @@ export function GistDialog({ onClose }: GistDialogProps) {
         layout: store.layout,
       }
       const result = await saveToGist(project, undefined, isPublic)
-      const url = `https://gist.github.com/${result.id}`
+      const url = result.url || `https://gist.github.com/${result.id}`
       setGistUrl(url)
-      setStatus('Saved!')
-      /* Persist to saved gists history */
+      setStatus(t('gist.savedStatus'))
       const entry = { id: result.id, url, date: new Date().toISOString() }
       const updated = [entry, ...savedGists.filter(g => g.id !== result.id)].slice(0, 20)
       setSavedGists(updated)
-      localStorage.setItem('lmc-saved-gists', JSON.stringify(updated))
+      try {
+        localStorage.setItem('lmc-saved-gists', JSON.stringify(updated))
+      } catch { /* ignore storage quota errors */ }
     } catch (err) {
-      setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)
+      setStatus(t('gist.errorPrefix', { message: err instanceof Error ? err.message : 'Unknown' }))
     }
     setSaving(false)
   }
 
-  /* --- Gist load handler — applies loaded project to store --- */
+  /* --- Gist load handler — public & secret Gists load without requiring a PAT --- */
 
   const handleLoad = async () => {
     const gistId = parseGistId(gistInput)
     if (!gistId) {
-      setStatus('Invalid Gist ID or URL')
+      setStatus(t('gist.invalidGist'))
       return
     }
+    setLoadingGist(true)
     setStatus(t('gist.loading'))
     try {
       const project = await loadFromGist(gistId)
-      /* Use loadProject so BPM is clamped through setBpm — fixes D-4 */
-      useAppStore.getState().loadProject({
+      const store = useAppStore.getState()
+      store.loadProject({
         bpm: project.bpm,
         defaultEngine: project.defaultEngine,
         files: project.files,
         layout: project.layout,
       })
-      setStatus('Loaded successfully!')
+      /* External Gist code is untrusted — activate security gate and close modal */
+      store.setUntrustedCodePending(true)
+      setStatus(t('gist.loadedStatus'))
+      setLoadingGist(false)
+      onClose()
+      return
     } catch (err) {
-      setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`)
+      setStatus(t('gist.errorPrefix', { message: err instanceof Error ? err.message : 'Unknown' }))
     }
+    setLoadingGist(false)
   }
 
-  /* Shared input styles — reusable across both inputs */
   const inputStyle: React.CSSProperties = {
     backgroundColor: 'var(--color-bg)',
     color: 'var(--color-text)',
@@ -170,11 +207,14 @@ export function GistDialog({ onClose }: GistDialogProps) {
     padding: 'var(--space-3)',
   }
 
+  const canSave = (hasToken || Boolean(token.trim())) && !saving
+
   return (
     <div
       ref={backdropRef}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="gist-dialog-title"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
       onKeyDown={handleKeyDown}
@@ -190,6 +230,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
           <h2
+            id="gist-dialog-title"
             style={{
               fontSize: 'var(--font-size-lg)',
               fontWeight: 'var(--font-weight-semibold)',
@@ -198,69 +239,64 @@ export function GistDialog({ onClose }: GistDialogProps) {
           >
             {t('toolbar.gist')}
           </h2>
-          <Button variant="ghost" onClick={onClose} aria-label="Close">
+          <Button variant="ghost" onClick={onClose} aria-label={t('common.close')}>
             <X size={18} />
           </Button>
         </div>
 
         {/* --- Token management section --- */}
         <section style={{ marginBottom: 'var(--space-4)' }}>
-          <label
-            className="block"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-secondary)',
-              marginBottom: 'var(--space-2)',
-            }}
-          >
-            GitHub Personal Access Token
-          </label>
+          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
+            <label
+              htmlFor="gist-pat-input"
+              style={{
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              {t('gist.patLabel')}
+            </label>
+            {hasToken && (
+              <span
+                className="inline-flex items-center gap-1"
+                style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-primary)',
+                }}
+              >
+                <ShieldCheck size={14} aria-hidden="true" />
+                {t('gist.tokenConfigured')}
+              </span>
+            )}
+          </div>
           <input
+            id="gist-pat-input"
             type="password"
             value={token}
             onChange={(e) => setToken(e.target.value)}
             placeholder="ghp_..."
-            aria-label="GitHub Personal Access Token"
+            aria-label={t('gist.patLabel')}
             autoComplete="off"
             className="w-full rounded"
-            style={{ ...inputStyle, marginBottom: 'var(--space-3)' }}
+            style={{ ...inputStyle, marginBottom: 'var(--space-2)' }}
           />
-          <div className="flex items-center" style={{ marginBottom: 'var(--space-3)', gap: 'var(--space-2)' }}>
-            <label
-              className="flex items-center cursor-pointer"
-              style={{
-                fontSize: 'var(--font-size-xs)',
-                color: 'var(--color-text-muted)',
-                gap: 'var(--space-2)',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              Remember token (localStorage)
-            </label>
-            {/* Security warning — shown when user enables remember-me */}
-            {remember && (
-              <span
-                aria-label={t('gist.rememberWarning')}
-                style={{
-                  fontSize: 'var(--font-size-xs)',
-                  color: 'var(--color-warning)',
-                }}
-              >
-                {t('gist.rememberWarning')}
-              </span>
-            )}
-          </div>
+          <p
+            style={{
+              fontSize: 'var(--font-size-xs)',
+              color: 'var(--color-text-muted)',
+              lineHeight: 'var(--line-height-base)',
+              marginBottom: 'var(--space-3)',
+            }}
+          >
+            {isElectron ? t('gist.desktopKeychainNotice') : t('gist.webMemoryNotice')}
+          </p>
           <div className="flex" style={{ gap: 'var(--space-3)' }}>
             <Button variant="secondary" onClick={handleSaveToken}>
               {t('gist.saveToken')}
             </Button>
             {hasToken && (
               <Button variant="ghost" onClick={handleClearToken} className="flex items-center gap-1">
-                <Trash2 size={14} /> {t('gist.clear')}
+                <Trash2 size={14} aria-hidden="true" /> {t('gist.clear')}
               </Button>
             )}
           </div>
@@ -275,6 +311,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
               fontSize: 'var(--font-size-sm)',
               color: 'var(--color-text-secondary)',
               cursor: 'pointer',
+              minHeight: 'var(--size-touch, 44px)',
             }}
           >
             <input
@@ -288,10 +325,10 @@ export function GistDialog({ onClose }: GistDialogProps) {
           <Button
             variant="primary"
             onClick={handleSave}
-            disabled={!hasToken || saving}
+            disabled={!canSave}
             className="w-full flex items-center justify-center gap-2"
           >
-            <Upload size={16} />
+            <Upload size={16} aria-hidden="true" />
             <span>{t('gist.saveToGist')}</span>
           </Button>
         </section>
@@ -299,6 +336,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         {/* --- Load from Gist section --- */}
         <section style={{ marginBottom: 'var(--space-4)' }}>
           <label
+            htmlFor="gist-load-input"
             className="block"
             style={{
               fontSize: 'var(--font-size-sm)',
@@ -306,13 +344,14 @@ export function GistDialog({ onClose }: GistDialogProps) {
               marginBottom: 'var(--space-2)',
             }}
           >
-            Load from Gist (URL or ID)
+            {t('gist.loadLabel')}
           </label>
           <input
+            id="gist-load-input"
             value={gistInput}
             onChange={(e) => setGistInput(e.target.value)}
             placeholder="https://gist.github.com/user/abc123"
-            aria-label="Gist URL or ID"
+            aria-label={t('gist.gistInputAria')}
             className="w-full rounded"
             style={{
               ...inputStyle,
@@ -323,17 +362,17 @@ export function GistDialog({ onClose }: GistDialogProps) {
           <Button
             variant="secondary"
             onClick={handleLoad}
-            disabled={!hasToken || !gistInput}
+            disabled={!gistInput.trim() || loadingGist}
             className="w-full flex items-center justify-center gap-2"
           >
-            <Download size={16} />
+            <Download size={16} aria-hidden="true" />
             <span>{t('gist.loadFromGist')}</span>
           </Button>
         </section>
 
         {/* --- Status + URL --- */}
         {status && (
-          <div className="text-center" style={{ marginBottom: 'var(--space-3)' }}>
+          <div role="status" aria-live="polite" className="text-center" style={{ marginBottom: 'var(--space-3)' }}>
             <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>{status}</p>
             {gistUrl && (
               <a
@@ -360,7 +399,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         {savedGists.length > 0 && (
           <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)' }}>
             <div style={{ fontSize: 'var(--font-size-2xs)', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 'var(--letter-spacing-legend)', marginBottom: 'var(--space-2)' }}>
-              Saved Gists
+              {t('gist.savedGistsTitle')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', maxHeight: '120px', overflowY: 'auto' }}>
               {savedGists.map((g) => (
@@ -378,11 +417,11 @@ export function GistDialog({ onClose }: GistDialogProps) {
                   </span>
                   <button
                     type="button"
-                    onClick={() => { setGistInput(g.url); }}
+                    onClick={() => { setGistInput(g.url) }}
                     title={t('gist.loadThisGist')}
-                    style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', marginLeft: 'var(--space-2)' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', marginLeft: 'var(--space-2)', padding: 'var(--space-1) var(--space-2)' }}
                   >
-                    Load
+                    {t('gist.selectGist')}
                   </button>
                 </div>
               ))}

@@ -601,6 +601,9 @@
   "a11y": {
     "skipToContent": "Skip to content"
   },
+  "common": {
+    "close": "Close"
+  },
   "footer": {
     "license": "Live Music Coder — Open Source (AGPL-3.0)",
     "aiDisclosure": "The sessions on this website are AI-composed."
@@ -619,8 +622,11 @@
     "placeholderText": "Write Strudel, Tone.js or Web Audio code and hear the result while you type. A node graph shows how the sound is routed, and real-time visualizers show the waveform, the spectrum and the notes. Everything runs in the browser, with nothing to install.",
     "evaluating": "Evaluating...",
     "liveMode": "Live mode",
-    "sharedCodeWarning": "This code was loaded from a shared URL. Review it before running.",
+    "sharedCodeWarningTitle": "Review external code",
+    "sharedCodeWarning": "This code was loaded from an external source (shared link, Gist, or project file). Review it in the editor before running.",
     "dismiss": "Dismiss",
+    "reviewBeforeRun": "Review in editor",
+    "discardExternalCode": "Discard & reset",
     "synthMode": "Synth Mode",
     "oscillator": "Oscillator",
     "virtualKeyboard": "Virtual Keyboard",
@@ -648,7 +654,19 @@
     "clear": "Clear",
     "rememberWarning": "Token stays in browser storage. Readable by scripts on this device — use a gist-scoped token only.",
     "loadThisGist": "Load this gist",
-    "makePublic": "Make public"
+    "makePublic": "Make public",
+    "patLabel": "GitHub Personal Access Token",
+    "webMemoryNotice": "Web security: token is held only in memory while this dialog is open and never written to browser storage. Use a fine-grained token with Gist scope only.",
+    "desktopKeychainNotice": "Desktop security: token is encrypted in your OS Keychain via the main process and never exposed to evaluated patterns.",
+    "tokenConfigured": "Token configured",
+    "loadLabel": "Load from Gist (URL or ID)",
+    "gistInputAria": "Gist URL or ID",
+    "savedStatus": "Saved!",
+    "loadedStatus": "Loaded! Review external code before running.",
+    "invalidGist": "Invalid Gist ID or URL",
+    "errorPrefix": "Error: {{message}}",
+    "savedGistsTitle": "Saved Gists",
+    "selectGist": "Select"
   },
   "pianoroll": {
     "zoomInTime": "Zoom in (time)",

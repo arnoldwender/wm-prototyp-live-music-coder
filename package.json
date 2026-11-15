@@ -32,6 +32,7 @@
   "build": {
     "appId": "com.wendermedia.live-music-coder",
     "productName": "Live Music Coder",
+    "afterPack": "scripts/after-pack-fuses.cjs",
     "directories": {
       "output": "release"
     },

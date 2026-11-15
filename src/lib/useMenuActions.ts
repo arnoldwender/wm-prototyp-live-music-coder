@@ -90,6 +90,7 @@ export function useMenuActions(): void {
               files: project.files,
               layout: project.layout,
             });
+            store.setUntrustedCodePending(true);
           } catch {
             api.notify?.('Open failed', 'That file is not a readable Live Music Coder project.');
           }
@@ -131,8 +132,12 @@ export function useMenuActions(): void {
           break;
 
         case 'open-settings':
+          navigate('/editor');
+          store.setSettingsModalOpen(true);
+          break;
+
         case 'open-shortcuts':
-          navigate('/docs');
+          navigate('/docs/shortcuts');
           break;
 
         case 'open-docs':
@@ -168,12 +173,14 @@ export function useMenuActions(): void {
       try {
         const project = deserializeProject(json);
         navigate('/editor');
-        useAppStore.getState().loadProject({
+        const currentStore = useAppStore.getState();
+        currentStore.loadProject({
           bpm: project.bpm,
           defaultEngine: project.defaultEngine,
           files: project.files,
           layout: project.layout,
         });
+        currentStore.setUntrustedCodePending(true);
       } catch {
         api.notify?.('Open failed', 'That file is not a readable Live Music Coder project.');
       }

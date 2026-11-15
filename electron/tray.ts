@@ -6,13 +6,20 @@ import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron'
 // --- Module-level tray reference for cleanup ---
 let tray: Tray | null = null
 
+// Monochrome 32x32 (@2x for 16x16pt) 5-bar waveform icon for menu bar / system tray
+const TRAY_WAVEFORM_PNG_DATA_URL =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAQklEQVR42mNgGAVDHLxGwqMOGP4OwGbZqAPo6qiR5QBKLBuUDiDZUaMOGHXAsHPAaEk4shwwfNsDo23CUQeMApoAABTmxknUfK/nAAAAAElFTkSuQmCC'
+
 /**
  * Create the system tray icon with context menu.
  * Click toggles window visibility. Context menu provides quick actions.
  */
 export function createTray(mainWindow: BrowserWindow): Tray {
-  // Placeholder icon — will be replaced with real icon in Task 9
-  const icon = nativeImage.createEmpty()
+  const rawIcon = nativeImage.createFromDataURL(TRAY_WAVEFORM_PNG_DATA_URL)
+  const icon = rawIcon.resize({ width: 16, height: 16 })
+  if (process.platform === 'darwin') {
+    icon.setTemplateImage(true)
+  }
 
   tray = new Tray(icon)
   tray.setToolTip('Live Music Coder')

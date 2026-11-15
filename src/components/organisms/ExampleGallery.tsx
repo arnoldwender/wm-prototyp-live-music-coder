@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom'
 import { Play, Square } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { STARTER_TEMPLATES, getCategories, getTemplatesByCategory } from '../../data/templates'
-import { encodeToUrl } from '../../lib/persistence/url'
 import { useIsClient } from '../../lib/useIsClient'
 import { Icon } from '../atoms'
 
@@ -35,9 +34,16 @@ export function ExampleGallery() {
 
   const handleTryExample = (template: (typeof STARTER_TEMPLATES)[0]) => {
     /* Stop any playing pattern first */
-    stopPlaying()
-    const hash = encodeToUrl({ code: template.code, bpm: 120, engine: template.engine })
-    navigate(`/editor#code=${hash}&autoplay=1`)
+    void stopPlaying()
+    navigate('/editor', {
+      state: {
+        share: {
+          code: template.code,
+          bpm: 120,
+          engine: template.engine,
+        },
+      },
+    })
   }
 
   const stopPlaying = async () => {
@@ -87,7 +93,8 @@ export function ExampleGallery() {
           await (await import('../../lib/audio/context')).adoptSharedContextForStrudel()
           replRef.current = await initStrudel()
           try {
-            await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false)
+            const { loadDefaultDirtSamples } = await import('../../lib/audio/defaultSamples')
+            await loadDefaultDirtSamples(replRef.current)
           } catch { /* samples may fail */ }
         }
         try {

@@ -70,6 +70,9 @@ export function StrudelEditor() {
   const files = useAppStore((s) => s.files);
   const updateFileCode = useAppStore((s) => s.updateFileCode);
   const activeFile = files.find((f) => f.active);
+  const activeFileId = activeFile?.id;
+  const activeFileCode = activeFile?.code;
+  const activeFileEngine = activeFile?.engine;
 
   /* Synth panel — oscillator type lives in the global store so it survives
    * StrudelEditor unmount/remount and can be controlled from elsewhere. */
@@ -177,6 +180,7 @@ export function StrudelEditor() {
      keybinding, so the keymap reaches it through a ref rather than closing over
      a stale value. Assigned right after the callback is created. */
   const handleStopRef = useRef<(() => void) | null>(null);
+  const handleEvaluateRef = useRef<(() => Promise<void>) | null>(null);
   const [midiLearning, setMidiLearning] = useState(false);
   const midiMenuRef = useRef<HTMLDivElement>(null);
 
@@ -232,13 +236,13 @@ export function StrudelEditor() {
   /* MIDI quick-action: load code into editor and evaluate */
   const loadMidiCode = useCallback((code: string) => {
     const view = viewRef.current;
-    if (!view || !activeFile) return;
+    if (!view || activeFileId === undefined) return;
     view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: code } });
-    updateFileCode(activeFile.id, code);
+    updateFileCode(activeFileId, code);
     setMidiMenuOpen(false);
     /* Auto-evaluate after loading — viewRef guard prevents fire on unmounted component */
-    setTimeout(() => { if (viewRef.current) handleEvaluate(); }, 100);
-  }, [activeFile, updateFileCode]);
+    setTimeout(() => { if (viewRef.current) void handleEvaluateRef.current?.(); }, 100);
+  }, [activeFileId, updateFileCode]);
 
   /* Initialize Strudel REPL + load @strudel/codemirror extensions */
   useEffect(() => {
@@ -274,26 +278,18 @@ export function StrudelEditor() {
         /* Expose REPL globally for pianoroll and other visualizers */
         window.__strudelRepl = repl;
 
-        /* Load Dirt-Samples + register synth sounds */
+        /* Load Dirt-Samples via first-party manifest + proxy (zero direct GitHub IP leak) */
         try {
-          /* Init audio on first click if available */
           try {
             const webaudio = await import('@strudel/webaudio');
             if (typeof webaudio.initAudioOnFirstClick === 'function') webaudio.initAudioOnFirstClick();
           } catch { /* not available */ }
 
-          /* Load samples via REPL (preferred — makes them available to patterns) */
-          await repl.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
-          console.log('[StrudelEditor] Samples loaded via REPL');
-        } catch (e1) {
-          console.warn('[StrudelEditor] REPL samples failed:', e1);
-          try {
-            const { samples } = await import('@strudel/webaudio');
-            await samples('github:tidalcycles/Dirt-Samples/master');
-            console.log('[StrudelEditor] Samples loaded via direct import');
-          } catch (e2) {
-            console.error('[StrudelEditor] Sample loading failed:', e2);
-          }
+          const { loadDefaultDirtSamples } = await import('../../lib/audio/defaultSamples');
+          await loadDefaultDirtSamples(repl);
+          console.log('[StrudelEditor] Samples loaded via first-party manifest');
+        } catch (sampleErr) {
+          console.error('[StrudelEditor] Sample loading failed:', sampleErr);
         }
 
         /* Load @strudel/midi via evalScope for .midi() output + CC functions,
@@ -414,7 +410,9 @@ export function StrudelEditor() {
    * the editor is instantiated. The `mounted` guard prevents stale
    * creation when the effect is cleaned up during the await. */
   useEffect(() => {
-    if (!editorRef.current || !activeFile) return;
+    if (!editorRef.current || activeFileId === undefined || activeFileEngine === undefined) return;
+    const initialDoc =
+      useAppStore.getState().files.find((f) => f.id === activeFileId)?.code ?? '';
     viewRef.current?.destroy();
     viewRef.current = null;
     let mounted = true;
@@ -423,22 +421,17 @@ export function StrudelEditor() {
       const updateListener = EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           const code = update.state.doc.toString();
-          updateFileCode(activeFile.id, code);
-          /* Live mode: debounced auto-evaluate.
-           * Fires when:
-           *   a) Live mode + transport is playing (normal live coding)
-           *   b) Compose mode + live mode (writing MIDI notes → immediate playback)
-           *      The debounce is slightly longer in compose mode so a chord's
-           *      notes all land before the eval fires (chord window = 20ms,
-           *      eval delay = 300ms → no partial-chord evaluations). */
+          useAppStore.getState().updateFileCode(activeFileId, code);
+          /* Live mode: debounced auto-evaluate. */
           const shouldEval =
+            !useAppStore.getState().untrustedCodePending &&
             liveModeRef.current && replRef.current &&
             (isPlayingRef.current || composeModeRef.current);
           if (shouldEval) {
             if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
             const delay = composeModeRef.current ? 300 : 150;
             evalTimerRef.current = setTimeout(async () => {
-              if (!replRef.current) return; // component may have unmounted during debounce
+              if (!replRef.current || useAppStore.getState().untrustedCodePending) return;
               try {
                 await replRef.current.evaluate(code, true);
                 resetStrudelTap();
@@ -458,7 +451,7 @@ export function StrudelEditor() {
         {
           key: 'Ctrl-Enter',
           mac: 'Cmd-Enter',
-          run: () => { handleEvaluate(); return true; },
+          run: () => { void handleEvaluateRef.current?.(); return true; },
         },
         {
           /* Documented in the in-app shortcuts list as "Ctrl+. — stop all audio"
@@ -497,7 +490,7 @@ export function StrudelEditor() {
             const next = toggleLayerMute(code, i);
             if (next === code) return true; /* no such layer — swallow the key */
             view.dispatch({ changes: { from: 0, to: code.length, insert: next } });
-            handleEvaluate();
+            void handleEvaluateRef.current?.();
             return true;
           },
         })),
@@ -508,7 +501,7 @@ export function StrudelEditor() {
             const next = toggleLayerSolo(code, i);
             if (next === code) return true;
             view.dispatch({ changes: { from: 0, to: code.length, insert: next } });
-            handleEvaluate();
+            void handleEvaluateRef.current?.();
             return true;
           },
         })),
@@ -517,7 +510,7 @@ export function StrudelEditor() {
       /* Build extension list — theme ID from Zustand store drives CM6 theme */
       const extensions = [
         ...getBaseExtensions(editorTheme),
-        ...getEngineExtensions(activeFile.engine),
+        ...getEngineExtensions(activeFileEngine ?? 'strudel'),
         highlightField,
         updateListener,
         evalKeymapExt,
@@ -566,7 +559,7 @@ export function StrudelEditor() {
       if (!mounted || !editorRef.current) return;
 
       const state = EditorState.create({
-        doc: activeFile.code,
+        doc: initialDoc,
         extensions,
       });
 
@@ -579,19 +572,19 @@ export function StrudelEditor() {
       viewRef.current = null;
       if (evalTimerRef.current) clearTimeout(evalTimerRef.current);
     };
-  }, [activeFile?.id, activeFile?.engine, ready, editorTheme, vimMode]);
+  }, [activeFileId, activeFileEngine, ready, editorTheme, vimMode]);
 
   /* Sync external store code changes into CM6 */
   useEffect(() => {
     const view = viewRef.current;
-    if (!view || !activeFile) return;
+    if (!view || activeFileCode === undefined) return;
     const currentDoc = view.state.doc.toString();
-    if (currentDoc !== activeFile.code) {
+    if (currentDoc !== activeFileCode) {
       view.dispatch({
-        changes: { from: 0, to: currentDoc.length, insert: activeFile.code },
+        changes: { from: 0, to: currentDoc.length, insert: activeFileCode },
       });
     }
-  }, [activeFile?.code]);
+  }, [activeFileCode]);
 
   /* Highlight loop — queries scheduler for active haps and marks their code positions */
   useEffect(() => {
@@ -648,6 +641,7 @@ export function StrudelEditor() {
   }, [isPlaying]);
 
   const handleEvaluate = useCallback(async () => {
+    if (useAppStore.getState().untrustedCodePending) return;
     if (!replRef.current) { setEvalError('Not ready'); return; }
     const view = viewRef.current;
     if (!view) return;
@@ -715,6 +709,10 @@ export function StrudelEditor() {
     }
   }, [isPlaying, togglePlay]);
 
+  useEffect(() => {
+    handleEvaluateRef.current = handleEvaluate;
+  }, [handleEvaluate]);
+
   const handleStop = useCallback(() => {
     try {
       replRef.current?.stop();
@@ -723,7 +721,10 @@ export function StrudelEditor() {
       togglePlay();
     }
   }, [isPlaying, togglePlay]);
-  handleStopRef.current = handleStop;
+
+  useEffect(() => {
+    handleStopRef.current = handleStop;
+  }, [handleStop]);
 
   /* Double-click to clear: first click arms, second click within 2s clears */
   const clearArmedRef = useRef(false);

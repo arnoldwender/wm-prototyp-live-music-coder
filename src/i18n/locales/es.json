@@ -601,6 +601,9 @@
   "a11y": {
     "skipToContent": "Saltar al contenido"
   },
+  "common": {
+    "close": "Cerrar"
+  },
   "footer": {
     "license": "Live Music Coder — Código abierto (AGPL-3.0)",
     "aiDisclosure": "Las sesiones de este sitio web están compuestas por IA."
@@ -619,8 +622,11 @@
     "placeholderText": "Escribe código de Strudel, Tone.js o Web Audio y escucha el resultado mientras tecleas. Un grafo de nodos muestra cómo se enruta el sonido y los visualizadores en tiempo real muestran la forma de onda, el espectro y las notas. Todo funciona en el navegador, sin instalar nada.",
     "evaluating": "Evaluando...",
     "liveMode": "Modo en vivo",
-    "sharedCodeWarning": "Este código fue cargado desde una URL compartida. Revísalo antes de ejecutarlo.",
+    "sharedCodeWarningTitle": "Revisar código externo",
+    "sharedCodeWarning": "Este código se cargó desde una fuente externa (enlace compartido, Gist o archivo de proyecto). Revísalo antes de ejecutarlo.",
     "dismiss": "Cerrar",
+    "reviewBeforeRun": "Revisar en el editor",
+    "discardExternalCode": "Descartar y restablecer",
     "synthMode": "Modo Synth",
     "oscillator": "Oscilador",
     "virtualKeyboard": "Teclado virtual",
@@ -648,7 +654,19 @@
     "clear": "Eliminar",
     "rememberWarning": "El token permanece en el navegador. Legible por scripts en este dispositivo — usa solo un token con alcance gist.",
     "loadThisGist": "Cargar este gist",
-    "makePublic": "Hacer público"
+    "makePublic": "Hacer público",
+    "patLabel": "Token de acceso personal de GitHub",
+    "webMemoryNotice": "Seguridad web: el token se mantiene solo en memoria mientras este diálogo está abierto y nunca se guarda en el navegador. Usa un token solo con permisos de Gist.",
+    "desktopKeychainNotice": "Seguridad de escritorio: el token se cifra en el llavero del sistema desde el proceso principal y nunca se expone al código evaluado.",
+    "tokenConfigured": "Token configurado",
+    "loadLabel": "Cargar desde Gist (URL o ID)",
+    "gistInputAria": "URL o ID del Gist",
+    "savedStatus": "¡Guardado!",
+    "loadedStatus": "¡Cargado! Revisa el código externo antes de ejecutarlo.",
+    "invalidGist": "ID o URL de Gist no válido",
+    "errorPrefix": "Error: {{message}}",
+    "savedGistsTitle": "Gists guardados",
+    "selectGist": "Seleccionar"
   },
   "pianoroll": {
     "zoomInTime": "Acercar (tiempo)",

@@ -2,212 +2,184 @@
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
    GitHub Gist integration — save/load projects via PAT.
-   Token stored in sessionStorage by default; localStorage
-   opt-in uses AES-GCM encryption (B-1 security fix).
-   SECURITY: PAT encrypted with AES-GCM — key in sessionStorage,
-   ciphertext in localStorage.
+
+   SECURITY ARCHITECTURE:
+   · Web build: Evaluated musical patterns execute via `new Function()` in the
+     same browser origin, where `localStorage` and `sessionStorage` are directly
+     readable. Therefore the web build NEVER writes GitHub PATs to Web Storage
+     and actively scrubs legacy storage keys on startup. Instead, the token lives
+     only in a module-private lexical variable while the Gist dialog is open and
+     is wiped immediately on `clearStoredToken()` / dialog close / untrusted load.
+   · Desktop (Electron) build: PAT is encrypted via OS Keychain (`safeStorage`)
+     inside the main process, never crosses `contextBridge` back to the renderer,
+     and requires explicit native dialog confirmation before publishing.
    ────────────────────────────────────────────────────────── */
 
-import { Octokit } from '@octokit/rest';
-import type { Project } from '../../types/project';
-import { serializeProject, deserializeProject } from './local';
+import { Octokit } from '@octokit/rest'
+import type { Project } from '../../types/project'
+import { serializeProject, deserializeProject } from './local'
 
-/* --- Storage key constants --- */
+/* Legacy storage keys scrubbed on load to protect returning users */
+const LEGACY_STORAGE_KEYS = [
+  'lmc-gist-token',
+  'lmc-gist-key',
+  'lmc-gist-token-enc',
+  'lmc-gist-token-persist',
+] as const
 
-const TOKEN_KEY_SESSION = 'lmc-gist-token';           // sessionStorage: plaintext (non-remember path)
-const PAT_KEY_KEY       = 'lmc-gist-key';             // sessionStorage: base64-encoded AES-GCM key
-const PAT_CT_KEY        = 'lmc-gist-token-enc';       // localStorage: base64-encoded iv+ciphertext
-const PAT_PLAIN_KEY     = 'lmc-gist-token-persist';   // legacy key — migration path (read-only)
+/** Ephemeral in-memory token for the active Gist dialog session on the web. */
+let ephemeralWebToken: string | null = null
 
-/* ─────────────────────────────────────────────────────────────
-   AES-GCM helpers — SubtleCrypto encryption for remember-me PAT
-   ───────────────────────────────────────────────────────────── */
-
-/** Load existing session key from sessionStorage or generate and persist a new one */
-async function deriveOrLoadKey(): Promise<CryptoKey> {
-  const stored = sessionStorage.getItem(PAT_KEY_KEY);
-  if (stored) {
-    const raw = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
-    return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
-  }
-  /* Generate a fresh 256-bit key for this browser session */
-  const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
-  const exported = await crypto.subtle.exportKey('raw', key);
-  sessionStorage.setItem(PAT_KEY_KEY, btoa(String.fromCharCode(...new Uint8Array(exported))));
-  return key;
-}
-
-/** Encrypt a PAT string; returns base64-encoded iv+ciphertext */
-async function encryptPAT(token: string): Promise<string> {
-  const key = await deriveOrLoadKey();
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const enc = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(token));
-  /* Prepend iv (12 bytes) to ciphertext so we can recover it on decrypt */
-  const combined = new Uint8Array(iv.byteLength + enc.byteLength);
-  combined.set(iv);
-  combined.set(new Uint8Array(enc), iv.byteLength);
-  return btoa(String.fromCharCode(...combined));
-}
-
-/** Decrypt a base64-encoded iv+ciphertext; returns null when key is gone (new session) */
-async function decryptPAT(encoded: string): Promise<string | null> {
+/** Scrub any historical PAT artifacts from Web Storage. */
+export function purgeLegacyGistStorage(): void {
   try {
-    const key = await deriveOrLoadKey();
-    const combined = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-    const iv = combined.slice(0, 12);
-    const ct = combined.slice(12);
-    const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
-    return new TextDecoder().decode(dec);
+    for (const key of LEGACY_STORAGE_KEYS) {
+      sessionStorage.removeItem(key)
+      localStorage.removeItem(key)
+    }
   } catch {
-    /* Decryption fails when the sessionStorage key has been cleared (new tab/session) */
-    return null;
+    /* Storage unavailable (SSR or restricted context) */
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Public API
-   ───────────────────────────────────────────────────────────── */
+purgeLegacyGistStorage()
+
+function getElectronApi() {
+  return typeof window !== 'undefined' ? window.electronAPI : undefined
+}
+
+/** Whether a GitHub PAT is currently configured (ephemeral web or Electron Keychain). */
+export async function hasStoredToken(): Promise<boolean> {
+  purgeLegacyGistStorage()
+  const api = getElectronApi()
+  if (api?.hasGistToken) {
+    return api.hasGistToken()
+  }
+  return Boolean(ephemeralWebToken)
+}
 
 /**
- * Get stored GitHub PAT.
- * Priority: sessionStorage (plain) → localStorage (AES-GCM encrypted) → legacy plain → null.
- * Clears ciphertext if the session key is gone (new session/tab).
+ * Retrieve the active in-memory GitHub PAT on the web (null in Electron where
+ * the secret remains isolated inside the main process).
  */
 export async function getStoredToken(): Promise<string | null> {
-  /* Fast path — non-remember session token (plaintext, tab-scoped) */
-  const session = sessionStorage.getItem(TOKEN_KEY_SESSION);
-  if (session) return session;
-
-  /* Encrypted remember-me path */
-  const ciphertext = localStorage.getItem(PAT_CT_KEY);
-  if (ciphertext) {
-    /* If sessionStorage key exists we can decrypt; otherwise key is gone */
-    if (sessionStorage.getItem(PAT_KEY_KEY)) {
-      const plain = await decryptPAT(ciphertext);
-      if (plain !== null) return plain;
-    }
-    /* Key gone — new session/tab; clear stale ciphertext so we don't loop */
-    localStorage.removeItem(PAT_CT_KEY);
-    return null;
-  }
-
-  /* Legacy migration path — plaintext token written before B-1 */
-  const legacy = localStorage.getItem(PAT_PLAIN_KEY);
-  if (legacy) return legacy;
-
-  return null;
+  purgeLegacyGistStorage()
+  return ephemeralWebToken
 }
 
 /**
- * Store GitHub PAT.
- * remember=true → AES-GCM encrypted in localStorage (key pinned to this session).
- * remember=false → plaintext in sessionStorage only (cleared on tab close).
+ * Configure the GitHub PAT.
+ * - Electron: encrypted via OS `safeStorage` in the main process.
+ * - Web: held strictly in module-private ephemeral memory (never Web Storage).
  */
-export async function setStoredToken(token: string, remember: boolean): Promise<void> {
-  /* Clear all previous storage locations before writing */
-  clearStoredToken();
-  if (remember) {
-    const ciphertext = await encryptPAT(token);
-    localStorage.setItem(PAT_CT_KEY, ciphertext);
-    /* Remove legacy plaintext entry if it exists */
-    localStorage.removeItem(PAT_PLAIN_KEY);
-  } else {
-    sessionStorage.setItem(TOKEN_KEY_SESSION, token);
+export async function setStoredToken(token: string, _remember = false): Promise<void> {
+  purgeLegacyGistStorage()
+  const trimmed = token.trim()
+  const api = getElectronApi()
+  if (api?.setGistToken) {
+    ephemeralWebToken = null
+    if (!trimmed) {
+      await api.clearGistToken()
+      return
+    }
+    const ok = await api.setGistToken(trimmed)
+    if (!ok) throw new Error('Secure OS credential storage is unavailable')
+    return
   }
+  ephemeralWebToken = trimmed || null
 }
 
-/** Clear token from all storage locations */
+/** Wipe only ephemeral web memory + legacy Web Storage (leaves Electron Keychain intact). */
+export function clearEphemeralWebToken(): void {
+  ephemeralWebToken = null
+  purgeLegacyGistStorage()
+}
+
+/** Wipe any ephemeral token in memory, Electron Keychain, and legacy Web Storage. */
 export function clearStoredToken(): void {
-  sessionStorage.removeItem(TOKEN_KEY_SESSION);
-  sessionStorage.removeItem(PAT_KEY_KEY);
-  localStorage.removeItem(PAT_CT_KEY);
-  localStorage.removeItem(PAT_PLAIN_KEY);
-}
-
-/** Create an authenticated Octokit instance from stored token */
-async function getOctokit(): Promise<Octokit | null> {
-  const token = await getStoredToken();
-  if (!token) return null;
-  return new Octokit({ auth: token });
+  clearEphemeralWebToken()
+  const api = getElectronApi()
+  if (api?.clearGistToken) {
+    void api.clearGistToken()
+  }
 }
 
 /**
  * Save project as a GitHub Gist (create or update).
- *
- * `isPublic` defaults to false. Secret gists are not listed or searchable, but
- * anyone holding the link can read them — the shipped docs string used to claim
- * the opposite ("Gists are public by default — make them secret if you prefer"),
- * describing both the default and a toggle that did not exist. The toggle now
- * exists; the string was corrected to match.
+ * `isPublic` defaults to false (secret Gist).
  */
 export async function saveToGist(
   project: Project,
   gistId?: string,
   isPublic = false,
 ): Promise<{ id: string; url: string }> {
-  const octokit = await getOctokit();
-  if (!octokit) throw new Error('No GitHub token configured');
-
   const files: Record<string, { content: string }> = {
     'project.json': { content: serializeProject(project) },
-  };
-
-  /* Add individual code files for readability on GitHub */
-  for (const file of project.files) {
-    files[file.name] = { content: file.code };
   }
+  for (const file of project.files) {
+    files[file.name] = { content: file.code }
+  }
+  const description = `Live Music Coder: ${project.name}`
+
+  const api = getElectronApi()
+  if (api?.saveGist) {
+    return api.saveGist({ files, description, gistId, isPublic })
+  }
+
+  const token = await getStoredToken()
+  if (!token) throw new Error('No GitHub token configured')
+  const octokit = new Octokit({ auth: token })
 
   if (gistId) {
-    /* Update existing gist */
     const response = await octokit.gists.update({
       gist_id: gistId,
-      description: `Live Music Coder: ${project.name}`,
+      description,
       files,
-    });
+    })
     if (!response.data.id || !response.data.html_url) {
-      throw new Error('Gist update response missing id or html_url');
+      throw new Error('Gist update response missing id or html_url')
     }
-    return { id: response.data.id, url: response.data.html_url };
-  } else {
-    /* Create new gist */
-    const response = await octokit.gists.create({
-      description: `Live Music Coder: ${project.name}`,
-      /* Visibility is fixed at creation: the GitHub API cannot flip an existing
-         gist between public and secret, which is why the update branch above
-         does not take this parameter. */
-      public: isPublic,
-      files,
-    });
-    if (!response.data.id || !response.data.html_url) {
-      throw new Error('Gist create response missing id or html_url');
-    }
-    return { id: response.data.id, url: response.data.html_url };
+    return { id: response.data.id, url: response.data.html_url }
   }
+
+  const response = await octokit.gists.create({
+    description,
+    public: isPublic,
+    files,
+  })
+  if (!response.data.id || !response.data.html_url) {
+    throw new Error('Gist create response missing id or html_url')
+  }
+  return { id: response.data.id, url: response.data.html_url }
 }
 
-/** Load project from a GitHub Gist by ID */
+/**
+ * Load project from a GitHub Gist by ID.
+ * Public and secret Gists are readable by ID without authentication; if an
+ * ephemeral web token exists it is used for rate-limit headroom and then wiped
+ * before untrusted project code enters the editor.
+ */
 export async function loadFromGist(gistId: string): Promise<Project> {
-  const octokit = await getOctokit();
-  if (!octokit) throw new Error('No GitHub token configured');
+  const token = await getStoredToken()
+  const octokit = token ? new Octokit({ auth: token }) : new Octokit()
 
-  const response = await octokit.gists.get({ gist_id: gistId });
-  const files = response.data.files;
-  if (!files) throw new Error('Gist has no files');
+  const response = await octokit.gists.get({ gist_id: gistId })
+  const files = response.data.files
+  if (!files) throw new Error('Gist has no files')
 
-  const projectFile = files['project.json'];
-  if (!projectFile?.content) throw new Error('Gist missing project.json');
+  const projectFile = files['project.json']
+  if (!projectFile?.content) throw new Error('Gist missing project.json')
 
-  return deserializeProject(projectFile.content);
+  const project = deserializeProject(projectFile.content)
+  /* Wipe ephemeral web token before untrusted external Gist code can be evaluated */
+  ephemeralWebToken = null
+  return project
 }
 
 /** Extract Gist ID from a URL or raw ID string */
 export function parseGistId(input: string): string | null {
-  /* Full URL: https://gist.github.com/user/abc123 */
-  const urlMatch = input.match(/gist\.github\.com\/[\w-]+\/([a-f0-9]+)/);
-  if (urlMatch) return urlMatch[1];
-
-  /* Just the hex ID */
-  if (/^[a-f0-9]+$/.test(input.trim())) return input.trim();
-
-  return null;
+  const urlMatch = input.match(/gist\.github\.com\/[\w-]+\/([a-f0-9]+)/)
+  if (urlMatch) return urlMatch[1]
+  if (/^[a-f0-9]+$/.test(input.trim())) return input.trim()
+  return null
 }

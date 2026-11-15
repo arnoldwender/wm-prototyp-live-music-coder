@@ -10,8 +10,24 @@ import tailwindcss from '@tailwindcss/vite'
  * Note: sw.js cache-busting is handled by scripts/inject-sw-version.mjs
  * via the "postbuild" npm script — Vite 8 (Rolldown) plugin hooks fire
  * before Vite copies public/ assets, making in-plugin injection unreliable. */
+const DIRT_SAMPLES_SHA = 'c74fc80f8db8038f6a33648ffef5ac00a07ad402'
+const DIRT_SAMPLES_PROXY = {
+  '/dirt-samples': {
+    target: 'https://raw.githubusercontent.com',
+    changeOrigin: true,
+    rewrite: (p: string) =>
+      `/tidalcycles/Dirt-Samples/${DIRT_SAMPLES_SHA}${p.slice('/dirt-samples'.length)}`,
+  },
+}
+
 export default defineConfig({
   base: '/',
+  server: {
+    proxy: DIRT_SAMPLES_PROXY,
+  },
+  preview: {
+    proxy: DIRT_SAMPLES_PROXY,
+  },
   plugins: [
     react(),
     tailwindcss(),
