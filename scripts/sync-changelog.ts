@@ -49,6 +49,7 @@ for (const entry of sorted) {
 
 /* Category label map */
 const CATEGORY_LABEL: Record<string, string> = {
+  security: 'Security',
   feature: 'Added',
   bugfix: 'Fixed',
   content: 'Content',

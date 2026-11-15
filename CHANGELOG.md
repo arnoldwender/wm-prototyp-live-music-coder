@@ -13,6 +13,12 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.2] - 2026-11-15
+
+### Security
+
+- **Credential isolation, Electron fuses, WCAG 2.2 AA, and first-party sample proxy** ([#105](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/105)) — GitHub Personal Access Tokens are no longer stored in browser Web Storage.
+
 ## [1.3.1] - 2026-08-17
 
 ### Fixed
@@ -27,7 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [1.2.0] - 2026-08-17
 
-### security
+### Security
 
 - **Security release — arbitrary file write, navigation and permission guards** — SECURITY: every previous desktop build could be made to write an attacker-
 
