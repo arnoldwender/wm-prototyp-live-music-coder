@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { FilterPill } from '../components/molecules/FilterPill'
 import { SortSelect } from '../components/molecules/SortSelect'
 import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
@@ -178,8 +179,8 @@ export default function Sessions() {
   ]
 
   return (
-    <main
-      className="min-h-screen"
+    <div
+      className="min-h-screen flex flex-col"
       style={{
         backgroundColor: 'var(--color-bg)',
         color: 'var(--color-text)',
@@ -261,7 +262,7 @@ export default function Sessions() {
         </ContentSidebar>
 
         {/* Content column */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <main style={{ flex: 1, minWidth: 0 }}>
 
       {/* --- Page header --- */}
       <section
@@ -334,6 +335,7 @@ export default function Sessions() {
           <input
             type="search"
             placeholder={t('sessions.searchPlaceholder')}
+            aria-label={t('sessions.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -365,8 +367,8 @@ export default function Sessions() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '24px',
-                height: '24px',
+                width: 'var(--space-10)',
+                height: 'var(--space-10)',
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 backgroundColor: 'var(--color-bg-elevated)',
@@ -524,6 +526,7 @@ export default function Sessions() {
       {/* --- Piece list --- */}
       <section
         id="sessions-list"
+        tabIndex={-1}
         aria-label={t('sessions.listAriaLabel')}
         style={{
           maxWidth: '960px',
@@ -663,8 +666,10 @@ export default function Sessions() {
           </Link>
         ))}
       </section>
-        </div>{/* end content column */}
+        </main>{/* end content column */}
       </div>{/* end flex wrapper */}
-    </main>
+
+      <SiteFooter />
+    </div>
   )
 }

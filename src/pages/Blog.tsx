@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { FilterPill } from '../components/molecules/FilterPill'
 import { SortSelect } from '../components/molecules/SortSelect'
 import { Badge } from '../components/atoms'
@@ -87,12 +88,14 @@ export default function Blog() {
   ]
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
       <a href="#blog-list" className="sr-only focus:not-sr-only" style={{ position: 'absolute', top: 'var(--space-2)', left: 'var(--space-2)', zIndex: 100, padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-on-accent)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--font-size-sm)' }}>
         {t('a11y.skipToContent')}
       </a>
 
       <SiteNav />
+
+      <main className="flex-1">
 
       {/* Hero — matches Sessions golden page pattern */}
       <section
@@ -142,13 +145,14 @@ export default function Blog() {
           <input
             type="search"
             placeholder={t('blog.searchPlaceholder')}
+            aria-label={t('blog.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ flex: '1 1 200px', minWidth: '200px', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-bg-alt)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text)', fontSize: 'var(--font-size-sm)' }}
           />
           <SortSelect options={sortOptions} value={sortBy} onChange={(v) => setSortBy(v as SortKey)} />
           {activeFilterCount > 0 && (
-            <button type="button" onClick={clearFilters} className="flex items-center gap-1 cursor-pointer" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', background: 'none', border: 'none', padding: 'var(--space-1)' }}>
+            <button type="button" onClick={clearFilters} className="flex items-center gap-1 cursor-pointer" style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', background: 'none', border: 'none', padding: 'var(--space-2)', minHeight: 'var(--space-10)' }}>
               <X size={12} /> {t('blog.clearFilters')}
             </button>
           )}
@@ -174,7 +178,7 @@ export default function Blog() {
       </div>
 
       {/* Post cards */}
-      <section id="blog-list" aria-label={t('blog.listAriaLabel')} style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-6) var(--space-8)' }}>
+      <section id="blog-list" tabIndex={-1} aria-label={t('blog.listAriaLabel')} style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-6) var(--space-8)' }}>
         {sorted.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 'var(--space-8) 0' }}>
             {t('blog.noResults')}
@@ -222,6 +226,9 @@ export default function Blog() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+
+      <SiteFooter />
+    </div>
   )
 }

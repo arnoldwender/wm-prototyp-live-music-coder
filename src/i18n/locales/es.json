@@ -12,7 +12,10 @@
     "sessions": "Sessions",
     "blog": "Blog",
     "changelog": "Changelog",
-    "legal": "Legal"
+    "legal": "Legal",
+    "mainAriaLabel": "Navegación principal",
+    "openMenu": "Abrir menú de navegación",
+    "closeMenu": "Cerrar menú de navegación"
   },
   "transport": {
     "play": "Reproducir",
@@ -60,7 +63,11 @@
   "status": {
     "engine": "Motor",
     "files": "Archivos",
-    "ready": "Listo"
+    "ready": "Listo",
+    "playing": "Reproduciendo",
+    "stopped": "Detenido",
+    "xpProgress": "Progreso de XP",
+    "whatsNew": "Novedades"
   },
   "landing": {
     "hero": "Programa tu música en vivo",
@@ -86,8 +93,8 @@
         "desc": "Comparte patrones por URL comprimida, exporta a GitHub Gist o graba tu sesión como audio."
       },
       "share": {
-        "title": "Compartir y colaborar",
-        "desc": "Comparte por URL, guarda en GitHub Gist o graba tu sesión como audio."
+        "title": "MIDI y control en vivo",
+        "desc": "19 perfiles de controlador, asignación de perillas MIDI Learn y Modo Composición MIDI en tiempo real."
       },
       "i18n": {
         "title": "DE / EN / ES",
@@ -96,8 +103,9 @@
     },
     "download": {
       "title": "Descargar App de Escritorio",
-      "subtitle": "Guardado nativo de archivos, bandeja del sistema, exportación de audio y actualizaciones automáticas. El mismo poder de live coding, sin conexión.",
-      "cta": "Descargar para macOS"
+      "subtitle": "Guardado nativo de proyectos .lmc, bandeja en barra de menús, exportación WAV y actualizaciones firmadas para macOS. El mismo poder de live coding, sin conexión.",
+      "cta": "Descargar para macOS",
+      "platforms": "macOS (Apple Silicon + Intel) — Windows y Linux próximamente"
     }
   },
   "help": {
@@ -558,7 +566,7 @@
       "verifiedHeading": "Dispositivo Verificado",
       "verifiedText": "El siguiente dispositivo ha sido completamente probado. Todas las funciones — midikeys(), midin(), MIDI Compose Mode, MIDI Learn y el panel Synth — están confirmadas como funcionales:",
       "verifiedMpk": "Akai MPK mini 3 — completamente probado. Perfil CC de fábrica cargado automáticamente (CC 1 = mod wheel, CC 7 = volumen, perillas K1–K8 en CC 70–77).",
-      "verifiedOther": "Se incluyen 19 perfiles de dispositivos adicionales (Launchkey, Arturia, Novation, Korg, M-Audio y más). Deberían funcionar pero no han sido verificados personalmente. Los controladores MIDI USB estándar sin perfil seguirán funcionando para midikeys() y entrada básica.",
+      "verifiedOther": "Se incluyen 18 perfiles de dispositivos adicionales (Launchkey, Arturia, Novation, Korg, M-Audio y más). Deberían funcionar pero no han sido verificados personalmente. Los controladores MIDI USB estándar sin perfil seguirán funcionando para midikeys() y entrada básica.",
       "synthModeHeading": "Panel de Modo Sintetizador",
       "synthModeText": "Cuando se conecta un teclado MIDI, aparece un panel Synth compacto sobre el editor. Contiene un selector de oscilador (seno, sierra, cuadrada, triángulo), un filtro biquad (PB/PA/PB/Notch) con perillas de cutoff y resonancia, y un teclado virtual en pantalla. Haz clic en la barra de encabezado para expandir o contraer.",
       "midikeysHeading": "midikeys() — Entrada MIDI como Patrones",
@@ -610,7 +618,8 @@
   },
   "share": {
     "copied": "¡Copiado!",
-    "copyUrl": "Copiar URL"
+    "copyUrl": "Copiar URL",
+    "urlAriaLabel": "URL para compartir"
   },
   "editor": {
     "run": "Ejecutar",
@@ -666,7 +675,8 @@
     "invalidGist": "ID o URL de Gist no válido",
     "errorPrefix": "Error: {{message}}",
     "savedGistsTitle": "Gists guardados",
-    "selectGist": "Seleccionar"
+    "selectGist": "Seleccionar",
+    "noSavedGists": "Aún no hay Gists guardados. Usa el botón Gist en la barra de herramientas para guardar."
   },
   "pianoroll": {
     "zoomInTime": "Acercar (tiempo)",
@@ -677,7 +687,18 @@
   },
   "legal": {
     "impressum": "Aviso legal",
-    "datenschutz": "Política de privacidad"
+    "datenschutz": "Política de privacidad",
+    "sectionsAriaLabel": "Secciones legales"
+  },
+  "settingsModal": {
+    "title": "Ajustes",
+    "close": "Cerrar ajustes",
+    "theme": "Tema",
+    "fontSize": "Tamaño de fuente",
+    "lineNumbers": "Números de línea",
+    "wordWrap": "Ajuste de línea",
+    "vimMode": "Modo Vim",
+    "zenMode": "Modo Zen"
   },
   "sidePanel": {
     "toggle": "Alternar panel",

@@ -72,7 +72,7 @@ pre,
   -webkit-appearance: none;
   appearance: none;
   width: 64px;
-  height: 14px;
+  height: 24px;
   margin: 0 4px;
   background: transparent;
   cursor: pointer;
@@ -230,8 +230,8 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-ring);
-  outline: none;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* ── Card hover lift ─────────────────────────────────────────

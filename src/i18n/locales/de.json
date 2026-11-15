@@ -12,7 +12,10 @@
     "sessions": "Sessions",
     "blog": "Blog",
     "changelog": "Changelog",
-    "legal": "Rechtliches"
+    "legal": "Rechtliches",
+    "mainAriaLabel": "Hauptnavigation",
+    "openMenu": "Navigationsmenü öffnen",
+    "closeMenu": "Navigationsmenü schließen"
   },
   "transport": {
     "play": "Abspielen",
@@ -60,7 +63,11 @@
   "status": {
     "engine": "Engine",
     "files": "Dateien",
-    "ready": "Bereit"
+    "ready": "Bereit",
+    "playing": "Wiedergabe",
+    "stopped": "Gestoppt",
+    "xpProgress": "XP-Fortschritt",
+    "whatsNew": "Neuigkeiten"
   },
   "landing": {
     "hero": "Programmiere deine Musik live",
@@ -86,8 +93,8 @@
         "desc": "Patterns per komprimierter URL teilen, als GitHub Gist exportieren oder deine Session als Audio aufnehmen."
       },
       "share": {
-        "title": "Teilen & Zusammenarbeiten",
-        "desc": "Per URL teilen, als GitHub Gist speichern oder deine Session als Audio aufnehmen."
+        "title": "MIDI & Live-Steuerung",
+        "desc": "19 Controller-Profile, MIDI-Learn-Reglerzuweisung und MIDI-Compose-Modus in Echtzeit."
       },
       "i18n": {
         "title": "DE / EN / ES",
@@ -96,8 +103,9 @@
     },
     "download": {
       "title": "Desktop App herunterladen",
-      "subtitle": "Nativer Dateispeicher, System-Tray, Audio-Export und Auto-Updates. Die gleiche Live-Coding-Power, offline.",
-      "cta": "Für macOS herunterladen"
+      "subtitle": "Natives .lmc-Projektspeichern, Menüleisten-Tray, WAV-Export und signierte macOS-Auto-Updates. Die gleiche Live-Coding-Power, offline.",
+      "cta": "Für macOS herunterladen",
+      "platforms": "macOS (Apple Silicon + Intel) — Windows & Linux folgen in Kürze"
     }
   },
   "help": {
@@ -494,18 +502,18 @@
     "controls": {
       "title": "Interaktive Steuerung",
       "sliderHeading": "slider() — Inline-Regler",
-      "sliderText": "slider(wert, min, max, step) erzeugt einen Schieberegler direkt im Code. Ziehen Sie den Regler, um den Wert in Echtzeit zu ändern — der Code aktualisiert sich automatisch.",
+      "sliderText": "slider(wert, min, max, step) erzeugt einen Schieberegler direkt im Code. Zieh den Regler, um den Wert in Echtzeit zu ändern — der Code aktualisiert sich automatisch.",
       "onkeyHeading": "onKey() — Tastenbelegung",
-      "onkeyText": "Binden Sie Tasten an Aktionen mit onKey(taste, callback). Funktioniert nur, wenn der Editor nicht fokussiert ist.",
+      "onkeyText": "Binde Tasten an Aktionen mit onKey(taste, callback). Funktioniert nur, wenn der Editor nicht fokussiert ist.",
       "paramsHeading": "createParams() — Benannte Parameter",
       "paramsText": "Benannte Parameter mit createParams(name, default) anlegen. Der Wert ist live: setParam() oder ein per MIDI Learn zugewiesener Regler ändert ein laufendes Pattern, ohne es neu auszuwerten."
     },
     "visualizers": {
       "title": "Visualisierer",
       "inlineHeading": "Inline-Visualisierer",
-      "inlineText": "Fügen Sie ._pianoroll(), ._scope() oder ._punchcard() am Ende einer Pattern-Kette hinzu, um eine Visualisierung direkt unter dem Code anzuzeigen.",
+      "inlineText": "Füge ._pianoroll(), ._scope() oder ._punchcard() am Ende einer Pattern-Kette hinzu, um eine Visualisierung direkt unter dem Code anzuzeigen.",
       "panelHeading": "Visualisierungs-Panels",
-      "panelText": "7 Visualisierungs-Panels verfügbar — aktivieren Sie sie über die Pill-Buttons am unteren Rand:",
+      "panelText": "7 Visualisierungs-Panels verfügbar — aktiviere sie über die Pill-Buttons am unteren Rand:",
       "waveform": "Waveform — Echtzeit-Wellenform (Oszilloskop)",
       "spectrum": "Spectrum — Frequenzanalyse mit Balken",
       "timeline": "Timeline — Beat-Raster und Level-Meter",
@@ -517,13 +525,13 @@
     "settings": {
       "title": "Einstellungen",
       "themesHeading": "Themes",
-      "themesText": "4 Editor-Themes verfügbar — wechseln Sie über das Zahnrad-Icon in der Toolbar:",
+      "themesText": "4 Editor-Themes verfügbar — wechsle über das Zahnrad-Icon in der Toolbar:",
       "themePurple": "Purple (Standard) — Zinc/Lila, die Standard-Ästhetik",
       "themeAmber": "Amber — warme Stein-/Bernsteintöne",
       "themeCyan": "Cyan — tiefer Ozean, Türkistöne",
       "themeMatrix": "Matrix — Grün auf Schwarz, Terminal-Stil",
       "editorHeading": "Editor-Optionen",
-      "editorText": "Passen Sie den Editor an Ihre Vorlieben an:",
+      "editorText": "Passe den Editor an deine Vorlieben an:",
       "fontSize": "Schriftgröße — Slider von 10px bis 22px",
       "vimMode": "Vim-Modus — Vim-Tastenkombinationen im Editor",
       "wordWrap": "Zeilenumbruch — automatischer Umbruch langer Zeilen",
@@ -558,7 +566,7 @@
       "verifiedHeading": "Getestetes Gerät",
       "verifiedText": "Folgendes Gerät wurde vollständig getestet. Alle Funktionen — midikeys(), midin(), MIDI Compose Mode, MIDI Learn und das Synth-Panel — sind bestätigt funktionsfähig:",
       "verifiedMpk": "Akai MPK mini 3 — vollständig getestet. Factory-CC-Profil wird automatisch geladen (CC 1 = Mod-Wheel, CC 7 = Lautstärke, Regler K1–K8 auf CC 70–77).",
-      "verifiedOther": "19 weitere Geräteprofile sind enthalten (Launchkey, Arturia, Novation, Korg, M-Audio u. a.). Diese sollten funktionieren, wurden aber nicht persönlich verifiziert. Standard-USB-MIDI-Controller ohne Profil funktionieren weiterhin für midikeys() und grundlegende Eingabe.",
+      "verifiedOther": "18 weitere Geräteprofile sind enthalten (Launchkey, Arturia, Novation, Korg, M-Audio u. a.). Diese sollten funktionieren, wurden aber nicht persönlich verifiziert. Standard-USB-MIDI-Controller ohne Profil funktionieren weiterhin für midikeys() und grundlegende Eingabe.",
       "synthModeHeading": "Synth-Modus-Panel",
       "synthModeText": "Wenn ein MIDI-Keyboard verbunden wird, erscheint ein kompaktes Synth-Panel über dem Editor. Es enthält einen Oszillator-Selektor (Sinus, Sägezahn, Rechteck, Dreieck), einen Biquad-Filter (TP/HP/BP/Notch) mit Cutoff- und Resonanz-Reglern sowie eine virtuelle Bildschirmtastatur. Auf die Kopfzeile klicken zum Auf- oder Zuklappen.",
       "midikeysHeading": "midikeys() — MIDI-Eingabe als Pattern",
@@ -610,7 +618,8 @@
   },
   "share": {
     "copied": "Kopiert!",
-    "copyUrl": "URL kopieren"
+    "copyUrl": "URL kopieren",
+    "urlAriaLabel": "Teilen-URL"
   },
   "editor": {
     "run": "Ausführen",
@@ -666,7 +675,8 @@
     "invalidGist": "Ungültige Gist-ID oder URL",
     "errorPrefix": "Fehler: {{message}}",
     "savedGistsTitle": "Gespeicherte Gists",
-    "selectGist": "Auswählen"
+    "selectGist": "Auswählen",
+    "noSavedGists": "Noch keine gespeicherten Gists. Nutze den Gist-Button in der Toolbar zum Speichern."
   },
   "pianoroll": {
     "zoomInTime": "Vergrößern (Zeit)",
@@ -677,7 +687,18 @@
   },
   "legal": {
     "impressum": "Impressum",
-    "datenschutz": "Datenschutz"
+    "datenschutz": "Datenschutz",
+    "sectionsAriaLabel": "Rechtliche Bereiche"
+  },
+  "settingsModal": {
+    "title": "Einstellungen",
+    "close": "Einstellungen schließen",
+    "theme": "Theme",
+    "fontSize": "Schriftgröße",
+    "lineNumbers": "Zeilennummern",
+    "wordWrap": "Zeilenumbruch",
+    "vimMode": "Vim-Modus",
+    "zenMode": "Zen-Modus"
   },
   "sidePanel": {
     "toggle": "Panel umschalten",

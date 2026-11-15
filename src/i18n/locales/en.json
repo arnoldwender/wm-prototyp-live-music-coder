@@ -12,7 +12,10 @@
     "sessions": "Sessions",
     "blog": "Blog",
     "changelog": "Changelog",
-    "legal": "Legal"
+    "legal": "Legal",
+    "mainAriaLabel": "Main navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu"
   },
   "transport": {
     "play": "Play",
@@ -60,7 +63,11 @@
   "status": {
     "engine": "Engine",
     "files": "Files",
-    "ready": "Ready"
+    "ready": "Ready",
+    "playing": "Playing",
+    "stopped": "Stopped",
+    "xpProgress": "XP Progress",
+    "whatsNew": "What's New"
   },
   "landing": {
     "hero": "Live code your music",
@@ -86,8 +93,8 @@
         "desc": "Share patterns via compressed URLs, export to GitHub Gist, or record your session as audio."
       },
       "share": {
-        "title": "Share & Collaborate",
-        "desc": "Share via URL, save to GitHub Gist, or record your session as audio."
+        "title": "MIDI & Live Control",
+        "desc": "19 controller profiles, MIDI Learn knob mapping, and real-time MIDI Compose Mode."
       },
       "i18n": {
         "title": "DE / EN / ES",
@@ -96,8 +103,9 @@
     },
     "download": {
       "title": "Download Desktop App",
-      "subtitle": "Native file save/load, system tray, audio export, and auto-updates. Same live coding power, offline.",
-      "cta": "Download for macOS"
+      "subtitle": "Native .lmc project save/load, menu-bar tray, WAV export, and signed macOS auto-updates. Same live coding power, offline.",
+      "cta": "Download for macOS",
+      "platforms": "macOS (Apple Silicon + Intel) — Windows & Linux coming soon"
     }
   },
   "help": {
@@ -558,7 +566,7 @@
       "verifiedHeading": "Verified Device",
       "verifiedText": "The following device has been fully tested. All features — midikeys(), midin(), MIDI Compose Mode, MIDI Learn, and the Synth panel — are confirmed working:",
       "verifiedMpk": "Akai MPK mini 3 — fully tested. Factory CC profile loaded automatically (CC 1 = mod wheel, CC 7 = volume, knobs K1–K8 on CC 70–77).",
-      "verifiedOther": "19 other device profiles are included (Launchkey, Arturia, Novation, Korg, M-Audio, and more). They should work but have not been personally verified. Standard USB MIDI controllers without a profile will still work for midikeys() and basic input.",
+      "verifiedOther": "18 other device profiles are included (Launchkey, Arturia, Novation, Korg, M-Audio, and more). They should work but have not been personally verified. Standard USB MIDI controllers without a profile will still work for midikeys() and basic input.",
       "synthModeHeading": "Synth Mode Panel",
       "synthModeText": "When a MIDI keyboard connects, a compact Synth panel appears above the editor. It contains an oscillator selector (sine, sawtooth, square, triangle), a biquad filter (LP/HP/BP/Notch) with cutoff and resonance knobs, and a virtual on-screen keyboard. Click the header bar to expand or collapse it.",
       "midikeysHeading": "midikeys() — MIDI Input as Patterns",
@@ -610,7 +618,8 @@
   },
   "share": {
     "copied": "Copied!",
-    "copyUrl": "Copy URL"
+    "copyUrl": "Copy URL",
+    "urlAriaLabel": "Share URL"
   },
   "editor": {
     "run": "Run",
@@ -666,7 +675,8 @@
     "invalidGist": "Invalid Gist ID or URL",
     "errorPrefix": "Error: {{message}}",
     "savedGistsTitle": "Saved Gists",
-    "selectGist": "Select"
+    "selectGist": "Select",
+    "noSavedGists": "No saved gists yet. Use the Gist button in the toolbar to save."
   },
   "pianoroll": {
     "zoomInTime": "Zoom in (time)",
@@ -677,7 +687,18 @@
   },
   "legal": {
     "impressum": "Impressum",
-    "datenschutz": "Privacy Policy"
+    "datenschutz": "Privacy Policy",
+    "sectionsAriaLabel": "Legal sections"
+  },
+  "settingsModal": {
+    "title": "Settings",
+    "close": "Close settings",
+    "theme": "Theme",
+    "fontSize": "Font Size",
+    "lineNumbers": "Line Numbers",
+    "wordWrap": "Word Wrap",
+    "vimMode": "Vim Mode",
+    "zenMode": "Zen Mode"
   },
   "sidePanel": {
     "toggle": "Toggle Panel",

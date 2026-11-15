@@ -2,15 +2,15 @@
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
    Landing page — header navbar, hero section, feature grid,
-   example gallery, and powered-by footer.
+   example gallery, desktop download CTA, and shared footer.
    ---------------------------------------------------------- */
 
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { HeroSection } from '../components/organisms/HeroSection'
 import { FeatureGrid } from '../components/organisms/FeatureGrid'
 import { ExampleGallery } from '../components/organisms/ExampleGallery'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
 import { isElectron } from '../lib/platform'
@@ -21,26 +21,10 @@ function SectionDivider() {
     <div
       aria-hidden="true"
       style={{
-        maxWidth: '800px',
+        maxWidth: 'var(--width-content-sm)',
         margin: '0 auto',
         height: '1px',
         background: 'linear-gradient(90deg, transparent, var(--color-border), transparent)',
-      }}
-    />
-  )
-}
-
-/** Small colored dot for the powered-by footer */
-function EngineDot({ color }: { color: string }) {
-  return (
-    <span
-      aria-hidden="true"
-      style={{
-        display: 'inline-block',
-        width: '6px',
-        height: '6px',
-        borderRadius: 'var(--radius-full)',
-        backgroundColor: color,
       }}
     />
   )
@@ -61,9 +45,8 @@ function Landing() {
   useScrollablePage()
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen"
+    <div
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Skip-to-content link for accessibility */}
@@ -88,169 +71,97 @@ function Landing() {
       {/* --- Shared top navbar (single source of truth) --- */}
       <SiteNav />
 
-      {/* Hero with animated waveform, gradient text, and CTA */}
-      <section id="hero">
-        <HeroSection />
-      </section>
+      <main id="main-content" tabIndex={-1} className="flex-1">
+        {/* Hero with animated waveform, gradient text, and CTA */}
+        <section id="hero">
+          <HeroSection />
+        </section>
 
-      {/* In Electron: show ONLY hero + footer (slim splash screen).
-          On the web: show full marketing page with features, examples, download. */}
-      {!isElectron && (
-        <>
-          <SectionDivider />
+        {/* In Electron: show ONLY hero + footer (slim splash screen).
+            On the web: show full marketing page with features, examples, download. */}
+        {!isElectron && (
+          <>
+            <SectionDivider />
 
-          {/* Feature highlights grid with Lucide icons.
-              The ids live on the components' own <section>s — repeating them
-              here put two #features and two #examples in the page. */}
-          <section>
+            {/* Feature highlights grid with Lucide icons */}
             <FeatureGrid />
-          </section>
 
-          <SectionDivider />
+            <SectionDivider />
 
-          {/* Pre-built example demos */}
-          <section>
+            {/* Pre-built example demos */}
             <ExampleGallery />
-          </section>
 
-          <SectionDivider />
-        </>
-      )}
+            <SectionDivider />
 
-      {/* Desktop app download section — web only.
-          Hidden inside the packaged Electron app because the user is
-          already running the desktop build; a "Download .dmg" CTA
-          would be confusing there. */}
-      {!isElectron && (
-      <section
-        id="download"
-        className="flex flex-col items-center text-center px-4 py-16 max-w-6xl mx-auto"
-      >
-        <h2 style={{
-          fontSize: 'var(--font-size-3xl)',
-          fontWeight: 'var(--font-weight-bold)',
-          color: 'var(--color-text)',
-          marginBottom: 'var(--space-3)',
-          lineHeight: 'var(--line-height-tight)',
-        }}>
-          {t('landing.download.title')}
-        </h2>
-        <p style={{
-          fontSize: 'var(--font-size-base)',
-          color: 'var(--color-text-muted)',
-          marginBottom: 'var(--space-8)',
-          maxWidth: '520px',
-          lineHeight: 'var(--line-height-base)',
-        }}>
-          {t('landing.download.subtitle')}
-        </p>
+            {/* Desktop app download section — web only */}
+            <section
+              id="download"
+              className="flex flex-col items-center text-center px-4 py-16 max-w-6xl mx-auto"
+            >
+              <h2
+                style={{
+                  fontSize: 'var(--font-size-3xl)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--color-text)',
+                  marginBottom: 'var(--space-3)',
+                  lineHeight: 'var(--line-height-tight)',
+                }}
+              >
+                {t('landing.download.title')}
+              </h2>
+              <p
+                style={{
+                  fontSize: 'var(--font-size-base)',
+                  color: 'var(--color-text-muted)',
+                  marginBottom: 'var(--space-8)',
+                  maxWidth: '520px',
+                  lineHeight: 'var(--line-height-base)',
+                }}
+              >
+                {t('landing.download.subtitle')}
+              </p>
 
-        {/* CTA button */}
-        <a
-          href="https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            padding: 'var(--space-4) var(--space-8)',
-            backgroundColor: 'var(--color-primary)',
-            color: 'var(--color-bg)',
-            fontSize: 'var(--font-size-base)',
-            fontWeight: 'var(--font-weight-bold)',
-            borderRadius: 'var(--radius-md)',
-            textDecoration: 'none',
-            transition: 'var(--transition-fast)',
-            minHeight: '48px',
-          }}
-        >
-          {t('landing.download.cta')}
-        </a>
+              {/* CTA button */}
+              <a
+                href="https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  padding: 'var(--space-4) var(--space-8)',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-bg)',
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  borderRadius: 'var(--radius-md)',
+                  textDecoration: 'none',
+                  transition: 'var(--transition-fast)',
+                  minHeight: 'var(--size-touch-comfortable)',
+                }}
+              >
+                {t('landing.download.cta')}
+              </a>
 
-        {/* Platform availability */}
-        <p style={{
-          fontSize: 'var(--font-size-xs)',
-          color: 'var(--color-text-muted)',
-          marginTop: 'var(--space-4)',
-          letterSpacing: 'var(--letter-spacing-normal)',
-        }}>
-          macOS (Apple Silicon + Intel) — Windows &amp; Linux coming soon
-        </p>
-      </section>
-      )}
+              {/* Platform availability */}
+              <p
+                style={{
+                  fontSize: 'var(--font-size-xs)',
+                  color: 'var(--color-text-muted)',
+                  marginTop: 'var(--space-4)',
+                  letterSpacing: 'var(--letter-spacing-normal)',
+                }}
+              >
+                {t('landing.download.platforms')}
+              </p>
+            </section>
+          </>
+        )}
+      </main>
 
-      {!isElectron && <SectionDivider />}
-
-      {/* Footer with powered-by engines and license */}
-      <footer
-        className="text-center py-12"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        {/* Powered-by line with engine color dots */}
-        <p
-          className="flex items-center justify-center gap-3 mb-4"
-          style={{ fontSize: 'var(--font-size-xs)', letterSpacing: 'var(--letter-spacing-legend)' }}
-        >
-          {t('landing.poweredBy')}
-          <EngineDot color="var(--color-strudel)" />
-          Strudel
-          <EngineDot color="var(--color-tonejs)" />
-          Tone.js
-          <EngineDot color="var(--color-webaudio)" />
-          Web Audio
-        </p>
-
-        {/* Blog + Changelog — highlight new features */}
-        <p className="flex items-center justify-center gap-3 mb-3" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/blog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Blog</Link>
-          <span>|</span>
-          <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 'var(--font-weight-medium)' }}>Changelog</Link>
-        </p>
-
-        {/* Legal links + GitHub + License */}
-        <p className="flex items-center justify-center gap-3 mb-2" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.impressum')}</Link>
-          <span>|</span>
-          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>{t('legal.datenschutz')}</Link>
-          <span>|</span>
-          <a
-            href="https://github.com/arnoldwender/wm-prototyp-live-music-coder"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}
-          >
-            GitHub
-          </a>
-        </p>
-        <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          {t('footer.license')}
-        </p>
-        {/* KI-Kennzeichnung — EU AI Act Art. 50 (2026-08-02) */}
-        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-          {t('footer.aiDisclosure')}
-        </p>
-        <p className="flex items-center justify-center gap-2 mt-3" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <a
-            href="https://arnoldwender.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}
-          >
-            Arnold Wender
-          </a>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <a
-            href="https://wendermedia.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}
-          >
-            Wender Media
-          </a>
-        </p>
-      </footer>
-    </main>
+      <SiteFooter showPoweredBy />
+    </div>
   )
 }
 

@@ -1,13 +1,16 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   Legal page — Impressum + Datenschutz with tab navigation */
+   Legal page — Impressum (/legal) + Datenschutzerklärung
+   (/datenschutz and /legal#datenschutz) with accessible
+   ARIA tablist, roving tabindex, lang="de" content part,
+   and proper landmark separation. */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
-import { Logo } from '../components/atoms';
-import { LanguageSwitcher } from '../components/molecules';
+import { useLocation } from 'react-router-dom';
+import { SiteNav } from '../components/organisms/SiteNav';
+import { SiteFooter } from '../components/organisms/SiteFooter';
 import { IMPRESSUM_HTML, DATENSCHUTZ_HTML } from '../data/legal';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useScrollablePage } from '../lib/useScrollablePage';
@@ -19,28 +22,69 @@ function Legal() {
   const { t } = useTranslation();
   const location = useLocation();
   const isClient = useIsClient();
+  const impressumBtnRef = useRef<HTMLButtonElement>(null);
+  const datenschutzBtnRef = useRef<HTMLButtonElement>(null);
 
-  /* Until the visitor picks a tab, the tab follows the URL hash. The hash
-     never reaches a server, so the prerendered /legal and the hydration pass
-     show the Impressum; for /legal#datenschutz the Datenschutz tab takes over
-     right after hydration (reading the hash earlier would make the browser's
-     first render differ from the prerendered HTML). */
-  const [pickedTab, setTab] = useState<LegalTab | null>(null);
-  const hashTab: LegalTab = isClient && location.hash === '#datenschutz' ? 'datenschutz' : 'impressum';
-  const tab = pickedTab ?? hashTab;
+  const isDatenschutzRoute = location.pathname === '/datenschutz';
 
-  /* Per-page SEO meta tags */
-  usePageMeta({
-    title: 'Legal — Live Music Coder',
-    description: 'Impressum und Datenschutzerklärung für Live Music Coder.',
-    path: '/legal',
-  });
+  /* Keyed to pathname+hash so navigating between /legal and /datenschutz
+     automatically switches tabs without needing a setState-in-effect, while
+     preserving identical SSR + hydration output on both routes. */
+  const routeKey = `${location.pathname}${isClient ? location.hash : ''}`;
+  const [picked, setPicked] = useState<{ key: string; tab: LegalTab } | null>(null);
+
+  const defaultTab: LegalTab = isDatenschutzRoute
+    ? 'datenschutz'
+    : isClient && location.hash === '#datenschutz'
+      ? 'datenschutz'
+      : 'impressum';
+
+  const tab: LegalTab = picked && picked.key === routeKey ? picked.tab : defaultTab;
+
+  const selectTab = (next: LegalTab, focus = false) => {
+    setPicked({ key: routeKey, tab: next });
+    if (focus) {
+      const target = next === 'impressum' ? impressumBtnRef.current : datenschutzBtnRef.current;
+      target?.focus();
+    }
+  };
+
+  /* Per-page SEO meta tags — distinct canonical & title for /legal vs /datenschutz */
+  usePageMeta(
+    isDatenschutzRoute
+      ? {
+          title: 'Datenschutzerklärung — Live Music Coder',
+          description: 'Datenschutzerklärung (DSGVO / TDDDG) für Live Music Coder.',
+          path: '/datenschutz',
+        }
+      : {
+          title: 'Legal — Live Music Coder',
+          description: 'Impressum und Datenschutzerklärung für Live Music Coder.',
+          path: '/legal',
+        },
+  );
 
   /* Override body overflow for scrolling (shared hook) */
   useScrollablePage();
 
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      selectTab(tab === 'impressum' ? 'datenschutz' : 'impressum', true);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      selectTab('impressum', true);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      selectTab('datenschutz', true);
+    }
+  };
+
   return (
-    <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
+    >
       {/* --- Skip-to-content for a11y --- */}
       <a
         href="#legal-content"
@@ -60,107 +104,101 @@ function Legal() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* Header */}
-      <nav
-        aria-label="Legal page navigation"
-        className="flex items-center justify-between"
-        style={{ height: '64px', padding: '0 var(--space-6)', backgroundColor: 'var(--color-bg-alt)', borderBottom: '1px solid var(--color-border)' }}
-      >
-        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }} aria-label={t('nav.backToHome')}>
-          <Logo size="sm" />
-        </Link>
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-          <Link to="/editor" style={{ padding: 'var(--space-2) var(--space-4)', backgroundColor: 'var(--color-primary)', color: 'var(--color-bg)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', borderRadius: 'var(--radius-md)', textDecoration: 'none' }}>
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      <SiteNav />
 
-      {/* Tab navigation — ARIA tabs pattern */}
-      <div role="tablist" aria-label="Legal sections" className="flex justify-center" style={{ padding: 'var(--space-4)', gap: 'var(--space-2)', borderBottom: '1px solid var(--color-border)' }}>
-        <button
-          role="tab"
-          aria-selected={tab === 'impressum'}
-          aria-controls="tabpanel-impressum"
-          id="tab-impressum"
-          onClick={() => setTab('impressum')}
-          className="cursor-pointer"
+      <main id="legal-main" className="flex-1">
+        {/* Tab navigation — ARIA tabs pattern with roving tabindex */}
+        <div
+          role="tablist"
+          aria-label={t('legal.sectionsAriaLabel')}
+          onKeyDown={handleTabKeyDown}
+          className="flex flex-wrap justify-center"
           style={{
-            padding: 'var(--space-2) var(--space-4)',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: tab === 'impressum' ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-            color: tab === 'impressum' ? 'var(--color-bg)' : 'var(--color-text-secondary)',
-            border: 'none',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-medium)',
+            padding: 'var(--space-4)',
+            gap: 'var(--space-2)',
+            borderBottom: '1px solid var(--color-border)',
           }}
         >
-          {t('legal.impressum')}
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'datenschutz'}
-          aria-controls="tabpanel-datenschutz"
-          id="tab-datenschutz"
-          onClick={() => setTab('datenschutz')}
-          className="cursor-pointer"
-          style={{
-            padding: 'var(--space-2) var(--space-4)',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: tab === 'datenschutz' ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-            color: tab === 'datenschutz' ? 'var(--color-bg)' : 'var(--color-text-secondary)',
-            border: 'none',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-weight-medium)',
-          }}
-        >
-          {t('legal.datenschutz')}
-        </button>
-      </div>
-
-      {/* Content — ARIA tabpanel */}
-      <article
-        id="legal-content"
-        role="tabpanel"
-        aria-labelledby={`tab-${tab}`}
-        className="max-w-3xl mx-auto"
-        style={{ padding: 'var(--space-8) var(--space-6)', lineHeight: 'var(--line-height-loose)' }}
-        /* SECURITY: Content is static HTML from data/legal.ts — never from user input */
-        dangerouslySetInnerHTML={{ __html: tab === 'impressum' ? IMPRESSUM_HTML : DATENSCHUTZ_HTML }}
-      />
-
-      {/* Styled legal content */}
-      <style>{`
-        article h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: var(--space-6) 0 var(--space-4); color: var(--color-text); }
-        article h2 { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); margin: var(--space-6) 0 var(--space-3); color: var(--color-text); }
-        article h3 { font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin: var(--space-4) 0 var(--space-2); color: var(--color-text); }
-        article h4 { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); margin: var(--space-3) 0 var(--space-2); color: var(--color-text-secondary); }
-        article p { margin: var(--space-2) 0; color: var(--color-text-secondary); }
-        article a { color: var(--color-primary); text-decoration: underline; }
-        article a:hover { color: var(--color-text); }
-      `}</style>
-
-      <footer className="text-center py-8" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
-        <p>{t('footer.license')}</p>
-        {/* AGPL compliance — source code link required for network services */}
-        <p style={{ marginTop: 'var(--space-2)' }}>
-          <a
-            href="https://github.com/arnoldwender/wm-prototyp-live-music-coder"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
+          <button
+            ref={impressumBtnRef}
+            type="button"
+            role="tab"
+            aria-selected={tab === 'impressum'}
+            aria-controls="legal-content"
+            id="tab-impressum"
+            tabIndex={tab === 'impressum' ? 0 : -1}
+            onClick={() => selectTab('impressum')}
+            className="cursor-pointer"
+            style={{
+              minHeight: 'var(--size-touch)',
+              padding: 'var(--space-2) var(--space-4)',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: tab === 'impressum' ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
+              color: tab === 'impressum' ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              border: 'none',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
           >
-            Source Code (AGPL-3.0)
-          </a>
-        </p>
-        <p className="flex items-center justify-center gap-2 mt-3">
-          <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
-        </p>
-      </footer>
-    </main>
+            {t('legal.impressum')}
+          </button>
+          <button
+            ref={datenschutzBtnRef}
+            type="button"
+            role="tab"
+            aria-selected={tab === 'datenschutz'}
+            aria-controls="legal-content"
+            id="tab-datenschutz"
+            tabIndex={tab === 'datenschutz' ? 0 : -1}
+            onClick={() => selectTab('datenschutz')}
+            className="cursor-pointer"
+            style={{
+              minHeight: 'var(--size-touch)',
+              padding: 'var(--space-2) var(--space-4)',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: tab === 'datenschutz' ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
+              color: tab === 'datenschutz' ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              border: 'none',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {t('legal.datenschutz')}
+          </button>
+        </div>
+
+        {/* Content — ARIA tabpanel with lang="de" (WCAG 3.1.2 Language of Parts) */}
+        <article
+          id="legal-content"
+          tabIndex={-1}
+          role="tabpanel"
+          aria-labelledby={`tab-${tab}`}
+          lang="de"
+          className="max-w-3xl mx-auto legal-prose"
+          style={{
+            padding: 'var(--space-8) var(--space-6)',
+            lineHeight: 'var(--line-height-loose)',
+          }}
+          /* SECURITY: Content is static HTML from data/legal.ts — never from user input */
+          dangerouslySetInnerHTML={{ __html: tab === 'impressum' ? IMPRESSUM_HTML : DATENSCHUTZ_HTML }}
+        />
+
+        {/* Styled legal content */}
+        <style>{`
+          .legal-prose h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: var(--space-6) 0 var(--space-4); color: var(--color-text); }
+          .legal-prose h2 { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); margin: var(--space-6) 0 var(--space-3); color: var(--color-text); }
+          .legal-prose h3 { font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); margin: var(--space-4) 0 var(--space-2); color: var(--color-text); }
+          .legal-prose h4 { font-size: var(--font-size-base); font-weight: var(--font-weight-medium); margin: var(--space-3) 0 var(--space-2); color: var(--color-text-secondary); }
+          .legal-prose p { margin: var(--space-2) 0; color: var(--color-text-secondary); overflow-wrap: anywhere; }
+          .legal-prose ul { margin: var(--space-2) 0; padding-left: var(--space-8); list-style: disc; color: var(--color-text-secondary); }
+          .legal-prose li { margin: var(--space-1) 0; }
+          .legal-prose a { color: var(--color-primary); text-decoration: underline; overflow-wrap: anywhere; }
+          .legal-prose a:hover { color: var(--color-text); }
+        `}</style>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }
 

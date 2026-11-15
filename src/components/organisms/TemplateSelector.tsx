@@ -25,15 +25,21 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const files = useAppStore((s) => s.files)
   const backdropRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  /* Focus trap — focus first focusable element on mount */
+  /* Focus trap — focus first focusable element on mount and restore on close */
   useEffect(() => {
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const container = backdropRef.current
-    if (!container) return
-    const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    if (focusable.length > 0) focusable[0].focus()
+    if (container) {
+      const focusable = container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length > 0) focusable[0].focus()
+    }
+    return () => {
+      previousFocusRef.current?.focus()
+    }
   }, [])
 
   /* Focus trap — keep Tab cycling within the dialog */
@@ -75,6 +81,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
       ref={backdropRef}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="template-dialog-title"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
       onKeyDown={handleKeyDown}
@@ -92,6 +99,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
         }}
       >
         <h2
+          id="template-dialog-title"
           className="text-xl font-bold mb-1"
           style={{ color: 'var(--color-text)' }}
         >
@@ -106,6 +114,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
           {STARTER_TEMPLATES.slice(0, 6).map((tmpl) => (
             <button
               key={tmpl.id}
+              type="button"
               onClick={() => handleSelect(tmpl)}
               className="rounded-md text-left cursor-pointer"
               style={{

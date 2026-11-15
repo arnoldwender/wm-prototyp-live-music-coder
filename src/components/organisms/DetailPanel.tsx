@@ -7,18 +7,20 @@
    ────────────────────────────────────────────────────────── */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, X } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { SampleBrowser, ReferencePanel, ConsolePanel, SettingsPanel } from './SidePanel';
 import { MidiPanel } from './MidiPanel';
-import { loadFromGist } from '../../lib/persistence/gist';
+import { loadFromGist, clearEphemeralWebToken } from '../../lib/persistence/gist';
 import { safeJsonParse } from '../../lib/persistence/local';
 
 /* Saved Gists list — reads from localStorage */
 interface SavedGist { id: string; url: string; date: string }
 
 function SavedGistsList() {
+  const { t } = useTranslation();
   /* Read during the initial render rather than from an effect: the effect
    * version painted the "no saved gists yet" empty state for one frame and
    * then replaced it, which reads as a flash on every open. */
@@ -31,13 +33,16 @@ function SavedGistsList() {
     setLoading(gistId);
     try {
       const project = await loadFromGist(gistId);
+      clearEphemeralWebToken();
       /* Use loadProject so BPM is clamped through setBpm — fixes D-4 */
-      useAppStore.getState().loadProject({
+      const store = useAppStore.getState();
+      store.loadProject({
         bpm: project.bpm,
         defaultEngine: project.defaultEngine,
         files: project.files,
         layout: project.layout,
       });
+      store.setUntrustedCodePending(true);
     } catch { /* load failed */ }
     setLoading(null);
   };
@@ -45,7 +50,7 @@ function SavedGistsList() {
   if (gists.length === 0) {
     return (
       <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-ui)', textAlign: 'center' }}>
-        No saved gists yet. Use the Gist button in the toolbar to save.
+        {t('gist.noSavedGists')}
       </div>
     );
   }
@@ -69,9 +74,9 @@ function SavedGistsList() {
             type="button"
             onClick={() => handleLoad(g.id)}
             disabled={loading === g.id}
-            style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', padding: '1px var(--space-2)', flexShrink: 0 }}
+            style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: 'var(--font-size-2xs)', padding: 'var(--space-1) var(--space-2)', minHeight: 'var(--space-10)', flexShrink: 0 }}
           >
-            {loading === g.id ? '...' : 'Load'}
+            {loading === g.id ? '...' : t('gist.loadThisGist')}
           </button>
         </div>
       ))}

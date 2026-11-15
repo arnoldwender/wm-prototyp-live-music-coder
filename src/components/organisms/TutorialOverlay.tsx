@@ -6,7 +6,7 @@
    completion state to localStorage so it only shows once.
    ────────────────────────────────────────────────────────── */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Code2, Play, BarChart3, HelpCircle, ChevronRight, X } from 'lucide-react'
 import { Button } from '../atoms'
@@ -25,6 +25,8 @@ const STEP_ICONS = [Code2, Play, BarChart3, HelpCircle] as const
 export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
   const { t } = useTranslation()
   const [step, setStep] = useState(0)
+  const backdropRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   /** Mark tutorial as done and close */
   const handleDone = useCallback(() => {
@@ -46,15 +48,55 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
     handleDone()
   }, [handleDone])
 
+  /* Focus trap entry + restoration on close */
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const container = backdropRef.current
+    if (container) {
+      const focusable = container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length > 0) focusable[0].focus()
+    }
+    return () => {
+      previousFocusRef.current?.focus()
+    }
+  }, [])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      handleSkip()
+      return
+    }
+    if (e.key !== 'Tab') return
+    const container = backdropRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [handleSkip])
+
   const StepIcon = STEP_ICONS[step]
 
   return (
     <div
+      ref={backdropRef}
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
       role="dialog"
       aria-modal="true"
-      aria-label={t('tutorial.step1.title')}
+      aria-labelledby="tutorial-dialog-title"
+      onKeyDown={handleKeyDown}
     >
       {/* Modal card */}
       <div
@@ -76,11 +118,17 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             position: 'absolute',
             top: 'var(--space-sm)',
             right: 'var(--space-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 'var(--space-11)',
+            height: 'var(--space-11)',
             background: 'none',
             border: 'none',
+            borderRadius: 'var(--radius-sm)',
             color: 'var(--color-text-muted)',
             cursor: 'pointer',
-            padding: 'var(--space-xs)',
+            padding: 0,
           }}
           aria-label={t('tutorial.skip')}
         >
@@ -117,6 +165,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
 
         {/* Step title */}
         <h2
+          id="tutorial-dialog-title"
           className="text-center"
           style={{
             fontSize: 'var(--font-size-lg)',
@@ -168,9 +217,11 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             style={{
               background: 'none',
               border: 'none',
+              borderRadius: 'var(--radius-sm)',
               color: 'var(--color-text-muted)',
               fontSize: 'var(--font-size-sm)',
               cursor: 'pointer',
+              minHeight: 'var(--space-11)',
               padding: 'var(--space-xs) var(--space-sm)',
             }}
           >

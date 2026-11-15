@@ -8,10 +8,11 @@
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
 import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
 import { SAMPLE_LIBRARY, SAMPLE_CATEGORIES, BASE_SAMPLE_COUNT, TOTAL_SAMPLE_COUNT } from '../data/sample-library'
@@ -185,8 +186,8 @@ function SampleCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 'var(--space-8)',
-                  height: 'var(--space-8)',
+                  width: 'var(--space-10)',
+                  height: 'var(--space-10)',
                   borderRadius: 'var(--radius-full)',
                   border: 'none',
                   backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-bg)',
@@ -398,8 +399,8 @@ function Samples() {
   }
 
   return (
-    <main
-      className="min-h-screen"
+    <div
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Skip-to-content for a11y */}
@@ -472,7 +473,7 @@ function Samples() {
         </ContentSidebar>
 
         {/* Content column */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <main style={{ flex: 1, minWidth: 0 }}>
 
       {/* --- Page header with title and stats --- */}
       <header
@@ -544,8 +545,8 @@ function Samples() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 'var(--space-8)',
-                height: 'var(--space-8)',
+                width: 'var(--space-10)',
+                height: 'var(--space-10)',
                 border: 'none',
                 backgroundColor: 'transparent',
                 color: 'var(--color-text-muted)',
@@ -711,6 +712,7 @@ function Samples() {
       {/* --- Sample card grid --- */}
       <section
         id="sample-grid"
+        tabIndex={-1}
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
@@ -750,28 +752,10 @@ function Samples() {
         )}
       </section>
 
-      {/* Footer with legal links — TMG requires Impressum reachable from every page */}
-      <footer
-        className="text-center py-12"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: 'var(--space-2)' }}>
-          {t('footer.license')}
-        </p>
-        <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
-          {' | '}
-          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
-        </p>
-        <p className="flex items-center justify-center gap-2 mt-3" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
-        </p>
-      </footer>
-
-        </div>{/* end content column */}
+        </main>{/* end content column */}
       </div>{/* end flex wrapper */}
+
+      <SiteFooter />
 
       {/* NowPlaying floating indicator — shows when a sample is playing */}
       <NowPlayingIndicator
@@ -780,7 +764,7 @@ function Samples() {
         engineType={'strudel' as EngineType}
         onStop={handleStop}
       />
-    </main>
+    </div>
   )
 }
 

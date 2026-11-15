@@ -14,6 +14,7 @@
 import { Link, useNavigate, useParams, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import {
   getSessionBySlug,
   formatSessionDuration,
@@ -61,8 +62,8 @@ export default function SessionPiece() {
   }
 
   return (
-    <main
-      className="min-h-screen"
+    <div
+      className="min-h-screen flex flex-col"
       style={{
         backgroundColor: 'var(--color-bg)',
         color: 'var(--color-text)',
@@ -91,8 +92,10 @@ export default function SessionPiece() {
       <SiteNav />
 
       {/* --- Content --- */}
+      <main className="flex-1">
       <article
         id="piece-main"
+        tabIndex={-1}
         style={{
           maxWidth: '840px',
           margin: '0 auto',
@@ -375,6 +378,9 @@ export default function SessionPiece() {
           </p>
         )}
       </article>
-    </main>
+      </main>
+
+      <SiteFooter />
+    </div>
   )
 }
