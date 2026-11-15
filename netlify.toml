@@ -42,13 +42,11 @@
   status = 200
   force = true
 
-# SPA fallback — every path without a file of its own gets the bare app shell.
-# The routes of public/sitemap.xml have their own prerendered file since 2026-10-05
-# (scripts/prerender.mjs: / → index.html, /docs → docs.html …), and a real file wins
-# over this non-forced rule. Not index.html any more: that is now the prerendered
-# home page, and serving it for /sessions/<slug> would show the home page's content
-# until the app replaced it. spa.html is the untouched template, written by the same script.
+# 404 fallback — every valid route in public/sitemap.xml (including /docs/:sectionId,
+# /sessions/:slug, /blog/:slug, and /datenschutz) has its own prerendered HTML file in dist/,
+# and a real file wins over this non-forced rule. Unmatched paths serve dist/404.html with a
+# true HTTP 404 status (eliminating Soft-404 indexing) while still booting the React router.
 [[redirects]]
   from = "/*"
-  to = "/spa.html"
-  status = 200
+  to = "/404.html"
+  status = 404

@@ -48,8 +48,11 @@ export const SITE_URL = 'https://live-music-coder.pro'
 export const MIN_WORDS = 80
 /* Any other route: enough text that a fallback or an empty render cannot pass */
 export const MIN_ROOT_WORDS = 20
-/* The SPA shell for paths without a prerendered file — netlify.toml rewrites to it */
+/* The SPA shell for offline service-worker navigation fallback */
 export const SHELL_FILE = 'spa.html'
+/* Prerendered 404 document served by Netlify with HTTP status 404 on unmatched paths */
+export const NOT_FOUND_FILE = '404.html'
+export const NOT_FOUND_ROUTE = '/__404__'
 
 const STRIP_RX = /<!--[\s\S]*?-->|<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>|<template\b[\s\S]*?<\/template>/gi
 const TAG_RX = /<[^>]+>/g
@@ -205,6 +208,40 @@ export function checkPage(page, appHtml, { routePath, meta, canonical }) {
   return { problems, words, rootWords, h1s }
 }
 
+/**
+ * Builds dist/404.html from the unmatched NotFound route: carries noindex/nofollow, no canonical
+ * link (a 404 page must never canonicalize a broken URL), and the prerendered <h1>404</h1>.
+ */
+export function buildNotFoundPage(template, appHtml, siteUrl = SITE_URL) {
+  const problems = []
+  const meta = {
+    title: '404 — Page Not Found — Live Music Coder',
+    description: 'This page does not exist on Live Music Coder.',
+  }
+
+  const placeholders = template.split(PLACEHOLDER).length - 1
+  if (placeholders !== 1) problems.push(`expected exactly one ${PLACEHOLDER} in the template, found ${placeholders}`)
+  if (count(template, /<link rel="canonical"/) !== 0) problems.push('the template already carries a canonical link')
+
+  let page = template
+  for (const tag of HEAD_TAGS) {
+    const found = count(page, tag.rx)
+    if (found !== 1) {
+      problems.push(`expected exactly one ${tag.label} in the template, found ${found}`)
+      continue
+    }
+    page = page.replace(tag.rx, () => tag.render(meta, siteUrl))
+  }
+  page = page.replace('</head>', () => '<meta name="robots" content="noindex, nofollow" />\n  </head>')
+  if (placeholders === 1) {
+    page = page.replace(PLACEHOLDER, () => `<div id="root" data-prerendered="${NOT_FOUND_ROUTE}">${appHtml}</div>`)
+  }
+  if (h1Count(appHtml) !== 1) problems.push(`expected 1 <h1> in NotFound render, found ${h1Count(appHtml)}`)
+  if (FALLBACK_RX.test(appHtml)) problems.push('React wrote a Suspense fallback on NotFound route')
+
+  return { page, problems }
+}
+
 /** Problems across routes: a <title> on two URLs fails S5. */
 export function checkTitles(results) {
   const seen = new Map()
@@ -243,13 +280,18 @@ async function main() {
   }
   problems.push(...checkTitles(results))
 
+  const { html: notFoundAppHtml } = await render(NOT_FOUND_ROUTE)
+  const { page: notFoundPage, problems: notFoundProblems } = buildNotFoundPage(template, notFoundAppHtml)
+  for (const problem of notFoundProblems) problems.push(`${NOT_FOUND_FILE}: ${problem}`)
+
   if (problems.length > 0) {
     for (const problem of problems) console.error(`[prerender] FAIL — ${problem}`)
     process.exit(1)
   }
 
-  /* The bare shell first: index.html is about to become the prerendered home page */
+  /* The bare shell first (for offline SW fallback) + prerendered 404.html */
   writeFileSync(path.join(dist, SHELL_FILE), template)
+  writeFileSync(path.join(dist, NOT_FOUND_FILE), notFoundPage)
   for (const { routePath, page, words, rootWords, h1s } of results) {
     const file = path.join(dist, outputFile(routePath))
     mkdirSync(path.dirname(file), { recursive: true })
@@ -260,7 +302,9 @@ async function main() {
     )
   }
   rmSync(ssrDir, { recursive: true, force: true })
-  console.log(`[prerender] ${results.length} routes prerendered; dist/${SHELL_FILE} keeps the SPA shell`)
+  console.log(
+    `[prerender] ${results.length} routes prerendered + dist/${NOT_FOUND_FILE}; dist/${SHELL_FILE} keeps the offline SPA shell`,
+  )
 }
 
 /* Only when run as a script: tests import the checks without a build */

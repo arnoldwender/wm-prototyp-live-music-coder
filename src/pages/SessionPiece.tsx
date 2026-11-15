@@ -32,7 +32,7 @@ export default function SessionPiece() {
 
   usePageMeta({
     title: piece
-      ? `${piece.title} — Sessions — Live Music Coder`
+      ? `${piece.title} — ${piece.subtitle} — Live Music Coder`
       : 'Sessions — Live Music Coder',
     description: piece?.shortDescription ?? '',
     path: piece ? `/sessions/${piece.slug}` : '/sessions',
@@ -43,6 +43,28 @@ export default function SessionPiece() {
   if (!piece) {
     return <Navigate to="/sessions" replace />
   }
+
+  const sessionJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'MusicComposition',
+    name: piece.title,
+    description: piece.shortDescription,
+    dateCreated: piece.date,
+    inLanguage: 'de',
+    genre: piece.category,
+    url: `https://live-music-coder.pro/sessions/${piece.slug}`,
+    ...(piece.movements?.[0]?.key ? { musicalKey: piece.movements[0].key } : {}),
+    composer: {
+      '@type': piece.author.kind === 'human' ? 'Person' : 'SoftwareApplication',
+      name: piece.author.name,
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': 'https://www.wendermedia.com/#organization',
+      name: 'Wender Media',
+      url: 'https://www.wendermedia.com',
+    },
+  }).replace(/</g, '\\u003c')
 
   /* Load code into the built-in editor. Passes the payload through
      react-router's `location.state` instead of a URL hash because
@@ -69,6 +91,10 @@ export default function SessionPiece() {
         color: 'var(--color-text)',
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: sessionJsonLd }}
+      />
       {/* --- Skip-to-content --- */}
       <a
         href="#piece-main"

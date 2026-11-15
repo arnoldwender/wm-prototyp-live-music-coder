@@ -17,7 +17,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { Suspense } from 'react'
-import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Landing from './pages/Landing'
 import EditorPage from './pages/EditorPage'
@@ -123,7 +123,7 @@ export function AppContent() {
               via the isElectron prop from platform.ts. The hero's "Start Coding"
               CTA navigates to /editor. */}
           <Route path="/" element={<Landing />} />
-          <Route path="/landing" element={<Landing />} />
+          <Route path="/landing" element={<Navigate to="/" replace />} />
           <Route path="/editor" element={<EditorPage />} />
           {/* Lazy pages — one table with preloadRoute() (src/routes.ts) */}
           {LAZY_PAGES.map(({ path, route }) => (

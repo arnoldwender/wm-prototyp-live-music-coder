@@ -31,8 +31,35 @@ export default function BlogPost() {
 
   if (!post) return <NotFound />
 
+  const blogJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.date,
+    inLanguage: 'en',
+    url: `https://live-music-coder.pro/blog/${post.slug}`,
+    mainEntityOfPage: `https://live-music-coder.pro/blog/${post.slug}`,
+    author: {
+      '@type': 'Person',
+      '@id': 'https://arnoldwender.com/#person',
+      name: post.author.name,
+      ...(post.author.url ? { url: post.author.url } : {}),
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': 'https://www.wendermedia.com/#organization',
+      name: 'Wender Media',
+      url: 'https://www.wendermedia.com',
+    },
+  }).replace(/</g, '\\u003c')
+
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: blogJsonLd }}
+      />
       {/* --- Skip-to-content for a11y --- */}
       <a
         href="#blog-post-content"

@@ -37,10 +37,18 @@ export function getDefaultSampleUrls(protocol?: string): DefaultSampleUrls {
   }
 }
 
-/** Build the Strudel REPL expression that registers default samples without autoplay. */
+function toSingleQuotedJsString(value: string): string {
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+}
+
+/**
+ * Build the Strudel REPL expression that registers default samples without autoplay.
+ * Must use single-quoted JS strings: Strudel's transpiler rewrites double-quoted
+ * strings ("...") into mini-notation m("..."), which throws a parse error on URLs.
+ */
 export function getDefaultSamplesReplExpression(protocol?: string): string {
   const { manifestUrl, baseUrl } = getDefaultSampleUrls(protocol)
-  return `samples(${JSON.stringify(manifestUrl)}, ${JSON.stringify(baseUrl)})`
+  return `samples(${toSingleQuotedJsString(manifestUrl)}, ${toSingleQuotedJsString(baseUrl)})`
 }
 
 /** Register default Dirt-Samples on a Strudel REPL instance, with direct webaudio fallback. */

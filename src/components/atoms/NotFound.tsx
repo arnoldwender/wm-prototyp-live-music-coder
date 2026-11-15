@@ -5,9 +5,15 @@
    Uses design tokens for consistent dark theme styling.
    ────────────────────────────────────────────────────────── */
 
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 function NotFound() {
+  useEffect(() => {
+    document.title = '404 — Page Not Found — Live Music Coder'
+    document.querySelector('link[rel="canonical"]')?.remove()
+  }, [])
+
   return (
     <main
       style={{
