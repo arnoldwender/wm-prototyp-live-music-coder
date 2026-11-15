@@ -20,9 +20,12 @@ import { describe, expect, it } from 'vitest'
 import {
   MIN_ROOT_WORDS,
   MIN_WORDS,
+  NOT_FOUND_FILE,
+  NOT_FOUND_ROUTE,
   PLACEHOLDER,
   SHELL_FILE,
   SITE_URL,
+  buildNotFoundPage,
   buildPage,
   checkPage,
   checkTitles,
@@ -197,12 +200,23 @@ describe('checkTitles', () => {
   })
 })
 
+describe('buildNotFoundPage', () => {
+  it('writes noindex/nofollow, omits canonical, and marks #root with NOT_FOUND_ROUTE', () => {
+    const { page, problems } = buildNotFoundPage(template(), '<main><h1>404</h1><p>Not found</p></main>')
+    expect(problems).toEqual([])
+    expect(page).toContain('<title>404 — Page Not Found — Live Music Coder</title>')
+    expect(page).toContain('<meta name="robots" content="noindex, nofollow" />')
+    expect(page).not.toContain('<link rel="canonical"')
+    expect(page).toContain(`<div id="root" data-prerendered="${NOT_FOUND_ROUTE}">`)
+  })
+})
+
 describe('netlify.toml', () => {
-  it('rewrites paths without a file to the SPA shell the script writes, not to the home page', () => {
+  it('serves prerendered 404.html with true HTTP 404 for unmatched paths (no Soft-404)', () => {
     const toml = readFileSync(path.join(root, 'netlify.toml'), 'utf8')
     const rule = toml.match(/\[\[redirects\]\][^[]*from = "\/\*"[^[]*/)?.[0] ?? ''
-    expect(rule).toMatch(new RegExp(`to = "/${SHELL_FILE.replace('.', '\\.')}"`))
-    expect(rule).toMatch(/status = 200/)
+    expect(rule).toMatch(new RegExp(`to = "/${NOT_FOUND_FILE.replace('.', '\\.')}"`))
+    expect(rule).toMatch(/status = 404/)
     expect(rule).not.toMatch(/force = true/)
   })
 })

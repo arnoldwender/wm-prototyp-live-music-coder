@@ -7,7 +7,7 @@
    first-time visitors. Renders achievement toast overlay.
    ────────────────────────────────────────────────────────── */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import EditorLayout from '../layouts/EditorLayout'
@@ -15,17 +15,20 @@ import { TransportBar, StatusBar, CodeEditor, NodeGraph, VisualizerDashboard, Te
 import { AchievementToast } from '../components/molecules'
 import { readShareFromUrl } from '../lib/persistence/url'
 import type { UrlShareData } from '../lib/persistence/url'
+import { clearEphemeralWebToken } from '../lib/persistence/gist'
+import { DEFAULT_BPM, DEFAULT_ENGINE } from '../lib/constants'
 import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
 import { startAutosave, readAutosave, clearAutosave } from '../lib/persistence/autosave'
 import type { Project } from '../types/project'
+
+const SAFE_DEFAULT_CODE = 'note("c3 e3 g3 b3").s("sawtooth").lpf(800)'
 
 function Editor() {
   const { t } = useTranslation()
   const location = useLocation()
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
-  const [showSharedWarning, setShowSharedWarning] = useState(false)
   const [recovered, setRecovered] = useState<Project | null>(null)
 
   const files = useAppStore((s) => s.files)
@@ -33,6 +36,11 @@ function Editor() {
   const setBpm = useAppStore((s) => s.setBpm)
   const setDefaultEngine = useAppStore((s) => s.setDefaultEngine)
   const checkStreak = useAppStore((s) => s.checkStreak)
+  const untrustedCodePending = useAppStore((s) => s.untrustedCodePending)
+  const setUntrustedCodePending = useAppStore((s) => s.setUntrustedCodePending)
+
+  const warningDialogRef = useRef<HTMLDivElement>(null)
+  const reviewBtnRef = useRef<HTMLButtonElement>(null)
 
   /* The page's title, description and canonical are set by the route wrapper,
      src/pages/EditorPage.tsx, which the prerender renders without this IDE. */
@@ -40,16 +48,13 @@ function Editor() {
   /* On mount: check streak, load shared code, or show template selector.
    *
    *  Shared code can arrive from two channels:
-   *    1. `location.state.share` — set by in-app navigation from
-   *       Examples, SessionPiece, etc. Preferred because it survives
-   *       HashRouter under Electron (the URL hash is reserved for
-   *       routing there, so a `#code=` fragment gets clobbered).
-   *    2. `window.location.hash` — the legacy channel, still used by
-   *       external share links on the web (both hand-crafted and
-   *       generated via `generateShareUrl`).
+   *    1. `location.state.share` — set by first-party in-app navigation from
+   *       Examples, Samples, SessionPiece, ExampleGallery. Survives HashRouter
+   *       under Electron and cannot be forged cross-origin.
+   *    2. `window.location.hash` — external share links (`#code=...`), which
+   *       are untrusted and activate `untrustedCodePending` until reviewed.
    */
   useEffect(() => {
-    /* Check and update daily streak */
     checkStreak()
 
     const stateShare = (location.state as { share?: UrlShareData } | null)?.share
@@ -65,27 +70,30 @@ function Editor() {
       setBpm(shared.bpm)
       setDefaultEngine(shared.engine)
 
-      /* SECURITY: Always show warning for shared/external code — never skip */
-      setShowSharedWarning(true)
-      /* Clean the hash after reading (only meaningful under BrowserRouter;
-         harmless under HashRouter because the share came from state). */
-      if (!stateShare) window.location.hash = ''
+      if (!stateShare) {
+        /* External URL share — block execution and wipe ephemeral PAT until reviewed */
+        clearEphemeralWebToken()
+        setUntrustedCodePending(true)
+        window.location.hash = ''
+      } else {
+        setUntrustedCodePending(false)
+      }
     } else if (!localStorage.getItem('lmc-onboarded')) {
-      /* First visit — show the template selector */
       setShowTemplateSelector(true)
     } else if (!localStorage.getItem('lmc-tutorial-done')) {
-      /* Onboarded but tutorial not completed — show tutorial overlay */
       setShowTutorial(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /* Move focus into the untrusted-code security gate whenever it opens */
+  useEffect(() => {
+    if (!untrustedCodePending) return
+    clearEphemeralWebToken()
+    reviewBtnRef.current?.focus()
+  }, [untrustedCodePending])
+
   /* Autosave + crash recovery.
-   *
-   * The service worker calls skipWaiting() on install and navigates every open
-   * client on activate, so a deploy reloads a live-coding session mid-set. Until
-   * this existed there was nothing to come back to: the whole IndexedDB layer
-   * shipped with zero consumers.
    *
    * The restore is OFFERED, never applied silently — the user may have opened
    * the editor deliberately empty, and overwriting their buffer with a previous
@@ -108,8 +116,6 @@ function Editor() {
       }
     }
 
-    /* Offer recovery only when there is something to recover AND the current
-       buffer is untouched, so we never talk over work in progress. */
     void readAutosave().then((saved) => {
       if (!saved) return
       const current = useAppStore.getState().files
@@ -142,10 +148,8 @@ function Editor() {
     return () => {
       const orch = getOrchestrator()
       orch.stop()
-      /* Reset store play state so TransportBar is correct on re-entry */
       useAppStore.getState().stop()
 
-      /* Show session summary toast if session was > 60 seconds */
       const stats = useAppStore.getState().sessionStats
       const elapsed = Math.floor((Date.now() - stats.startTime) / 1000)
       if (elapsed > 60) {
@@ -163,20 +167,52 @@ function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const dismissWarning = useCallback(() => setShowSharedWarning(false), [])
+  const approveExternalCode = useCallback(() => {
+    setUntrustedCodePending(false)
+  }, [setUntrustedCodePending])
+
+  const discardExternalCode = useCallback(() => {
+    useAppStore.getState().loadProject({
+      bpm: DEFAULT_BPM,
+      defaultEngine: DEFAULT_ENGINE,
+      files: [
+        {
+          id: `file_${Date.now()}`,
+          name: 'main.js',
+          engine: DEFAULT_ENGINE,
+          code: SAFE_DEFAULT_CODE,
+          active: true,
+        },
+      ],
+    })
+    setUntrustedCodePending(false)
+  }, [setUntrustedCodePending])
+
+  const handleWarningKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab') return
+    const container = warningDialogRef.current
+    if (!container) return
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [])
 
   return (
     <>
-      {/* The page's heading for assistive technology — the IDE has no visible
-          title bar, and EditorPage's placeholder (which it replaces) carries the
-          same text as a visible <h1>. */}
       <h1 className="sr-only">{t('editor.placeholderTitle')}</h1>
 
-      {/* Security warning modal when code was loaded from a shared URL */}
-      {/* Crash-recovery offer. Non-modal by design: the shared-code warning is a
-          security gate and blocks, this is a convenience and must not stand
-          between the user and an empty editor. */}
-      {recovered && (
+      {/* Crash-recovery offer (non-modal convenience) */}
+      {recovered && !untrustedCodePending && (
         <div
           role="dialog"
           aria-label={t('editor.recoverTitle')}
@@ -246,8 +282,10 @@ function Editor() {
         </div>
       )}
 
-      {showSharedWarning && (
+      {/* Blocking security gate whenever code enters from URL hash, Gist, or .lmc file */}
+      {untrustedCodePending && (
         <div
+          onKeyDown={handleWarningKeyDown}
           style={{
             position: 'fixed',
             inset: 0,
@@ -261,47 +299,87 @@ function Editor() {
           }}
         >
           <div
+            ref={warningDialogRef}
             role="alertdialog"
-            aria-label={t('editor.sharedCodeWarning')}
+            aria-modal="true"
+            aria-labelledby="shared-code-warning-title"
+            aria-describedby="shared-code-warning-desc"
             style={{
               backgroundColor: 'var(--color-bg-elevated)',
               border: '1px solid var(--color-warning)',
               borderRadius: 'var(--radius-md)',
               padding: 'var(--space-6)',
-              maxWidth: '400px',
+              maxWidth: '440px',
               width: '100%',
               textAlign: 'center',
+              boxShadow: 'var(--shadow-lg)',
             }}
           >
-            <div style={{ fontSize: '24px', marginBottom: 'var(--space-3)' }}>&#9888;</div>
-            <div style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text)',
-              marginBottom: 'var(--space-4)',
-              lineHeight: 'var(--line-height-base)',
-            }}>
-              {t('editor.sharedCodeWarning')}
-            </div>
-            <button
-              type="button"
-              onClick={dismissWarning}
+            <div aria-hidden="true" style={{ fontSize: 'var(--font-size-xl)', marginBottom: 'var(--space-2)' }}>&#9888;</div>
+            <h2
+              id="shared-code-warning-title"
               style={{
-                backgroundColor: 'var(--color-warning)',
-                color: 'var(--color-bg)',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                padding: 'var(--space-2) var(--space-6)',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: 'var(--font-weight-bold)',
-                cursor: 'pointer',
+                fontSize: 'var(--font-size-base)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: 'var(--color-text)',
+                marginBottom: 'var(--space-2)',
               }}
             >
-              {t('editor.dismiss')}
-            </button>
+              {t('editor.sharedCodeWarningTitle')}
+            </h2>
+            <p
+              id="shared-code-warning-desc"
+              style={{
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--color-text-secondary)',
+                marginBottom: 'var(--space-4)',
+                lineHeight: 'var(--line-height-base)',
+              }}
+            >
+              {t('editor.sharedCodeWarning')}
+            </p>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={discardExternalCode}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-text)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--font-size-sm)',
+                  cursor: 'pointer',
+                  minHeight: 'var(--size-touch, 44px)',
+                }}
+              >
+                {t('editor.discardExternalCode')}
+              </button>
+              <button
+                ref={reviewBtnRef}
+                type="button"
+                onClick={approveExternalCode}
+                style={{
+                  backgroundColor: 'var(--color-warning)',
+                  color: 'var(--color-bg)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-2) var(--space-5)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-bold)',
+                  cursor: 'pointer',
+                  minHeight: 'var(--size-touch, 44px)',
+                }}
+              >
+                {t('editor.reviewBeforeRun')}
+              </button>
+            </div>
           </div>
         </div>
       )}
+
       <EditorLayout
+        inert={untrustedCodePending}
         toolbar={<TransportBar />}
         activityBar={<ActivityBar />}
         editor={<CodeEditor />}
@@ -314,7 +392,6 @@ function Editor() {
       {showTemplateSelector && (
         <TemplateSelector onSelect={() => {
           setShowTemplateSelector(false)
-          /* After template selection, show tutorial if not already done */
           if (!localStorage.getItem('lmc-tutorial-done')) {
             setShowTutorial(true)
           }
@@ -324,7 +401,6 @@ function Editor() {
         <TutorialOverlay onComplete={() => setShowTutorial(false)} />
       )}
 
-      {/* Achievement toast overlay — renders above everything */}
       <AchievementToast />
     </>
   )

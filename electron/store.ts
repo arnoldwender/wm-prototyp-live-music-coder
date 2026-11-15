@@ -26,13 +26,15 @@ export interface AppPreferences {
   windowBounds: WindowBounds | null
   minimizeToTray: boolean
   lastSavePath: string | null
+  encryptedGistToken: string | null
 }
 
 const DEFAULTS: AppPreferences = {
   recentFiles: [],
   windowBounds: null,
-  minimizeToTray: true,
+  minimizeToTray: false,
   lastSavePath: null,
+  encryptedGistToken: null,
 }
 
 /** Simple JSON-based preferences store — lazy-initialized after app ready */

@@ -5,7 +5,7 @@
    theme, font size, vim mode, zen mode. Persists to localStorage.
    ────────────────────────────────────────────────────────── */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { EDITOR_THEMES } from '../../lib/editor/themes';
@@ -26,6 +26,8 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
   const [settings, setSettings] = useState<EditorSettings>(loadSettings);
   const setEditorTheme = useAppStore((s) => s.setEditorTheme);
   const setVimMode = useAppStore((s) => s.setVimMode);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   /* Persist on change and sync to Zustand store for reactive CM6 reconfiguration */
   useEffect(() => {
@@ -34,6 +36,45 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
     setVimMode(settings.vimMode);
     onSettingsChange?.(settings);
   }, [settings, onSettingsChange, setEditorTheme, setVimMode]);
+
+  /* Focus trap entry + focus restoration on close */
+  useEffect(() => {
+    if (!open) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const container = backdropRef.current;
+    if (container) {
+      const focusable = container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length > 0) focusable[0].focus();
+    }
+    return () => {
+      previousFocusRef.current?.focus();
+    };
+  }, [open]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const container = backdropRef.current;
+    if (!container) return;
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, [onClose]);
 
   if (!open) return null;
 
@@ -44,6 +85,11 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
   return (
     /* Backdrop */
     <div
+      ref={backdropRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-dialog-title"
+      onKeyDown={handleKeyDown}
       style={{
         position: 'fixed',
         inset: 0,
@@ -59,11 +105,12 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
       {/* Panel */}
       <div
         style={{
-          width: '420px',
+          width: 'calc(100% - var(--space-8))',
+          maxWidth: '420px',
           maxHeight: '80vh',
           backgroundColor: 'var(--color-bg-alt)',
           border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg, 12px)',
+          borderRadius: 'var(--radius-lg)',
           overflow: 'auto',
         }}
       >
@@ -77,19 +124,19 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
             borderBottom: '1px solid var(--color-border)',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: 'var(--font-size-lg)', fontWeight: 600 }}>
-            Settings
+          <h2 id="settings-dialog-title" style={{ margin: 0, fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-semibold)' }}>
+            {t('settingsModal.title')}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close settings"
+            aria-label={t('settingsModal.close')}
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '28px',
-              height: '28px',
+              width: 'var(--space-11)',
+              height: 'var(--space-11)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'transparent',
@@ -105,20 +152,21 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
         <div style={{ padding: 'var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
 
           {/* Theme */}
-          <SettingRow label="Theme">
+          <SettingRow label={t('settingsModal.theme')}>
             <select
+              aria-label={t('settingsModal.theme')}
               value={settings.themeId}
               onChange={(e) => update('themeId', e.target.value)}
               style={selectStyle}
             >
-              {EDITOR_THEMES.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
+              {EDITOR_THEMES.map((th) => (
+                <option key={th.id} value={th.id}>{th.name}</option>
               ))}
             </select>
           </SettingRow>
 
           {/* Font size */}
-          <SettingRow label="Font Size">
+          <SettingRow label={t('settingsModal.fontSize')}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <input
                 type="range"
@@ -127,30 +175,30 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
                 step={1}
                 value={settings.fontSize}
                 onChange={(e) => update('fontSize', Number(e.target.value))}
-                aria-label="Font Size"
+                aria-label={t('settingsModal.fontSize')}
                 style={{ width: '120px' }}
               />
-              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)', minWidth: '30px' }}>
+              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-family-mono)', minWidth: 'var(--space-12)' }}>
                 {settings.fontSize}px
               </span>
             </div>
           </SettingRow>
 
           {/* Toggles */}
-          <SettingRow label="Line Numbers">
-            <Toggle aria-label="Line Numbers" checked={settings.lineNumbers} onChange={(v) => update('lineNumbers', v)} />
+          <SettingRow label={t('settingsModal.lineNumbers')}>
+            <Toggle aria-label={t('settingsModal.lineNumbers')} checked={settings.lineNumbers} onChange={(v) => update('lineNumbers', v)} />
           </SettingRow>
 
-          <SettingRow label="Word Wrap">
-            <Toggle aria-label="Word Wrap" checked={settings.wordWrap} onChange={(v) => update('wordWrap', v)} />
+          <SettingRow label={t('settingsModal.wordWrap')}>
+            <Toggle aria-label={t('settingsModal.wordWrap')} checked={settings.wordWrap} onChange={(v) => update('wordWrap', v)} />
           </SettingRow>
 
-          <SettingRow label="Vim Mode">
-            <Toggle aria-label="Vim Mode" checked={settings.vimMode} onChange={(v) => update('vimMode', v)} />
+          <SettingRow label={t('settingsModal.vimMode')}>
+            <Toggle aria-label={t('settingsModal.vimMode')} checked={settings.vimMode} onChange={(v) => update('vimMode', v)} />
           </SettingRow>
 
-          <SettingRow label="Zen Mode">
-            <Toggle aria-label="Zen Mode" checked={settings.zenMode} onChange={(v) => update('zenMode', v)} />
+          <SettingRow label={t('settingsModal.zenMode')}>
+            <Toggle aria-label={t('settingsModal.zenMode')} checked={settings.zenMode} onChange={(v) => update('zenMode', v)} />
           </SettingRow>
         </div>
 
@@ -175,8 +223,8 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
 
 function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{label}</span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)' }}>
+      <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{label}</span>
       {children}
     </div>
   );
@@ -191,25 +239,26 @@ function Toggle({ checked, onChange, 'aria-label': ariaLabel }: { checked: boole
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       style={{
-        width: '36px',
-        height: '20px',
-        borderRadius: '10px',
+        width: 'var(--space-13)',
+        height: 'var(--space-10)',
+        borderRadius: 'var(--radius-full)',
         border: 'none',
         backgroundColor: checked ? 'var(--color-primary)' : 'var(--color-bg-hover)',
         cursor: 'pointer',
         position: 'relative',
         transition: 'var(--transition-fast)',
+        flexShrink: 0,
       }}
     >
       <span
         style={{
           position: 'absolute',
-          top: '2px',
-          left: checked ? '18px' : '2px',
-          width: '16px',
-          height: '16px',
-          borderRadius: '50%',
-          backgroundColor: 'white',
+          top: 'var(--space-2)',
+          left: checked ? 'var(--space-9)' : 'var(--space-2)',
+          width: 'var(--space-8)',
+          height: 'var(--space-8)',
+          borderRadius: 'var(--radius-full)',
+          backgroundColor: 'var(--color-text)',
           transition: 'var(--transition-fast)',
         }}
       />
@@ -225,6 +274,6 @@ const selectStyle: React.CSSProperties = {
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-sm)',
   padding: 'var(--space-1) var(--space-3)',
+  minHeight: 'var(--space-11)',
   cursor: 'pointer',
-  outline: 'none',
 };

@@ -8,6 +8,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { MarkdownRenderer } from '../components/molecules/MarkdownRenderer'
 import { Badge } from '../components/atoms'
 import { NotFound } from '../components/atoms'
@@ -30,8 +31,35 @@ export default function BlogPost() {
 
   if (!post) return <NotFound />
 
+  const blogJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.date,
+    inLanguage: 'en',
+    url: `https://live-music-coder.pro/blog/${post.slug}`,
+    mainEntityOfPage: `https://live-music-coder.pro/blog/${post.slug}`,
+    author: {
+      '@type': 'Person',
+      '@id': 'https://arnoldwender.com/#person',
+      name: post.author.name,
+      ...(post.author.url ? { url: post.author.url } : {}),
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': 'https://www.wendermedia.com/#organization',
+      name: 'Wender Media',
+      url: 'https://www.wendermedia.com',
+    },
+  }).replace(/</g, '\\u003c')
+
   return (
-    <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: blogJsonLd }}
+      />
       {/* --- Skip-to-content for a11y --- */}
       <a
         href="#blog-post-content"
@@ -53,7 +81,8 @@ export default function BlogPost() {
 
       <SiteNav />
 
-      <article id="blog-post-content" style={{ maxWidth: '760px', margin: '0 auto', padding: 'var(--space-6)' }}>
+      <main className="flex-1">
+      <article id="blog-post-content" tabIndex={-1} style={{ maxWidth: '760px', margin: '0 auto', padding: 'var(--space-6)' }}>
         {/* Back link */}
         <Link
           to="/blog"
@@ -97,6 +126,9 @@ export default function BlogPost() {
         {/* Body */}
         <MarkdownRenderer content={post.body} />
       </article>
-    </main>
+      </main>
+
+      <SiteFooter />
+    </div>
   )
 }

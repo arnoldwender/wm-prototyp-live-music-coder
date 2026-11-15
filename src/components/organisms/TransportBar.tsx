@@ -97,12 +97,15 @@ function TransportBar() {
   /* Dialog and panel visibility state */
   const [showShare, setShowShare] = useState(false)
   const [showGist, setShowGist] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
+  const showSettings = useAppStore((s) => s.settingsModalOpen)
+  const setShowSettings = useAppStore((s) => s.setSettingsModalOpen)
+  const untrustedCodePending = useAppStore((s) => s.untrustedCodePending)
 
   /* ── Orchestrator-wired handlers ── */
 
   /** Play/pause toggle — bridges UI state with audio engine */
   const handlePlay = async () => {
+    if (untrustedCodePending) return
     const orch = getOrchestrator()
     if (isPlaying) {
       orch.stop()

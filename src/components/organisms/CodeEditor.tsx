@@ -87,6 +87,7 @@ export function CodeEditor() {
 
   /** Manually evaluate the current code — works regardless of play state */
   const handleManualEvaluate = useCallback(async () => {
+    if (useAppStore.getState().untrustedCodePending) return;
     if (activeFileCode === undefined || activeFileEngine === undefined) return;
     const orch = getOrchestrator();
     try {
@@ -131,6 +132,7 @@ export function CodeEditor() {
     const orch = getOrchestrator();
     evaluatorRef.current = createEvaluator(
       async (code) => {
+        if (useAppStore.getState().untrustedCodePending) return;
         /* Syntax pre-check — don't evaluate broken code in live mode.
          * This prevents flooding errors while the user is mid-keystroke.
          * SECURITY: new Function() on user-authored code is self-XSS by design — the user
@@ -151,9 +153,16 @@ export function CodeEditor() {
     );
   }, [activeFileId, activeFileEngine]);
 
+  const handleManualEvaluateRef = useRef(handleManualEvaluate);
+  useEffect(() => {
+    handleManualEvaluateRef.current = handleManualEvaluate;
+  }, [handleManualEvaluate]);
+
   /** Create or recreate the CM6 editor when active file changes */
   useEffect(() => {
-    if (!editorRef.current || !activeFile) return;
+    if (!editorRef.current || activeFileId === undefined || activeFileEngine === undefined) return;
+    const initialCode =
+      useAppStore.getState().files.find((f) => f.id === activeFileId)?.code ?? '';
 
     /* Destroy previous editor */
     viewRef.current?.destroy();
@@ -162,10 +171,10 @@ export function CodeEditor() {
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         const code = update.state.doc.toString();
-        updateFileCode(activeFile.id, code);
+        useAppStore.getState().updateFileCode(activeFileId, code);
         /* Live mode: auto-evaluate on every code change when enabled.
-     * Works for ALL engines — no need to press Play first. */
-        if (autoUpdateRef.current) {
+         * Works for ALL engines — no need to press Play first. */
+        if (autoUpdateRef.current && !useAppStore.getState().untrustedCodePending) {
           evaluatorRef.current?.evaluate(code);
         }
       }
@@ -176,17 +185,17 @@ export function CodeEditor() {
       key: 'Ctrl-Enter',
       mac: 'Cmd-Enter',
       run: () => {
-        handleManualEvaluate();
+        void handleManualEvaluateRef.current();
         return true;
       },
     }]);
 
     /* Create new editor state with base + engine-specific extensions */
     const state = EditorState.create({
-      doc: activeFile.code,
+      doc: initialCode,
       extensions: [
         ...getBaseExtensions(),
-        ...getEngineExtensions(activeFile.engine),
+        ...getEngineExtensions(activeFileEngine),
         flashField,
         updateListener,
         evalKeymap,
@@ -199,14 +208,12 @@ export function CodeEditor() {
       parent: editorRef.current,
     });
 
-    setupEvaluator();
-
     return () => {
       evaluatorRef.current?.cancel();
       viewRef.current?.destroy();
       viewRef.current = null;
     };
-  }, [activeFile?.id, activeFile?.engine]);
+  }, [activeFileId, activeFileEngine]);
 
   /* Sync playing state with evaluator */
   useEffect(() => {
@@ -218,14 +225,14 @@ export function CodeEditor() {
    * is created, or when code is set from outside the editor */
   useEffect(() => {
     const view = viewRef.current;
-    if (!view || !activeFile) return;
+    if (!view || activeFileCode === undefined) return;
     const currentDoc = view.state.doc.toString();
-    if (currentDoc !== activeFile.code) {
+    if (currentDoc !== activeFileCode) {
       view.dispatch({
-        changes: { from: 0, to: currentDoc.length, insert: activeFile.code },
+        changes: { from: 0, to: currentDoc.length, insert: activeFileCode },
       });
     }
-  }, [activeFile?.code]);
+  }, [activeFileCode]);
 
   /* Listen for 'node-focus' custom events from EngineNode double-click.
    * Searches for the code string in the editor and selects it. */

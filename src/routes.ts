@@ -40,6 +40,7 @@ export const LAZY_PAGES: ReadonlyArray<{ path: string; route: LazyRoute }> = [
   { path: '/blog', route: blog },
   { path: '/blog/:slug', route: blogPost },
   { path: '/legal', route: legal },
+  { path: '/datenschutz', route: legal },
 ]
 
 /** Loads the page module of the route matching `pathname`; resolves at once for other routes */

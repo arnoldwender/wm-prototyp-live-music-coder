@@ -35,12 +35,25 @@ export function usePageMeta({ title, description, path }: PageMeta): void {
   collect?.({ title, description, path })
 
   useEffect(() => {
+    const canonicalUrl = `${SITE_URL}${path}`
+
     /* Title */
     document.title = title
 
     /* Meta description — index.html always carries one */
     const mainDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null
     if (mainDesc) mainDesc.content = description
+
+    /* Open Graph + Twitter Card tags — keep client SPA navigation in sync with SSR head */
+    const setMetaContent = (selector: string, content: string) => {
+      const el = document.querySelector(selector) as HTMLMetaElement | null
+      if (el) el.content = content
+    }
+    setMetaContent('meta[property="og:title"]', title)
+    setMetaContent('meta[property="og:description"]', description)
+    setMetaContent('meta[property="og:url"]', canonicalUrl)
+    setMetaContent('meta[name="twitter:title"]', title)
+    setMetaContent('meta[name="twitter:description"]', description)
 
     /* Canonical URL — the prerendered pages carry one; the SPA shell gets it here */
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
@@ -49,7 +62,7 @@ export function usePageMeta({ title, description, path }: PageMeta): void {
       canonical.setAttribute('rel', 'canonical')
       document.head.appendChild(canonical)
     }
-    canonical.href = `${SITE_URL}${path}`
+    canonical.href = canonicalUrl
 
     return () => {
       /* Restore defaults on unmount */

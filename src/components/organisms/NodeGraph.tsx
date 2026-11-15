@@ -106,22 +106,25 @@ export default function NodeGraph() {
     () => files.find((f) => f.active),
     [files],
   )
+  const activeFileId = activeFile?.id
+  const activeFileCode = activeFile?.code
+  const activeFileEngine = activeFile?.engine
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   /* Re-parse and rebuild graph when the active file code or engine changes */
   useEffect(() => {
-    if (!activeFile) {
+    if (activeFileId === undefined || activeFileCode === undefined || activeFileEngine === undefined) {
       setNodes([])
       setEdges([])
       return
     }
 
-    const { blocks, connections } = parseCode(activeFile.code, activeFile.engine)
+    const { blocks, connections } = parseCode(activeFileCode, activeFileEngine)
     setNodes(blocksToNodes(blocks, connections))
     setEdges(connectionsToEdges(connections))
-  }, [activeFile?.code, activeFile?.engine, activeFile?.id, setNodes, setEdges])
+  }, [activeFileId, activeFileCode, activeFileEngine, setNodes, setEdges])
 
   /* Whether an edit in the canvas can be written back as code for this engine */
   const graphIsEditable = activeFile

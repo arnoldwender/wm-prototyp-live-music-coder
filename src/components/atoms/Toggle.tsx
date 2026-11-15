@@ -37,8 +37,8 @@ function Toggle({ checked, onChange, label }: ToggleProps) {
         onClick={() => onChange(!checked)}
         className="relative focus-visible:outline-2 focus-visible:outline-offset-2"
         style={{
-          width: '36px',
-          height: '20px',
+          width: 'var(--space-13)',
+          height: 'var(--space-10)',
           borderRadius: 'var(--radius-full)',
           backgroundColor: checked ? 'var(--color-primary)' : 'var(--color-bg-hover)',
           border: 'none',
@@ -51,10 +51,10 @@ function Toggle({ checked, onChange, label }: ToggleProps) {
         <span
           style={{
             position: 'absolute',
-            top: '2px',
-            left: checked ? '18px' : '2px',
-            width: '16px',
-            height: '16px',
+            top: 'var(--space-2)',
+            left: checked ? 'var(--space-9)' : 'var(--space-2)',
+            width: 'var(--space-8)',
+            height: 'var(--space-8)',
             borderRadius: 'var(--radius-full)',
             backgroundColor: 'var(--color-text)',
             transition: 'var(--transition-fast)',

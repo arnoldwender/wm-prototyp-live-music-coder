@@ -1,13 +1,14 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   StatusBar organism — 3-zone bottom bar:
+   StatusBar organism — 3-zone bottom bar inside EditorLayout's <footer>:
    Left: engine badge (colored dot + short name)
    Center: BPM + playback status dot
-   Right: compact XP bar with level
+   Right: compact XP bar with level + legal links
    ────────────────────────────────────────────────────────── */
 
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAppStore, xpForLevel } from '../../lib/store'
 import { ENGINE_COLORS } from '../../lib/constants'
 
@@ -21,6 +22,7 @@ const ENGINE_SHORT: Record<string, string> = {
 
 /** Compact XP progress bar — level badge + filled bar */
 function XpBar() {
+  const { t } = useTranslation()
   const userXp = useAppStore((s) => s.userXp)
   const userLevel = useAppStore((s) => s.userLevel)
 
@@ -39,7 +41,7 @@ function XpBar() {
         color: 'var(--color-text-muted)',
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '4px',
+        gap: 'var(--space-2)',
       }}
       title={`Level ${userLevel} — ${xpInLevel}/${xpNeeded} XP`}
     >
@@ -52,10 +54,10 @@ function XpBar() {
       <span
         style={{
           display: 'inline-block',
-          width: '48px',
-          height: '4px',
+          width: 'var(--space-14)',
+          height: 'var(--space-2)',
           backgroundColor: 'var(--color-border)',
-          borderRadius: '2px',
+          borderRadius: 'var(--radius-sm)',
           overflow: 'hidden',
           verticalAlign: 'middle',
         }}
@@ -66,15 +68,13 @@ function XpBar() {
           aria-valuenow={Math.round(progress * 100)}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="XP Fortschritt"
+          aria-label={t('status.xpProgress')}
           style={{
             display: 'block',
             width: `${Math.round(progress * 100)}%`,
             height: '100%',
             backgroundColor: 'var(--color-primary)',
-            borderRadius: '2px',
-            /* XP progress bar — width transition is intentional for
-               smooth fill. Uses token for duration. */
+            borderRadius: 'var(--radius-sm)',
             transition: 'width var(--transition-base)',
           }}
         />
@@ -83,8 +83,9 @@ function XpBar() {
   )
 }
 
-/** 3-zone status bar: engine | BPM + status | XP */
+/** 3-zone status bar: engine | BPM + status | XP + legal links */
 function StatusBar() {
+  const { t } = useTranslation()
   const defaultEngine = useAppStore((s) => s.defaultEngine)
   const bpm = useAppStore((s) => s.bpm)
   const isPlaying = useAppStore((s) => s.isPlaying)
@@ -94,13 +95,13 @@ function StatusBar() {
   const engineName = ENGINE_SHORT[defaultEngine] ?? defaultEngine
 
   return (
-    <footer
+    <div
       className="flex items-center shrink-0"
       style={{
         backgroundColor: 'var(--color-bg-alt)',
         borderTop: '1px solid var(--color-border)',
-        padding: '0 12px',
-        height: '24px',
+        padding: '0 var(--space-6)',
+        height: 'var(--space-10)',
         fontSize: 'var(--font-size-ui)',
         color: 'var(--color-text-muted)',
         fontFamily: 'var(--font-family-mono)',
@@ -111,15 +112,14 @@ function StatusBar() {
       {/* ── Left zone: engine badge ── */}
       <div
         className="flex items-center"
-        style={{ gap: '6px', minWidth: 0, flex: '0 0 auto' }}
+        style={{ gap: 'var(--space-3)', minWidth: 0, flex: '0 0 auto' }}
       >
-        {/* Colored dot indicating active engine */}
         <span
           style={{
             display: 'inline-block',
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
+            width: 'var(--space-3)',
+            height: 'var(--space-3)',
+            borderRadius: 'var(--radius-full)',
             backgroundColor: engineColor,
             flexShrink: 0,
           }}
@@ -131,23 +131,22 @@ function StatusBar() {
       {/* ── Center zone: BPM + playback status ── */}
       <div
         className="flex items-center justify-center"
-        style={{ gap: '6px', flex: '1 1 auto', minWidth: 0 }}
+        style={{ gap: 'var(--space-3)', flex: '1 1 auto', minWidth: 0 }}
       >
-        <span style={{ color: 'var(--color-text)', fontWeight: 700 }}>
+        <span style={{ color: 'var(--color-text)', fontWeight: 'var(--font-weight-bold)' }}>
           {bpm}
         </span>
         <span>BPM</span>
-        {/* Status dot — green when playing, muted when stopped */}
         <span
           style={{
             display: 'inline-block',
-            width: '5px',
-            height: '5px',
-            borderRadius: '50%',
+            width: 'var(--space-3)',
+            height: 'var(--space-3)',
+            borderRadius: 'var(--radius-full)',
             backgroundColor: isPlaying ? 'var(--color-success)' : 'var(--color-text-muted)',
             flexShrink: 0,
           }}
-          aria-label={isPlaying ? 'Playing' : 'Stopped'}
+          aria-label={isPlaying ? t('status.playing') : t('status.stopped')}
           role="status"
         />
       </div>
@@ -155,18 +154,40 @@ function StatusBar() {
       {/* ── Right zone: XP bar + legal links ── */}
       <div
         className="flex items-center"
-        style={{ flex: '0 0 auto', minWidth: 0, gap: '8px' }}
+        style={{ flex: '0 0 auto', minWidth: 0, gap: 'var(--space-4)' }}
       >
         <XpBar />
-        {/* What's New link — discoverability for new features */}
-        <Link to="/changelog" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)', fontWeight: 'var(--font-weight-medium)' }}>What's New</Link>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>|</span>
-        {/* Legal links — TMG requires Impressum reachable from every page */}
-        <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}>Impressum</Link>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>|</span>
-        <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}>Datenschutz</Link>
+        <Link
+          to="/changelog"
+          style={{
+            color: 'var(--color-primary)',
+            textDecoration: 'none',
+            fontSize: 'var(--font-size-2xs)',
+            fontWeight: 'var(--font-weight-medium)',
+          }}
+        >
+          {t('status.whatsNew')}
+        </Link>
+        <span aria-hidden="true" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>
+          |
+        </span>
+        <Link
+          to="/legal"
+          style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}
+        >
+          {t('legal.impressum')}
+        </Link>
+        <span aria-hidden="true" style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-2xs)' }}>
+          |
+        </span>
+        <Link
+          to="/datenschutz"
+          style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: 'var(--font-size-2xs)' }}
+        >
+          {t('legal.datenschutz')}
+        </Link>
       </div>
-    </footer>
+    </div>
   )
 }
 

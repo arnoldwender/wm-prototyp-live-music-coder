@@ -28,9 +28,11 @@ interface EditorLayoutProps {
   detailPanel: ReactNode
   /** Bottom status bar */
   statusBar: ReactNode
+  /** Disable interaction/focus while a blocking security modal is open */
+  inert?: boolean
 }
 
-function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detailPanel, statusBar }: EditorLayoutProps) {
+function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detailPanel, statusBar, inert }: EditorLayoutProps) {
   const zenMode = useAppStore((s) => s.zenMode)
   const layout = useAppStore((s) => s.layout)
   const setEditorWidth = useAppStore((s) => s.setEditorWidth)
@@ -40,7 +42,7 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
   const isMobile = useMediaQuery('(max-width: 768px)')
 
   /* Ref for the main content area — used to compute resize percentages */
-  const mainRef = useRef<HTMLDivElement>(null)
+  const mainRef = useRef<HTMLElement>(null)
 
   /* ── Vertical resize (editor <-> graph) ── */
   const handleVerticalResize = useCallback(
@@ -137,7 +139,7 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
   const showGraph = !isMobile && layout.showGraph
 
   return (
-    <div className="flex flex-col h-full">
+    <div inert={inert || undefined} className="flex flex-col h-full">
       {/* ── Toolbar (40px) — hidden in zen mode ── */}
       {!zenMode && <header className="shrink-0">{toolbar}</header>}
 
@@ -147,7 +149,7 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
         {!zenMode && !isMobile && activityBar}
 
         {/* Center: editor zone (top) + visualizer zone (bottom) — takes all remaining space */}
-        <div ref={mainRef} className="flex-1 flex flex-col min-h-0 min-w-0">
+        <main ref={mainRef} id="editor-main" tabIndex={-1} className="flex-1 flex flex-col min-h-0 min-w-0">
           {/* Top zone: editor + graph (stacked vertically on mobile) */}
           <div
             className={isMobile ? 'flex flex-col flex-1 min-h-0' : 'flex min-h-0'}
@@ -235,7 +237,7 @@ function EditorLayout({ toolbar, activityBar, editor, graph, visualizers, detail
               {visualizers}
             </section>
           )}
-        </div>
+        </main>
 
         {/* Right: detail panel — overlays content, doesn't push editor */}
         {!zenMode && !isMobile && (

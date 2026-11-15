@@ -9,6 +9,7 @@
 import { AudioGraph } from './graph'
 import { createEngineAsync } from '../engines'
 import { resumeContext } from '../audio/context'
+import { useAppStore } from '../store'
 import type { EngineType, EngineAdapter } from '../../types/engine'
 import type { OrchestratorState } from './types'
 
@@ -46,6 +47,9 @@ export class Orchestrator {
 
   /** Evaluate code with the specified engine */
   async evaluate(code: string, engineType: EngineType): Promise<void> {
+    if (useAppStore.getState().untrustedCodePending) {
+      throw new Error('Review and accept external code before evaluating')
+    }
     const engine = await this.getEngine(engineType)
     /* EngineAdapter does not mandate evaluate() — delegate only if present */
     if ('evaluate' in engine && typeof (engine as Record<string, unknown>).evaluate === 'function') {
@@ -55,6 +59,7 @@ export class Orchestrator {
 
   /** Start playback — resumes AudioContext and starts all active engines */
   async start(): Promise<void> {
+    if (useAppStore.getState().untrustedCodePending) return
     await resumeContext()
     for (const engine of this.engines.values()) {
       /* Call without a block — interface now accepts optional EngineBlock */

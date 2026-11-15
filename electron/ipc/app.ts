@@ -3,9 +3,15 @@
 
 import { ipcMain, app, Notification } from 'electron'
 
+const MAX_NOTIFY_TITLE = 80
+const MAX_NOTIFY_BODY = 240
+const MIN_NOTIFY_INTERVAL_MS = 1_500
+
+let lastNotifyAt = 0
+
 /**
  * Register app-level IPC handlers.
- * Provides version info, notifications, quit, and update triggers.
+ * Provides version info, rate-limited notifications, and update triggers.
  */
 export function registerAppHandlers(): void {
   // --- Return app info to renderer ---
@@ -18,14 +24,19 @@ export function registerAppHandlers(): void {
     }
   })
 
-  // --- Show native notification ---
-  ipcMain.on('app:notify', (_event, title: string, body: string) => {
-    new Notification({ title, body }).show()
-  })
+  // --- Show native notification (type-checked, bounded, rate-limited) ---
+  ipcMain.on('app:notify', (_event, title: unknown, body: unknown) => {
+    if (typeof title !== 'string' || typeof body !== 'string') return
+    const now = Date.now()
+    if (now - lastNotifyAt < MIN_NOTIFY_INTERVAL_MS) return
+    lastNotifyAt = now
 
-  // --- Quit the application ---
-  ipcMain.on('app:quit', () => {
-    app.quit()
+    const safeTitle = title.trim().slice(0, MAX_NOTIFY_TITLE)
+    const safeBody = body.trim().slice(0, MAX_NOTIFY_BODY)
+    if (!safeTitle) return
+    if (Notification.isSupported()) {
+      new Notification({ title: safeTitle, body: safeBody }).show()
+    }
   })
 
   // --- Trigger manual update check ---

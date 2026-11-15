@@ -7,13 +7,15 @@
    CodeMirror and React Flow, which cannot run in the build's
    Node prerender. So while the build prerenders this route and
    while the browser hydrates that HTML, the route renders a
-   static placeholder that carries the page's <h1> and says what
-   the editor does — the text crawlers without JavaScript read.
+   static placeholder that carries the page's <h1>, says what
+   the editor does, and keeps 1-click legal links (§ 5 DDG /
+   Art. 13 DSGVO) reachable even without JavaScript.
    Right after hydration useIsClient flips and the IDE mounts;
    until its chunk has loaded, the same placeholder stays up.
    ────────────────────────────────────────────────────────── */
 
 import { lazy, Suspense } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useIsClient } from '../lib/useIsClient'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -26,50 +28,80 @@ function EditorPlaceholder() {
   const { t } = useTranslation()
 
   return (
-    <main
-      id="main-content"
+    <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         minHeight: '100vh',
-        padding: 'var(--space-8)',
-        textAlign: 'center',
         backgroundColor: 'var(--color-bg)',
         color: 'var(--color-text)',
-        gap: 'var(--space-4)',
       }}
     >
-      <h1
+      <main
+        id="main-content"
+        tabIndex={-1}
         style={{
-          fontSize: 'var(--font-size-2xl)',
-          fontWeight: 'var(--font-weight-bold)',
-          lineHeight: 'var(--line-height-tight)',
-          margin: 0,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'var(--space-8)',
+          textAlign: 'center',
+          gap: 'var(--space-4)',
         }}
       >
-        {t('editor.placeholderTitle')}
-      </h1>
-      <p
+        <h1
+          style={{
+            fontSize: 'var(--font-size-2xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            lineHeight: 'var(--line-height-tight)',
+            margin: 0,
+          }}
+        >
+          {t('editor.placeholderTitle')}
+        </h1>
+        <p
+          style={{
+            maxWidth: '640px',
+            margin: 0,
+            fontSize: 'var(--font-size-base)',
+            lineHeight: 'var(--line-height-loose)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          {t('editor.placeholderText')}
+        </p>
+        <p
+          role="status"
+          aria-live="polite"
+          style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}
+        >
+          {t('editor.loading')}
+        </p>
+      </main>
+
+      <footer
         style={{
-          maxWidth: '640px',
-          margin: 0,
-          fontSize: 'var(--font-size-base)',
-          lineHeight: 'var(--line-height-loose)',
-          color: 'var(--color-text-secondary)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 'var(--space-3)',
+          padding: 'var(--space-3) var(--space-4)',
+          fontSize: 'var(--font-size-xs)',
+          color: 'var(--color-text-muted)',
+          borderTop: '1px solid var(--color-border)',
         }}
       >
-        {t('editor.placeholderText')}
-      </p>
-      <p
-        role="status"
-        aria-live="polite"
-        style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}
-      >
-        {t('editor.loading')}
-      </p>
-    </main>
+        <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          {t('legal.impressum')}
+        </Link>
+        <span aria-hidden="true">|</span>
+        <Link to="/datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          {t('legal.datenschutz')}
+        </Link>
+      </footer>
+    </div>
   )
 }
 

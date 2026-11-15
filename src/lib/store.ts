@@ -99,6 +99,12 @@ interface AppState {
   setEditorTheme: (id: string) => void
   setVimMode: (enabled: boolean) => void
 
+  /* Security & modal coordination */
+  untrustedCodePending: boolean
+  setUntrustedCodePending: (pending: boolean) => void
+  settingsModalOpen: boolean
+  setSettingsModalOpen: (open: boolean) => void
+
   /* Synth panel — selected oscillator waveform for the on-screen MIDI keyboard */
   synthOscillator: 'sine' | 'sawtooth' | 'square' | 'triangle'
   setSynthOscillator: (type: 'sine' | 'sawtooth' | 'square' | 'triangle') => void
@@ -218,6 +224,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setEditorTheme: (id: string) => set({ editorTheme: id }),
   setVimMode: (enabled: boolean) => set({ vimMode: enabled }),
 
+  /* Security gate & modal coordination */
+  untrustedCodePending: false,
+  setUntrustedCodePending: (pending: boolean) =>
+    set((s) => ({
+      untrustedCodePending: pending,
+      isPlaying: pending ? false : s.isPlaying,
+    })),
+  settingsModalOpen: false,
+  setSettingsModalOpen: (open: boolean) => set({ settingsModalOpen: open }),
+
   /* Synth panel — defaults to sine, the most musical and forgiving waveform */
   synthOscillator: 'sine',
   setSynthOscillator: (type) => set({ synthOscillator: type }),
@@ -298,7 +314,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   /* --- Transport actions --- */
 
-  togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
+  togglePlay: () =>
+    set((s) => {
+      if (s.untrustedCodePending && !s.isPlaying) return {}
+      return { isPlaying: !s.isPlaying }
+    }),
 
   stop: () => set({ isPlaying: false, isRecording: false }),
 

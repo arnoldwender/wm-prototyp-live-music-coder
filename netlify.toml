@@ -19,20 +19,34 @@
   [headers.values]
     # unsafe-eval: required by Strudel live-coding engine (new Function / eval) — accepted risk by design
     # unsafe-inline (style-src): required by Tailwind CSS 4 utility classes + React style={{}} props — no nonce alternative
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' blob: data:; script-src-elem 'self' blob: data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com https://freesound.org https://*.freesound.org; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self' data:; worker-src 'self' blob: data:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' blob: data:; script-src-elem 'self' blob: data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://*.githubusercontent.com; img-src 'self' data: blob:; media-src 'self' blob: data:; font-src 'self' data:; worker-src 'self' blob: data:; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# SPA fallback — every path without a file of its own gets the bare app shell.
-# The routes of public/sitemap.xml have their own prerendered file since 2026-10-05
-# (scripts/prerender.mjs: / → index.html, /docs → docs.html …), and a real file wins
-# over this non-forced rule. Not index.html any more: that is now the prerendered
-# home page, and serving it for /sessions/<slug> would show the home page's content
-# until the app replaced it. spa.html is the untouched template, written by the same script.
+# Canonical redirect for legacy /landing path
+[[redirects]]
+  from = "/landing"
+  to = "/"
+  status = 301
+  force = true
+
+# First-party Dirt-Samples proxy pinned to an immutable commit SHA (DSGVO + supply-chain safety).
+# Browser fetches /dirt-samples/*.wav from live-music-coder.pro ('self'); Netlify Edge caches and
+# proxies upstream without exposing visitor IPs directly to GitHub/Fastly.
+[[redirects]]
+  from = "/dirt-samples/*"
+  to = "https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/c74fc80f8db8038f6a33648ffef5ac00a07ad402/:splat"
+  status = 200
+  force = true
+
+# 404 fallback — every valid route in public/sitemap.xml (including /docs/:sectionId,
+# /sessions/:slug, /blog/:slug, and /datenschutz) has its own prerendered HTML file in dist/,
+# and a real file wins over this non-forced rule. Unmatched paths serve dist/404.html with a
+# true HTTP 404 status (eliminating Soft-404 indexing) while still booting the React router.
 [[redirects]]
   from = "/*"
-  to = "/spa.html"
-  status = 200
+  to = "/404.html"
+  status = 404

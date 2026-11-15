@@ -8,8 +8,9 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { Logo } from '../components/atoms'
-import { LanguageSwitcher, ContentSidebar, SidebarSection } from '../components/molecules'
+import { ContentSidebar, SidebarSection } from '../components/molecules'
+import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useScrollablePage } from '../lib/useScrollablePage'
 import { docSections } from '../data/docs'
@@ -118,11 +119,16 @@ function Docs() {
     }
   }, [sectionId, navigate])
 
-  /* Per-page SEO meta tags */
+  /* Per-page SEO meta tags — distinct canonical & title per section */
   usePageMeta({
-    title: 'Documentation — Live Music Coder',
-    description: 'Learn how to use Live Music Coder: Strudel patterns, Tone.js synths, Web Audio nodes, MIDI output, and the visual node graph.',
-    path: '/docs',
+    title: sectionId
+      ? `${t(activeSection.titleKey)} — Documentation — Live Music Coder`
+      : 'Documentation — Live Music Coder',
+    description:
+      sectionId && activeSection.content[0]?.contentKey
+        ? t(activeSection.content[0].contentKey)
+        : 'Learn how to use Live Music Coder: Strudel patterns, Tone.js synths, Web Audio nodes, MIDI output, and the visual node graph.',
+    path: sectionId ? `/docs/${activeSection.id}` : '/docs',
   })
 
   /* Override body overflow for scrolling (shared hook) */
@@ -160,77 +166,17 @@ function Docs() {
         {t('a11y.skipToContent')}
       </a>
 
-      {/* --- Header navbar --- */}
-      <nav
-        aria-label={t('docs.navigation')}
-        className="flex items-center justify-between"
-        style={{
-          height: '64px',
-          padding: '0 var(--space-6)',
-          backgroundColor: 'var(--color-bg-alt)',
-          borderBottom: '1px solid var(--color-border)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-        }}
-      >
-        {/* Left: Logo linked to home */}
-        <div className="flex items-center" style={{ gap: 'var(--space-6)' }}>
-          <Link
-            to="/"
-            style={{ textDecoration: 'none', color: 'inherit' }}
-            aria-label={t('nav.backToHome')}
-          >
-            <Logo size="sm" />
-          </Link>
-
-          {/* Back to home text link */}
-          <Link
-            to="/"
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--color-text-muted)',
-              textDecoration: 'none',
-              transition: 'var(--transition-fast)',
-            }}
-            aria-label={t('nav.backToHome')}
-          >
-            &larr; {t('nav.backToHome')}
-          </Link>
-        </div>
-
-        {/* Right: Language switcher */}
-        <div className="flex items-center" style={{ gap: 'var(--space-4)' }}>
-          <LanguageSwitcher />
-
-          <Link
-            to="/editor"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: 'var(--space-2) var(--space-4)',
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-bg)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              transition: 'var(--transition-fast)',
-            }}
-          >
-            {t('nav.openEditor')}
-          </Link>
-        </div>
-      </nav>
+      {/* Shared top nav (single source of truth in SiteNav) */}
+      <SiteNav />
 
       {/* --- Main layout: sidebar + content --- */}
       <div
-        className="flex"
+        className="flex flex-1"
         style={{
-          maxWidth: '1200px',
+          maxWidth: 'var(--width-content-md)',
+          width: '100%',
           margin: '0 auto',
-          minHeight: 'calc(100vh - 64px)',
+          minHeight: 'calc(100vh - var(--size-nav))',
         }}
       >
         {/* Sidebar — shared ContentSidebar with doc section links as children */}
@@ -266,12 +212,38 @@ function Docs() {
         {/* Content area */}
         <main
           id="doc-content"
+          tabIndex={-1}
+          className="flex-1 px-6 py-8 md:p-12"
           style={{
-            flex: 1,
-            padding: 'var(--space-14) var(--space-14)',
-            maxWidth: '800px',
+            maxWidth: 'var(--width-content-sm)',
+            minWidth: 0,
           }}
         >
+          {/* Mobile section selector (sidebar is hidden below lg) */}
+          <div className="lg:hidden" style={{ marginBottom: 'var(--space-6)' }}>
+            <select
+              aria-label={t('docs.sidebarLabel')}
+              value={activeSection.id}
+              onChange={(e) => navigate(`/docs/${e.target.value}`)}
+              style={{
+                width: '100%',
+                minHeight: 'var(--size-touch)',
+                padding: 'var(--space-2) var(--space-3)',
+                fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-sans)',
+                color: 'var(--color-text)',
+                backgroundColor: 'var(--color-bg-alt)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              {docSections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {t(section.titleKey)}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* Section title */}
           <h1
             style={{
@@ -332,22 +304,10 @@ function Docs() {
               <span />
             )}
           </nav>
-
-          {/* Legal links — TMG requires Impressum reachable from every page */}
-          <footer className="text-center" style={{ marginTop: 'var(--space-10)', paddingTop: 'var(--space-4)', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
-            <p>
-              <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
-              {' | '}
-              <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
-            </p>
-            <p className="flex items-center justify-center gap-2 mt-2">
-              <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
-              <span style={{ color: 'var(--color-border)' }}>|</span>
-              <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
-            </p>
-          </footer>
         </main>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

@@ -49,7 +49,8 @@ export function useInlinePlayer() {
           await (await import('./audio/context')).adoptSharedContextForStrudel();
           replRef.current = await initStrudel();
           try {
-            await replRef.current.evaluate(`samples('github:tidalcycles/Dirt-Samples/master')`, false);
+            const { loadDefaultDirtSamples } = await import('./audio/defaultSamples');
+            await loadDefaultDirtSamples(replRef.current);
           } catch { /* ok */ }
         }
         try {

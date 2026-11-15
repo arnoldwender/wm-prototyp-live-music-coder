@@ -25,6 +25,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
   const activeFile = files.find((f) => f.active)
   const [copied, setCopied] = useState(false)
   const backdropRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   /* Generate share URL from active file state */
   const shareUrl = activeFile
@@ -42,14 +43,19 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     }
   }
 
-  /* Focus trap — focus first focusable element on mount */
+  /* Focus trap — focus first focusable element on mount and restore on close */
   useEffect(() => {
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const container = backdropRef.current
-    if (!container) return
-    const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    if (focusable.length > 0) focusable[0].focus()
+    if (container) {
+      const focusable = container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length > 0) focusable[0].focus()
+    }
+    return () => {
+      previousFocusRef.current?.focus()
+    }
   }, [])
 
   /* Focus trap — keep Tab cycling within the dialog */
@@ -78,9 +84,11 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
       ref={backdropRef}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="share-dialog-title"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'var(--color-backdrop)' }}
       onKeyDown={handleKeyDown}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
         className="rounded-lg max-w-lg w-full mx-4"
@@ -93,6 +101,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
           <h2
+            id="share-dialog-title"
             style={{
               fontSize: 'var(--font-size-lg)',
               fontWeight: 'var(--font-weight-semibold)',
@@ -101,7 +110,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
           >
             {t('toolbar.share')}
           </h2>
-          <Button variant="ghost" onClick={onClose} aria-label="Close">
+          <Button variant="ghost" onClick={onClose} aria-label={t('common.close')}>
             <X size={18} />
           </Button>
         </div>
@@ -110,7 +119,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
         <input
           readOnly
           value={shareUrl}
-          aria-label="Share URL"
+          aria-label={t('share.urlAriaLabel')}
           className="w-full rounded"
           style={{
             backgroundColor: 'var(--color-bg)',

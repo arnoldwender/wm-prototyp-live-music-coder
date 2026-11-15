@@ -9,10 +9,11 @@
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { FilterPill, SortSelect, NowPlayingIndicator } from '../components/molecules'
 import { ContentSidebar, SidebarSection, SidebarFilterItem } from '../components/molecules/ContentSidebar'
 import { SiteNav } from '../components/organisms/SiteNav'
+import { SiteFooter } from '../components/organisms/SiteFooter'
 import { EXAMPLE_LIBRARY, EXAMPLE_CATEGORIES, TOTAL_EXAMPLE_COUNT } from '../data/example-library'
 import type { ExampleEntry } from '../data/example-library'
 import { ENGINE_COLORS } from '../lib/constants'
@@ -256,8 +257,8 @@ function ExampleCard({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '32px',
-            height: '32px',
+            width: 'var(--space-12)',
+            height: 'var(--space-12)',
             borderRadius: 'var(--radius-full)',
             border: 'none',
             backgroundColor: isPlaying ? ENGINE_COLORS[example.engine] : 'var(--color-bg)',
@@ -465,8 +466,8 @@ function Examples() {
   const difficulties: ExampleEntry['difficulty'][] = ['beginner', 'intermediate', 'advanced']
 
   return (
-    <main
-      className="min-h-screen"
+    <div
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
     >
       {/* Skip-to-content for a11y */}
@@ -563,7 +564,7 @@ function Examples() {
         </ContentSidebar>
 
         {/* Content column */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <main style={{ flex: 1, minWidth: 0 }}>
 
       {/* --- Page header --- */}
       <header
@@ -633,8 +634,8 @@ function Examples() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '24px',
-                height: '24px',
+                width: 'var(--space-10)',
+                height: 'var(--space-10)',
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 backgroundColor: 'var(--color-bg-elevated)',
@@ -799,6 +800,7 @@ function Examples() {
       {/* --- Example card grid --- */}
       <section
         id="example-grid"
+        tabIndex={-1}
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
@@ -827,28 +829,10 @@ function Examples() {
         )}
       </section>
 
-      {/* Footer with legal links — TMG requires Impressum reachable from every page */}
-      <footer
-        className="text-center py-12"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: 'var(--space-2)' }}>
-          {t('footer.license')}
-        </p>
-        <p style={{ fontSize: 'var(--font-size-xs)' }}>
-          <Link to="/legal" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Impressum</Link>
-          {' | '}
-          <Link to="/legal#datenschutz" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Datenschutz</Link>
-        </p>
-        <p className="flex items-center justify-center gap-2 mt-3" style={{ fontSize: 'var(--font-size-xs)' }}>
-          <a href="https://arnoldwender.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Arnold Wender</a>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <a href="https://wendermedia.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>Wender Media</a>
-        </p>
-      </footer>
-
-        </div>{/* end content column */}
+        </main>{/* end content column */}
       </div>{/* end flex wrapper */}
+
+      <SiteFooter />
 
       {/* NowPlayingIndicator — floating bottom-right */}
       <NowPlayingIndicator
@@ -857,7 +841,7 @@ function Examples() {
         engineType={playingEngine}
         onStop={stop}
       />
-    </main>
+    </div>
   )
 }
 

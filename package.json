@@ -12,11 +12,12 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/verify-llms-txt.mjs",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "postbuild": "node scripts/inject-sw-version.mjs",
     "verify:hydration": "node scripts/verify-hydration.mjs",
     "verify:ai-labels": "node scripts/verify-ai-labels.mjs",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -32,6 +33,7 @@
   "build": {
     "appId": "com.wendermedia.live-music-coder",
     "productName": "Live Music Coder",
+    "afterPack": "scripts/after-pack-fuses.cjs",
     "directories": {
       "output": "release"
     },
