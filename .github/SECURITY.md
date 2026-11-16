@@ -25,8 +25,8 @@ are fixed and disclosed once a fix exists.
 
 | Version | Supported |
 | ------- | --------- |
-| `1.3.x` (`>= 1.3.2`) | Yes |
-| `< 1.3.2` | No — upgrade to `v1.3.2` or newer |
+| `1.3.x` (`>= 1.3.3`) | Yes |
+| `< 1.3.3` | No — upgrade to `v1.3.3` or newer |
 
 ## Security model notes
 

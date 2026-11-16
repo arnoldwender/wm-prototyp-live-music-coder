@@ -13,6 +13,12 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.3] - 2026-11-16
+
+### Security
+
+- **Gist uploads ask before they send, dialogs keep the keyboard, and a new app icon** ([#109](https://github.com/arnoldwender/wm-prototyp-live-music-coder/pull/109)) — The desktop app asks before it sends anything to GitHub, and the question
+
 ## [1.3.2] - 2026-11-15
 
 ### Security

@@ -1,9 +1,10 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ──────────────────────────────────────────────────────────
-   Renders public/icon-192.png and public/icon-512.png from
-   public/icon-source.svg so the PWA icons can never silently drift
-   from the mark. Run after any change to the icon source:
+   Renders public/icon-192.png, public/icon-512.png and the desktop
+   bundle icon build/icon.png from public/icon-source.svg so no icon
+   can silently drift from the mark. Run after any change to the icon
+   source:
 
        node scripts/render-icons.mjs
 
@@ -44,6 +45,36 @@ for (const size of [192, 512]) {
   )
   await page.screenshot({ path: path.join(root, `public/icon-${size}.png`), omitBackground: false })
   console.log(`public/icon-${size}.png written`)
+  await ctx.close()
+}
+
+/* ── Desktop bundle icon ───────────────────────────────────
+   electron-builder turns build/icon.png into the .icns of the packaged
+   app. macOS does not mask an app icon, so the full-bleed square the
+   PWA needs would sit in the Dock as a hard-cornered tile among rounded
+   ones. Apple's grid for a 1024 px canvas is an 824 px tile with 100 px
+   of clear space on every side; 185 px corners approximate its curve.
+   The ground outside the tile stays transparent. */
+{
+  const CANVAS = 1024
+  const TILE = 824
+  const RADIUS = 185
+  const ctx = await browser.newContext({
+    viewport: { width: CANVAS, height: CANVAS },
+    deviceScaleFactor: 1,
+  })
+  const page = await ctx.newPage()
+  const tile = svg.replace(
+    /width="\d+" height="\d+"/,
+    `width="${TILE}" height="${TILE}" style="display:block"`
+  )
+  await page.setContent(
+    `<body style="margin:0;background:transparent">` +
+      `<div style="width:${TILE}px;height:${TILE}px;margin:${(CANVAS - TILE) / 2}px;` +
+      `border-radius:${RADIUS}px;overflow:hidden">${tile}</div></body>`
+  )
+  await page.screenshot({ path: path.join(root, 'build/icon.png'), omitBackground: true })
+  console.log('build/icon.png written')
   await ctx.close()
 }
 
