@@ -10,6 +10,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Code2, Play, BarChart3, HelpCircle, ChevronRight, X } from 'lucide-react'
 import { Button } from '../atoms'
+import { FOCUSABLE_SELECTOR } from '../../lib/focusable'
 
 /** localStorage key for tutorial completion */
 const TUTORIAL_DONE_KEY = 'lmc-tutorial-done'
@@ -54,7 +55,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
     const container = backdropRef.current
     if (container) {
       const focusable = container.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        FOCUSABLE_SELECTOR
       )
       if (focusable.length > 0) focusable[0].focus()
     }
@@ -72,7 +73,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
     const container = backdropRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length === 0) return
     const first = focusable[0]

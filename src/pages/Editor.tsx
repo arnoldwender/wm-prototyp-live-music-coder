@@ -21,6 +21,7 @@ import { useAppStore } from '../lib/store'
 import { getOrchestrator } from '../lib/orchestrator'
 import { startAutosave, readAutosave, clearAutosave } from '../lib/persistence/autosave'
 import type { Project } from '../types/project'
+import { FOCUSABLE_SELECTOR } from '../lib/focusable'
 
 const SAFE_DEFAULT_CODE = 'note("c3 e3 g3 b3").s("sawtooth").lpf(800)'
 
@@ -193,7 +194,7 @@ function Editor() {
     const container = warningDialogRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length === 0) return
     const first = focusable[0]

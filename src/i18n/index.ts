@@ -17,15 +17,18 @@ const STORAGE_KEY = 'lmc-lang'
 
 export type SupportedLocale = 'en' | 'de' | 'es'
 
+/* Build-time prerender (src/entry-server.tsx): no window, no visitor. Node has
+   its own navigator.language — the build machine's locale — so the server must
+   not detect anything: src/main.tsx only hydrates English pages. */
+const IS_SERVER = typeof window === 'undefined'
+
 function isSupportedLocale(value: string): value is SupportedLocale {
   return value === 'en' || value === 'de' || value === 'es'
 }
 
 /** Detect initial language from localStorage or browser setting */
 function detectLanguage(): SupportedLocale {
-  /* Build-time prerender (src/entry-server.tsx): no window, no visitor —
-     always English. */
-  if (typeof window === 'undefined') return 'en'
+  if (IS_SERVER) return 'en'
 
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -89,10 +92,19 @@ i18n.on('languageChanged', (lng) => {
   if (typeof document !== 'undefined') document.documentElement.lang = lng
 })
 
-/** Resolves once the initial detected locale bundle is loaded and active. */
+/**
+ * Resolves once the initial detected locale bundle is loaded and active.
+ *
+ * It never rejects: src/main.tsx mounts the app when this settles, so a locale
+ * chunk that fails to load (offline, a deploy that replaced the hashed file)
+ * would otherwise leave a German or Spanish visitor with a page that never
+ * becomes interactive. The app starts in English instead.
+ */
 export const readyLanguagePromise: Promise<void> =
-  typeof window !== 'undefined' && INITIAL_LANGUAGE !== 'en'
-    ? switchLanguage(INITIAL_LANGUAGE)
+  !IS_SERVER && INITIAL_LANGUAGE !== 'en'
+    ? switchLanguage(INITIAL_LANGUAGE).catch(() => {
+        document.documentElement.lang = 'en'
+      })
     : Promise.resolve()
 
 export default i18n

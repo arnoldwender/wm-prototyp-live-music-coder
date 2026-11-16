@@ -11,6 +11,7 @@ import { X } from 'lucide-react';
 import { EDITOR_THEMES } from '../../lib/editor/themes';
 import { useAppStore } from '../../lib/store';
 import { loadSettings, saveSettings, type EditorSettings } from '../../lib/editor/settings';
+import { FOCUSABLE_SELECTOR } from '../../lib/focusable'
 
 /* ── Component ────────────────────────────────────────── */
 
@@ -44,7 +45,7 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
     const container = backdropRef.current;
     if (container) {
       const focusable = container.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        FOCUSABLE_SELECTOR,
       );
       if (focusable.length > 0) focusable[0].focus();
     }
@@ -62,7 +63,7 @@ export function SettingsPanel({ open, onClose, onSettingsChange }: SettingsPanel
     const container = backdropRef.current;
     if (!container) return;
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      FOCUSABLE_SELECTOR,
     );
     if (focusable.length === 0) return;
     const first = focusable[0];

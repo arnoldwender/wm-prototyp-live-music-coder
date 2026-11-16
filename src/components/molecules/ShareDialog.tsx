@@ -12,6 +12,7 @@ import { Copy, Check, X } from 'lucide-react'
 import { useAppStore } from '../../lib/store'
 import { generateShareUrl } from '../../lib/persistence/url'
 import { Button } from '../atoms'
+import { FOCUSABLE_SELECTOR } from '../../lib/focusable'
 
 interface ShareDialogProps {
   onClose: () => void
@@ -49,7 +50,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     const container = backdropRef.current
     if (container) {
       const focusable = container.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        FOCUSABLE_SELECTOR
       )
       if (focusable.length > 0) focusable[0].focus()
     }
@@ -65,7 +66,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
     const container = backdropRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length === 0) return
     const first = focusable[0]

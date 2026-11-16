@@ -165,7 +165,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `/changelog` | Project changelog |
 | `/blog` | Developer blog — listing |
 | `/blog/:slug` | Individual blog post (6 prerendered routes) |
-| `/legal` | Impressum & Datenschutz (`/impressum` and `/datenschutz` resolve directly to their respective tabs) |
+| `/legal` | Impressum & Datenschutz (`/datenschutz` is the privacy tab as its own page; `/impressum` redirects `301 -> /legal`) |
 | `*` | Prerendered `404.html` (`NotFound` view, served with HTTP status `404`) |
 
 ---
@@ -218,7 +218,7 @@ electron/           # Native desktop shell (main, preload, IPC handlers, safeSto
 src/
   components/
     atoms/          # Button, Icon, Toggle, Badge, Tooltip, NotFound, ErrorBoundary, ...
-    molecules/      # EngineSelector, FileTabs, ShareDialog, ExternalCodePrompt, ...
+    molecules/      # EngineSelector, FileTabs, ShareDialog, AchievementToast, ...
     organisms/      # TransportBar, CodeEditor, NodeGraph, SiteNav, Visualizers, ...
   layouts/          # EditorLayout (resizable 3-zone IDE)
   pages/            # Landing, Editor, EditorPage, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal

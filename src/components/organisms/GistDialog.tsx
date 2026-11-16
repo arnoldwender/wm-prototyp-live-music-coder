@@ -24,6 +24,7 @@ import { safeJsonParse } from '../../lib/persistence/local'
 import { isElectron } from '../../lib/platform'
 import { Button } from '../atoms'
 import type { Project } from '../../types/project'
+import { FOCUSABLE_SELECTOR } from '../../lib/focusable'
 
 interface GistDialogProps {
   onClose: () => void
@@ -76,7 +77,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
     const container = backdropRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length > 0) focusable[0].focus()
   }, [])
@@ -88,7 +89,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
     const container = backdropRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length === 0) return
     const first = focusable[0]

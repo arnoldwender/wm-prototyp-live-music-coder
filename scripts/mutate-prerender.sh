@@ -81,7 +81,7 @@ mutate "M2 the IDE rendered on the server: React writes a Suspense fallback" \
   "$BUILD_ONLY" fail
 
 mutate "M3 no fixed server language: a German build machine prerenders German" \
-  src/i18n/index.ts "  if (typeof window === 'undefined') return 'en'" "" \
+  src/i18n/index.ts "const IS_SERVER = typeof window === 'undefined'" "const IS_SERVER = false" \
   "$SERVER_TESTS" fail
 
 mutate "M4 the route's page is not preloaded before renderToString" \
@@ -120,8 +120,8 @@ mutate "M12 the examples description back to a hardcoded count" \
   src/pages/Examples.tsx 'description: `${TOTAL_EXAMPLE_COUNT} curated' 'description: `165+ curated' \
   "$SERVER_TESTS" fail
 
-mutate "M13 the SPA fallback back to index.html (the prerendered home page)" \
-  netlify.toml '  to = "/spa.html"' '  to = "/index.html"' \
+mutate "M13 unknown paths answered with index.html (the prerendered home page) instead of the 404" \
+  netlify.toml '  to = "/404.html"' '  to = "/index.html"' \
   "$GATE_TESTS" fail
 
 mutate "C0 control: a comment changes, every check still passes" \
