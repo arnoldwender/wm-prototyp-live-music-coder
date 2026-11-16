@@ -124,6 +124,7 @@ export function AppContent() {
               CTA navigates to /editor. */}
           <Route path="/" element={<Landing />} />
           <Route path="/landing" element={<Navigate to="/" replace />} />
+          <Route path="/impressum" element={<Navigate to="/legal" replace />} />
           <Route path="/editor" element={<EditorPage />} />
           {/* Lazy pages — one table with preloadRoute() (src/routes.ts) */}
           {LAZY_PAGES.map(({ path, route }) => (

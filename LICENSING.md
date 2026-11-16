@@ -21,7 +21,7 @@ Files marked with `SPDX-License-Identifier: MIT` may be extracted and used under
 | Module | Path | Description |
 |--------|------|-------------|
 | Desktop Shell | `electron/` | Electron main process, preload, IPC handlers, encrypted `safeStorage` Gist store, updater, URL guard, WAV encoder, tray, menu |
-| Audio Architecture | `src/lib/audio/context.ts`, `analyzer.ts`, `recorder.ts`, `worklet.ts` | Shared AudioContext, beat detection, recording |
+| Audio Architecture | `src/lib/audio/context.ts`, `analyzer.ts`, `recorder.ts`, `sample-import.ts` | Shared AudioContext, beat detection, recording, local sample import |
 | Engine Orchestrator | `src/lib/orchestrator/` | Multi-engine management, DAG audio graph |
 | Engine Adapters | `src/lib/engines/base.ts`, `tonejs.ts`, `webaudio.ts`, `midi.ts` | Tone.js, WebAudio, MIDI adapters |
 | Parser/Codegen | `src/lib/parser/`, `src/lib/codegen/` | Code-to-graph and graph-to-code |
@@ -35,7 +35,6 @@ Files marked with `SPDX-License-Identifier: MIT` may be extracted and used under
 | Types | `src/types/engine.ts`, `src/types/project.ts`, `src/types/global.d.ts` | TypeScript type definitions |
 | i18n | `src/i18n/` | Translations and lazy locale loader (DE/EN/ES) |
 | Styles | `src/styles/` | Design tokens and global CSS |
-| Workers | `src/workers/` | Web Workers |
 
 ### AGPL-only Files (Strudel Integration)
 

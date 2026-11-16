@@ -12,6 +12,7 @@ import { STARTER_TEMPLATES, type StarterTemplate } from '../../data/templates'
 import { useAppStore } from '../../lib/store'
 import { Button } from '../atoms'
 import { ENGINE_COLORS } from '../../lib/constants'
+import { FOCUSABLE_SELECTOR } from '../../lib/focusable'
 
 interface TemplateSelectorProps {
   onSelect: () => void
@@ -33,7 +34,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
     const container = backdropRef.current
     if (container) {
       const focusable = container.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        FOCUSABLE_SELECTOR
       )
       if (focusable.length > 0) focusable[0].focus()
     }
@@ -49,7 +50,7 @@ export function TemplateSelector({ onSelect }: TemplateSelectorProps) {
     const container = backdropRef.current
     if (!container) return
     const focusable = container.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      FOCUSABLE_SELECTOR
     )
     if (focusable.length === 0) return
     const first = focusable[0]

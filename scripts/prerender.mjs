@@ -232,7 +232,11 @@ export function buildNotFoundPage(template, appHtml, siteUrl = SITE_URL) {
     }
     page = page.replace(tag.rx, () => tag.render(meta, siteUrl))
   }
-  page = page.replace('</head>', () => '<meta name="robots" content="noindex, nofollow" />\n  </head>')
+  /* One robots tag, not two: the template says "index, follow" and a second tag only works because
+     crawlers happen to take the stricter one. */
+  const NOINDEX = '<meta name="robots" content="noindex, nofollow" />'
+  const ROBOTS_RX = /<meta name="robots"[^>]*>/
+  page = ROBOTS_RX.test(page) ? page.replace(ROBOTS_RX, () => NOINDEX) : page.replace('</head>', () => `${NOINDEX}\n  </head>`)
   if (placeholders === 1) {
     page = page.replace(PLACEHOLDER, () => `<div id="root" data-prerendered="${NOT_FOUND_ROUTE}">${appHtml}</div>`)
   }

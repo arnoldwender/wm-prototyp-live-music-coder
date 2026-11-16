@@ -32,8 +32,9 @@ are fixed and disclosed once a fix exists.
 
 Live Music Coder is a live-coding music IDE: evaluating user-written JavaScript / Strudel / Tone.js / Web Audio patterns locally in the renderer (`Function()` / Strudel transpiler) is how the instrument works. Because evaluated code shares the renderer JavaScript realm:
 
-- **Credentials are isolated from Web Storage:** On the web, GitHub Gist personal access tokens stay ephemeral in memory for the current tab session only (never written to `localStorage` or `IndexedDB`). In the macOS Electron app, tokens live in the main process encrypted with OS Keychain (`safeStorage`) and require native user confirmation before outbound Gist requests.
-- **Untrusted links are gated:** Opening shared `?code=` or `?gist=` links shows an explicit confirmation dialog before loading or evaluating external code.
+- **Credentials are kept out of Web Storage:** On the web, a GitHub Gist personal access token is held in memory only while the Gist dialog is open (never written to `localStorage`, `sessionStorage` or `IndexedDB`). In the macOS Electron app, the token lives in the main process, encrypted with a key from the OS keychain (`safeStorage`); storing a token and every upload made with it require a native confirmation, and the token is never handed back to the renderer.
+- **What that does not cover:** the token is typed into a field of the page. Code that is already running in the page at that moment can read it. Run patterns you do not trust in a session where you do not enter a token.
+- **Untrusted code is gated:** A shared `#code=` link, a project loaded from a Gist and an opened `.lmc` file put their code in the editor behind a blocking dialog. Nothing is evaluated until the dialog is answered, and accepting it only unlocks the editor — the code runs when you press play.
 - **Desktop hardening:** Packaged Electron builds ship with `contextIsolation: true`, `nodeIntegration: false`, strict navigation/protocol guards, hardened macOS runtime, notarization, and burned Electron V1 fuses (`RunAsNode` and `NODE_OPTIONS` / CLI inspect flags disabled, ASAR integrity validation enforced).
 
 ## Scope

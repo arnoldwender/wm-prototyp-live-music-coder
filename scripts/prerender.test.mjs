@@ -209,6 +209,13 @@ describe('buildNotFoundPage', () => {
     expect(page).not.toContain('<link rel="canonical"')
     expect(page).toContain(`<div id="root" data-prerendered="${NOT_FOUND_ROUTE}">`)
   })
+
+  it('replaces the robots tag of the real template instead of adding a second one', () => {
+    const withRobots = template().replace('</head>', '<meta name="robots" content="index, follow" /></head>')
+    const { page } = buildNotFoundPage(withRobots, '<main><h1>404</h1><p>Not found</p></main>')
+    expect(page.match(/<meta name="robots"/g)).toHaveLength(1)
+    expect(page).toContain('<meta name="robots" content="noindex, nofollow" />')
+  })
 })
 
 describe('netlify.toml', () => {
@@ -218,5 +225,12 @@ describe('netlify.toml', () => {
     expect(rule).toMatch(new RegExp(`to = "/${NOT_FOUND_FILE.replace('.', '\\.')}"`))
     expect(rule).toMatch(/status = 404/)
     expect(rule).not.toMatch(/force = true/)
+  })
+
+  it('answers /impressum with the page that holds the Impressum, never with the 404', () => {
+    const toml = readFileSync(path.join(root, 'netlify.toml'), 'utf8')
+    const rule = toml.match(/\[\[redirects\]\][^[]*from = "\/impressum"[^[]*/)?.[0] ?? ''
+    expect(rule).toMatch(/to = "\/legal"/)
+    expect(rule).toMatch(/status = 301/)
   })
 })

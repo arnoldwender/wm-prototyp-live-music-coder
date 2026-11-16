@@ -3,13 +3,9 @@
 
 import { BrowserWindow, dialog, ipcMain, safeStorage } from 'electron'
 import { appStore } from '../store'
+import { describeGistUpload, validateGistPayload } from '../gist-payload'
 
-export interface MainGistSavePayload {
-  files: Record<string, { content: string }>
-  description: string
-  gistId?: string
-  isPublic: boolean
-}
+const MAX_TOKEN_LENGTH = 256
 
 function readDecryptedToken(): string | null {
   const encoded = appStore.get('encryptedGistToken')
@@ -22,24 +18,70 @@ function readDecryptedToken(): string | null {
   }
 }
 
+/* One confirmation at a time: evaluated code could otherwise stack dialogs
+   until one of them catches a stray click. */
+let confirmationOpen = false
+
+/**
+ * Ask the user in a native dialog. "Cancel" is the default button on purpose:
+ * this is a live-coding editor, the user is typing, and a dialog that appears
+ * under their hands must not turn the next Return into a confirmation.
+ */
+async function confirmNatively(
+  mainWindow: BrowserWindow,
+  options: { title: string; message: string; detail: string; confirmLabel: string },
+): Promise<boolean> {
+  if (confirmationOpen) return false
+  confirmationOpen = true
+  try {
+    const { response } = await dialog.showMessageBox(mainWindow, {
+      type: 'question',
+      buttons: ['Cancel', options.confirmLabel],
+      defaultId: 0,
+      cancelId: 0,
+      title: options.title,
+      message: options.message,
+      detail: options.detail,
+    })
+    return response === 1
+  } finally {
+    confirmationOpen = false
+  }
+}
+
 /**
  * Register GitHub Gist IPC handlers for Electron.
  *
- * SECURITY: The renderer runs shared musical patterns via `new Function()`, so
- * the GitHub PAT NEVER crosses `contextBridge` back into the renderer. It is
- * encrypted at rest with OS keychain `safeStorage` and used exclusively inside
- * the main process after explicit native dialog confirmation.
+ * SECURITY: The renderer evaluates shared musical patterns as code, so every
+ * handler here can be called by a stranger's pattern. The GitHub PAT never
+ * crosses `contextBridge` back into the renderer, it is encrypted at rest with
+ * a key from the OS keychain (`safeStorage`), and nothing that sends data or
+ * replaces the stored token happens without a native confirmation.
  */
 export function registerGistHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle('gist:has-token', () => {
     return readDecryptedToken() !== null
   })
 
-  ipcMain.handle('gist:set-token', (_event, token: unknown) => {
+  ipcMain.handle('gist:set-token', async (_event, token: unknown) => {
     if (typeof token !== 'string') return false
     const trimmed = token.trim()
-    if (trimmed.length === 0 || trimmed.length > 256) return false
+    if (trimmed.length === 0 || trimmed.length > MAX_TOKEN_LENGTH) return false
     if (!safeStorage.isEncryptionAvailable()) return false
+
+    /* Without this, evaluated code could swap in its author's token in silence
+       and every later upload — confirmed by the user — would land in a
+       stranger's account. */
+    const confirmed = await confirmNatively(mainWindow, {
+      title: 'Store GitHub Token',
+      message: 'Store this GitHub token for Gist uploads?',
+      detail:
+        'It is encrypted with a key from your system keychain and replaces any token stored before. ' +
+        'Confirm only if you just entered it yourself in the Gist dialog.',
+      confirmLabel: 'Store Token',
+    })
+    if (!confirmed) return false
+
     const encrypted = safeStorage.encryptString(trimmed).toString('base64')
     appStore.set('encryptedGistToken', encrypted)
     return true
@@ -49,48 +91,33 @@ export function registerGistHandlers(mainWindow: BrowserWindow): void {
     appStore.set('encryptedGistToken', null)
   })
 
-  ipcMain.handle('gist:save', async (_event, payload: MainGistSavePayload) => {
+  ipcMain.handle('gist:save', async (_event, payload: unknown) => {
     const token = readDecryptedToken()
     if (!token) throw new Error('No GitHub token configured')
 
-    if (!payload || typeof payload !== 'object' || !payload.files || typeof payload.files !== 'object') {
-      throw new Error('Invalid Gist payload')
-    }
+    const upload = validateGistPayload(payload)
+    const { message, detail } = describeGistUpload(upload)
 
-    const visibilityLabel = payload.gistId
-      ? 'update existing Gist'
-      : payload.isPublic
-        ? 'create a PUBLIC Gist'
-        : 'create a secret Gist'
-
-    const confirm = await dialog.showMessageBox(mainWindow, {
-      type: 'question',
-      buttons: ['Publish to GitHub Gist', 'Cancel'],
-      defaultId: 0,
-      cancelId: 1,
+    const confirmed = await confirmNatively(mainWindow, {
       title: 'Confirm GitHub Gist Upload',
-      message: `Do you want to ${visibilityLabel} on GitHub?`,
-      detail: 'Your current project code will be uploaded to gist.github.com using your saved token.',
+      message,
+      detail,
+      confirmLabel: upload.gistId ? 'Overwrite Gist' : 'Upload to GitHub',
     })
-
-    if (confirm.response !== 0) {
+    if (!confirmed) {
       throw new Error('Gist upload cancelled')
     }
 
-    const endpoint = payload.gistId
-      ? `https://api.github.com/gists/${encodeURIComponent(payload.gistId)}`
+    const endpoint = upload.gistId
+      ? `https://api.github.com/gists/${encodeURIComponent(upload.gistId)}`
       : 'https://api.github.com/gists'
 
-    const body = payload.gistId
-      ? { description: String(payload.description ?? '').slice(0, 256), files: payload.files }
-      : {
-          description: String(payload.description ?? '').slice(0, 256),
-          public: Boolean(payload.isPublic),
-          files: payload.files,
-        }
+    const body = upload.gistId
+      ? { description: upload.description, files: upload.files }
+      : { description: upload.description, public: upload.isPublic, files: upload.files }
 
     const response = await fetch(endpoint, {
-      method: payload.gistId ? 'PATCH' : 'POST',
+      method: upload.gistId ? 'PATCH' : 'POST',
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,

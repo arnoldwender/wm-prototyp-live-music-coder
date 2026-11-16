@@ -28,7 +28,7 @@ function LanguageSwitcher() {
           key={lang}
           variant="ghost"
           active={i18n.language === lang}
-          onClick={() => { void switchLanguage(lang) }}
+          onClick={() => { switchLanguage(lang).catch(() => { /* locale chunk unavailable: keep the current language */ }) }}
           aria-label={lang.toUpperCase()}
           style={{
             padding: 'var(--space-2) var(--space-3)',

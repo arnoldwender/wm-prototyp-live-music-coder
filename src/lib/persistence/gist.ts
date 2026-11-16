@@ -10,9 +10,13 @@
      and actively scrubs legacy storage keys on startup. Instead, the token lives
      only in a module-private lexical variable while the Gist dialog is open and
      is wiped immediately on `clearStoredToken()` / dialog close / untrusted load.
-   · Desktop (Electron) build: PAT is encrypted via OS Keychain (`safeStorage`)
-     inside the main process, never crosses `contextBridge` back to the renderer,
-     and requires explicit native dialog confirmation before publishing.
+   · Desktop (Electron) build: PAT is encrypted with a key from the OS keychain
+     (`safeStorage`) inside the main process, never crosses `contextBridge` back
+     to the renderer, and both storing it and uploading with it require a native
+     confirmation dialog.
+   · What this does NOT cover: the token is typed into a field of this page, so
+     code already running in the page at that moment can read the keystrokes.
+     Keeping it out of storage shortens that window; it does not close it.
    ────────────────────────────────────────────────────────── */
 
 import { Octokit } from '@octokit/rest'
@@ -82,8 +86,9 @@ export async function setStoredToken(token: string, _remember = false): Promise<
       await api.clearGistToken()
       return
     }
+    /* false: the user declined the native confirmation, or the OS has no keychain */
     const ok = await api.setGistToken(trimmed)
-    if (!ok) throw new Error('Secure OS credential storage is unavailable')
+    if (!ok) throw new Error('The token was not stored')
     return
   }
   ephemeralWebToken = trimmed || null
@@ -155,13 +160,13 @@ export async function saveToGist(
 
 /**
  * Load project from a GitHub Gist by ID.
- * Public and secret Gists are readable by ID without authentication; if an
- * ephemeral web token exists it is used for rate-limit headroom and then wiped
- * before untrusted project code enters the editor.
+ * Public and secret Gists are readable by ID without authentication, so the
+ * request never carries the token — reading someone's Gist is not a reason to
+ * send a credential. Any ephemeral web token is wiped before the untrusted
+ * project code enters the editor.
  */
 export async function loadFromGist(gistId: string): Promise<Project> {
-  const token = await getStoredToken()
-  const octokit = token ? new Octokit({ auth: token }) : new Octokit()
+  const octokit = new Octokit()
 
   const response = await octokit.gists.get({ gist_id: gistId })
   const files = response.data.files

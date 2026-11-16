@@ -33,6 +33,14 @@
   status = 301
   force = true
 
+# The Impressum lives on /legal. /impressum is the address people type and the one this repo's
+# README names, so it must not answer 404 (same site, same page — not a cross-domain redirect).
+[[redirects]]
+  from = "/impressum"
+  to = "/legal"
+  status = 301
+  force = true
+
 # First-party Dirt-Samples proxy pinned to an immutable commit SHA (DSGVO + supply-chain safety).
 # Browser fetches /dirt-samples/*.wav from live-music-coder.pro ('self'); Netlify Edge caches and
 # proxies upstream without exposing visitor IPs directly to GitHub/Fastly.
