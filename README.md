@@ -11,7 +11,7 @@
 
 | | |
 | --- | --- |
-| **Status** | Live (`v1.3.2`, web + signed/notarized macOS `arm64` & `x64`, measured 2026-11-15) |
+| **Status** | Live (`v1.3.3`, web + signed/notarized macOS `arm64` & `x64`, measured 2026-11-16) |
 | **Domain** | https://live-music-coder.pro |
 | **Stack** | React 19 · TypeScript 5.9 (`strict`) · Vite 8 · Tailwind CSS 4 · Electron 43 |
 | **Hosting & CI** | Netlify Edge (auto-deploy on `main`) · GitHub Actions (`.github/workflows/ci.yml`) · GitHub Releases (desktop) |
@@ -40,8 +40,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4, signed & notarized `v1.3.2`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
-| macOS | Intel (`x64`, signed & notarized `v1.3.2`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Apple Silicon (M1/M2/M3/M4, signed & notarized `v1.3.3`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Intel (`x64`, signed & notarized `v1.3.3`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
 | Windows | x64 | Coming soon |
 | Linux | x64 | Coming soon |
 
@@ -65,7 +65,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Tone.js | High-level synths, effects, transport | `tone` |
 | Web Audio | Low-level audio node programming | Native API |
 | MIDI | Keyboard input + CC knobs + output | `@strudel/midi` |
-| Extras | Microtonal, soundfonts, OSC, serial | `@strudel/xen`, `soundfonts`, `osc`, `serial` |
+| Extras | Microtonal, OSC, serial | `@strudel/xen`, `osc`, `serial` |
 
 **7 Real-Time Visualizers** — All rendered on Canvas 2D at 60fps:
 

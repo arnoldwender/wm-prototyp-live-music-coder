@@ -28,14 +28,14 @@ All SHA-256 digests and byte counts are measured directly against the repository
 | `V08` | `src/components/atoms/Logo.tsx` | Inline React SVG (`24×24` viewBox) | — | Tracked in git | 4-bar amber `WaveformIcon` (`sm` 20px / `md` 28px / `lg` 36px) | MIT (`SPDX-License-Identifier: MIT`) | `aria-hidden="true"` paired with `{t('app.name')}` text | **Active** |
 | `V09` | `electron/tray.ts` | Inline base64 PNG (`32×32` `@2x` → `16×16pt`) | `164` (b64) | Tracked in git | Monochrome 5-bar waveform template icon (`setTemplateImage(true)` on macOS) | MIT (`SPDX-License-Identifier: MIT`) | `tray.setToolTip('Live Music Coder')` | **Active** (Electron desktop) |
 | `V10` | `lucide-react` (`package.json`) | Inline SVG React components | — | Lockfile-pinned | Open-source UI icon set for transport/editor toolbar glyphs | ISC (Lucide) | `aria-hidden="true"` inside labelled `<button>` / `aria-label` | **Active** |
+| `V11` | `build/icon.png` | Raster PNG (`1024×1024`, transparent ground) | `20,368` | `fdbc9314f4b41849c688d7e37fb048bf3ef7cbf81438f91b86a63400fc17dc5e` | Derived from `public/icon-source.svg` via `node scripts/render-icons.mjs`: the mark on an `824×824` tile with `185px` corners and `100px` of clear space (macOS app-icon grid) | MIT (repo original) | Dock / Finder icon of the packaged app | **Active** (desktop bundle icon since `v1.3.3`; replaced the `v1.0.0` lightning bolt) |
 
 ### 2.2 Legacy / Unreferenced Visual Files (Disclosed Audit State)
 
-Visual inspection of every binary/SVG file in `public/` and `build/` identified two pre-Signal-Room artifacts retained on disk:
+Visual inspection of every binary/SVG file in `public/` and `build/` identified one pre-Signal-Room artifact retained on disk (the second, the `v1.0.0` desktop icon `build/icon.png`, was regenerated for `v1.3.3` and is `V11` above):
 
 | ID | Path | Kind & Dimensions | Bytes | SHA-256 | Inspected Content & Status | Planned Follow-Up |
 | --- | --- | --- | --- | --- | --- | --- |
-| `L01` | `build/icon.png` | Raster PNG (`512×512`) | `121,684` | `944dd32ef9641c729237d187b0866d60c041bbf639efbf672fe902edbace4654` | **Legacy desktop bundle icon:** Visually displays the v1.0.0 (`9f0d205`) violet-to-blue gradient lightning bolt on transparent ground. Picked up by `electron-builder` convention (`build/icon.png`) when packaging `.app`/`.dmg`. Left untouched after notarized `v1.3.2` release so repository state matches published binaries. | **Pending (`v1.3.3+`):** Extend `scripts/render-icons.mjs` to write `build/icon.png` (`1024×1024` or `512×512`) from `public/icon-source.svg` before next notarized desktop build. |
 | `L02` | `public/icons.svg` | Vector SVG sprite (`6` `<symbol>` defs) | `5,031` | `b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a` | **Orphaned Vite starter sprite:** Contains `bluesky-icon`, `discord-icon`, `documentation-icon`, `github-icon`, `social-icon`, `x-icon` with `#aa3bff` strokes. Zero references anywhere in `index.html`, `src/`, or `electron/`. | Safe to remove in a future housekeeping pass. |
 
 ### 2.3 Self-Hosted Webfont Assets (`public/fonts/`)
@@ -61,7 +61,7 @@ Visual inspection of every binary/SVG file in `public/` and `build/` identified 
 
 ## 3. Exact Reproduction Recipes
 
-### Recipe 1 — Regenerating `icon-192.png`, `icon-512.png`, and `og-image.png`
+### Recipe 1 — Regenerating `icon-192.png`, `icon-512.png`, `build/icon.png`, and `og-image.png`
 
 Script: [`scripts/render-icons.mjs`](../../scripts/render-icons.mjs)
 
@@ -76,7 +76,11 @@ How `scripts/render-icons.mjs` guarantees pixel-accurate, deterministic output:
    - Opens a headless Chromium context with `viewport: { width: size, height: size }, deviceScaleFactor: 1`.
    - Injects `<body style="margin:0">` with `width="${size}" height="${size}"` so the `#1b1815` ground bleeds edge-to-edge (`omitBackground: false`).
    - Saves `public/icon-192.png` and `public/icon-512.png`.
-2. **Open Graph / Social Preview (`1200×630`):**
+2. **Desktop bundle icon (`build/icon.png`, `1024×1024`):**
+   - Same `public/icon-source.svg`, rendered at `824×824` inside a `div` with `border-radius: 185px; overflow: hidden` and a `100px` margin on a `1024×1024` viewport.
+   - `omitBackground: true` keeps the ground outside the tile transparent. macOS does not mask app icons, so the full-bleed square of the PWA icons would show hard corners in the Dock.
+   - `electron-builder` picks the file up by convention and writes the `.icns`.
+3. **Open Graph / Social Preview (`1200×630`):**
    - Reads `public/og-image.svg`.
    - Injects local `file://` `@font-face` rules pointing directly at `public/fonts/ibm-plex-sans-latin-400-normal.woff2`, `ibm-plex-sans-latin-700-normal.woff2`, and `public/fonts/ibm-plex-mono-latin-400-normal.woff2`.
    - Awaits `document.fonts.ready` + `300ms` settle so the card never renders in fallback system fonts.
