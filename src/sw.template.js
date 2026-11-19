@@ -69,8 +69,12 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  /* Never cache audio sample libraries — avoids exhausting Cache Storage quota */
-  if (url.pathname.startsWith('/dirt-samples/') || (url.pathname.startsWith('/samples/') && !url.pathname.endsWith('.json'))) {
+  /* Never cache audio sample or soundfont libraries — avoids exhausting Cache Storage quota */
+  if (
+    url.pathname.startsWith('/dirt-samples/') ||
+    url.pathname.startsWith('/soundfonts/') ||
+    (url.pathname.startsWith('/samples/') && !url.pathname.endsWith('.json'))
+  ) {
     return;
   }
 

@@ -10,6 +10,7 @@
    ────────────────────────────────────────────────────────── */
 
 import { BaseEngine } from './base'
+import { clearKeyBindings, prepareStrudelCode } from '../strudel-extensions'
 import type { EngineType, EngineBlock, AudioNodeWrapper } from '../../types/engine'
 
 /** Strudel engine adapter.
@@ -48,9 +49,11 @@ export class StrudelEngine extends BaseEngine {
        * compiles `$: pat` into `pat.p('$')` and the REPL stacks every such
        * registration, so removing them collapses a multi-layer pattern down to
        * whichever layer happened to be last. See src/lib/dollar-label.test.ts. */
-      if (!code.trim()) return
+      const prepared = prepareStrudelCode(code)
+      clearKeyBindings()
+      if (!prepared.trim()) return
 
-      await this.replInstance.evaluate(code)
+      await this.replInstance.evaluate(prepared)
     } catch (err) {
       console.error('[Strudel] Evaluation error:', err)
       throw err

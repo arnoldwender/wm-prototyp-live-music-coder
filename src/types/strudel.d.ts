@@ -13,6 +13,7 @@ declare module '@strudel/core' {
   }
   /** Injects module exports into globalThis + strudelScope for REPL eval access */
   export function evalScope(...modules: (Promise<unknown> | Record<string, unknown>)[]): Promise<unknown[]>
+  export function getSoundIndex(n: unknown, numSounds: number): number
   /** Applies a transform to every currently active pattern. Only present in
    *  recent @strudel/core, hence the `| undefined` — ensureAllFunction() probes
    *  for it and registers nothing when the installed version predates it. */
@@ -27,6 +28,41 @@ declare module '@strudel/webaudio' {
      Calling this before initStrudel is what keeps the app on ONE AudioContext;
      webaudioRepl resolves its context as `options.audioContext ?? getAudioContext()`. */
   export function setAudioContext(context: AudioContext | null): void
+  export function registerSound(
+    name: string,
+    onTrigger: (
+      time: number,
+      value: Record<string, unknown>,
+      onended: () => void,
+    ) => Promise<{ node: AudioNode; stop: (releaseTime?: number) => void; nodes: Record<string, unknown> }>,
+    options?: Record<string, unknown>,
+  ): void
+  export function getADSRValues(values: unknown[]): [number, number, number, number]
+  export function getParamADSR(
+    param: AudioParam,
+    attack: number,
+    decay: number,
+    sustain: number,
+    release: number,
+    min: number,
+    max: number,
+    startTime: number,
+    endTime: number,
+    curve: 'linear' | 'exponential',
+  ): void
+  export function getVibratoOscillator(
+    detune: AudioParam,
+    value: Record<string, unknown>,
+    time: number,
+  ): { stop: () => void; nodes?: Record<string, unknown> } | undefined
+  export function getPitchEnvelope(
+    detune: AudioParam,
+    value: Record<string, unknown>,
+    time: number,
+    holdEnd: number,
+  ): void
+  export function onceEnded(node: AudioScheduledSourceNode, callback: () => void): void
+  export function releaseAudioNode(node: AudioNode): void
   export function samples(
     sampleMap: string | Record<string, unknown>,
     baseUrl?: string,
@@ -131,7 +167,14 @@ declare module '@strudel/xen' {
 }
 
 declare module '@strudel/soundfonts' {
-  export function soundfonts(url?: string): Promise<void>
+  export function setSoundfontUrl(url: string): void
+  export function getFontBufferSource(
+    name: string,
+    value: Record<string, unknown>,
+    ac: AudioContext,
+  ): Promise<AudioBufferSourceNode>
+  export function registerSoundfonts(): void
+  export function loadSoundfont(url: string): Promise<unknown>
 }
 
 declare module '@strudel/osc' {

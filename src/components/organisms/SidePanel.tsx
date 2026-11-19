@@ -13,6 +13,7 @@ import { useAppStore } from '../../lib/store';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { Button } from '../atoms';
 import { SampleDropZone } from '../molecules/SampleDropZone';
+import { GM_SAMPLE_CATEGORIES } from '../../lib/audio/fluidSoundfonts';
 
 /* ── Tab definitions ── */
 type TabId = 'samples' | 'reference' | 'console' | 'settings';
@@ -178,6 +179,7 @@ const SAMPLE_CATEGORIES = [
   { id: 'fx', label: 'FX & Noise', samples: ['industrial', 'noise', 'noise2', 'metal', 'pebbles'] },
   { id: 'world', label: 'World', samples: ['tabla', 'tabla2', 'sitar', 'pluck', 'kalimba'] },
   { id: 'misc', label: 'Misc', samples: ['birds', 'birds3', 'wind', 'numbers', 'can'] },
+  ...GM_SAMPLE_CATEGORIES,
 ];
 
 /* Engine-specific sample categories */
@@ -421,9 +423,9 @@ oscs.forEach((o, i) => {
     /* Generate code per engine */
     switch (engine) {
       case 'strudel': {
-        /* Oscillator types need note().s(), not standalone s() */
+        /* Oscillator types and GM SoundFonts need note().s(), not standalone s() */
         const oscTypes = ['sawtooth','sine','square','triangle','supersquare','supersaw','fatsawtooth','fatsquare','fattriangle','fatsine'];
-        if (oscTypes.includes(sample)) {
+        if (oscTypes.includes(sample) || sample.startsWith('gm_')) {
           insertion = code.trim() ? `\nnote("c3 e3 g3 b3").s("${sample}")` : `note("c3 e3 g3 b3").s("${sample}")`;
         } else {
           insertion = code.trim() ? `\ns("${sample}")` : `s("${sample}")`;
@@ -606,7 +608,8 @@ const STRUDEL_REFERENCE = [
     { fn: '.s("square")', desc: 'Square — hollow, retro, 8-bit' },
     { fn: '.s("triangle")', desc: 'Triangle — soft, muted' },
     { fn: '.s("superpiano")', desc: 'Piano sample sound' },
-    { fn: 'samples("url")', desc: 'Load sample pack' },
+    { fn: '.s("gm_piano")', desc: 'FluidR3 General MIDI voices (125 gm_* packs)' },
+    { fn: "samples('url')", desc: 'Load sample pack (single-quoted URL)' },
   ]},
   { title: 'Envelope & Filter', items: [
     { fn: '.attack(0.1)', desc: 'Attack time (seconds)' },
@@ -643,10 +646,10 @@ const STRUDEL_REFERENCE = [
     { fn: 'mouseX', desc: 'Mouse X position (0-1)' },
     { fn: 'mouseY', desc: 'Mouse Y position (0-1)' },
     { fn: '.range(lo, hi)', desc: 'Map value range' },
-    { fn: 'createParams("name", 0)', desc: 'Custom named parameter' },
-    { fn: 'getParam("name")', desc: 'Read parameter value' },
-    { fn: 'setParam("name", v)', desc: 'Set parameter value' },
-    { fn: 'onKey("a", () => ...)', desc: 'Bind keyboard shortcut' },
+    { fn: "createParams('name', 0)", desc: 'Custom named parameter' },
+    { fn: "getParam('name')", desc: 'Read parameter value' },
+    { fn: "setParam('name', v)", desc: 'Set parameter value' },
+    { fn: "onKey('a', () => ...)", desc: 'Bind keyboard shortcut' },
   ]},
   { title: 'Visualizers', items: [
     { fn: '._pianoroll()', desc: 'Inline piano roll (before transforms)' },

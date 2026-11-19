@@ -27,14 +27,15 @@ export async function loadXen(): Promise<boolean> {
   }
 }
 
-/** Load @strudel/soundfonts for GM soundfont playback */
+/** Load first-party FluidR3_GM SoundFonts (125 GM voices via /soundfonts/*) */
 export async function loadSoundfonts(): Promise<boolean> {
   try {
-    await import('@strudel/soundfonts');
-    if (import.meta.env.DEV) console.log('[Strudel] @strudel/soundfonts loaded');
+    const { registerFluidSoundfonts } = await import('./audio/fluidSoundfonts');
+    await registerFluidSoundfonts();
+    if (import.meta.env.DEV) console.log('[Strudel] FluidR3_GM soundfonts registered (125 voices)');
     return true;
-  } catch {
-    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/soundfonts not available');
+  } catch (err) {
+    if (import.meta.env.DEV) console.warn('[Strudel] FluidR3_GM soundfonts not available:', err);
     return false;
   }
 }
@@ -288,6 +289,155 @@ export function stopClockSync(): void {
 }
 
 /* ── _$: label muting — mute patterns with _$: prefix ── */
+
+function toSingleQuotedLiteral(rawContent: string): string {
+  const unescapedQuotes = rawContent.replace(/\\"/g, '"');
+  return `'${unescapedQuotes.replace(/'/g, "\\'")}'`;
+}
+
+function readDoubleQuotedAt(src: string, idx: number): { content: string; nextIdx: number } | null {
+  if (src[idx] !== '"') return null;
+  let i = idx + 1;
+  while (i < src.length) {
+    const ch = src[i];
+    if (ch === '\\') {
+      i += 2;
+      continue;
+    }
+    if (ch === '\n' || ch === '\r') return null;
+    if (ch === '"') {
+      return { content: src.slice(idx + 1, i), nextIdx: i + 1 };
+    }
+    i++;
+  }
+  return null;
+}
+
+const PURE_JS_FIRST_ARG_HELPERS = new Set(['createParams', 'getParam', 'setParam', 'onKey']);
+
+/**
+ * Convert double-quoted JS string arguments inside helper calls that expect
+ * raw strings rather than Strudel mini-notation (`samples("https://...")`,
+ * `createParams("name", ...)`, `getParam("name")`, `setParam("name", v)`,
+ * `onKey("a", fn)`), leaving comments and pattern strings (`note("...")`,
+ * `s("...")`) untouched.
+ */
+export function normalizeStrudelHelperQuotes(code: string): string {
+  let out = '';
+  let i = 0;
+
+  while (i < code.length) {
+    const ch = code[i];
+
+    // Preserve line comments verbatim
+    if (ch === '/' && code[i + 1] === '/') {
+      const nl = code.indexOf('\n', i);
+      const end = nl === -1 ? code.length : nl + 1;
+      out += code.slice(i, end);
+      i = end;
+      continue;
+    }
+
+    // Preserve block comments verbatim
+    if (ch === '/' && code[i + 1] === '*') {
+      const close = code.indexOf('*/', i + 2);
+      const end = close === -1 ? code.length : close + 2;
+      out += code.slice(i, end);
+      i = end;
+      continue;
+    }
+
+    // Skip string/template literals outside targeted helper call heads
+    if (ch === '"' || ch === "'" || ch === '`') {
+      const quote = ch;
+      let j = i + 1;
+      while (j < code.length) {
+        if (code[j] === '\\') {
+          j += 2;
+          continue;
+        }
+        if (code[j] === quote) {
+          j++;
+          break;
+        }
+        j++;
+      }
+      out += code.slice(i, j);
+      i = j;
+      continue;
+    }
+
+    // Match standalone helper identifier calls (not property accesses like `.samples(`)
+    if (/[A-Za-z_]/.test(ch)) {
+      let j = i + 1;
+      while (j < code.length && /[A-Za-z0-9_]/.test(code[j])) j++;
+      const ident = code.slice(i, j);
+      const prevChar = i > 0 ? code[i - 1] : '';
+      const isCallBoundary = !prevChar || !/[A-Za-z0-9_$.]/.test(prevChar);
+
+      if (isCallBoundary && (ident === 'samples' || PURE_JS_FIRST_ARG_HELPERS.has(ident))) {
+        let k = j;
+        while (k < code.length && /\s/.test(code[k])) k++;
+        if (code[k] === '(') {
+          let argStart = k + 1;
+          while (argStart < code.length && /\s/.test(code[argStart])) argStart++;
+          const first = readDoubleQuotedAt(code, argStart);
+          if (first) {
+            if (ident === 'samples') {
+              if (/[/:]|\.json\b/i.test(first.content)) {
+                out += code.slice(i, argStart) + toSingleQuotedLiteral(first.content);
+                const afterFirst = first.nextIdx;
+                let commaScan = afterFirst;
+                while (commaScan < code.length && /\s/.test(code[commaScan])) commaScan++;
+                if (code[commaScan] === ',') {
+                  let secondStart = commaScan + 1;
+                  while (secondStart < code.length && /\s/.test(code[secondStart])) secondStart++;
+                  const second = readDoubleQuotedAt(code, secondStart);
+                  if (second && /[/:]/.test(second.content)) {
+                    out += code.slice(afterFirst, secondStart) + toSingleQuotedLiteral(second.content);
+                    i = second.nextIdx;
+                    continue;
+                  }
+                }
+                i = afterFirst;
+                continue;
+              }
+            } else {
+              out += code.slice(i, argStart) + toSingleQuotedLiteral(first.content);
+              i = first.nextIdx;
+              continue;
+            }
+          }
+        }
+      }
+
+      out += ident;
+      i = j;
+      continue;
+    }
+
+    out += ch;
+    i++;
+  }
+
+  return out;
+}
+
+/** Pre-process Strudel code consistently across live eval, manual run, and engine calls. */
+export function prepareStrudelCode(code: string): string {
+  return processMutedLabels(normalizeStrudelHelperQuotes(code));
+}
+
+const CSP_NETWORK_ERR_RX = /failed to fetch|networkerror|load failed|content security policy/i;
+
+/** Turn generic fetch/CSP runtime errors into actionable guidance for the IDE ErrorBar. */
+export function formatStrudelEvalError(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  if (CSP_NETWORK_ERR_RX.test(message)) {
+    return `${message} — External sample hosts are blocked by browser CSP/privacy policy. Use built-in Dirt-Samples, gm_* SoundFonts (e.g. .s("gm_piano")), or drop local audio files into the Samples panel.`;
+  }
+  return message;
+}
 
 /**
  * Process code to handle _$: prefix muting.

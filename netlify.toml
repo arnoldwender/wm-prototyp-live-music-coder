@@ -50,6 +50,15 @@
   status = 200
   force = true
 
+# First-party General MIDI SoundFonts proxy pinned to an immutable commit SHA (MIT FluidR3_GM + DSGVO).
+# Browser fetches /soundfonts/*.js from live-music-coder.pro ('self'); Netlify Edge caches and proxies
+# upstream without sending visitor IPs to third-party GitHub Pages or loosening connect-src.
+[[redirects]]
+  from = "/soundfonts/*"
+  to = "https://raw.githubusercontent.com/felixroos/webaudiofontdata/23ca907d4370a04fd89ca483a92915e4d6159ab9/sound/:splat"
+  status = 200
+  force = true
+
 # 404 fallback — every valid route in public/sitemap.xml (including /docs/:sectionId,
 # /sessions/:slug, /blog/:slug, and /datenschutz) has its own prerendered HTML file in dist/,
 # and a real file wins over this non-forced rule. Unmatched paths serve dist/404.html with a
