@@ -136,6 +136,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `npm run verify:hydration` | Loads every prerendered route in Chromium and fails on hydration mismatches or console/page errors (`--url <origin>` checks a live deployment) |
 | `npm run verify:ai-labels` | Verifies in Chromium that all 49 AI-composed sessions display EU AI Act Art. 50 labels in EN/DE/ES and no route renders unclassified images |
 | `npm run sync:changelog` | Regenerates `CHANGELOG.md` from `src/data/changelog-library.ts` |
+| `bash scripts/mutate-verify-llms-txt.sh` | Breaks `public/llms.txt` / sitemap invariants across 8 mutations to verify the prebuild gate |
 | `bash scripts/mutate-prerender.sh` | Breaks each prerender mechanism on purpose and checks that its test catches it (needs a clean tree) |
 | `npm run test` | Run all unit/integration tests (Vitest 5) |
 | `npm run test:watch` | Watch mode |
@@ -223,14 +224,14 @@ src/
   lib/
     orchestrator/   # Multi-engine management + DAG audio graph
     engines/        # Strudel, Tone.js, WebAudio, MIDI adapters
-    audio/          # Shared AudioContext, analyser, recorder, first-party defaultSamples
+    audio/          # Shared AudioContext, analyser, recorder, first-party defaultSamples & fluidSoundfonts
     editor/         # CodeMirror theme, setup, extensions, inline-widgets, 4 themes
     input/          # Gamepad API polling
     midi/           # MIDI input, compose mode, MIDI learn, strudel-keys, device profiles
     parser/         # Code-to-graph extraction (per engine)
     codegen/        # Graph-to-code generation
     visualizers/    # Waveform, spectrum, timeline, pianoroll, punchcard, spiral, pitchwheel
-    persistence/    # IndexedDB, URL sharing, GitHub Gist
+    persistence/    # IndexedDB, node graph layout, URL sharing, GitHub Gist
     store.ts        # Zustand global state
     history.ts      # Undo/redo (100-entry cap)
   data/             # Templates, docs, examples, sessions, sample catalog, midi-devices, blog, changelog

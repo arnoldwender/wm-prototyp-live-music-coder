@@ -103,9 +103,9 @@
     },
     "download": {
       "title": "Descargar App de Escritorio",
-      "subtitle": "Guardado nativo de proyectos .lmc, bandeja en barra de menús, exportación WAV y actualizaciones firmadas para macOS. El mismo poder de live coding, sin conexión.",
+      "subtitle": "Guardado nativo de proyectos .lmc, bandeja en barra de menús, exportación WAV y actualizaciones firmadas para macOS. El mismo flujo de live coding en tu escritorio.",
       "cta": "Descargar para macOS",
-      "platforms": "macOS (Apple Silicon + Intel) — Windows y Linux próximamente"
+      "platforms": "macOS (Apple Silicon + Intel, firmada y notarizada)"
     }
   },
   "help": {
@@ -451,7 +451,7 @@
       "mt": "mt — Tom medio",
       "ht": "ht — Tom agudo",
       "banksHeading": "Bancos de muestras",
-      "banksText": "Usa nombres de muestras directos como bd, sd, hh, oh, cp para batería. Para sonidos 808/909, usa s(\"808\") o s(\"909\") directamente.",
+      "banksText": "Usa nombres directos como bd, sd, hh, oh, cp para batería, s(\"808\") / s(\"909\") para cajas de ritmos y cualquiera de los 125 instrumentos General MIDI integrados como s(\"gm_epiano1\") o s(\"gm_acoustic_bass\"). Al cargar paquetes propios con samples('https://...'), escribe las URLs entre comillas simples.",
       "oscillatorsHeading": "Osciladores",
       "oscillatorsText": "Para síntesis, usa .s() con tipos de oscilador: sawtooth (brillante, zumbante), sine (puro, limpio), square (hueco, retro) y triangle (suave, melódico)."
     },
@@ -517,7 +517,7 @@
       "waveform": "Waveform — osciloscopio en tiempo real",
       "spectrum": "Spectrum — analizador de frecuencias",
       "timeline": "Timeline — cuadrícula de beats y medidor de nivel",
-      "pianoroll": "Piano Roll — notas scrolleantes calidad DAW (estilo Ableton)",
+      "pianoroll": "Piano Roll — vista de notas de solo lectura con zoom, desplazamiento temporal y audición al hacer clic",
       "punchcard": "Punchcard — cuadrícula de puntos para eventos",
       "spiral": "Spiral — visualización rotativa de notas",
       "pitchwheel": "Pitchwheel — círculo de 12 tonos (análisis armónico)"
@@ -526,10 +526,10 @@
       "title": "Configuración",
       "themesHeading": "Temas",
       "themesText": "4 temas de editor disponibles — cambia con el icono de engranaje en la barra de herramientas:",
-      "themePurple": "Purple (Por defecto) — zinc/morado, la estética predeterminada",
-      "themeAmber": "Amber — tonos cálidos piedra/ámbar",
-      "themeCyan": "Cyan — océano profundo, tonos turquesa",
-      "themeMatrix": "Matrix — verde sobre negro, estilo terminal",
+      "themePurple": "Signal (Por defecto) — paleta Signal Room completa sobre carbón cálido",
+      "themeAmber": "Sodium — terminal monocromo de fósforo ámbar",
+      "themeCyan": "Scope — acento osciloscopio aguamarina de alto contraste",
+      "themeMatrix": "Phosphor — terminal monocromo de fósforo verde",
       "editorHeading": "Opciones del Editor",
       "editorText": "Personaliza el editor a tu gusto:",
       "fontSize": "Tamaño de fuente — slider de 10px a 22px",
@@ -598,7 +598,7 @@
       "urlHeading": "Compartir por URL",
       "urlText": "Haz clic en el icono de compartir en la barra de herramientas para generar una URL comprimida con tu código actual. La URL usa compresión lz-string — patrones de hasta varios kilobytes caben en un solo enlace. Quien abra el enlace puede revisar tu código en un diálogo de confirmación antes de cargarlo o ejecutarlo.",
       "gistHeading": "GitHub Gists",
-      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) e ingresa tu token de acceso personal de GitHub. Puedes guardar cualquier pestaña como un nuevo Gist, cargar Gists guardados anteriormente y organizar tus patrones entre sesiones. En el navegador, tu token permanece en memoria solo durante la sesión de la pestaña actual (nunca en Web Storage); en la app de escritorio para macOS se cifra en el Llavero del sistema y pide confirmación antes de enviar solicitudes. Los Gists se crean como secretos por defecto: no aparecen en búsquedas, pero cualquiera con el enlace puede leerlos. Marca “Hacer público” antes de guardar para crear uno público — GitHub fija la visibilidad al crearlo y no se puede cambiar después.",
+      "gistText": "Abre el panel de Gists (icono de marcador en la barra lateral) para guardar cualquier pestaña como un nuevo Gist o cargar Gists existentes. En el navegador, abrir el diálogo pausa la reproducción activa y tu token de acceso personal de GitHub permanece en memoria solo durante la sesión de la pestaña actual (nunca en Web Storage). En la app de escritorio para macOS, copia tu token y pulsa «Importar token del portapapeles» — el proceso principal pide confirmación nativa, lo cifra en el Llavero del sistema, limpia el portapapeles y solicita confirmación antes de cada subida. Los Gists se crean como secretos por defecto: no aparecen en búsquedas, pero cualquiera con el enlace puede leerlos. Marca “Hacer público” antes de guardar para crear uno público — GitHub fija la visibilidad al crearlo y no se puede cambiar después.",
       "downloadHeading": "Descargar como .js",
       "downloadText": "La barra de herramientas incluye un botón de descarga que guarda tu código actual como archivo .js. Útil para hacer copias de seguridad de patrones o compartirlos fuera de la app.",
       "sessionsHeading": "Biblioteca de Sesiones",

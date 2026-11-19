@@ -18,6 +18,8 @@ import { EXAMPLE_LIBRARY } from './example-library';
 import { SESSIONS_LIBRARY } from './sessions-library';
 import { docSections } from './docs';
 import { MIDI_DEVICES } from './midi-devices';
+import { BASE_SAMPLE_COUNT } from './sample-library';
+import { FLUID_GM_NAMES } from '../lib/audio/fluidSoundfonts';
 
 /* Anchored at the project root like colors.test.ts: under jsdom, import.meta.url is not a
    file: URL, and process.cwd() is the project root. */
@@ -32,6 +34,8 @@ describe('public/llms.txt counts', () => {
     ['AI-composed sessions', /(\d+) curated,? AI-composed/g, SESSIONS_LIBRARY.length],
     ['documentation sections', /(\d+)(?:-section documentation| documentation sections)/g, docSections.length],
     ['MIDI device profiles', /(\d+) factory device profiles/g, MIDI_DEVICES.length],
+    ['Dirt-Samples groups', /(\d+) Dirt-Samples groups/g, BASE_SAMPLE_COUNT],
+    ['General MIDI voices', /(\d+) General MIDI/g, FLUID_GM_NAMES.length],
   ] as const)('%s match the data', (_label, pattern, actual) => {
     const numbers = stated(pattern);
     // The phrase must still be there: a rewrite that drops it would otherwise pass in silence.

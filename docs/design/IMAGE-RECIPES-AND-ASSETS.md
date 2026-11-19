@@ -51,11 +51,12 @@ Visual inspection of every binary/SVG file in `public/` and `build/` identified 
 | `F06` | `public/fonts/ibm-plex-sans-latin-600-normal.woff2` | `600 normal` | `24,252` | `8960851d691c054ed38e259bdcf1a6190d157b4203ed5bb32c632a863fb8ec2f` | `SIL OFL 1.1` |
 | `F07` | `public/fonts/ibm-plex-sans-latin-700-normal.woff2` | `700 normal` | `22,832` | `42e7b0c143c19df9d99fd896e76b48f846edf0902d200bc29796b34d12c33aa7` | `SIL OFL 1.1` |
 
-### 2.4 Audio Sample Manifest & First-Party Proxy (`public/samples/`)
+### 2.4 Audio Sample & SoundFont First-Party Proxies
 
 | ID | Path | Kind | Bytes | SHA-256 | Provenance & License |
 | --- | --- | --- | --- | --- | --- |
 | `S01` | `public/samples/dirt-samples.json` | Sample bank JSON manifest (`_base: "/dirt-samples/"`) | `47,585` | `9d6c34a5244a6debe97f3afeaef2cd8dd7223f8f66e8a07b37e7622aed34db43` | Derived from `tidalcycles/Dirt-Samples` pinned commit `c74fc80f8db8038f6a33648ffef5ac00a07ad402`; `.wav` audio files proxied lazily on demand through first-party `/dirt-samples/*` (`GPL-3.0`, compatible with combined `AGPL-3.0-or-later`; documented in [`public/samples/LICENSE.md`](../../public/samples/LICENSE.md)). |
+| `S02` | `src/lib/audio/fluidSoundfonts.ts` | General MIDI SoundFont registry (`125` `gm_*` voices / `215` JS presets via `/soundfonts/*`) | `14,867` | `1f7d5d834f47456cff96323487b60504e287f7e4f99b9743ff834dc9da466bf1` | Strictly MIT-licensed `FluidR3_GM` preset modules served lazily on demand through same-origin `/soundfonts/*` proxy (`felixroos/webaudiofontdata` pinned commit `23ca907d4370a04fd89ca483a92915e4d6159ab9`; attribution in [`public/samples/LICENSE.md`](../../public/samples/LICENSE.md)). |
 
 ---
 
