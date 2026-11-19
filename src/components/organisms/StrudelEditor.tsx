@@ -188,9 +188,12 @@ export function StrudelEditor() {
   useEffect(() => {
     if (!navigator.requestMIDIAccess) return;
     let mounted = true;
+    let attachedMidi: MIDIAccess | null = null;
+    let stateChangeHandler: (() => void) | null = null;
     navigator.requestMIDIAccess({ sysex: false }).then((midi) => {
       if (!mounted) return;
       const checkDevices = () => {
+        if (!mounted) return;
         const inputs = [...midi.inputs.values()];
         setMidiConnected(inputs.length > 0);
         const name = inputs[0]?.name ?? '';
@@ -215,10 +218,17 @@ export function StrudelEditor() {
           console.log(`[midi] profile "${profile.id}" loaded for "${name}"`, midimap);
         }).catch(() => { /* profile data unavailable — MIDI still works raw */ });
       };
+      attachedMidi = midi;
+      stateChangeHandler = checkDevices;
       checkDevices();
-      midi.onstatechange = checkDevices;
+      midi.addEventListener('statechange', checkDevices);
     }).catch(() => {});
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      if (attachedMidi && stateChangeHandler) {
+        attachedMidi.removeEventListener('statechange', stateChangeHandler);
+      }
+    };
   }, []);
 
   /* Close MIDI menu on outside click */
@@ -432,14 +442,19 @@ export function StrudelEditor() {
             const delay = composeModeRef.current ? 300 : 150;
             evalTimerRef.current = setTimeout(async () => {
               if (!replRef.current || useAppStore.getState().untrustedCodePending) return;
+              const { prepareStrudelCode, clearKeyBindings, formatStrudelEvalError } =
+                await import('../../lib/strudel-extensions');
               try {
-                await replRef.current.evaluate(code, true);
+                const prepared = prepareStrudelCode(code);
+                clearKeyBindings();
+                if (!prepared.trim()) return;
+                await replRef.current.evaluate(prepared, true);
                 resetStrudelTap();
                 setEvalError(null);
                 const v = viewRef.current;
                 if (v) syncWidgetsAfterEval(v, replRef.current);
               } catch (err) {
-                setEvalError(err instanceof Error ? err.message : String(err));
+                setEvalError(formatStrudelEvalError(err));
               }
             }, delay);
           }
@@ -669,15 +684,24 @@ export function StrudelEditor() {
        * Note processMutedLabels below operates on `_$:`, which is a different
        * prefix and still works on the raw text. See src/lib/dollar-label.test.ts. */
       let code = view.state.doc.toString();
+      let formatEvalError = (err: unknown) => (err instanceof Error ? err.message : String(err));
       try {
-        const { processMutedLabels, clearKeyBindings } = await import('../../lib/strudel-extensions');
-        code = processMutedLabels(code);
+        const { prepareStrudelCode, clearKeyBindings, formatStrudelEvalError } =
+          await import('../../lib/strudel-extensions');
+        formatEvalError = formatStrudelEvalError;
+        code = prepareStrudelCode(code);
         clearKeyBindings(); /* Reset onKey bindings before re-eval */
       } catch { /* extensions not loaded */ }
       if (!code.trim()) { setEvaluating(false); return; }
 
       /* evaluate(code, autoplay=true) — Strudel auto-starts the scheduler */
-      await replRef.current.evaluate(code, true);
+      try {
+        await replRef.current.evaluate(code, true);
+      } catch (err) {
+        setEvalError(formatEvalError(err));
+        setEvaluating(false);
+        return;
+      }
 
       /* Sync inline widgets from REPL state to CM6 editor.
        * After evaluate(), repl.state.widgets contains slider and block widget
@@ -694,6 +718,11 @@ export function StrudelEditor() {
       setTimeout(() => resetStrudelTap(), 600);
       setTimeout(() => resetStrudelTap(), 1000);
       setTimeout(() => resetStrudelTap(), 2000);
+
+      try {
+        const { broadcastTransport } = await import('../../lib/strudel-extensions');
+        broadcastTransport(true);
+      } catch { /* extensions not loaded */ }
 
       /* Track evaluation for session stats */
       const evalStore = useAppStore.getState();
@@ -717,6 +746,9 @@ export function StrudelEditor() {
     try {
       replRef.current?.stop();
     } catch { /* stop may fail if not started */ }
+    void import('../../lib/strudel-extensions').then(({ broadcastTransport }) => {
+      broadcastTransport(false);
+    }).catch(() => {});
     if (isPlaying) {
       togglePlay();
     }
@@ -916,7 +948,7 @@ export function StrudelEditor() {
                   Sound Browser
                 </div>
                 <div className="grid grid-cols-2 gap-0.5 px-1 pb-1">
-                  {(['sine', 'sawtooth', 'square', 'triangle', 'superpiano', 'supersaw', 'metal', 'piano'] as const).map((sound) => (
+                  {(['sine', 'sawtooth', 'square', 'triangle', 'superpiano', 'supersaw', 'metal', 'piano', 'gm_piano', 'gm_epiano1', 'gm_acoustic_bass', 'gm_pad_warm'] as const).map((sound) => (
                     <button
                       type="button"
                       key={sound}

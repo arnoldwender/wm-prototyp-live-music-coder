@@ -27,14 +27,15 @@ export async function loadXen(): Promise<boolean> {
   }
 }
 
-/** Load @strudel/soundfonts for GM soundfont playback */
+/** Load first-party FluidR3_GM SoundFonts (125 GM voices via /soundfonts/*) */
 export async function loadSoundfonts(): Promise<boolean> {
   try {
-    await import('@strudel/soundfonts');
-    if (import.meta.env.DEV) console.log('[Strudel] @strudel/soundfonts loaded');
+    const { registerFluidSoundfonts } = await import('./audio/fluidSoundfonts');
+    await registerFluidSoundfonts();
+    if (import.meta.env.DEV) console.log('[Strudel] FluidR3_GM soundfonts registered (125 voices)');
     return true;
-  } catch {
-    if (import.meta.env.DEV) console.warn('[Strudel] @strudel/soundfonts not available');
+  } catch (err) {
+    if (import.meta.env.DEV) console.warn('[Strudel] FluidR3_GM soundfonts not available:', err);
     return false;
   }
 }
@@ -179,17 +180,124 @@ export function getAllParams(): Map<string, number> {
 
 /* ── Clock sync — multi-window/tab synchronization ───── */
 
+const CLOCK_CHANNEL_NAME = 'lmc-clock-sync';
+const LEADER_ELECTION_MS = 500;
+const HEARTBEAT_MS = 2000;
+const BARS_PER_CYCLE = 4;
+
 /** BroadcastChannel for clock sync between tabs */
 let clockChannel: BroadcastChannel | null = null;
 let isClockLeader = false;
 /** Pending leader-election timeout — must be cancelled on cleanup */
 let leaderTimeout: ReturnType<typeof setTimeout> | null = null;
+/** Periodic phase + tempo heartbeat when this tab is leader */
+let leaderHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
+let pageHideHandler: (() => void) | null = null;
 /** Guards against double-initialization across HMR cycles */
 let clockSyncInitialized = false;
 
+function epochNowMs(): number {
+  if (typeof performance !== 'undefined' && typeof performance.timeOrigin === 'number') {
+    return performance.timeOrigin + performance.now();
+  }
+  return Date.now();
+}
+
+function getLeaderCps(): number {
+  try {
+    const cps = window.__strudelRepl?.scheduler?.cps;
+    return typeof cps === 'number' && Number.isFinite(cps) && cps > 0 ? cps : 0.5;
+  } catch {
+    return 0.5;
+  }
+}
+
+function getLeaderCycle(): number {
+  try {
+    const now = window.__strudelRepl?.scheduler?.now?.();
+    return typeof now === 'number' && Number.isFinite(now) ? now : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Compute a monotonically non-decreasing `scheduler.lastEnd` that aligns a follower
+ * tab's fractional cycle phase to the leader's phase within ~1% of a cycle.
+ * Returns `null` when inputs are invalid or phase is already aligned.
+ */
+export function computePhaseAlignedLastEnd(
+  currentLastEnd: number,
+  currentCycle: number,
+  leaderCycle: number,
+  cps: number,
+  elapsedMs: number,
+): number | null {
+  if (
+    !Number.isFinite(currentCycle) ||
+    !Number.isFinite(leaderCycle) ||
+    !Number.isFinite(cps) ||
+    cps <= 0 ||
+    !Number.isFinite(elapsedMs)
+  ) {
+    return null;
+  }
+  const safeElapsedSec = Math.max(0, elapsedMs) / 1000;
+  const targetCycle = leaderCycle + safeElapsedSec * cps;
+  const diff = (((targetCycle - currentCycle) % 1) + 1) % 1;
+  if (diff <= 0.01 || diff >= 0.99) return null;
+
+  const base = Number.isFinite(currentLastEnd)
+    ? Math.max(currentLastEnd, currentCycle)
+    : currentCycle;
+  return base + diff;
+}
+
+function buildClockPayload(
+  type: 'sync' | 'bpm' | 'transport',
+  bpmOverride?: number,
+  started?: boolean,
+) {
+  const bpm =
+    typeof bpmOverride === 'number' && Number.isFinite(bpmOverride) && bpmOverride > 0
+      ? bpmOverride
+      : getLeaderBpm();
+  const cps = typeof bpmOverride === 'number' && bpmOverride > 0 ? bpm / (60 * BARS_PER_CYCLE) : getLeaderCps();
+  return {
+    type,
+    bpm,
+    cps,
+    cycle: getLeaderCycle(),
+    sentAtMs: epochNowMs(),
+    ...(typeof started === 'boolean' ? { started } : {}),
+  };
+}
+
+function promoteToLeader(): void {
+  if (isClockLeader) return;
+  isClockLeader = true;
+  if (import.meta.env.DEV) console.log('[ClockSync] This tab is now the clock leader');
+  clockChannel?.postMessage(buildClockPayload('sync'));
+  if (leaderHeartbeatTimer === null) {
+    leaderHeartbeatTimer = setInterval(() => {
+      if (isClockLeader && clockChannel) {
+        clockChannel.postMessage(buildClockPayload('sync'));
+      }
+    }, HEARTBEAT_MS);
+  }
+}
+
+function scheduleElection(delayMs = LEADER_ELECTION_MS): void {
+  if (leaderTimeout !== null || isClockLeader) return;
+  leaderTimeout = setTimeout(() => {
+    leaderTimeout = null;
+    promoteToLeader();
+  }, delayMs);
+}
+
 /**
  * Initialize clock sync — the first tab becomes the leader,
- * subsequent tabs sync their scheduler to the leader's clock.
+ * subsequent tabs sync tempo, cycle phase, and transport stop to the leader.
  */
 export function initClockSync(): void {
   if (typeof BroadcastChannel === 'undefined') {
@@ -200,43 +308,57 @@ export function initClockSync(): void {
   if (clockSyncInitialized) return;
   clockSyncInitialized = true;
 
-  clockChannel = new BroadcastChannel('lmc-clock-sync');
+  clockChannel = new BroadcastChannel(CLOCK_CHANNEL_NAME);
 
   /* Announce presence */
-  clockChannel.postMessage({ type: 'ping', timestamp: Date.now() });
+  clockChannel.postMessage({ type: 'ping', sentAtMs: epochNowMs() });
 
   clockChannel.onmessage = (e) => {
-    const { type } = e.data;
-    switch (type) {
+    const data = (e.data ?? {}) as Record<string, unknown>;
+    switch (data.type) {
       case 'ping':
-        /* Another tab appeared — if we're the leader, respond */
+        /* Another tab appeared — if we're the leader, send tempo + current cycle phase */
         if (isClockLeader) {
-          clockChannel?.postMessage({
-            type: 'sync',
-            timestamp: Date.now(),
-            bpm: getLeaderBpm(),
-          });
+          clockChannel?.postMessage(buildClockPayload('sync'));
         }
         break;
       case 'sync':
       case 'bpm':
-        /* Adopt the leader's tempo. Both cases used to only log, so the feature
-           elected a leader and then ignored it — README called that "BPM
-           broadcast". Followers now set their own scheduler. */
-        if (!isClockLeader) applyLeaderBpm(e.data.bpm);
+      case 'transport':
+        /* Another leader answered; cancel pending election and follow its clock */
+        if (leaderTimeout !== null) {
+          clearTimeout(leaderTimeout);
+          leaderTimeout = null;
+        }
+        if (!isClockLeader) {
+          applyLeaderBpm(data.bpm);
+          if (data.type === 'transport' && data.started === false) {
+            try { window.__strudelRepl?.stop?.(); } catch { /* ignore */ }
+          } else {
+            applyLeaderPhase(data.cycle, data.cps, data.sentAtMs);
+          }
+        }
+        break;
+      case 'leader-resign':
+        if (!isClockLeader) {
+          clockChannel?.postMessage({ type: 'ping', sentAtMs: epochNowMs() });
+          scheduleElection(LEADER_ELECTION_MS);
+        }
         break;
     }
   };
 
-  /* Become leader after a short timeout if no leader responds.
-   * Store ID so stopClockSync() can cancel it before it fires. */
-  leaderTimeout = setTimeout(() => {
-    leaderTimeout = null;
-    if (!isClockLeader) {
-      isClockLeader = true;
-      if (import.meta.env.DEV) console.log('[ClockSync] This tab is now the clock leader');
-    }
-  }, 500);
+  if (typeof window !== 'undefined') {
+    pageHideHandler = () => {
+      if (isClockLeader && clockChannel) {
+        try { clockChannel.postMessage({ type: 'leader-resign', sentAtMs: epochNowMs() }); } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener('pagehide', pageHideHandler);
+  }
+
+  /* Become leader after a short timeout if no leader responds. */
+  scheduleElection(LEADER_ELECTION_MS);
 }
 
 /**
@@ -248,7 +370,6 @@ export function initClockSync(): void {
  */
 function applyLeaderBpm(bpm: unknown): void {
   if (typeof bpm !== 'number' || !Number.isFinite(bpm) || bpm <= 0) return;
-  const BARS_PER_CYCLE = 4;
   const cpm = bpm / BARS_PER_CYCLE;
   try {
     const repl = window.__strudelRepl;
@@ -259,27 +380,74 @@ function applyLeaderBpm(bpm: unknown): void {
   }
 }
 
+function applyLeaderPhase(leaderCycle: unknown, leaderCps: unknown, sentAtMs: unknown): void {
+  if (typeof leaderCycle !== 'number' || typeof sentAtMs !== 'number') return;
+  try {
+    const scheduler = window.__strudelRepl?.scheduler;
+    if (!scheduler || typeof scheduler.now !== 'function') return;
+    const currentCycle = scheduler.now();
+    const cps =
+      typeof leaderCps === 'number' && Number.isFinite(leaderCps) && leaderCps > 0
+        ? leaderCps
+        : typeof scheduler.cps === 'number' && scheduler.cps > 0
+          ? scheduler.cps
+          : 0.5;
+    const currentLastEnd = typeof scheduler.lastEnd === 'number' ? scheduler.lastEnd : currentCycle;
+    const nextLastEnd = computePhaseAlignedLastEnd(
+      currentLastEnd,
+      currentCycle,
+      leaderCycle,
+      cps,
+      epochNowMs() - sentAtMs,
+    );
+    if (nextLastEnd !== null) {
+      scheduler.lastEnd = nextLastEnd;
+      scheduler.num_ticks_since_cps_change = 0;
+    }
+  } catch {
+    /* No running scheduler in this tab yet */
+  }
+}
+
 function getLeaderBpm(): number {
   try {
     const repl = window.__strudelRepl;
-    return (repl?.scheduler?.cps != null ? repl.scheduler.cps * 60 * 4 : undefined) ?? 120;
+    return (repl?.scheduler?.cps != null ? repl.scheduler.cps * 60 * BARS_PER_CYCLE : undefined) ?? 120;
   } catch {
     return 120;
   }
 }
 
-/** Broadcast BPM change to other tabs */
+/** Broadcast BPM + cycle phase change to other tabs */
 export function broadcastBpm(bpm: number): void {
   if (isClockLeader && clockChannel) {
-    clockChannel.postMessage({ type: 'bpm', bpm, timestamp: Date.now() });
+    clockChannel.postMessage(buildClockPayload('bpm', bpm));
   }
 }
 
-/** Stop clock sync — closes the channel, cancels pending leader election, resets all state */
+/** Broadcast play/stop transport transitions from the leader tab to followers */
+export function broadcastTransport(started: boolean): void {
+  if (isClockLeader && clockChannel) {
+    clockChannel.postMessage(buildClockPayload('transport', undefined, started));
+  }
+}
+
+/** Stop clock sync — resigns leadership, closes channel, cancels timers, resets state */
 export function stopClockSync(): void {
   if (leaderTimeout !== null) {
     clearTimeout(leaderTimeout);
     leaderTimeout = null;
+  }
+  if (leaderHeartbeatTimer !== null) {
+    clearInterval(leaderHeartbeatTimer);
+    leaderHeartbeatTimer = null;
+  }
+  if (typeof window !== 'undefined' && pageHideHandler) {
+    window.removeEventListener('pagehide', pageHideHandler);
+    pageHideHandler = null;
+  }
+  if (isClockLeader && clockChannel) {
+    try { clockChannel.postMessage({ type: 'leader-resign', sentAtMs: epochNowMs() }); } catch { /* ignore */ }
   }
   clockChannel?.close();
   clockChannel = null;
@@ -288,6 +456,155 @@ export function stopClockSync(): void {
 }
 
 /* ── _$: label muting — mute patterns with _$: prefix ── */
+
+function toSingleQuotedLiteral(rawContent: string): string {
+  const unescapedQuotes = rawContent.replace(/\\"/g, '"');
+  return `'${unescapedQuotes.replace(/'/g, "\\'")}'`;
+}
+
+function readDoubleQuotedAt(src: string, idx: number): { content: string; nextIdx: number } | null {
+  if (src[idx] !== '"') return null;
+  let i = idx + 1;
+  while (i < src.length) {
+    const ch = src[i];
+    if (ch === '\\') {
+      i += 2;
+      continue;
+    }
+    if (ch === '\n' || ch === '\r') return null;
+    if (ch === '"') {
+      return { content: src.slice(idx + 1, i), nextIdx: i + 1 };
+    }
+    i++;
+  }
+  return null;
+}
+
+const PURE_JS_FIRST_ARG_HELPERS = new Set(['createParams', 'getParam', 'setParam', 'onKey']);
+
+/**
+ * Convert double-quoted JS string arguments inside helper calls that expect
+ * raw strings rather than Strudel mini-notation (`samples("https://...")`,
+ * `createParams("name", ...)`, `getParam("name")`, `setParam("name", v)`,
+ * `onKey("a", fn)`), leaving comments and pattern strings (`note("...")`,
+ * `s("...")`) untouched.
+ */
+export function normalizeStrudelHelperQuotes(code: string): string {
+  let out = '';
+  let i = 0;
+
+  while (i < code.length) {
+    const ch = code[i];
+
+    // Preserve line comments verbatim
+    if (ch === '/' && code[i + 1] === '/') {
+      const nl = code.indexOf('\n', i);
+      const end = nl === -1 ? code.length : nl + 1;
+      out += code.slice(i, end);
+      i = end;
+      continue;
+    }
+
+    // Preserve block comments verbatim
+    if (ch === '/' && code[i + 1] === '*') {
+      const close = code.indexOf('*/', i + 2);
+      const end = close === -1 ? code.length : close + 2;
+      out += code.slice(i, end);
+      i = end;
+      continue;
+    }
+
+    // Skip string/template literals outside targeted helper call heads
+    if (ch === '"' || ch === "'" || ch === '`') {
+      const quote = ch;
+      let j = i + 1;
+      while (j < code.length) {
+        if (code[j] === '\\') {
+          j += 2;
+          continue;
+        }
+        if (code[j] === quote) {
+          j++;
+          break;
+        }
+        j++;
+      }
+      out += code.slice(i, j);
+      i = j;
+      continue;
+    }
+
+    // Match standalone helper identifier calls (not property accesses like `.samples(`)
+    if (/[A-Za-z_]/.test(ch)) {
+      let j = i + 1;
+      while (j < code.length && /[A-Za-z0-9_]/.test(code[j])) j++;
+      const ident = code.slice(i, j);
+      const prevChar = i > 0 ? code[i - 1] : '';
+      const isCallBoundary = !prevChar || !/[A-Za-z0-9_$.]/.test(prevChar);
+
+      if (isCallBoundary && (ident === 'samples' || PURE_JS_FIRST_ARG_HELPERS.has(ident))) {
+        let k = j;
+        while (k < code.length && /\s/.test(code[k])) k++;
+        if (code[k] === '(') {
+          let argStart = k + 1;
+          while (argStart < code.length && /\s/.test(code[argStart])) argStart++;
+          const first = readDoubleQuotedAt(code, argStart);
+          if (first) {
+            if (ident === 'samples') {
+              if (/[/:]|\.json\b/i.test(first.content)) {
+                out += code.slice(i, argStart) + toSingleQuotedLiteral(first.content);
+                const afterFirst = first.nextIdx;
+                let commaScan = afterFirst;
+                while (commaScan < code.length && /\s/.test(code[commaScan])) commaScan++;
+                if (code[commaScan] === ',') {
+                  let secondStart = commaScan + 1;
+                  while (secondStart < code.length && /\s/.test(code[secondStart])) secondStart++;
+                  const second = readDoubleQuotedAt(code, secondStart);
+                  if (second && /[/:]/.test(second.content)) {
+                    out += code.slice(afterFirst, secondStart) + toSingleQuotedLiteral(second.content);
+                    i = second.nextIdx;
+                    continue;
+                  }
+                }
+                i = afterFirst;
+                continue;
+              }
+            } else {
+              out += code.slice(i, argStart) + toSingleQuotedLiteral(first.content);
+              i = first.nextIdx;
+              continue;
+            }
+          }
+        }
+      }
+
+      out += ident;
+      i = j;
+      continue;
+    }
+
+    out += ch;
+    i++;
+  }
+
+  return out;
+}
+
+/** Pre-process Strudel code consistently across live eval, manual run, and engine calls. */
+export function prepareStrudelCode(code: string): string {
+  return processMutedLabels(normalizeStrudelHelperQuotes(code));
+}
+
+const CSP_NETWORK_ERR_RX = /failed to fetch|networkerror|load failed|content security policy/i;
+
+/** Turn generic fetch/CSP runtime errors into actionable guidance for the IDE ErrorBar. */
+export function formatStrudelEvalError(err: unknown): string {
+  const message = err instanceof Error ? err.message : String(err);
+  if (CSP_NETWORK_ERR_RX.test(message)) {
+    return `${message} — External sample hosts are blocked by browser CSP/privacy policy. Use built-in Dirt-Samples, gm_* SoundFonts (e.g. .s("gm_piano")), or drop local audio files into the Samples panel.`;
+  }
+  return message;
+}
 
 /**
  * Process code to handle _$: prefix muting.

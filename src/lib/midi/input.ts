@@ -39,7 +39,7 @@ export async function initMidiInput(): Promise<boolean> {
     }
 
     /* Listen for new devices — fires on both connect and disconnect */
-    midiAccess.onstatechange = (e) => {
+    midiAccess.addEventListener('statechange', (e) => {
       const port = (e as MIDIConnectionEvent).port;
       if (!port || port.type !== 'input') return;
       if (port.state === 'connected') {
@@ -49,7 +49,7 @@ export async function initMidiInput(): Promise<boolean> {
         console.log(`[MidiInput] Disconnected: ${port.name}`);
       }
       notifyDeviceListeners();
-    };
+    });
 
     console.log(`[MidiInput] Initialized with ${midiAccess.inputs.size} inputs`);
     return true;

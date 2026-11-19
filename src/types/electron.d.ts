@@ -11,7 +11,10 @@ export interface ElectronAPI {
   revealInFinder: (filePath: string) => void
   exportWav: (buffer: ArrayBuffer, sampleRate: number, channels: number) => Promise<{ path: string } | null>
   hasGistToken: () => Promise<boolean>
-  setGistToken: (token: string) => Promise<boolean>
+  importGistTokenFromClipboard: () => Promise<{
+    ok: boolean
+    reason?: 'empty' | 'invalid' | 'cancelled' | 'unavailable'
+  }>
   clearGistToken: () => Promise<void>
   saveGist: (payload: {
     files: Record<string, { content: string }>

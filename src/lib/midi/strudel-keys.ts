@@ -10,19 +10,19 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { getMasterGain, getSharedContext } from '../audio/context';
+
 /** Buffered MIDI haps per device, keyed by device name/index */
 const kHaps: Record<string, any[]> = {};
 
 /* ── Shared OscillatorNode trigger ──
  *
  * Both the physical MIDI controller and the on-screen VirtualKeyboard
- * funnel notes through `playOscillatorNote`. The function lazily creates
- * a single AudioContext, picks an OscillatorType (defaulting to the
- * VirtualKeyboard's selected waveform), and plays a short ADSR-shaped
- * note. Exposed globally as `window.__lmcPlayNote` so the React tree
- * can call it without importing this module directly. */
-
-let sharedAudioCtx: AudioContext | null = null;
+ * funnel notes through `playOscillatorNote`. It uses the app's single
+ * master AudioContext and routes through `getMasterGain()`, so MIDI and
+ * Synth notes obey master volume and feed visualizers + recording.
+ * Exposed globally as `window.__lmcPlayNote` so the React tree can call
+ * it without importing this module directly. */
 
 /** Currently selected oscillator type — settable from the synth UI */
 let currentOscillatorType: OscillatorType = 'sine';
@@ -39,16 +39,14 @@ let currentFilterCutoff = 2000;
 /* Q ranges roughly 0.1 (neutral) to 20 (screaming) — our UI 0-1 maps here */
 let currentFilterResonance = 0.1;
 
-/** Lazily create / resume the shared AudioContext */
-function getSharedAudioCtx(): AudioContext {
-  if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
-    sharedAudioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  }
-  if (sharedAudioCtx.state === 'suspended') {
+/** Return and resume the single shared AudioContext */
+function getActiveAudioCtx(): AudioContext {
+  const ctx = getSharedContext();
+  if (ctx.state === 'suspended') {
     /* Fire and forget — resume() returns a promise but we don't need to await */
-    sharedAudioCtx.resume().catch(() => { /* may fail before user gesture */ });
+    ctx.resume().catch(() => { /* may fail before user gesture */ });
   }
-  return sharedAudioCtx;
+  return ctx;
 }
 
 /** Set the oscillator type used by `playOscillatorNote` (no fallback chain) */
@@ -92,7 +90,7 @@ export function playOscillatorNote(
   oscType?: OscillatorType
 ): void {
   try {
-    const ac = getSharedAudioCtx();
+    const ac = getActiveAudioCtx();
     const freq = midiToFreq(midiNote);
     const vol = Math.max(0, Math.min(1, velocity));
 
@@ -118,7 +116,7 @@ export function playOscillatorNote(
 
     osc.connect(filter);
     filter.connect(gainNode);
-    gainNode.connect(ac.destination);
+    gainNode.connect(getMasterGain());
     osc.start(ac.currentTime);
     osc.stop(ac.currentTime + 0.45);
   } catch { /* audio failed — silently drop the note */ }

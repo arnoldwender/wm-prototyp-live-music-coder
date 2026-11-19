@@ -27,10 +27,11 @@ describe('Service Worker lifecycle & cache safety', () => {
     expect(swCode).toMatch(/SKIP_WAITING/)
   })
 
-  it('guards cache.put behind status === 200 and skips byte-range and dirt-samples requests', () => {
+  it('guards cache.put behind status === 200 and skips byte-range, dirt-samples, and soundfonts requests', () => {
     expect(swCode).toMatch(/response\.status\s*===\s*200/)
     expect(swCode).toMatch(/request\.headers\.has\(\s*['"]range['"]\s*\)/)
     expect(swCode).toMatch(/\/dirt-samples\//)
+    expect(swCode).toMatch(/\/soundfonts\//)
     expect(swCode).toMatch(/\/spa\.html/)
   })
 })

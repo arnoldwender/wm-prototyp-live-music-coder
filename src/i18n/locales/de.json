@@ -602,7 +602,7 @@
       "downloadHeading": "Als .js herunterladen",
       "downloadText": "Die Toolbar enthält einen Download-Button, der den aktuellen Code als .js-Datei speichert. Nützlich für Backups oder zum Teilen außerhalb der App.",
       "sessionsHeading": "Sessions-Bibliothek",
-      "sessionsText": "Die Seite /sessions enthält 49 kuratierte KI-komponierte Stücke aus 15 Genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi u. a.). Jede Session mit einem Klick im Editor öffnen. Sessions sind ein idealer Einstiegspunkt, um zu erkunden, was Strudel kann."
+      "sessionsText": "Die Seite /sessions enthält 49 kuratierte KI-komponierte Stücke aus 15 Genres (Trance, Techno, Electronic, Blues, Ambient, Lo-Fi u. a.). Jede Session mit einem Klick im Editor öffnen. Sessions sind ein idealer Einstiegspunkt, um zu erkunden, was Strudel kann."
     },
     "shortcutsSoloMute": "Strg+1..9 — Ebene N solo · Umschalt+Strg+1..9 — Ebene N stummschalten (setzt das _ Präfix im Code)"
   },
@@ -666,7 +666,12 @@
     "makePublic": "Öffentlich machen",
     "patLabel": "GitHub Personal Access Token",
     "webMemoryNotice": "Web-Sicherheit: Das Token wird nur im Arbeitsspeicher gehalten, solange dieser Dialog geöffnet ist, und niemals im Browser gespeichert. Verwende ein Token nur mit Gist-Berechtigung.",
-    "desktopKeychainNotice": "Desktop-Sicherheit: Das Token wird über den Hauptprozess verschlüsselt im System-Schlüsselbund gespeichert und nie an ausgeführten Code weitergegeben.",
+    "desktopKeychainNotice": "Desktop-Sicherheit: Dein GitHub-Token wird direkt vom Hauptprozess aus der Zwischenablage gelesen, im System-Schlüsselbund verschlüsselt, aus der Zwischenablage gelöscht und berührt nie den Editor.",
+    "pasteFromClipboard": "Token aus Zwischenablage speichern",
+    "clipboardEmpty": "Die Zwischenablage ist leer. Kopiere zuerst ein GitHub-Token und klicke dann erneut.",
+    "clipboardInvalid": "Die Zwischenablage enthält kein gültiges einzeiliges Token.",
+    "clipboardCancelled": "Token-Import abgebrochen.",
+    "clipboardUnavailable": "Die Verschlüsselung über den System-Schlüsselbund ist auf diesem Gerät nicht verfügbar.",
     "tokenConfigured": "Token eingerichtet",
     "loadLabel": "Aus Gist laden (URL oder ID)",
     "gistInputAria": "Gist-URL oder ID",

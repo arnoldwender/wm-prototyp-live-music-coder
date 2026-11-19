@@ -360,8 +360,6 @@ export function drawPianoroll(
   zoomX = 1,
   zoomY = 1,
   timeOffset = 0,
-  velocityOverrides?: Map<string, number>,
-  pitchOverrides?: Map<string, number>,
   eventSink?: { events: NoteEvent[]; timeStart: number; timeEnd: number; drawW: number; keysWidth: number; minNote: number; maxNote: number; noteHeight: number; yOffset: number },
 ) {
   /* ── Background ─────────────────────────────────────── */
@@ -496,24 +494,10 @@ export function drawPianoroll(
     /* Skip notes completely outside the draw area */
     if (x1 > width || x2 < KEYS_WIDTH) continue;
 
-    /* Apply pitch override for display position — original evt.note used as key */
-    const overrideKey = `${evt.note}:${evt.start}`;
-    const drawNote = pitchOverrides?.get(overrideKey) ?? evt.note;
+    const drawNote = evt.note;
     const y = noteY(drawNote);
 
     drawNoteBar(ctx, x1, y, w, h, evt.velocity, isActive);
-
-    /* Accent outline when pitch has been dragged from its original position */
-    if (drawNote !== evt.note) {
-      /* Accent outline via shared helper — marks notes whose pitch has been dragged */
-      const r = Math.min(3, h / 2, w / 2);
-      ctx.save();
-      ctx.strokeStyle = `${VIZ_COLORS.accent}99`; // accent at 60% opacity
-      ctx.lineWidth = 1;
-      roundRectPath(ctx, x1, y, w, h, r);
-      ctx.stroke();
-      ctx.restore();
-    }
 
     /* Note name label — rendered when bar is tall and wide enough to fit text.
      * Clipped to bar bounds so text never bleeds into adjacent rows. */
@@ -523,8 +507,7 @@ export function drawPianoroll(
       const label = pitchClass === 'C'
         ? 'C' + (Math.floor(drawNote / 12) - 1)
         : pitchClass;
-      /* Active / pitch-overridden notes use accent color to signal override */
-      const labelColor = (isActive || drawNote !== evt.note)
+      const labelColor = isActive
         ? VIZ_COLORS.accent
         : VIZ_COLORS.noteLabelText;
       ctx.save();
@@ -581,10 +564,9 @@ export function drawPianoroll(
     ctx.lineTo(width, velY);
     ctx.stroke();
 
-    /* Velocity bars — apply overrides when dragging */
+    /* Velocity bars */
     for (const evt of events) {
-      const overrideKey = `${evt.note}:${evt.start}`;
-      const vel = velocityOverrides?.get(overrideKey) ?? evt.velocity;
+      const vel = evt.velocity;
       const x1 = timeX(evt.start);
       const x2 = timeX(evt.end);
       const w = Math.max(2, x2 - x1);

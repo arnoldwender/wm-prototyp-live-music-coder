@@ -11,22 +11,29 @@ import tailwindcss from '@tailwindcss/vite'
  * via the "postbuild" npm script — Vite 8 (Rolldown) plugin hooks fire
  * before Vite copies public/ assets, making in-plugin injection unreliable. */
 const DIRT_SAMPLES_SHA = 'c74fc80f8db8038f6a33648ffef5ac00a07ad402'
-const DIRT_SAMPLES_PROXY = {
+const SOUNDFONTS_SHA = '23ca907d4370a04fd89ca483a92915e4d6159ab9'
+const FIRST_PARTY_AUDIO_PROXY = {
   '/dirt-samples': {
     target: 'https://raw.githubusercontent.com',
     changeOrigin: true,
     rewrite: (p: string) =>
       `/tidalcycles/Dirt-Samples/${DIRT_SAMPLES_SHA}${p.slice('/dirt-samples'.length)}`,
   },
+  '/soundfonts': {
+    target: 'https://raw.githubusercontent.com',
+    changeOrigin: true,
+    rewrite: (p: string) =>
+      `/felixroos/webaudiofontdata/${SOUNDFONTS_SHA}/sound${p.slice('/soundfonts'.length)}`,
+  },
 }
 
 export default defineConfig({
   base: '/',
   server: {
-    proxy: DIRT_SAMPLES_PROXY,
+    proxy: FIRST_PARTY_AUDIO_PROXY,
   },
   preview: {
-    proxy: DIRT_SAMPLES_PROXY,
+    proxy: FIRST_PARTY_AUDIO_PROXY,
   },
   plugins: [
     react(),
@@ -35,7 +42,7 @@ export default defineConfig({
   resolve: {
     /* Force single instances of audio packages to avoid dead audio chains
      * and duplicate @strudel/core state (the double-instance MIDI bug) */
-    dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio', '@strudel/midi', '@strudel/draw', '@strudel/codemirror'],
+    dedupe: ['superdough', '@strudel/core', '@strudel/web', '@strudel/webaudio', '@strudel/soundfonts', '@strudel/midi', '@strudel/draw', '@strudel/codemirror'],
   },
   ssr: {
     /* Only the prerender's server bundle (vite build --ssr, scripts/prerender.mjs).
@@ -50,6 +57,7 @@ export default defineConfig({
       '@strudel/core',
       '@strudel/web',
       '@strudel/webaudio',
+      '@strudel/soundfonts',
       '@strudel/mini',
       '@strudel/tonal',
       '@strudel/transpiler',

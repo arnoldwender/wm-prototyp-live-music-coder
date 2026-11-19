@@ -602,7 +602,7 @@
       "downloadHeading": "Download as .js",
       "downloadText": "The toolbar includes a download button that saves your current code as a .js file. Useful for backing up patterns or sharing them outside the app.",
       "sessionsHeading": "Sessions Library",
-      "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
+      "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Electronic, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
     },
     "shortcutsSoloMute": "Ctrl+1..9 — solo layer N · Shift+Ctrl+1..9 — mute layer N (toggles the _ prefix in your code)"
   },
@@ -666,7 +666,12 @@
     "makePublic": "Make public",
     "patLabel": "GitHub Personal Access Token",
     "webMemoryNotice": "Web security: token is held only in memory while this dialog is open and never written to browser storage. Use a fine-grained token with Gist scope only.",
-    "desktopKeychainNotice": "Desktop security: token is encrypted in your OS Keychain via the main process and never exposed to evaluated patterns.",
+    "desktopKeychainNotice": "Desktop security: your GitHub token is read straight from the clipboard by the main process, encrypted in your OS Keychain, cleared from the clipboard, and never touches the editor.",
+    "pasteFromClipboard": "Store Token from Clipboard",
+    "clipboardEmpty": "Clipboard is empty. Copy a GitHub token first, then click Store Token from Clipboard.",
+    "clipboardInvalid": "Clipboard does not hold a valid single-line token.",
+    "clipboardCancelled": "Token import cancelled.",
+    "clipboardUnavailable": "System Keychain encryption is unavailable on this device.",
     "tokenConfigured": "Token configured",
     "loadLabel": "Load from Gist (URL or ID)",
     "gistInputAria": "Gist URL or ID",

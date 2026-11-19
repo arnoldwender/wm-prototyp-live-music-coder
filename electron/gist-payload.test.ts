@@ -3,7 +3,13 @@
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
 import { describe, expect, it } from 'vitest'
-import { MAX_GIST_BYTES, MAX_GIST_FILES, describeGistUpload, validateGistPayload } from './gist-payload'
+import {
+  MAX_GIST_BYTES,
+  MAX_GIST_FILES,
+  describeGistUpload,
+  validateClipboardToken,
+  validateGistPayload,
+} from './gist-payload'
 
 const project = { 'project.json': { content: '{}' }, 'main.js': { content: 'note("c3")' } }
 
@@ -63,5 +69,37 @@ describe('describeGistUpload', () => {
     const { message, detail } = describeGistUpload(validateGistPayload({ files: project, isPublic: true }))
     expect(message).toBe('Create a PUBLIC Gist on GitHub?')
     expect(detail).toContain('2 file(s), 1 kB: project.json, main.js')
+  })
+})
+
+describe('validateClipboardToken', () => {
+  it('accepts trimmed single-line tokens and redacts middle characters', () => {
+    const sample = ['tok', '_1234567890abcdef1234'].join('')
+    const res = validateClipboardToken(`  ${sample}  \n`)
+    expect(res).toEqual({
+      ok: true,
+      token: sample,
+      masked: 'tok_…1234',
+    })
+  })
+
+  it('masks short tokens completely without leaking characters', () => {
+    expect(validateClipboardToken('abc123')).toEqual({
+      ok: true,
+      token: 'abc123',
+      masked: '••••',
+    })
+  })
+
+  it('rejects empty/non-string input as empty', () => {
+    expect(validateClipboardToken(undefined)).toEqual({ ok: false, reason: 'empty' })
+    expect(validateClipboardToken('   \n\t ')).toEqual({ ok: false, reason: 'empty' })
+  })
+
+  it('rejects tokens containing whitespace, control chars, or >256 characters', () => {
+    expect(validateClipboardToken('tok_abc def')).toEqual({ ok: false, reason: 'invalid' })
+    expect(validateClipboardToken('tok_abc\ndef')).toEqual({ ok: false, reason: 'invalid' })
+    expect(validateClipboardToken('tok_abc\u0007def')).toEqual({ ok: false, reason: 'invalid' })
+    expect(validateClipboardToken('a'.repeat(257))).toEqual({ ok: false, reason: 'invalid' })
   })
 })

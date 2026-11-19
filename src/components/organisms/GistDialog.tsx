@@ -14,12 +14,14 @@ import {
   hasStoredToken,
   getStoredToken,
   setStoredToken,
+  importDesktopTokenFromClipboard,
   clearStoredToken,
   clearEphemeralWebToken,
   saveToGist,
   loadFromGist,
   parseGistId,
 } from '../../lib/persistence/gist'
+import { getOrchestrator } from '../../lib/orchestrator'
 import { safeJsonParse } from '../../lib/persistence/local'
 import { isElectron } from '../../lib/platform'
 import { Button } from '../atoms'
@@ -55,13 +57,21 @@ export function GistDialog({ onClose }: GistDialogProps) {
   const backdropRef = useRef<HTMLDivElement>(null)
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  /* Check token presence on mount; wipe ephemeral web token + restore focus on unmount */
+  /* Check token presence on mount; on web stop active playback so patterns cannot poll the dialog, wipe ephemeral web token + restore focus on unmount */
   useEffect(() => {
     previousFocusRef.current = document.activeElement as HTMLElement | null
 
+    if (!isElectron) {
+      getOrchestrator().stop()
+      if (typeof window.__strudelRepl?.stop === 'function') {
+        try { window.__strudelRepl.stop() } catch { /* ignore */ }
+      }
+      useAppStore.getState().stop()
+    }
+
     void Promise.all([hasStoredToken(), getStoredToken()]).then(([configured, webTok]) => {
       setHasToken(configured)
-      if (webTok) setToken(webTok)
+      if (!isElectron && webTok) setToken(webTok)
     })
 
     return () => {
@@ -110,11 +120,30 @@ export function GistDialog({ onClose }: GistDialogProps) {
       await setStoredToken(token)
       const configured = await hasStoredToken()
       setHasToken(configured)
-      if (isElectron) {
-        /* Never keep plaintext PAT in renderer state once stored in OS Keychain */
-        setToken('')
-      }
       setStatus(configured ? t('gist.tokenSaved') : t('gist.tokenCleared'))
+    } catch (err) {
+      setStatus(t('gist.errorPrefix', { message: err instanceof Error ? err.message : 'Unknown' }))
+    }
+  }
+
+  const handleImportClipboardToken = async () => {
+    try {
+      const res = await importDesktopTokenFromClipboard()
+      if (res.ok) {
+        const configured = await hasStoredToken()
+        setHasToken(configured)
+        setStatus(t('gist.tokenSaved'))
+        return
+      }
+      const key =
+        res.reason === 'empty'
+          ? 'gist.clipboardEmpty'
+          : res.reason === 'invalid'
+            ? 'gist.clipboardInvalid'
+            : res.reason === 'cancelled'
+              ? 'gist.clipboardCancelled'
+              : 'gist.clipboardUnavailable'
+      setStatus(t(key))
     } catch (err) {
       setStatus(t('gist.errorPrefix', { message: err instanceof Error ? err.message : 'Unknown' }))
     }
@@ -133,11 +162,10 @@ export function GistDialog({ onClose }: GistDialogProps) {
     setSaving(true)
     setStatus(t('gist.saving'))
     try {
-      /* If user typed a token without clicking Save Token first, apply it now */
-      if (token.trim() && !hasToken) {
+      /* On web, if user typed a token without clicking Save Token first, apply it now */
+      if (!isElectron && token.trim() && !hasToken) {
         await setStoredToken(token)
         setHasToken(true)
-        if (isElectron) setToken('')
       }
       const store = useAppStore.getState()
       const now = new Date().toISOString()
@@ -208,7 +236,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
     padding: 'var(--space-3)',
   }
 
-  const canSave = (hasToken || Boolean(token.trim())) && !saving
+  const canSave = (hasToken || (!isElectron && Boolean(token.trim()))) && !saving
 
   return (
     <div
@@ -249,7 +277,7 @@ export function GistDialog({ onClose }: GistDialogProps) {
         <section style={{ marginBottom: 'var(--space-4)' }}>
           <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
             <label
-              htmlFor="gist-pat-input"
+              htmlFor={isElectron ? undefined : 'gist-pat-input'}
               style={{
                 fontSize: 'var(--font-size-sm)',
                 color: 'var(--color-text-secondary)',
@@ -270,17 +298,19 @@ export function GistDialog({ onClose }: GistDialogProps) {
               </span>
             )}
           </div>
-          <input
-            id="gist-pat-input"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="ghp_..."
-            aria-label={t('gist.patLabel')}
-            autoComplete="off"
-            className="w-full rounded"
-            style={{ ...inputStyle, marginBottom: 'var(--space-2)' }}
-          />
+          {!isElectron && (
+            <input
+              id="gist-pat-input"
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="ghp_..."
+              aria-label={t('gist.patLabel')}
+              autoComplete="off"
+              className="w-full rounded"
+              style={{ ...inputStyle, marginBottom: 'var(--space-2)' }}
+            />
+          )}
           <p
             style={{
               fontSize: 'var(--font-size-xs)',
@@ -292,9 +322,15 @@ export function GistDialog({ onClose }: GistDialogProps) {
             {isElectron ? t('gist.desktopKeychainNotice') : t('gist.webMemoryNotice')}
           </p>
           <div className="flex" style={{ gap: 'var(--space-3)' }}>
-            <Button variant="secondary" onClick={handleSaveToken}>
-              {t('gist.saveToken')}
-            </Button>
+            {isElectron ? (
+              <Button variant="secondary" onClick={handleImportClipboardToken}>
+                {t('gist.pasteFromClipboard')}
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={handleSaveToken}>
+                {t('gist.saveToken')}
+              </Button>
+            )}
             {hasToken && (
               <Button variant="ghost" onClick={handleClearToken} className="flex items-center gap-1">
                 <Trash2 size={14} aria-hidden="true" /> {t('gist.clear')}

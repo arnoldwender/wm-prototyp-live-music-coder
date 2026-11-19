@@ -1,11 +1,12 @@
 /* SPDX-License-Identifier: MIT
    Copyright (c) 2026 Arnold Wender / Wender Media
    ────────────────────────────────────────────────────────── */
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
   getStoredToken,
   hasStoredToken,
   setStoredToken,
+  importDesktopTokenFromClipboard,
   clearStoredToken,
   purgeLegacyGistStorage,
   parseGistId,
@@ -40,6 +41,12 @@ describe('Gist token isolation & legacy scrubbing', () => {
   beforeEach(() => {
     ensureStorage()
     clearStoredToken()
+  })
+
+  afterEach(() => {
+    if (typeof window !== 'undefined') {
+      delete (window as { electronAPI?: unknown }).electronAPI
+    }
   })
 
   it('holds web token only in ephemeral memory and never writes to localStorage or sessionStorage', async () => {
@@ -78,5 +85,23 @@ describe('Gist token isolation & legacy scrubbing', () => {
     expect(parseGistId('https://gist.github.com/arnoldwender/a1b2c3d4e5f6')).toBe('a1b2c3d4e5f6')
     expect(parseGistId('a1b2c3d4e5f6')).toBe('a1b2c3d4e5f6')
     expect(parseGistId('not-a-valid-id!')).toBeNull()
+  })
+
+  it('delegates Electron clipboard token import without exposing the secret to the renderer', async () => {
+    expect(await importDesktopTokenFromClipboard()).toEqual({ ok: false, reason: 'unavailable' })
+
+    const results = [
+      { ok: true },
+      { ok: false, reason: 'empty' as const },
+      { ok: false, reason: 'invalid' as const },
+      { ok: false, reason: 'cancelled' as const },
+    ]
+    for (const expected of results) {
+      ;(window as unknown as { electronAPI: unknown }).electronAPI = {
+        importGistTokenFromClipboard: async () => expected,
+      }
+      expect(await importDesktopTokenFromClipboard()).toEqual(expected)
+      expect(await getStoredToken()).toBeNull()
+    }
   })
 })

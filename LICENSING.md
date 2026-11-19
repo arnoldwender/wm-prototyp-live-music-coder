@@ -26,13 +26,13 @@ Files marked with `SPDX-License-Identifier: MIT` may be extracted and used under
 | Engine Adapters | `src/lib/engines/base.ts`, `tonejs.ts`, `webaudio.ts`, `midi.ts` | Tone.js, WebAudio, MIDI adapters |
 | Parser/Codegen | `src/lib/parser/`, `src/lib/codegen/` | Code-to-graph and graph-to-code |
 | Audio Visualizers (non-Strudel) | `src/lib/visualizers/waveform.ts`, `spectrum.ts`, `timeline.ts`, `colors.ts`, `midi-utils.ts` | Canvas 2D waveform, spectrum, timeline, color palette, MIDI utilities |
-| Local & URL Persistence | `src/lib/persistence/local.ts`, `url.ts` | IndexedDB storage and `lz-string` URL sharing |
+| Local & URL Persistence | `src/lib/persistence/local.ts`, `graph-layout.ts`, `url.ts` | IndexedDB storage, node graph coordinates, and `lz-string` URL sharing |
 | State Management | `src/lib/store.ts`, `src/lib/history.ts` | Zustand store, undo/redo |
 | UI Components (non-Strudel) | `src/components/atoms/`, `src/components/molecules/`, `src/components/organisms/` *(except Strudel-coupled organisms listed below)* | Reusable React UI components |
 | Layouts | `src/layouts/` | Editor layout |
 | Pages | `src/pages/` | Landing, Editor, EditorPage, Docs, Samples, Examples, Sessions, SessionPiece, Changelog, Blog, BlogPost, Legal |
 | Data (non-Strudel) | `src/data/` *(except `sessions-library.ts`)* | Templates, docs, examples, sample catalog, MIDI device profiles, blog posts, changelog |
-| Types | `src/types/engine.ts`, `src/types/project.ts`, `src/types/global.d.ts` | TypeScript type definitions |
+| Types | `src/types/engine.ts`, `src/types/project.ts`, `src/types/global.d.ts`, `src/types/electron.d.ts` | TypeScript type definitions |
 | i18n | `src/i18n/` | Translations and lazy locale loader (DE/EN/ES) |
 | Styles | `src/styles/` | Design tokens and global CSS |
 
@@ -46,6 +46,7 @@ These files integrate with `@strudel/*` packages or Strudel pattern/REPL structu
 | `src/lib/strudel-extensions.ts` | Lazy registration of Strudel extension packages |
 | `src/lib/audio/strudel-tap.ts` | Strudel audio analysis bridge |
 | `src/lib/audio/defaultSamples.ts` | First-party Dirt-Samples loader for Strudel |
+| `src/lib/audio/fluidSoundfonts.ts` | First-party `FluidR3_GM` (MIT) SoundFont registry & loader for Strudel |
 | `src/lib/audio/solo-mute.ts`, `layer-mute.ts` | Strudel `$:` layer solo/mute helpers |
 | `src/lib/midi/strudel-keys.ts` | Strudel MIDI keyboard (`midikeys` / `midin`) integration |
 | `src/lib/editor/extensions.ts`, `inline-widgets.ts` | Strudel CodeMirror extensions and inline widgets |

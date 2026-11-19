@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { app, BrowserWindow, session, shell } from 'electron'
+import { app, BrowserWindow, dialog, session, shell } from 'electron'
 import { join } from 'node:path'
 import { readFile, stat } from 'node:fs/promises'
 import log from 'electron-log'
@@ -14,7 +14,7 @@ import { registerGistHandlers } from './ipc/gist'
 import { createMenu } from './menu'
 import { createTray, destroyTray } from './tray'
 import { initUpdater } from './updater'
-import { createExternalUrlGate, isOwnAppUrl } from './url-guard'
+import { createExternalUrlGate, describeExternalUrl, isOwnAppUrl } from './url-guard'
 
 // --- Track whether the app is truly quitting vs minimize-to-tray ---
 let isQuitting = false
@@ -28,14 +28,48 @@ log.transports.console.level = isDebug ? 'debug' : 'warn'
 
 // Rate-limited external URL gate shared across all webContents
 const allowExternalUrl = createExternalUrlGate(3, 5_000)
+let externalConfirmOpen = false
 
-function openExternalSafely(rawUrl: string): void {
+function openExternalSafely(rawUrl: string, parentWindow?: BrowserWindow | null): void {
   const safeUrl = allowExternalUrl(rawUrl)
-  if (safeUrl) {
-    void shell.openExternal(safeUrl)
-  } else {
+  if (!safeUrl) {
     log.warn(`[security] blocked or rate-limited external URL: ${String(rawUrl).slice(0, 120)}`)
+    return
   }
+  if (externalConfirmOpen) {
+    log.warn(`[security] suppressed overlapping external URL dialog: ${safeUrl.slice(0, 120)}`)
+    return
+  }
+
+  externalConfirmOpen = true
+  const { hostLabel, displayUrl } = describeExternalUrl(safeUrl)
+  const options: Electron.MessageBoxOptions = {
+    type: 'question',
+    buttons: ['Cancel', 'Open in Browser'],
+    defaultId: 0,
+    cancelId: 0,
+    title: 'Open External Link',
+    message: `Open ${hostLabel} in your default browser?`,
+    detail: `${displayUrl}\n\nConfirm only if you clicked this link yourself.`,
+  }
+
+  const prompt =
+    parentWindow && !parentWindow.isDestroyed()
+      ? dialog.showMessageBox(parentWindow, options)
+      : dialog.showMessageBox(options)
+
+  void prompt
+    .then(({ response }) => {
+      if (response === 1) {
+        void shell.openExternal(safeUrl)
+      }
+    })
+    .catch((err: Error) => {
+      log.error(`[security] external URL confirmation failed: ${err.message}`)
+    })
+    .finally(() => {
+      externalConfirmOpen = false
+    })
 }
 
 /**
@@ -92,7 +126,7 @@ function createWindow(): BrowserWindow {
   })
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    openExternalSafely(url)
+    openExternalSafely(url, mainWindow)
     return { action: 'deny' }
   })
 
@@ -214,7 +248,7 @@ app.whenReady().then(() => {
       log.warn(`[security] blocked navigation to ${url}`)
     })
     contents.setWindowOpenHandler(({ url }) => {
-      openExternalSafely(url)
+      openExternalSafely(url, BrowserWindow.fromWebContents(contents))
       return { action: 'deny' }
     })
   })
