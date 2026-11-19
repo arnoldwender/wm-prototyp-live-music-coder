@@ -10,7 +10,7 @@ Live Music Coder is for musicians and developers who want to explore live coding
 - [Examples](https://live-music-coder.pro/examples): 219 curated code examples for Strudel, Tone.js and Web Audio, filterable by engine and category.
 - [Sessions](https://live-music-coder.pro/sessions): 49 curated, AI-composed pieces with movements and composer notes — a good starting point for hearing what the engines can do before writing code.
 - [Docs](https://live-music-coder.pro/docs): 14-section documentation hub — getting started, Strudel basics and mini-notation, sounds and effects, keyboard shortcuts, visualizers, MIDI setup, live coding, sharing and settings.
-- [Samples](https://live-music-coder.pro/samples): built-in sample library browser.
+- [Samples](https://live-music-coder.pro/samples): built-in sample library browser (196 Dirt-Samples groups plus 125 General MIDI FluidR3_GM soundfont voices in the editor).
 - [Blog](https://live-music-coder.pro/blog): development blog — engine design decisions, visualizer builds, the MIDI debugging story.
 
 ## Desktop app

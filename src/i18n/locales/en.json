@@ -103,9 +103,9 @@
     },
     "download": {
       "title": "Download Desktop App",
-      "subtitle": "Native .lmc project save/load, menu-bar tray, WAV export, and signed macOS auto-updates. Same live coding power, offline.",
+      "subtitle": "Native .lmc project save/load, menu-bar tray, WAV export, and signed macOS auto-updates. Same live coding workflow on your desktop.",
       "cta": "Download for macOS",
-      "platforms": "macOS (Apple Silicon + Intel) — Windows & Linux coming soon"
+      "platforms": "macOS (Apple Silicon + Intel, signed & notarized)"
     }
   },
   "help": {
@@ -451,7 +451,7 @@
       "mt": "mt — Mid tom",
       "ht": "ht — High tom",
       "banksHeading": "Sample Banks",
-      "banksText": "Use direct sample names like bd, sd, hh, oh, cp for drums. For 808/909 sounds, use s(\"808\") or s(\"909\") directly.",
+      "banksText": "Use direct sample names like bd, sd, hh, oh, cp for drums, s(\"808\") / s(\"909\") for drum machines, and any of the 125 built-in General MIDI voices such as s(\"gm_epiano1\") or s(\"gm_acoustic_bass\"). When loading custom sample packs with samples('https://...'), wrap URLs in single quotes.",
       "oscillatorsHeading": "Oscillators",
       "oscillatorsText": "For synthesis, use .s() with oscillator types: sawtooth (bright, buzzy), sine (pure, clean), square (hollow, retro), and triangle (soft, mellow)."
     },
@@ -517,7 +517,7 @@
       "waveform": "Waveform — real-time oscilloscope",
       "spectrum": "Spectrum — frequency bars analyzer",
       "timeline": "Timeline — beat grid and level meter",
-      "pianoroll": "Piano Roll — DAW-quality scrolling notes (Ableton-style)",
+      "pianoroll": "Piano Roll — read-only scrolling note view with zoom, timeline pan, and click-to-audition",
       "punchcard": "Punchcard — dot grid for events",
       "spiral": "Spiral — rotational note visualization",
       "pitchwheel": "Pitchwheel — 12-tone circle (harmonic analysis)"
@@ -526,10 +526,10 @@
       "title": "Settings",
       "themesHeading": "Themes",
       "themesText": "4 editor themes available — switch via the gear icon in the toolbar:",
-      "themePurple": "Purple (Default) — zinc/purple, the default aesthetic",
-      "themeAmber": "Amber — warm stone/amber tones",
-      "themeCyan": "Cyan — deep ocean, teal tones",
-      "themeMatrix": "Matrix — green on black, terminal style",
+      "themePurple": "Signal (Default) — full Signal Room palette on warm carbon",
+      "themeAmber": "Sodium — monochrome amber-phosphor terminal",
+      "themeCyan": "Scope — high-contrast aqua oscilloscope accent",
+      "themeMatrix": "Phosphor — monochrome green-phosphor terminal",
       "editorHeading": "Editor Options",
       "editorText": "Customize the editor to your preferences:",
       "fontSize": "Font Size — slider from 10px to 22px",
@@ -598,7 +598,7 @@
       "urlHeading": "Share via URL",
       "urlText": "Click the share icon in the toolbar to generate a compressed URL containing your current code. The URL uses lz-string compression — patterns up to several kilobytes fit in a single link. Anyone who opens the link can inspect your code in a confirmation prompt before loading or running it.",
       "gistHeading": "GitHub Gists",
-      "gistText": "Open the Gists panel (bookmark icon in sidebar) and enter your GitHub personal access token. You can save any tab as a new Gist, load previously saved Gists, and organize your patterns across sessions. In the browser, your token stays in memory for the current tab session only (never saved to Web Storage); in the macOS desktop app, it is encrypted in the system Keychain and asks for confirmation before sending requests. Gists are created secret by default: not listed or searchable, but readable by anyone with the link. Tick “Make public” before saving to create a public one instead — GitHub fixes visibility at creation and it cannot be changed afterwards.",
+      "gistText": "Open the Gists panel (bookmark icon in sidebar) to save any tab as a new Gist or load existing Gists. In the browser, opening the dialog pauses active playback and your GitHub personal access token stays in memory for the current tab session only (never saved to Web Storage). In the macOS desktop app, copy your token and click Import Token from Clipboard — the main process confirms natively, encrypts it in the system Keychain, clears the clipboard, and asks for confirmation before every upload. Gists are created secret by default: not listed or searchable, but readable by anyone with the link. Tick “Make public” before saving to create a public one instead — GitHub fixes visibility at creation and it cannot be changed afterwards.",
       "downloadHeading": "Download as .js",
       "downloadText": "The toolbar includes a download button that saves your current code as a .js file. Useful for backing up patterns or sharing them outside the app.",
       "sessionsHeading": "Sessions Library",
