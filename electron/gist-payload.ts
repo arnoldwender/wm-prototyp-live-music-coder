@@ -93,3 +93,24 @@ export function describeGistUpload(upload: ValidGistUpload): { message: string; 
 
   return { message, detail }
 }
+
+const MAX_TOKEN_LENGTH = 256
+/* eslint-disable-next-line no-control-regex */
+const INVALID_TOKEN_CHARS_RX = /[\s\x00-\x1f\x7f]/
+
+/**
+ * Validate a GitHub PAT read directly from the OS clipboard inside the main process.
+ * Returns only a redacted mask for UI prompts so the token itself never crosses IPC.
+ */
+export function validateClipboardToken(
+  raw: unknown,
+): { ok: true; token: string; masked: string } | { ok: false; reason: 'empty' | 'invalid' } {
+  if (typeof raw !== 'string') return { ok: false, reason: 'empty' }
+  const trimmed = raw.trim()
+  if (trimmed.length === 0) return { ok: false, reason: 'empty' }
+  if (trimmed.length > MAX_TOKEN_LENGTH || INVALID_TOKEN_CHARS_RX.test(trimmed)) {
+    return { ok: false, reason: 'invalid' }
+  }
+  const masked = trimmed.length >= 12 ? `${trimmed.slice(0, 4)}…${trimmed.slice(-4)}` : '••••'
+  return { ok: true, token: trimmed, masked }
+}

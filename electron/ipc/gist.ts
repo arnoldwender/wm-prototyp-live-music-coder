@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Arnold Wender / Wender Media
 
-import { BrowserWindow, dialog, ipcMain, safeStorage } from 'electron'
+import { BrowserWindow, clipboard, dialog, ipcMain, safeStorage } from 'electron'
 import { appStore } from '../store'
-import { describeGistUpload, validateGistPayload } from '../gist-payload'
-
-const MAX_TOKEN_LENGTH = 256
+import { describeGistUpload, validateClipboardToken, validateGistPayload } from '../gist-payload'
 
 function readDecryptedToken(): string | null {
   const encoded = appStore.get('encryptedGistToken')
@@ -63,28 +61,33 @@ export function registerGistHandlers(mainWindow: BrowserWindow): void {
     return readDecryptedToken() !== null
   })
 
-  ipcMain.handle('gist:set-token', async (_event, token: unknown) => {
-    if (typeof token !== 'string') return false
-    const trimmed = token.trim()
-    if (trimmed.length === 0 || trimmed.length > MAX_TOKEN_LENGTH) return false
-    if (!safeStorage.isEncryptionAvailable()) return false
+  ipcMain.handle('gist:import-clipboard-token', async () => {
+    if (!safeStorage.isEncryptionAvailable()) {
+      return { ok: false as const, reason: 'unavailable' as const }
+    }
 
-    /* Without this, evaluated code could swap in its author's token in silence
-       and every later upload — confirmed by the user — would land in a
-       stranger's account. */
+    const check = validateClipboardToken(clipboard.readText())
+    if (!check.ok) {
+      return { ok: false as const, reason: check.reason }
+    }
+
+    /* Ask natively before storing and wipe the clipboard so the PAT never
+       enters the renderer HTML realm, even while being entered. */
     const confirmed = await confirmNatively(mainWindow, {
-      title: 'Store GitHub Token',
-      message: 'Store this GitHub token for Gist uploads?',
+      title: 'Store GitHub Token from Clipboard',
+      message: `Store clipboard token (${check.masked}, ${check.token.length} chars) in Keychain?`,
       detail:
-        'It is encrypted with a key from your system keychain and replaces any token stored before. ' +
-        'Confirm only if you just entered it yourself in the Gist dialog.',
+        'The token will be encrypted with your system keychain, cleared from the clipboard, and never exposed to editor patterns.',
       confirmLabel: 'Store Token',
     })
-    if (!confirmed) return false
+    if (!confirmed) {
+      return { ok: false as const, reason: 'cancelled' as const }
+    }
 
-    const encrypted = safeStorage.encryptString(trimmed).toString('base64')
+    const encrypted = safeStorage.encryptString(check.token).toString('base64')
     appStore.set('encryptedGistToken', encrypted)
-    return true
+    clipboard.clear()
+    return { ok: true as const }
   })
 
   ipcMain.handle('gist:clear-token', () => {

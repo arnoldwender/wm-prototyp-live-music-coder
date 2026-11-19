@@ -5,7 +5,7 @@
 import { pathToFileURL } from 'node:url'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { createExternalUrlGate, isOwnAppUrl } from './url-guard'
+import { createExternalUrlGate, describeExternalUrl, isOwnAppUrl } from './url-guard'
 
 describe('isOwnAppUrl', () => {
   const rendererDir = path.resolve('/opt/live-music-coder/dist')
@@ -33,12 +33,27 @@ describe('isOwnAppUrl', () => {
 })
 
 describe('createExternalUrlGate', () => {
-  it('allows valid https/mailto links up to the burst limit and blocks javascript:/file:', () => {
+  it('allows valid https/mailto links up to the burst limit and blocks javascript:/file:/credentials', () => {
     const allow = createExternalUrlGate(2, 10_000)
     expect(allow('javascript:alert(1)')).toBeNull()
     expect(allow('file:///etc/passwd')).toBeNull()
+    expect(allow('https://user:pass@evil.example/')).toBeNull()
     expect(allow('https://github.com/arnoldwender')).toBe('https://github.com/arnoldwender')
     expect(allow('mailto:info@wendermedia.com')).toBe('mailto:info@wendermedia.com')
     expect(allow('https://wendermedia.com')).toBeNull()
+  })
+})
+
+describe('describeExternalUrl', () => {
+  it('formats long https query URLs with bounded length and mailto recipients cleanly', () => {
+    const longUrl = `https://example.com/path?token=${'a'.repeat(350)}`
+    const web = describeExternalUrl(longUrl)
+    expect(web.hostLabel).toBe('https://example.com')
+    expect(web.displayUrl.length).toBe(300)
+    expect(web.displayUrl.endsWith('...')).toBe(true)
+
+    const mail = describeExternalUrl('mailto:info@wendermedia.com')
+    expect(mail.hostLabel).toBe('info@wendermedia.com')
+    expect(mail.displayUrl).toBe('mailto:info@wendermedia.com')
   })
 })

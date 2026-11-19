@@ -60,6 +60,9 @@ export function createExternalUrlGate(maxCalls = 3, windowMs = 5_000): (rawUrl: 
     if (!ALLOWED_EXTERNAL_PROTOCOLS.has(parsed.protocol)) {
       return null
     }
+    if (parsed.username || parsed.password) {
+      return null
+    }
 
     const now = Date.now()
     while (timestamps.length > 0 && now - timestamps[0] > windowMs) {
@@ -70,5 +73,20 @@ export function createExternalUrlGate(maxCalls = 3, windowMs = 5_000): (rawUrl: 
     }
     timestamps.push(now)
     return parsed.toString()
+  }
+}
+
+/** Human-readable target summary shown inside native open-external confirmations. */
+export function describeExternalUrl(safeUrl: string): { hostLabel: string; displayUrl: string } {
+  const parsed = new URL(safeUrl)
+  if (parsed.protocol === 'mailto:') {
+    return {
+      hostLabel: parsed.pathname || 'email recipient',
+      displayUrl: safeUrl.slice(0, 300),
+    }
+  }
+  return {
+    hostLabel: parsed.origin,
+    displayUrl: safeUrl.length > 300 ? `${safeUrl.slice(0, 297)}...` : safeUrl,
   }
 }

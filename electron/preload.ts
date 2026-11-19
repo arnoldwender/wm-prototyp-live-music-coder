@@ -24,7 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // GitHub Gist integration — PAT stays encrypted in the main process via safeStorage
   // and never crosses contextBridge back into the renderer.
   hasGistToken: () => ipcRenderer.invoke('gist:has-token'),
-  setGistToken: (token: string) => ipcRenderer.invoke('gist:set-token', token),
+  importGistTokenFromClipboard: () => ipcRenderer.invoke('gist:import-clipboard-token'),
   clearGistToken: () => ipcRenderer.invoke('gist:clear-token'),
   saveGist: (payload: {
     files: Record<string, { content: string }>

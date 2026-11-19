@@ -11,6 +11,7 @@ declare global {
      *  Only the members we actually consume are typed; the REPL carries more. */
     __strudelRepl?: {
       evaluate: (code: string, autoplay?: boolean) => Promise<unknown>;
+      stop?: () => unknown;
       /** Cycles per second. NOTE: the Cyclist defines cps, NOT bpm — code that
        *  read scheduler.bpm always got undefined and silently fell back. */
       setCps?: (cps: number) => unknown;

@@ -71,26 +71,29 @@ export async function getStoredToken(): Promise<string | null> {
   return ephemeralWebToken
 }
 
+export type ClipboardTokenImportResult = {
+  ok: boolean
+  reason?: 'empty' | 'invalid' | 'cancelled' | 'unavailable'
+}
+
 /**
- * Configure the GitHub PAT.
- * - Electron: encrypted via OS `safeStorage` in the main process.
- * - Web: held strictly in module-private ephemeral memory (never Web Storage).
+ * Import the GitHub PAT directly from the OS clipboard inside the Electron
+ * main process so no token ever enters the renderer DOM or JS realm.
+ */
+export async function importDesktopTokenFromClipboard(): Promise<ClipboardTokenImportResult> {
+  const api = getElectronApi()
+  if (!api?.importGistTokenFromClipboard) {
+    return { ok: false, reason: 'unavailable' }
+  }
+  return api.importGistTokenFromClipboard()
+}
+
+/**
+ * Configure the ephemeral in-memory GitHub PAT on the web (never Web Storage).
  */
 export async function setStoredToken(token: string, _remember = false): Promise<void> {
   purgeLegacyGistStorage()
   const trimmed = token.trim()
-  const api = getElectronApi()
-  if (api?.setGistToken) {
-    ephemeralWebToken = null
-    if (!trimmed) {
-      await api.clearGistToken()
-      return
-    }
-    /* false: the user declined the native confirmation, or the OS has no keychain */
-    const ok = await api.setGistToken(trimmed)
-    if (!ok) throw new Error('The token was not stored')
-    return
-  }
   ephemeralWebToken = trimmed || null
 }
 
