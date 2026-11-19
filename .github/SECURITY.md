@@ -25,17 +25,17 @@ are fixed and disclosed once a fix exists.
 
 | Version | Supported |
 | ------- | --------- |
-| `1.3.x` (`>= 1.3.3`) | Yes |
-| `< 1.3.3` | No — upgrade to `v1.3.3` or newer |
+| `1.4.x` (`>= 1.4.0`) | Yes |
+| `< 1.4.0` | No — upgrade to `v1.4.0` or newer |
 
 ## Security model notes
 
 Live Music Coder is a live-coding music IDE: evaluating user-written JavaScript / Strudel / Tone.js / Web Audio patterns locally in the renderer (`Function()` / Strudel transpiler) is how the instrument works. Because evaluated code shares the renderer JavaScript realm:
 
-- **Credentials are kept out of Web Storage:** On the web, a GitHub Gist personal access token is held in memory only while the Gist dialog is open (never written to `localStorage`, `sessionStorage` or `IndexedDB`). In the macOS Electron app, the token lives in the main process, encrypted with a key from the OS keychain (`safeStorage`); storing a token and every upload made with it require a native confirmation, and the token is never handed back to the renderer.
-- **What that does not cover:** the token is typed into a field of the page. Code that is already running in the page at that moment can read it. Run patterns you do not trust in a session where you do not enter a token.
+- **Credentials are kept out of Web Storage:** On the web, a GitHub Gist personal access token is held in memory only while the Gist dialog is open (never written to `localStorage`, `sessionStorage` or `IndexedDB`), and opening the dialog pauses active playback so running loops cannot poll the modal. In the macOS Electron app, the token never enters the renderer DOM at all: the main process imports it directly from the OS clipboard behind a native confirmation dialog, clears the clipboard, encrypts it with a key from the OS keychain (`safeStorage`), and never hands it back over `contextBridge`; every upload requires a second native confirmation.
+- **What that does not cover on the web:** in a browser tab, the token is typed into a field of the page, so code previously evaluated in that same tab session can attach global listeners before the dialog opens. Run untrusted patterns in a tab where you do not enter a token.
 - **Untrusted code is gated:** A shared `#code=` link, a project loaded from a Gist and an opened `.lmc` file put their code in the editor behind a blocking dialog. Nothing is evaluated until the dialog is answered, and accepting it only unlocks the editor — the code runs when you press play.
-- **Desktop hardening:** Packaged Electron builds ship with `contextIsolation: true`, `nodeIntegration: false`, strict navigation/protocol guards, hardened macOS runtime, notarization, and burned Electron V1 fuses (`RunAsNode` and `NODE_OPTIONS` / CLI inspect flags disabled, ASAR integrity validation enforced).
+- **Desktop hardening:** Packaged Electron builds ship with `contextIsolation: true`, `nodeIntegration: false`, strict navigation/protocol guards, native confirmation (`Cancel` default) before `shell.openExternal()`, hardened macOS runtime, notarization, and burned Electron V1 fuses (`RunAsNode` and `NODE_OPTIONS` / CLI inspect flags disabled, ASAR integrity validation enforced).
 
 ## Scope
 

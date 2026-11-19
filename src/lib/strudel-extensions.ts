@@ -180,17 +180,124 @@ export function getAllParams(): Map<string, number> {
 
 /* ── Clock sync — multi-window/tab synchronization ───── */
 
+const CLOCK_CHANNEL_NAME = 'lmc-clock-sync';
+const LEADER_ELECTION_MS = 500;
+const HEARTBEAT_MS = 2000;
+const BARS_PER_CYCLE = 4;
+
 /** BroadcastChannel for clock sync between tabs */
 let clockChannel: BroadcastChannel | null = null;
 let isClockLeader = false;
 /** Pending leader-election timeout — must be cancelled on cleanup */
 let leaderTimeout: ReturnType<typeof setTimeout> | null = null;
+/** Periodic phase + tempo heartbeat when this tab is leader */
+let leaderHeartbeatTimer: ReturnType<typeof setInterval> | null = null;
+let pageHideHandler: (() => void) | null = null;
 /** Guards against double-initialization across HMR cycles */
 let clockSyncInitialized = false;
 
+function epochNowMs(): number {
+  if (typeof performance !== 'undefined' && typeof performance.timeOrigin === 'number') {
+    return performance.timeOrigin + performance.now();
+  }
+  return Date.now();
+}
+
+function getLeaderCps(): number {
+  try {
+    const cps = window.__strudelRepl?.scheduler?.cps;
+    return typeof cps === 'number' && Number.isFinite(cps) && cps > 0 ? cps : 0.5;
+  } catch {
+    return 0.5;
+  }
+}
+
+function getLeaderCycle(): number {
+  try {
+    const now = window.__strudelRepl?.scheduler?.now?.();
+    return typeof now === 'number' && Number.isFinite(now) ? now : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Compute a monotonically non-decreasing `scheduler.lastEnd` that aligns a follower
+ * tab's fractional cycle phase to the leader's phase within ~1% of a cycle.
+ * Returns `null` when inputs are invalid or phase is already aligned.
+ */
+export function computePhaseAlignedLastEnd(
+  currentLastEnd: number,
+  currentCycle: number,
+  leaderCycle: number,
+  cps: number,
+  elapsedMs: number,
+): number | null {
+  if (
+    !Number.isFinite(currentCycle) ||
+    !Number.isFinite(leaderCycle) ||
+    !Number.isFinite(cps) ||
+    cps <= 0 ||
+    !Number.isFinite(elapsedMs)
+  ) {
+    return null;
+  }
+  const safeElapsedSec = Math.max(0, elapsedMs) / 1000;
+  const targetCycle = leaderCycle + safeElapsedSec * cps;
+  const diff = (((targetCycle - currentCycle) % 1) + 1) % 1;
+  if (diff <= 0.01 || diff >= 0.99) return null;
+
+  const base = Number.isFinite(currentLastEnd)
+    ? Math.max(currentLastEnd, currentCycle)
+    : currentCycle;
+  return base + diff;
+}
+
+function buildClockPayload(
+  type: 'sync' | 'bpm' | 'transport',
+  bpmOverride?: number,
+  started?: boolean,
+) {
+  const bpm =
+    typeof bpmOverride === 'number' && Number.isFinite(bpmOverride) && bpmOverride > 0
+      ? bpmOverride
+      : getLeaderBpm();
+  const cps = typeof bpmOverride === 'number' && bpmOverride > 0 ? bpm / (60 * BARS_PER_CYCLE) : getLeaderCps();
+  return {
+    type,
+    bpm,
+    cps,
+    cycle: getLeaderCycle(),
+    sentAtMs: epochNowMs(),
+    ...(typeof started === 'boolean' ? { started } : {}),
+  };
+}
+
+function promoteToLeader(): void {
+  if (isClockLeader) return;
+  isClockLeader = true;
+  if (import.meta.env.DEV) console.log('[ClockSync] This tab is now the clock leader');
+  clockChannel?.postMessage(buildClockPayload('sync'));
+  if (leaderHeartbeatTimer === null) {
+    leaderHeartbeatTimer = setInterval(() => {
+      if (isClockLeader && clockChannel) {
+        clockChannel.postMessage(buildClockPayload('sync'));
+      }
+    }, HEARTBEAT_MS);
+  }
+}
+
+function scheduleElection(delayMs = LEADER_ELECTION_MS): void {
+  if (leaderTimeout !== null || isClockLeader) return;
+  leaderTimeout = setTimeout(() => {
+    leaderTimeout = null;
+    promoteToLeader();
+  }, delayMs);
+}
+
 /**
  * Initialize clock sync — the first tab becomes the leader,
- * subsequent tabs sync their scheduler to the leader's clock.
+ * subsequent tabs sync tempo, cycle phase, and transport stop to the leader.
  */
 export function initClockSync(): void {
   if (typeof BroadcastChannel === 'undefined') {
@@ -201,43 +308,57 @@ export function initClockSync(): void {
   if (clockSyncInitialized) return;
   clockSyncInitialized = true;
 
-  clockChannel = new BroadcastChannel('lmc-clock-sync');
+  clockChannel = new BroadcastChannel(CLOCK_CHANNEL_NAME);
 
   /* Announce presence */
-  clockChannel.postMessage({ type: 'ping', timestamp: Date.now() });
+  clockChannel.postMessage({ type: 'ping', sentAtMs: epochNowMs() });
 
   clockChannel.onmessage = (e) => {
-    const { type } = e.data;
-    switch (type) {
+    const data = (e.data ?? {}) as Record<string, unknown>;
+    switch (data.type) {
       case 'ping':
-        /* Another tab appeared — if we're the leader, respond */
+        /* Another tab appeared — if we're the leader, send tempo + current cycle phase */
         if (isClockLeader) {
-          clockChannel?.postMessage({
-            type: 'sync',
-            timestamp: Date.now(),
-            bpm: getLeaderBpm(),
-          });
+          clockChannel?.postMessage(buildClockPayload('sync'));
         }
         break;
       case 'sync':
       case 'bpm':
-        /* Adopt the leader's tempo. Both cases used to only log, so the feature
-           elected a leader and then ignored it — README called that "BPM
-           broadcast". Followers now set their own scheduler. */
-        if (!isClockLeader) applyLeaderBpm(e.data.bpm);
+      case 'transport':
+        /* Another leader answered; cancel pending election and follow its clock */
+        if (leaderTimeout !== null) {
+          clearTimeout(leaderTimeout);
+          leaderTimeout = null;
+        }
+        if (!isClockLeader) {
+          applyLeaderBpm(data.bpm);
+          if (data.type === 'transport' && data.started === false) {
+            try { window.__strudelRepl?.stop?.(); } catch { /* ignore */ }
+          } else {
+            applyLeaderPhase(data.cycle, data.cps, data.sentAtMs);
+          }
+        }
+        break;
+      case 'leader-resign':
+        if (!isClockLeader) {
+          clockChannel?.postMessage({ type: 'ping', sentAtMs: epochNowMs() });
+          scheduleElection(LEADER_ELECTION_MS);
+        }
         break;
     }
   };
 
-  /* Become leader after a short timeout if no leader responds.
-   * Store ID so stopClockSync() can cancel it before it fires. */
-  leaderTimeout = setTimeout(() => {
-    leaderTimeout = null;
-    if (!isClockLeader) {
-      isClockLeader = true;
-      if (import.meta.env.DEV) console.log('[ClockSync] This tab is now the clock leader');
-    }
-  }, 500);
+  if (typeof window !== 'undefined') {
+    pageHideHandler = () => {
+      if (isClockLeader && clockChannel) {
+        try { clockChannel.postMessage({ type: 'leader-resign', sentAtMs: epochNowMs() }); } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener('pagehide', pageHideHandler);
+  }
+
+  /* Become leader after a short timeout if no leader responds. */
+  scheduleElection(LEADER_ELECTION_MS);
 }
 
 /**
@@ -249,7 +370,6 @@ export function initClockSync(): void {
  */
 function applyLeaderBpm(bpm: unknown): void {
   if (typeof bpm !== 'number' || !Number.isFinite(bpm) || bpm <= 0) return;
-  const BARS_PER_CYCLE = 4;
   const cpm = bpm / BARS_PER_CYCLE;
   try {
     const repl = window.__strudelRepl;
@@ -260,27 +380,74 @@ function applyLeaderBpm(bpm: unknown): void {
   }
 }
 
+function applyLeaderPhase(leaderCycle: unknown, leaderCps: unknown, sentAtMs: unknown): void {
+  if (typeof leaderCycle !== 'number' || typeof sentAtMs !== 'number') return;
+  try {
+    const scheduler = window.__strudelRepl?.scheduler;
+    if (!scheduler || typeof scheduler.now !== 'function') return;
+    const currentCycle = scheduler.now();
+    const cps =
+      typeof leaderCps === 'number' && Number.isFinite(leaderCps) && leaderCps > 0
+        ? leaderCps
+        : typeof scheduler.cps === 'number' && scheduler.cps > 0
+          ? scheduler.cps
+          : 0.5;
+    const currentLastEnd = typeof scheduler.lastEnd === 'number' ? scheduler.lastEnd : currentCycle;
+    const nextLastEnd = computePhaseAlignedLastEnd(
+      currentLastEnd,
+      currentCycle,
+      leaderCycle,
+      cps,
+      epochNowMs() - sentAtMs,
+    );
+    if (nextLastEnd !== null) {
+      scheduler.lastEnd = nextLastEnd;
+      scheduler.num_ticks_since_cps_change = 0;
+    }
+  } catch {
+    /* No running scheduler in this tab yet */
+  }
+}
+
 function getLeaderBpm(): number {
   try {
     const repl = window.__strudelRepl;
-    return (repl?.scheduler?.cps != null ? repl.scheduler.cps * 60 * 4 : undefined) ?? 120;
+    return (repl?.scheduler?.cps != null ? repl.scheduler.cps * 60 * BARS_PER_CYCLE : undefined) ?? 120;
   } catch {
     return 120;
   }
 }
 
-/** Broadcast BPM change to other tabs */
+/** Broadcast BPM + cycle phase change to other tabs */
 export function broadcastBpm(bpm: number): void {
   if (isClockLeader && clockChannel) {
-    clockChannel.postMessage({ type: 'bpm', bpm, timestamp: Date.now() });
+    clockChannel.postMessage(buildClockPayload('bpm', bpm));
   }
 }
 
-/** Stop clock sync — closes the channel, cancels pending leader election, resets all state */
+/** Broadcast play/stop transport transitions from the leader tab to followers */
+export function broadcastTransport(started: boolean): void {
+  if (isClockLeader && clockChannel) {
+    clockChannel.postMessage(buildClockPayload('transport', undefined, started));
+  }
+}
+
+/** Stop clock sync — resigns leadership, closes channel, cancels timers, resets state */
 export function stopClockSync(): void {
   if (leaderTimeout !== null) {
     clearTimeout(leaderTimeout);
     leaderTimeout = null;
+  }
+  if (leaderHeartbeatTimer !== null) {
+    clearInterval(leaderHeartbeatTimer);
+    leaderHeartbeatTimer = null;
+  }
+  if (typeof window !== 'undefined' && pageHideHandler) {
+    window.removeEventListener('pagehide', pageHideHandler);
+    pageHideHandler = null;
+  }
+  if (isClockLeader && clockChannel) {
+    try { clockChannel.postMessage({ type: 'leader-resign', sentAtMs: epochNowMs() }); } catch { /* ignore */ }
   }
   clockChannel?.close();
   clockChannel = null;

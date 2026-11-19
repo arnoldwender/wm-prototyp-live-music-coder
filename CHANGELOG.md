@@ -13,6 +13,12 @@ Run `npx tsx scripts/sync-changelog.ts` to regenerate.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.4.0] - 2026-11-19
+
+### Release
+
+- **First-party FluidR3 GM SoundFonts, unified synth audio bus, persistent graph, and phase Clock Sync** — All 125 General MIDI SoundFont instruments (`gm_*`) now load through the first-party
+
 ## [1.3.3] - 2026-11-16
 
 ### Security

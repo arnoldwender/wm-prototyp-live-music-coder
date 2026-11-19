@@ -18,7 +18,13 @@ declare global {
       /** Cycles per minute. setcpm(140/4) is 140 bpm in 4/4. */
       setCpm?: (cpm: number) => unknown;
       /** `now()` is the Cyclist clock the visualizers sample every frame. */
-      scheduler?: { now(): number; cps?: number; [key: string]: unknown };
+      scheduler?: {
+        now(): number;
+        cps?: number;
+        lastEnd?: number;
+        num_ticks_since_cps_change?: number;
+        [key: string]: unknown;
+      };
       /** Live REPL state. `pattern` is null until the first successful
        *  evaluation, which is why every draw loop guards on it. */
       state?: {

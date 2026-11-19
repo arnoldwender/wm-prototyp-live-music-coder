@@ -24,6 +24,7 @@ import '@xyflow/react/dist/style.css'
 import { parseCode } from '../../lib/parser'
 import { layoutGraph } from '../../lib/parser/layout'
 import { generateCode } from '../../lib/codegen'
+import { readSavedNodePositions, saveNodePosition } from '../../lib/persistence/graph-layout'
 import { EngineNode } from '../atoms'
 import { ENGINE_COLORS } from '../../lib/constants'
 import { useAppStore } from '../../lib/store'
@@ -39,14 +40,15 @@ const nodeTypes = { engineNode: EngineNode }
    snippets with newlines and destroy the pattern, so their graph is a view. */
 const EDITABLE_ENGINES: readonly EngineType[] = ['tonejs', 'webaudio']
 
-/** Convert parsed engine blocks to React Flow nodes, laid out by signal depth */
-function blocksToNodes(blocks: EngineBlock[], connections: Connection[]): Node[] {
+/** Convert parsed engine blocks to React Flow nodes, preserving saved coordinates when present */
+function blocksToNodes(blocks: EngineBlock[], connections: Connection[], fileId?: string): Node[] {
   const positions = layoutGraph(blocks, connections)
+  const saved = fileId ? readSavedNodePositions(fileId) : {}
 
   return blocks.map((block) => ({
     id: block.id,
     type: 'engineNode',
-    position: positions.get(block.id) ?? { x: 0, y: 0 },
+    position: saved[block.id] ?? positions.get(block.id) ?? { x: 0, y: 0 },
     data: {
       label: block.code.slice(0, 40),
       engine: block.engine,
@@ -122,7 +124,7 @@ export default function NodeGraph() {
     }
 
     const { blocks, connections } = parseCode(activeFileCode, activeFileEngine)
-    setNodes(blocksToNodes(blocks, connections))
+    setNodes(blocksToNodes(blocks, connections, activeFileId))
     setEdges(connectionsToEdges(connections))
   }, [activeFileId, activeFileCode, activeFileEngine, setNodes, setEdges])
 
@@ -174,6 +176,15 @@ export default function NodeGraph() {
       }
     },
     [onEdgesChange, edges, nodes, syncGraphToCode],
+  )
+
+  /* Persist manual node drag coordinates per file without modifying source code */
+  const handleNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (!activeFileId) return
+      saveNodePosition(activeFileId, node.id, node.position)
+    },
+    [activeFileId],
   )
 
   /** Color minimap nodes by their engine */
@@ -239,6 +250,7 @@ export default function NodeGraph() {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
+        onNodeDragStop={handleNodeDragStop}
         onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}

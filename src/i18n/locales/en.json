@@ -602,7 +602,7 @@
       "downloadHeading": "Download as .js",
       "downloadText": "The toolbar includes a download button that saves your current code as a .js file. Useful for backing up patterns or sharing them outside the app.",
       "sessionsHeading": "Sessions Library",
-      "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
+      "sessionsText": "The /sessions page contains 49 curated AI-composed pieces across 15 genres (Trance, Techno, Electronic, Blues, Ambient, Lo-Fi, and more). Open any session in the editor with one click. Sessions are a great starting point for exploring what Strudel can do."
     },
     "shortcutsSoloMute": "Ctrl+1..9 — solo layer N · Shift+Ctrl+1..9 — mute layer N (toggles the _ prefix in your code)"
   },

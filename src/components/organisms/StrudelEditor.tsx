@@ -719,6 +719,11 @@ export function StrudelEditor() {
       setTimeout(() => resetStrudelTap(), 1000);
       setTimeout(() => resetStrudelTap(), 2000);
 
+      try {
+        const { broadcastTransport } = await import('../../lib/strudel-extensions');
+        broadcastTransport(true);
+      } catch { /* extensions not loaded */ }
+
       /* Track evaluation for session stats */
       const evalStore = useAppStore.getState();
       evalStore.incrementEval();
@@ -741,6 +746,9 @@ export function StrudelEditor() {
     try {
       replRef.current?.stop();
     } catch { /* stop may fail if not started */ }
+    void import('../../lib/strudel-extensions').then(({ broadcastTransport }) => {
+      broadcastTransport(false);
+    }).catch(() => {});
     if (isPlaying) {
       togglePlay();
     }

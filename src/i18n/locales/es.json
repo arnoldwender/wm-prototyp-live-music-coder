@@ -602,7 +602,7 @@
       "downloadHeading": "Descargar como .js",
       "downloadText": "La barra de herramientas incluye un botón de descarga que guarda tu código actual como archivo .js. Útil para hacer copias de seguridad de patrones o compartirlos fuera de la app.",
       "sessionsHeading": "Biblioteca de Sesiones",
-      "sessionsText": "La página /sessions contiene 49 piezas curadas compuestas por IA en 15 géneros (Trance, Techno, Deep House, Blues, Ambient, Lo-Fi y más). Abre cualquier sesión en el editor con un clic. Las sesiones son un excelente punto de partida para explorar lo que Strudel puede hacer."
+      "sessionsText": "La página /sessions contiene 49 piezas curadas compuestas por IA en 15 géneros (Trance, Techno, Electronic, Blues, Ambient, Lo-Fi y más). Abre cualquier sesión en el editor con un clic. Las sesiones son un excelente punto de partida para explorar lo que Strudel puede hacer."
     },
     "shortcutsSoloMute": "Ctrl+1..9 — solo de la capa N · Shift+Ctrl+1..9 — silenciar la capa N (alterna el prefijo _ en tu código)"
   },

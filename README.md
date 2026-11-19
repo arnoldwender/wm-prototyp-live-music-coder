@@ -11,7 +11,7 @@
 
 | | |
 | --- | --- |
-| **Status** | Live (`v1.3.3`, web + signed/notarized macOS `arm64` & `x64`, measured 2026-11-16) |
+| **Status** | Live (`v1.4.0`, web + signed/notarized macOS `arm64` & `x64`, measured 2026-11-19) |
 | **Domain** | https://live-music-coder.pro |
 | **Stack** | React 19 · TypeScript 5.9 (`strict`) · Vite 8 · Tailwind CSS 4 · Electron 43 |
 | **Hosting & CI** | Netlify Edge (auto-deploy on `main`) · GitHub Actions (`.github/workflows/ci.yml`) · GitHub Releases (desktop) |
@@ -40,10 +40,8 @@
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| macOS | Apple Silicon (M1/M2/M3/M4, signed & notarized `v1.3.3`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
-| macOS | Intel (`x64`, signed & notarized `v1.3.3`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
-| Windows | x64 | Coming soon |
-| Linux | x64 | Coming soon |
+| macOS | Apple Silicon (M1/M2/M3/M4, signed & notarized `v1.4.0`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
+| macOS | Intel (`x64`, signed & notarized `v1.4.0`) | [Latest release](https://github.com/arnoldwender/wm-prototyp-live-music-coder/releases/latest) |
 
 Or [try it in your browser](https://live-music-coder.pro) — no download required.
 
@@ -55,7 +53,7 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Interactive Controls** — `slider(value, min, max, step)` creates draggable inline widgets. `onKey()` binds keyboard shortcuts. `createParams()` creates named parameters controllable via MIDI CC.
 
-**Visual Node Graph** — React Flow canvas auto-derived from your code in real time, laid out in columns by signal depth so every edge points forward. All four engines draw a graph. For Tone.js and Web Audio it is editable: nodes are declarations, edges are `.connect()` calls, and a change in the canvas is written back as code. For Strudel it is a view of the pattern itself — one lane per `$:` voice, one node per chained call, `stack()` drawn as the mixer it is — and edits stay in the editor, because a Strudel file is one expression and cannot be reassembled from node snippets. Node positions are not persisted yet.
+**Visual Node Graph** — React Flow canvas auto-derived from your code in real time, laid out in columns by signal depth so every edge points forward. All four engines draw a graph. For Tone.js and Web Audio it is editable: nodes are declarations, edges are `.connect()` calls, and a change in the canvas is written back as code. For Strudel it is a view of the pattern itself — one lane per `$:` voice, one node per chained call, `stack()` drawn as the mixer it is — and edits stay in the editor, because a Strudel file is one expression and cannot be reassembled from node snippets. Dragged node positions persist per file in browser storage without modifying code.
 
 **4 Audio Engines + Extensions**
 
@@ -74,16 +72,16 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 | Waveform | Oscilloscope with gradient fill and peak detection |
 | Spectrum | Frequency bars with logarithmic distribution |
 | Timeline | Beat grid with playhead, level meter, BPM display |
-| Piano Roll | DAW-quality (Ableton-style): scrolling notes, velocity colors, piano sidebar, beat grid, timeline pan, velocity drag, click-to-audition, pitch drag |
+| Piano Roll | Read-only DAW-style view: scrolling notes, velocity lane, piano sidebar, beat grid, zoom, timeline pan, and click-to-audition |
 | Punchcard | Dot grid — size/opacity mapped to velocity |
 | Spiral | Rotational display — time = angle, age = radius |
 | Pitchwheel | 12-tone circle for harmonic analysis |
 
-**49 Curated Sessions** *(measured 2026-11-15)* — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Deep House, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
+**49 Curated Sessions** *(measured 2026-11-15)* — AI-composed pieces across 15 genres (Trance, Techno, Dub Techno, Electronic, Blues, Jazz, Ambient, Lo-Fi, Dub, Retro, Narrative, Deep Work, Drum & Bass, Flamenco, Breakbeat) with filters, search, sort, and category badges.
 
 **219 Code Examples** *(measured 2026-11-15)* — Including interactive controls (`slider`, `onKey`, `createParams`), visualizer demos, MIDI keyboard input, compose mode, synth oscillators, advanced patterns (euclidean, polymetric, FM), and synthesis techniques.
 
-**Sample Library** — Browse 196 Dirt-Samples *(measured 2026-11-15)* served via a pinned first-party manifest (`/samples/dirt-samples.json`) and `/dirt-samples/*` edge proxy (no unconsented third-party network calls), plus drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
+**Sample & SoundFont Library** — Browse 196 Dirt-Samples *(measured 2026-11-15)* (`218` banks / `2,038` WAV files) served via a pinned first-party manifest (`/samples/dirt-samples.json`) and `/dirt-samples/*` edge proxy, plus all `125` General MIDI `FluidR3_GM` SoundFonts (`gm_*`, MIT license) served via `/soundfonts/*` (zero unconsented third-party network calls), and drag-and-drop import of local audio files (WAV, MP3, OGG, FLAC, AAC, M4A).
 
 **MIDI Keyboard Input** — Play any MIDI controller (MPK mini, Launchkey, Arturia, etc.) through Strudel synths with `midikeys()`. Map CC knobs to parameters with `midin()`. 19 device profiles *(measured 2026-11-15)* (MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more) with factory CC mappings. Works with any USB MIDI device.
 
@@ -99,13 +97,13 @@ Or [try it in your browser](https://live-music-coder.pro) — no download requir
 
 **Solo/Mute** — Ctrl+1..9 to solo a layer, Shift+Ctrl+1..9 to mute one. Both toggle the `_` prefix in your code, which is the mechanism Strudel itself honours (`_$:` returns silence), so the state stays visible in the source.
 
-**Clock Sync (preview)** — Leader election across tabs via BroadcastChannel. Tempo adoption is not implemented yet: the leader is chosen, but followers do not yet lock to its clock.
+**Clock Sync** — Multi-tab `BroadcastChannel` leader election with tempo sync (`applyLeaderBpm`), fractional cycle phase alignment, and transport stop sync across open tabs.
 
-**Synth Mode** — Virtual on-screen keyboard (2 octaves, QWERTY mapping, velocity from Y position) with oscillator selector (sine/sawtooth/square/triangle), SVG knob controls, and a real-time biquad filter with frequency response curve. Shares the same audio path as the physical MIDI keyboard via `window.__lmcPlayNote`.
+**Synth Mode** — Virtual on-screen keyboard (2 octaves, QWERTY mapping, velocity from Y position) with oscillator selector (sine/sawtooth/square/triangle), SVG knob controls, and a real-time biquad filter with frequency response curve. Routes through the single shared `AudioContext` and `masterGain` (`window.__lmcPlayNote`) so live MIDI/Synth notes reach visualizers, master volume, and session recording.
 
 **MIDI Panel** — Connected device list with hot-plug detection, live CC grid (one row per CC with name map, value bar, 0–127 readout), clear button, usage hints. Accessible via USB icon in sidebar.
 
-**Code Sharing** — Share via compressed URLs (`lz-string`, with explicit confirmation prompt before evaluating external code), save/load GitHub Gists (ephemeral in-memory PAT on web; encrypted OS Keychain via `safeStorage` + confirmation dialog on desktop), or download code as a `.js` file.
+**Code Sharing** — Share via compressed URLs (`lz-string`, with explicit confirmation prompt before evaluating external code), save/load GitHub Gists (ephemeral in-memory PAT on web with playback paused while open; clipboard-to-main-process Keychain import via `safeStorage` + native confirmations for both uploads and external links on desktop), or download code as a `.js` file.
 
 **Console Panel** — In-editor log output with color-coded levels and timestamps.
 
@@ -164,7 +162,7 @@ Open http://localhost:5173 — click **Start Coding** to open the IDE.
 | `/sessions/:slug` | Individual session piece (49 prerendered routes: code, movements, composer notes) |
 | `/changelog` | Project changelog |
 | `/blog` | Developer blog — listing |
-| `/blog/:slug` | Individual blog post (6 prerendered routes) |
+| `/blog/:slug` | Individual blog post (5 prerendered routes) |
 | `/legal` | Impressum & Datenschutz (`/datenschutz` is the privacy tab as its own page; `/impressum` redirects `301 -> /legal`) |
 | `*` | Prerendered `404.html` (`NotFound` view, served with HTTP status `404`) |
 
@@ -251,7 +249,7 @@ scripts/            # Prerender, sitemap generator, hydration & AI-label gates, 
 
 Hosted on [Netlify](https://www.netlify.com/), which builds `main` on every push with `npm run build` (Node 22, see `netlify.toml`), gated by GitHub Actions CI (`.github/workflows/ci.yml`). The build runs `scripts/verify-llms-txt.mjs` first, so a `public/llms.txt` that links a page missing from `public/sitemap.xml` stops the deploy.
 
-Every route in `public/sitemap.xml` (78 routes, generated by `npm run generate:sitemap`) is prerendered into its own static HTML file — `/` as `dist/index.html`, `/docs` as `dist/docs.html`, `/sessions/<slug>` as `dist/sessions/<slug>.html`, `/blog/<slug>` as `dist/blog/<slug>.html`, `/docs/<id>` as `dist/docs/<id>.html` — with its own `<title>`, meta description, Open Graph tags, canonical URL, and single `<h1>`. Unknown paths are served `dist/404.html` with a genuine HTTP `404` status (no Soft-404 SPA fallback). Built-in Dirt-Samples audio files are proxied first-party under `/dirt-samples/*` pinned to upstream commit `c74fc80f8db8038f6a33648ffef5ac00a07ad402`.
+Every route in `public/sitemap.xml` (78 routes, generated by `npm run generate:sitemap`) is prerendered into its own static HTML file — `/` as `dist/index.html`, `/docs` as `dist/docs.html`, `/sessions/<slug>` as `dist/sessions/<slug>.html`, `/blog/<slug>` as `dist/blog/<slug>.html`, `/docs/<id>` as `dist/docs/<id>.html` — with its own `<title>`, meta description, Open Graph tags, canonical URL, and single `<h1>`. Unknown paths are served `dist/404.html` with a genuine HTTP `404` status (no Soft-404 SPA fallback). Built-in Dirt-Samples audio files are proxied first-party under `/dirt-samples/*` pinned to upstream commit `c74fc80f8db8038f6a33648ffef5ac00a07ad402`, and all 125 `FluidR3_GM` General MIDI SoundFonts (`MIT`) are proxied first-party under `/soundfonts/*` pinned to upstream commit `23ca907d4370a04fd89ca483a92915e4d6159ab9`.
 
 **Known gotchas:**
 - **Generated files:** `public/sitemap.xml` (`npm run generate:sitemap`) and `CHANGELOG.md` (`npm run sync:changelog`) are generated from `src/data/*` — update the data files and re-run the generator instead of hand-editing the output.
@@ -268,7 +266,7 @@ Every route in `public/sitemap.xml` (78 routes, generated by `npm run generate:s
 | Done | **MIDI Learn** | Pick a parameter, move a knob, and the CC drives it live |
 | Done | **19 MIDI Device Profiles** | Factory CC mappings for MPK mini, Launchkey, Arturia, Novation, Korg, M-Audio, and more |
 | Done | **Developer Blog + Changelog** | In-app blog and changelog pages with Markdown rendering |
-| Planned | **Strudel Sound Library Browser** | Browse and audition all Strudel sounds (Dirt-Samples, synths, soundfonts) directly from the MIDI keyboard |
+| Done | **Strudel Sound Library Browser** | Browse and insert all Dirt-Samples, synths, and 125 first-party `FluidR3_GM` SoundFonts (`gm_*`), plus quick auditioning from the MIDI menu |
 | Ongoing | **Democratizing Music Production** | Making algorave/live coding accessible to everyone — professional features delivered as open source, built on years of community contributions |
 
 ---
