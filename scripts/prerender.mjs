@@ -208,6 +208,23 @@ export function checkPage(page, appHtml, { routePath, meta, canonical }) {
   return { problems, words, rootWords, h1s }
 }
 
+/* One robots tag, not two: the template says "index, follow" and a second tag only works because
+   crawlers happen to take the stricter one. */
+const NOINDEX = '<meta name="robots" content="noindex, nofollow" />'
+const ROBOTS_RX = /<meta name="robots"[^>]*>/
+
+function withNoIndex(page) {
+  return ROBOTS_RX.test(page) ? page.replace(ROBOTS_RX, () => NOINDEX) : page.replace('</head>', () => `${NOINDEX}\n  </head>`)
+}
+
+/**
+ * Builds dist/spa.html for the Service Worker offline fallback: marks noindex/nofollow so the
+ * empty shell is excluded from indexing without mutating the template passed to buildPage().
+ */
+export function buildShellPage(template) {
+  return withNoIndex(template)
+}
+
 /**
  * Builds dist/404.html from the unmatched NotFound route: carries noindex/nofollow, no canonical
  * link (a 404 page must never canonicalize a broken URL), and the prerendered <h1>404</h1>.
@@ -232,11 +249,7 @@ export function buildNotFoundPage(template, appHtml, siteUrl = SITE_URL) {
     }
     page = page.replace(tag.rx, () => tag.render(meta, siteUrl))
   }
-  /* One robots tag, not two: the template says "index, follow" and a second tag only works because
-     crawlers happen to take the stricter one. */
-  const NOINDEX = '<meta name="robots" content="noindex, nofollow" />'
-  const ROBOTS_RX = /<meta name="robots"[^>]*>/
-  page = ROBOTS_RX.test(page) ? page.replace(ROBOTS_RX, () => NOINDEX) : page.replace('</head>', () => `${NOINDEX}\n  </head>`)
+  page = withNoIndex(page)
   if (placeholders === 1) {
     page = page.replace(PLACEHOLDER, () => `<div id="root" data-prerendered="${NOT_FOUND_ROUTE}">${appHtml}</div>`)
   }
@@ -294,7 +307,7 @@ async function main() {
   }
 
   /* The bare shell first (for offline SW fallback) + prerendered 404.html */
-  writeFileSync(path.join(dist, SHELL_FILE), template)
+  writeFileSync(path.join(dist, SHELL_FILE), buildShellPage(template))
   writeFileSync(path.join(dist, NOT_FOUND_FILE), notFoundPage)
   for (const { routePath, page, words, rootWords, h1s } of results) {
     const file = path.join(dist, outputFile(routePath))
