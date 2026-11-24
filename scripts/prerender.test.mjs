@@ -27,6 +27,7 @@ import {
   SITE_URL,
   buildNotFoundPage,
   buildPage,
+  buildShellPage,
   checkPage,
   checkTitles,
   escapeHtml,
@@ -215,6 +216,22 @@ describe('buildNotFoundPage', () => {
     const { page } = buildNotFoundPage(withRobots, '<main><h1>404</h1><p>Not found</p></main>')
     expect(page.match(/<meta name="robots"/g)).toHaveLength(1)
     expect(page).toContain('<meta name="robots" content="noindex, nofollow" />')
+  })
+})
+
+describe('buildShellPage', () => {
+  it('marks the bare offline shell with noindex/nofollow without mutating the input', () => {
+    const bare = template()
+    const shell = buildShellPage(bare)
+    expect(shell).toContain('<meta name="robots" content="noindex, nofollow" />')
+    expect(bare).not.toContain('noindex, nofollow')
+  })
+
+  it('replaces an existing robots meta tag cleanly with a single noindex/nofollow tag', () => {
+    const withRobots = template().replace('</head>', '<meta name="robots" content="index, follow" /></head>')
+    const shell = buildShellPage(withRobots)
+    expect(shell.match(/<meta name="robots"/g)).toHaveLength(1)
+    expect(shell).toContain('<meta name="robots" content="noindex, nofollow" />')
   })
 })
 
